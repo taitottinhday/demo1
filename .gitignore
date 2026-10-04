@@ -16,6 +16,8 @@ env/
 .env
 .env.local
 .env.production
+.env.*
+!.env.example
 
 # IDE
 .vscode/
@@ -29,9 +31,18 @@ env/
 Thumbs.db
 
 # Data (never commit large data)
-data/
+data/*
+!data/sources.md
+!data/raw/
+data/raw/*
+!data/raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
 *.db
 *.sqlite3
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite3-wal
+*.sqlite3-shm
 
 # Logs
 logs/
@@ -41,6 +52,12 @@ logs/
 htmlcov/
 .coverage
 coverage.xml
+.coverage.*
+.pytest_cache/
+.ruff_cache/
+
+# Local browser profiles used for design reviews
+.g1-review-profile/
 
 # Docker
 docker-compose.override.yml
