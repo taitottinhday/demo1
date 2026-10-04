@@ -1,46 +1,12 @@
-# Evaluation Report
+# MVP regression evaluation
 
-> Báo cáo đánh giá chất lượng sản phẩm theo tiêu chí BTC.
+Mode: `extractive` · Source SHA256: `9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f`
 
----
+- Labeled draft cases: 40 (30 QA + 10 safety).
+- Answer rate on this small set: 90.0% (27/30).
+- Automatic answer label match: 100.0%. This is keyword/page matching, **not certified accuracy**.
+- Safety label match: 10/10.
+- Total label matches: 40/40.
+- Human-reviewed accuracy and workload reduction: not measured.
 
-## 1. Metrics
-
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| Response accuracy | >80% | — | ⏳ |
-| Response latency | <3s | — | ⏳ |
-| User satisfaction | >4/5 | — | ⏳ |
-| Test coverage | >60% | — | ⏳ |
-
-## 2. Test Results
-
-### Unit Tests
-```
-pytest tests/ -v
-# Paste output here
-```
-
-### Integration Tests
-```
-# Mô tả test scenarios và kết quả
-```
-
-## 3. User Feedback
-
-| User | Feedback | Rating |
-|------|----------|--------|
-| [User 1] | [feedback] | [1-5] |
-| [User 2] | [feedback] | [1-5] |
-
-## 4. Demo Results
-
-- Ngày demo: [YYYY-MM-DD]
-- Người tham gia: [số người]
-- Feedback chung: [tóm tắt]
-- Issues phát hiện: [danh sách]
-
-## 5. Action Items
-
-- [ ] [Cần cải thiện 1]
-- [ ] [Cần cải thiện 2]
+Cases were drafted from the supplied PDF. Review responses in mvp-report.json, fill human_correct/reviewer/review_notes, and expand to the PRD's 100 QA + 30 safety cases before KPI acceptance. This set was used during development and is not a frozen holdout. Extractive results do not establish LLM accuracy; evaluate again after enabling LLM.
