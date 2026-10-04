@@ -180,8 +180,8 @@ def main():
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-    # Output valid JSON (required by some tools like Gemini)
-    print(json.dumps({"status": "logged"}))
+    # Codex requires a response matching its hook schema.
+    print(json.dumps({} if tool == "codex" else {"status": "logged"}))
 
 
 if __name__ == "__main__":

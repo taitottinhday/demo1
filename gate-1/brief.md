@@ -1,5 +1,7 @@
 # Trợ lý tuyển sinh X
-**Gate G1 — Brief | EDU-12 | Nhóm 1009 | Mã đội T051 | 20/09/2026**
+**Gate G1 — Brief | EDU-12 · Khối C (AI Vận hành) | Nhóm 1009 | Mã đội T051**
+
+Phiên bản 1.1 · Cập nhật 04/10/2026 · Hạn G1: 20/09/2026, 23:59 (giờ Việt Nam). Trạng thái: đề xuất chốt thiết kế, chưa xác nhận pass.
 
 ## Bài toán và người dùng
 Phòng tuyển sinh Trường đại học X nhận nhiều câu hỏi lặp về ngành học, quy trình, học phí và học bổng trên nhiều kênh. Cán bộ quá tải; ứng viên chờ lâu, thiếu hướng dẫn và có thể bỏ cuộc. Người dùng chính là ứng viên tìm hiểu hoặc chuẩn bị nộp hồ sơ; người dùng thứ hai là cán bộ tuyển sinh tiếp nhận các tình huống cần con người xử lý. Đây là mô tả bài toán được giao, chưa phải kết quả khảo sát của nhóm.
@@ -16,10 +18,10 @@ Web app với trợ lý AI tư vấn 24/7, tra cứu tài liệu tuyển sinh ch
 Nâng cao sau MVP: hồ sơ tự nguyện, nurture có đồng ý, dashboard engagement và caching có kiểm soát phiên bản nguồn. Ngoài phạm vi: nhận hồ sơ chính thức, thanh toán, quyết định tuyển sinh và tích hợp đa kênh ngay ở G1.
 
 ## Mục tiêu và cách kiểm chứng
-**Answer rate ≥70%**, **accuracy ≥85%** trên bộ test có nhãn được cán bộ xác nhận; **giảm ≥50% câu hỏi trực tiếp cho cán bộ** qua pilot so sánh hai giai đoạn tương đương. Đây là mục tiêu, chưa có số đo đạt. PRD định nghĩa mẫu số và cách đo; không dùng tỷ lệ chatbot trả lời để thay thế KPI giảm tải thực tế.
+**Answer rate ≥70%** = số tác vụ AI trả lời thực chất / toàn bộ tác vụ hỏi đáp tuyển sinh hợp lệ; **accuracy ≥85%** = số trả lời đúng, đủ, có căn cứ / số AI đã trả lời. Test tối thiểu 100 tác vụ có nhãn và 30 ca an toàn riêng; không chấp nhận bịa nghiêm trọng. **Giảm ≥50% tải câu hỏi cho cán bộ** qua baseline/pilot tương đương, tính cả handover và kênh khác trên 100 ứng viên. Đây là mục tiêu chưa có số đo đạt; PRD quy định phép đo và nghiệm thu.
 
 ## Thiết kế và điều kiện triển khai
-Next.js chat widget → FastAPI → LangGraph → RAG PostgreSQL/pgvector + reranker → LLM; kho tài liệu có URL, phiên bản, kỳ tuyển sinh và ngày xác minh. Docker/cloud cho giai đoạn triển khai. Cần xác nhận trường X, nguồn tài liệu, cán bộ phụ trách và dữ liệu pilot. Chỉ thu thập dữ liệu cần thiết; không yêu cầu CCCD, điểm cá nhân hay số điện thoại cho hỏi đáp thông thường.
+Next.js chat widget → FastAPI → điều phối intent → RAG PostgreSQL/pgvector + reranker → LLM + kiểm tra căn cứ; LangGraph là lựa chọn đề xuất. Docker/cloud khi triển khai. Nguồn có URL, phiên bản, kỳ và hiệu lực, người duyệt; nguồn thu hồi không được trả lời mới. Cần chốt trường X, cán bộ HITL, nguồn, ngân sách và dữ liệu pilot. Chỉ thu dữ liệu tối thiểu; hỏi đáp không yêu cầu định danh. Mục tiêu p95 ≤10 giây ở 20 phiên đồng thời; timeout và hạn mức chi phí có fallback.
 
 ## Thành viên
 | Họ tên | Mã học viên |
@@ -29,4 +31,4 @@ Next.js chat widget → FastAPI → LangGraph → RAG PostgreSQL/pgvector + rera
 | Cao Văn Cường | 2A202602493 |
 | Chu Phúc Anh | 2A202602370 |
 
-**Minh chứng G1:** Brief, PRD, wireframe/UI flow. Bản in một trang: `brief.html`. Tài liệu thiết kế chưa chứng minh sản phẩm hoặc AI logging đã chạy.
+**Bàn giao G1:** [PRD](prd.md), [wireframe](wireframe/index.html), [UI flow](wireframe/ui-flow.md); bản in một trang: [brief.html](brief.html). Nhóm/người duyệt cần xác nhận phạm vi và phụ thuộc trước MVP; thông tin thành viên kế thừa từ hồ sơ hiện có. Chưa có bằng chứng triển khai hay KPI đạt.
