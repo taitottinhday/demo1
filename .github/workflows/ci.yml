@@ -23,10 +23,21 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Lint with ruff
-        run: ruff check src/ tests/
+        run: ruff check src/ tests/ scripts/ingest_sources.py scripts/evaluate_mvp.py scripts/check_browser.py
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
         env:
           APP_ENV: test
           OPENAI_API_KEY: test-key
+
+      - name: Evaluate local retrieval baseline
+        run: python -m scripts.evaluate_mvp
+        env:
+          ANSWER_MODE: extractive
+
+      - name: Upload evaluation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-evaluation
+          path: eval/results/
