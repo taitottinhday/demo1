@@ -1,5 +1,7 @@
 # AI20K Agent Template
 
+> Hướng dẫn riêng và hồ sơ Gate 2 của đồ án Trợ lý tuyển sinh X: [README MVP](README-MVP.md).
+
 Template chính thức cho học viên VinUni AI20K Build Phase: cấu trúc dự án, code
 mẫu và hướng dẫn kỹ thuật để xây dựng một AI Agent hoàn chỉnh — từ kiến trúc,
 code, test cho đến deploy và nộp bài Demo Day.
