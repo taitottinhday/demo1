@@ -1,0 +1,124 @@
+"""Concise source-backed rendering for the local demo (no paid model needed)."""
+
+import re
+
+from src.services.knowledge import normalize, tokens
+
+
+def format_answer(question, chunks, program=""):
+    q = normalize(question)
+    first = chunks[0]
+    result_date = any(t in q for t in ["ket qua", "trung tuyen", "diem chuan"]) and any(
+        t in q for t in ["khi nao", "bao gio", "ngay nao", "thoi gian", "thong bao", "cong bo"]
+    )
+    if result_date:
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(r"Thông báo trúng tuyển:\s*([^.]+)\.", chunk["text"])
+            if match:
+                return (
+                    f"Theo mục 6.2 về xét tuyển theo kết quả Đánh giá tư duy trong tài liệu HUST 2026, mốc thông báo trúng tuyển là {match.group(1)}. [{i}]\n\n"
+                    "Đây là lịch ghi trong tài liệu, không phải xác nhận kết quả đã được công bố. "
+                    "Nếu bạn hỏi phương thức khác hoặc tình trạng công bố hiện tại, cần kiểm tra thông báo chính thức đúng phương thức."
+                )
+        return None
+    if first["kind"] in {"fee", "overview"}:
+        return first["text"] + " [1]"
+    if first["kind"] == "program" and any(t in q for t in ["phuong thuc", "to hop", "xet tuyen"]):
+        text = first["text"]
+        methods = []
+        if "Phương thức XTTN" in text:
+            methods.append("• Xét tuyển tài năng (XTTN). [1]")
+        if "Phương thức ĐGTD" in text:
+            methods.append("• Xét tuyển theo kết quả thi Đánh giá tư duy (ĐGTD). [1]")
+        thpt = re.search(r"Phương thức THPT\s*\((.+)\)\.", text)
+        if thpt:
+            methods.append(f"• Xét tuyển theo kết quả thi tốt nghiệp THPT; tổ hợp: {thpt.group(1)}. [1]")
+        if methods:
+            return f"{first['code']} — {first['title']} có các phương thức xét tuyển:\n\n" + "\n".join(methods)
+    if "dang ky" in q and any(t in q for t in ["tu duy", "tsa", "dgtd"]):
+        for i, chunk in enumerate(chunks, 1):
+            text = chunk["text"]
+            if "https://tsa.hust.edu.vn/dk" in text and "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login" in text:
+                return (
+                    "Có hai bước đăng ký khác nhau:\n\n"
+                    f"1. Đăng ký dự thi Đánh giá tư duy tại https://tsa.hust.edu.vn/dk. [{i}]\n"
+                    "2. Đăng ký nguyện vọng xét tuyển bằng tài khoản thí sinh trên hệ thống của Bộ: "
+                    f"https://thisinh.thitotnghiepthpt.edu.vn/Account/Login, theo kế hoạch chung. [{i}]\n\n"
+                    f"Đăng ký dự thi không thay thế đăng ký nguyện vọng xét tuyển. [{i}]"
+                )
+    if "dia chi" in q:
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(r"Số 1 Đại Cồ Việt[^.]+\.", chunk["text"])
+            if match:
+                return f"Địa chỉ HUST: {match.group(0)} [{i}]"
+    if "k01" in q and "he so" in q:
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(r"Tổ hợp K01 \(Toán, Văn,[^.]+\.", chunk["text"])
+            if match:
+                return match.group(0) + f" [{i}]"
+    if (
+        any(t in q for t in ["ngoai ngu", "ielts", "vstep"])
+        and "quy doi" not in q
+        and not any(t in q for t in ["phi", "xac thuc", "diem thuong"])
+    ):
+        for i, chunk in enumerate(chunks, 1):
+            text = chunk["text"]
+            if all(t in text for t in ["5.0", "6.5", "5.5", "VSTEP"]):
+                row = next(((n, c) for n, c in enumerate(chunks, 1) if c.get("code") == program and program), None)
+                if row:
+                    n, c = row
+                    name = c["title"]
+                    english_advanced = "tien tien" in normalize(name) and "Chương trình học bằng tiếng Anh" in c["text"]
+                    if english_advanced or program in {"FL1", "FL3", "FL4"}:
+                        subject = {"FL3": "tiếng Trung", "FL4": "tiếng Hàn"}.get(program, "tiếng Anh")
+                        return (
+                            f"{program} — {name}: ngoài các điều kiện xét tuyển khác, bạn cần đáp ứng một trong các điều kiện ngoại ngữ đầu vào sau. [{n}] [{i}]\n\n"
+                            f"• VSTEP B1 trở lên. [{i}]\n"
+                            f"• IELTS Academic 5.0 trở lên hoặc tương đương. [{i}]\n"
+                            f"• Điểm thi tốt nghiệp THPT 2026 môn {subject} từ 6.5 trở lên. [{i}]"
+                        )
+                    if program in {"TROYIT", "FL2"}:
+                        return f"{program} — {name}: ngoài các điều kiện xét tuyển khác, yêu cầu IELTS Academic từ 5.5 trở lên. [{n}] [{i}]"
+                if program == "IT1":
+                    program_source = next((n for n, c in enumerate(chunks, 1) if c.get("code") == "IT1"), None)
+                    if program_source is None:
+                        return None
+                    return (
+                        f"IT1 là chương trình CNTT: Khoa học Máy tính. [{program_source}]\n\n"
+                        "Mục 5.2 của tài liệu tuyển sinh 2026 không nêu IT1 trong nhóm chương trình phải đáp ứng "
+                        f"ngưỡng ngoại ngữ đầu vào riêng như IELTS 5.0/5.5. Vì vậy, không áp các ngưỡng đó cho IT1. [{i}]\n\n"
+                        "Nếu bạn dùng chứng chỉ ngoại ngữ để quy đổi điểm hoặc cộng điểm thưởng, "
+                        f"chứng chỉ cần đăng ký xác thực trên https://ts-hn.hust.edu.vn/ theo quy định. [{i}]\n\n"
+                        "Điều này không xác nhận chuẩn ngoại ngữ đầu ra; bộ nguồn hiện tại chưa đủ quy định về chuẩn tốt nghiệp."
+                    )
+                response = (
+                    "Về ngoại ngữ đầu vào, tài liệu HUST 2026 quy định:\n\n"
+                    "• Chương trình tiên tiến giảng dạy bằng tiếng Anh và FL1, FL3, FL4: đáp ứng một trong các điều kiện "
+                    "VSTEP B1 trở lên; IELTS Academic 5.0 trở lên hoặc tương đương; hoặc điểm thi THPT 2026 môn ngoại ngữ "
+                    f"từ 6.5 (tiếng Anh, tiếng Trung đối với FL3, tiếng Hàn đối với FL4). [{i}]\n"
+                    f"• Chương trình liên kết TROY-IT và FL2: IELTS Academic 5.5 trở lên. [{i}]\n\n"
+                    f"Các yêu cầu này đi kèm những điều kiện xét tuyển khác, không áp dụng chung cho mọi chương trình. [{i}]"
+                )
+                if "dau ra" in q or "tot nghiep" in q:
+                    response += "\n\nVề chuẩn ngoại ngữ đầu ra: bộ nguồn hiện tại chưa đủ quy định để xác nhận. Bạn có thể chuyển cán bộ kiểm tra theo chương trình cụ thể."
+                return response
+    # Pick complete relevant sentences; never dump an entire retrieved PDF chunk.
+    query = set(tokens(question))
+    paragraphs = []
+    for i, chunk in enumerate(chunks, 1):
+        text = re.sub(r"^\d+\s+", "", chunk["text"])
+        sentences = re.split(r"(?<=[.;])\s+(?=[A-ZÀ-Ỹ(•+-])", text)
+        ranked = sorted(
+            enumerate(sentences),
+            key=lambda pair: len(query & set(tokens(pair[1]))),
+            reverse=True,
+        )
+        chosen = sorted(index for index, sentence in ranked[:2] if query & set(tokens(sentence)))
+        for index in chosen:
+            sentence = sentences[index].strip()
+            if len(sentence) <= 850:
+                sentence = re.sub(r"\s+\d+\.$", "", sentence)
+                paragraphs.append(f"{sentence} [{i}]")
+        if len(paragraphs) >= 3:
+            break
+    return "\n\n".join(paragraphs[:3]) or None
