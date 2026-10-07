@@ -1,0 +1,14 @@
+.account-card { max-width:565px; padding:42px 46px 28px; }
+.account-card h1 { font-size:clamp(42px,6vw,60px); line-height:1.08; letter-spacing:-2.4px; }
+.account-subtitle { font-size:15px; }
+.account-tabs { display:none; }
+.account-form input { background:#eaf2ff; border-color:#b9d0d3; border-radius:14px; padding:16px 15px; }
+.account-form .primary { min-height:55px; border-radius:14px; font-size:16px; box-shadow:0 10px 24px #07595d22; }
+.auth-switch { margin:28px 0 0; color:#78908f; font-size:13px; text-align:center; }
+.auth-switch button { border:0; padding:0; background:transparent; color:#07595d; font-weight:800; cursor:pointer; }
+.security-note { display:flex; gap:13px; align-items:flex-start; margin-top:29px; padding-top:23px; border-top:1px solid #d9e5e4; color:#356466; }
+.security-icon { font-size:25px; line-height:1; }
+.security-note strong,.security-note small { display:block; }
+.security-note strong { font-size:12px; }
+.security-note small { margin-top:3px; color:#78908f; font-size:10px; }
+@media(max-width:720px) { .account-card { padding:29px 23px 24px; } .account-card h1 { font-size:42px; } }

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import mimetypes
 from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlparse
@@ -11,16 +12,30 @@ from fastapi.staticfiles import StaticFiles
 from src.api.routes import router
 from src.config import get_settings
 from src.services.admissions import Admissions
+from src.services.email import SmtpMailer
 from src.services.knowledge import Knowledge
 from src.services.store import Store
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Some Windows Python installations do not register JavaScript MIME types.
+# With nosniff enabled, browsers then refuse to execute /assets/*.js and all
+# chat buttons appear inert.
+mimetypes.add_type("text/javascript", ".js")
+mimetypes.add_type("text/css", ".css")
+
 
 def create_app(settings=None):
     cfg = settings or get_settings()
     if cfg.app_env == "production" and (
-        cfg.staff_password == "Demo@2026!" or len(cfg.staff_password) < 12 or not cfg.secure_cookies
+        cfg.staff_password == "Demo@2026!"
+        or len(cfg.staff_password) < 12
+        or not cfg.secure_cookies
+        or len(cfg.auth_secret) < 32
+        or not cfg.smtp_host
+        or not cfg.smtp_user
+        or not cfg.smtp_password
+        or not cfg.smtp_from
     ):
         raise ValueError("Production cần STAFF_PASSWORD riêng ≥12 ký tự và SECURE_COOKIES=true với HTTPS.")
 
@@ -42,6 +57,7 @@ def create_app(settings=None):
             "store": store,
             "knowledge": knowledge,
             "admissions": Admissions(knowledge, store, cfg),
+            "mailer": SmtpMailer(cfg),
             "source_error": source_error,
         }
         store.purge(cfg.session_hours)
@@ -93,6 +109,10 @@ def create_app(settings=None):
     @app.get("/staff")
     async def staff_page():
         return FileResponse(ROOT / "src" / "web" / "staff.html")
+
+    @app.get("/account")
+    async def account_page():
+        return FileResponse(ROOT / "src" / "web" / "account.html")
 
     @app.get("/health")
     async def health():

@@ -1,16 +1,23 @@
+import asyncio
+import logging
 import re
 import secrets
 import time
 from typing import Literal
+from urllib.parse import urlencode
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 
 from src.services.admissions import redact
+from src.services.email import EmailDeliveryError
 from src.services.product_features import compare_programs
+from src.services.store import digest
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 class ChatInput(BaseModel):
@@ -49,6 +56,213 @@ class ComparisonInput(BaseModel):
     codes: list[str] = Field(min_length=2, max_length=3)
 
 
+class StudentRegisterInput(BaseModel):
+    email: str = Field(min_length=5, max_length=254)
+    password: str = Field(min_length=10, max_length=200)
+    name: str = Field(default="", max_length=120)
+
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, value):
+        value = value.strip().lower()
+        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
+            raise ValueError("Email không hợp lệ.")
+        return value
+
+
+class StudentEmailInput(BaseModel):
+    email: str = Field(min_length=5, max_length=254)
+
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, value):
+        value = value.strip().lower()
+        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value):
+            raise ValueError("Email không hợp lệ.")
+        return value
+
+
+class StudentVerifyInput(StudentEmailInput):
+    code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
+
+
+class StudentLoginInput(StudentEmailInput):
+    password: str = Field(min_length=1, max_length=200)
+
+
+class StudentResetInput(StudentVerifyInput):
+    password: str = Field(min_length=10, max_length=200)
+
+
+@router.get("/auth/google/start")
+def student_google_start(request: Request):
+    cfg = runtime(request)["settings"]
+    redirect_uri = google_redirect_uri(request, cfg, "student")
+    if not google_oauth_ready(cfg, redirect_uri):
+        raise HTTPException(503, "Google sign-in is not configured for students.")
+    state = secrets.token_urlsafe(32)
+    params = urlencode({
+        "client_id": cfg.google_client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "prompt": "select_account",
+    })
+    response = RedirectResponse(f"https://accounts.google.com/o/oauth2/v2/auth?{params}", status_code=302)
+    response.set_cookie(
+        "student_google_state", state, httponly=True, samesite="lax", secure=cfg.secure_cookies, max_age=600
+    )
+    return response
+
+
+@router.get("/auth/google/callback")
+async def student_google_callback(request: Request, code: str | None = None, state: str | None = None, error: str | None = None):
+    cfg = runtime(request)["settings"]
+    redirect_uri = google_redirect_uri(request, cfg, "student")
+
+    def fail(message: str):
+        response = RedirectResponse("/account?login_error=" + message, status_code=302)
+        response.delete_cookie("student_google_state")
+        return response
+
+    saved_state = request.cookies.get("student_google_state", "")
+    if error or not code or not state or not secrets.compare_digest(saved_state, state):
+        return fail("Google+sign-in+was+cancelled+or+could+not+be+verified.")
+    if not google_oauth_ready(cfg, redirect_uri):
+        return fail("Google+sign-in+is+not+configured.")
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "code": code,
+                    "client_id": cfg.google_client_id,
+                    "client_secret": cfg.google_client_secret,
+                    "redirect_uri": redirect_uri,
+                    "grant_type": "authorization_code",
+                },
+            )
+            token_response.raise_for_status()
+            access_token = token_response.json().get("access_token")
+            profile_response = await client.get(
+                "https://openidconnect.googleapis.com/v1/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            profile_response.raise_for_status()
+            profile = profile_response.json()
+    except (httpx.HTTPError, ValueError):
+        return fail("Google+sign-in+could+not+be+completed.+Please+try+again.")
+    email = str(profile.get("email", "")).strip().lower()
+    if not email or profile.get("email_verified") is not True:
+        return fail("Google+did+not+return+a+verified+email+address.")
+    token, student = runtime(request)["store"].student_google_login(email, str(profile.get("name", "")), cfg.session_hours)
+    if not token:
+        return fail("This+Google+account+cannot+access+the+student+area.")
+    await send_login_notice(runtime(request), student, "Google", request.client.host if request.client else "")
+    response = RedirectResponse("/", status_code=302)
+    student_cookie(response, token, cfg)
+    runtime(request)["store"].link_session(request.cookies.get("candidate"), student["id"])
+    response.delete_cookie("student_google_state")
+    return response
+
+
+@router.post("/auth/register")
+async def student_register(body: StudentRegisterInput, request: Request):
+    rt = runtime(request)
+    if not rt["mailer"].configured:
+        raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã xác nhận.")
+    if not auth_rate_allowed(rt, "auth-register:", body.email):
+        raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
+    student = rt["store"].student_register(body.email, body.password, body.name.strip())
+    if student is None:
+        raise HTTPException(409, "Email này đã đăng ký. Hãy đăng nhập hoặc dùng Quên mật khẩu.")
+    code = rt["store"].issue_code(body.email, "verify", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
+    await send_student_code(rt, body.email, code, "verify", body.name.strip())
+    return {"ok": True, "email": body.email, "message": "Mã xác nhận đã được gửi đến email của bạn."}
+
+
+@router.post("/auth/verify-email")
+def verify_student_email(body: StudentVerifyInput, request: Request):
+    rt = runtime(request)
+    status, student = rt["store"].verify_code(
+        body.email, "verify", body.code, rt["settings"].auth_secret, rt["settings"].verification_max_attempts
+    )
+    if status != "ok":
+        detail = {"invalid": "Mã không đúng.", "locked": "Mã đã bị khóa do thử quá nhiều lần.", "expired": "Mã đã hết hạn."}.get(status, "Mã không hợp lệ.")
+        raise HTTPException(422, detail)
+    return {"ok": True, "student": public_student(student)}
+
+
+@router.post("/auth/resend-code")
+async def resend_student_code(body: StudentEmailInput, request: Request):
+    rt = runtime(request)
+    if not auth_rate_allowed(rt, "auth-resend:", body.email):
+        raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
+    student = rt["store"].student(body.email)
+    if student and not student["verified_at"]:
+        if not rt["mailer"].configured:
+            raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã xác nhận.")
+        code = rt["store"].issue_code(body.email, "verify", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
+        await send_student_code(rt, body.email, code, "verify", student["display_name"])
+    return {"ok": True, "message": "Nếu email có tài khoản chưa xác nhận, mã mới đã được gửi."}
+
+
+@router.post("/auth/login")
+async def student_login(body: StudentLoginInput, request: Request, response: Response):
+    rt = runtime(request)
+    token, result = rt["store"].student_login(body.email, body.password, rt["settings"].session_hours)
+    if result == "not_verified":
+        raise HTTPException(403, "Email chưa được xác nhận. Hãy nhập mã trong email trước.")
+    if result == "invalid" or not token:
+        raise HTTPException(401, "Email hoặc mật khẩu không đúng.")
+    student_cookie(response, token, rt["settings"])
+    rt["store"].link_session(request.cookies.get("candidate"), result["id"])
+    await send_login_notice(rt, result, "Email/mật khẩu", request.client.host if request.client else "")
+    return {"ok": True, "student": public_student(result)}
+
+
+@router.get("/auth/me")
+def student_me(request: Request):
+    student = runtime(request)["store"].student_user(request.cookies.get("student"))
+    return {"authenticated": bool(student), "student": public_student(student) if student else None}
+
+
+@router.post("/auth/logout")
+def student_logout(request: Request, response: Response):
+    runtime(request)["store"].student_logout(request.cookies.get("student"))
+    response.delete_cookie("student")
+    response.delete_cookie("candidate")
+    return {"ok": True}
+
+
+@router.post("/auth/forgot-password")
+async def forgot_student_password(body: StudentEmailInput, request: Request):
+    rt = runtime(request)
+    if not auth_rate_allowed(rt, "auth-forgot:", body.email):
+        raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
+    student = rt["store"].student(body.email)
+    if student and student["verified_at"]:
+        if not rt["mailer"].configured:
+            raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã đặt lại mật khẩu.")
+        code = rt["store"].issue_code(body.email, "reset", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
+        await send_student_code(rt, body.email, code, "reset", student["display_name"])
+    return {"ok": True, "message": "Nếu email đã đăng ký, mã đặt lại mật khẩu đã được gửi."}
+
+
+@router.post("/auth/reset-password")
+def reset_student_password(body: StudentResetInput, request: Request):
+    rt = runtime(request)
+    status, student = rt["store"].verify_code(
+        body.email, "reset", body.code, rt["settings"].auth_secret, rt["settings"].verification_max_attempts
+    )
+    if status != "ok":
+        detail = {"invalid": "Mã không đúng.", "locked": "Mã đã bị khóa do thử quá nhiều lần.", "expired": "Mã đã hết hạn."}.get(status, "Mã không hợp lệ.")
+        raise HTTPException(422, detail)
+    rt["store"].reset_password(body.email, body.password)
+    return {"ok": True, "message": "Mật khẩu đã được cập nhật. Bạn có thể đăng nhập."}
+
+
 @router.post("/programs/compare")
 def comparison(body: ComparisonInput, request: Request):
     knowledge = runtime(request)["knowledge"]
@@ -64,7 +278,10 @@ def runtime(request: Request):
 
 def candidate(request: Request, response: Response):
     rt = runtime(request)
-    token, row = rt["store"].session(request.cookies.get("candidate"), rt["settings"].session_hours)
+    student = rt["store"].student_user(request.cookies.get("student"))
+    token, row = rt["store"].session(
+        request.cookies.get("candidate"), rt["settings"].session_hours, student["id"] if student else None
+    )
     response.set_cookie(
         "candidate",
         token,
@@ -76,8 +293,131 @@ def candidate(request: Request, response: Response):
     return row
 
 
+def public_student(student):
+    return {"id": student["id"], "email": student["email"], "name": student["display_name"], "verified": bool(student["verified_at"])}
+
+
+def student_cookie(response: Response, token: str, settings) -> None:
+    response.set_cookie(
+        "student", token, httponly=True, samesite="strict", secure=settings.secure_cookies,
+        max_age=settings.session_hours * 3600,
+    )
+
+
+async def send_student_code(rt, email, code, purpose, name=""):
+    try:
+        await asyncio.to_thread(rt["mailer"].send_code, email, code, purpose, name)
+    except EmailDeliveryError as exc:
+        raise HTTPException(503, "Không thể gửi email lúc này. Kiểm tra cấu hình SMTP rồi thử lại.") from exc
+
+
+async def send_login_notice(rt, student, method, ip=""):
+    """Send a best-effort security alert without blocking successful login."""
+    try:
+        await asyncio.to_thread(
+            rt["mailer"].send_login_notice,
+            student["email"],
+            student.get("display_name", ""),
+            method,
+            ip,
+        )
+    except EmailDeliveryError:
+        logger.warning("Login notification email failed for student %s", digest(student["email"]))
+
+
+def auth_rate_allowed(rt, prefix, email):
+    """Use a forgiving limit locally while keeping production protection strict."""
+    if rt["settings"].app_env == "development":
+        return rt["store"].allowed(prefix + digest(email), count=10, window=600)
+    return rt["store"].allowed(prefix + digest(email), count=3, window=3600)
+
+
+_SAFE_TICKET_FIELDS = {
+    "id",
+    "summary",
+    "reason",
+    "status",
+    "owner",
+    "reply",
+    "created",
+    "updated",
+}
+_REDACTED_TICKET_FIELDS = {"summary", "reason", "reply"}
+
+
 def safe_ticket(ticket):
-    return {k: v for k, v in ticket.items() if k not in ["session", "request_key"]}
+    """Return only the fields needed by the candidate/staff UIs.
+
+    This is intentionally an allowlist rather than a blacklist: internal
+    fields such as session identifiers, request keys, tokens, or future
+    columns must never become API data accidentally. Text is redacted again
+    at this boundary so legacy rows are protected too.
+    """
+    safe = {}
+    for key in _SAFE_TICKET_FIELDS:
+        if key not in ticket:
+            continue
+        value = ticket[key]
+        safe[key] = redact(str(value)) if key in _REDACTED_TICKET_FIELDS and value else value
+    return safe
+
+
+def safe_ticket_detail(detail):
+    """Expose only the consented handover content and safe ticket history."""
+    ticket = safe_ticket(detail["ticket"])
+    return {
+        **ticket,
+        # The current handover contract stores the candidate-approved text in
+        # summary. Do not read the whole session because it may contain
+        # unrelated messages that the candidate did not consent to share.
+        "shared_content": ticket["summary"],
+        "context_available": False,
+        "events": [
+            {
+                "actor": event.get("actor"),
+                "action": event.get("action"),
+                "created": event.get("created"),
+            }
+            for event in detail["events"]
+        ],
+    }
+
+
+def google_allowlisted(email: str, settings) -> bool:
+    """Require an explicit email or domain allow-list for staff access."""
+    email = email.strip().lower()
+    emails = {item.strip().lower() for item in settings.google_allowed_emails.split(",") if item.strip()}
+    domains = {item.strip().lower().lstrip("@") for item in settings.google_allowed_email_domains.split(",") if item.strip()}
+    return email in emails or ("@" in email and email.rsplit("@", 1)[1] in domains)
+
+
+def google_ready(settings) -> bool:
+    return bool(
+        settings.google_client_id
+        and settings.google_client_secret
+        and settings.google_redirect_uri
+        and (settings.google_allowed_emails.strip() or settings.google_allowed_email_domains.strip())
+    )
+
+
+def google_oauth_ready(settings, redirect_uri: str) -> bool:
+    return bool(settings.google_client_id and settings.google_client_secret and redirect_uri)
+
+
+def google_redirect_uri(request: Request, settings, audience: str) -> str:
+    paths = {
+        "staff": "/api/v1/staff/google/callback",
+        "student": "/api/v1/auth/google/callback",
+    }
+    if settings.app_env == "development":
+        return f"{request.url.scheme}://{request.headers.get('host')}{paths[audience]}"
+    return settings.google_redirect_uri if audience == "staff" else settings.google_student_redirect_uri
+
+
+def staff_cookie(response: Response, token: str, settings) -> None:
+    response.set_cookie(
+        "staff", token, httponly=True, samesite="strict", secure=settings.secure_cookies, max_age=8 * 3600
+    )
 
 
 def staff(request: Request):
@@ -89,7 +429,9 @@ def staff(request: Request):
 
 @router.post("/answers/{request_id}/feedback")
 def answer_feedback(request_id: str, body: FeedbackInput, request: Request, row=Depends(candidate)):
-    if not runtime(request)["store"].feedback(row["id"], request_id, body.rating):
+    rt = runtime(request)
+    student = rt["store"].student_user(request.cookies.get("student"))
+    if not rt["store"].feedback(row["id"], request_id, body.rating, student["id"] if student else None):
         raise HTTPException(404, "Không tìm thấy câu trả lời trong phiên của bạn.")
     return {"rating": body.rating}
 
@@ -97,16 +439,23 @@ def answer_feedback(request_id: str, body: FeedbackInput, request: Request, row=
 @router.get("/session")
 def session(request: Request, row=Depends(candidate)):
     rt = runtime(request)
+    student = rt["store"].student_user(request.cookies.get("student"))
     return {
-        "messages": rt["store"].messages(row["id"]),
+        "messages": rt["store"].student_messages(student["id"]) if student else rt["store"].messages(row["id"]),
         "program": row["context"],
         "tickets": [safe_ticket(t) for t in rt["store"].tickets(row["id"])],
+        "student": public_student(student) if student else None,
     }
 
 
 @router.delete("/session/messages")
 def clear(request: Request, row=Depends(candidate)):
-    runtime(request)["store"].clear(row["id"])
+    rt = runtime(request)
+    student = rt["store"].student_user(request.cookies.get("student"))
+    if student:
+        rt["store"].clear_student(student["id"], row["id"])
+    else:
+        rt["store"].clear(row["id"])
     return {
         "message": "Đã xóa ngữ cảnh và lịch sử chat. Ticket đã gửi vẫn được giữ; liên hệ cán bộ nếu cần xóa ticket."
     }
@@ -241,7 +590,7 @@ def login(body: LoginInput, request: Request, response: Response):
     ):
         raise HTTPException(401, "Thông tin đăng nhập không hợp lệ.")
     token = rt["store"].staff_login(body.username)
-    response.set_cookie("staff", token, httponly=True, samesite="strict", secure=cfg.secure_cookies, max_age=8 * 3600)
+    staff_cookie(response, token, cfg)
     return {"username": body.username}
 
 
@@ -251,6 +600,76 @@ def cancel_ticket(ticket_id: str, request: Request, row=Depends(candidate)):
     if not runtime(request)["store"].cancel(ticket_id, row["id"]):
         raise HTTPException(409, "Chỉ có thể hủy yêu cầu đang chờ hoặc đang xử lý.")
     return {"ok": True}
+
+
+@router.get("/staff/google/start")
+def google_start(request: Request):
+    """Start Google Authorization Code OAuth with a short-lived CSRF state."""
+    cfg = runtime(request)["settings"]
+    redirect_uri = google_redirect_uri(request, cfg, "staff")
+    if not google_oauth_ready(cfg, redirect_uri) or not (cfg.google_allowed_emails.strip() or cfg.google_allowed_email_domains.strip()):
+        raise HTTPException(503, "Google sign-in is not configured. Contact an administrator.")
+    state = secrets.token_urlsafe(32)
+    params = urlencode({
+        "client_id": cfg.google_client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "prompt": "select_account",
+    })
+    response = RedirectResponse(f"https://accounts.google.com/o/oauth2/v2/auth?{params}", status_code=302)
+    response.set_cookie(
+        "google_oauth_state", state, httponly=True, samesite="lax", secure=cfg.secure_cookies, max_age=600
+    )
+    return response
+
+
+@router.get("/staff/google/callback")
+async def google_callback(request: Request, code: str | None = None, state: str | None = None, error: str | None = None):
+    """Exchange the Google code, check the allow-list, then create a staff session."""
+    cfg = runtime(request)["settings"]
+    redirect_uri = google_redirect_uri(request, cfg, "staff")
+
+    def fail(message: str):
+        response = RedirectResponse("/staff?login_error=" + message, status_code=302)
+        response.delete_cookie("google_oauth_state")
+        return response
+
+    saved_state = request.cookies.get("google_oauth_state", "")
+    if error or not code or not state or not secrets.compare_digest(saved_state, state):
+        return fail("Google+sign-in+was+cancelled+or+could+not+be+verified.")
+    if not google_oauth_ready(cfg, redirect_uri) or not (cfg.google_allowed_emails.strip() or cfg.google_allowed_email_domains.strip()):
+        return fail("Google+sign-in+is+not+configured.")
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "code": code,
+                    "client_id": cfg.google_client_id,
+                    "client_secret": cfg.google_client_secret,
+                    "redirect_uri": redirect_uri,
+                    "grant_type": "authorization_code",
+                },
+            )
+            token_response.raise_for_status()
+            access_token = token_response.json().get("access_token")
+            profile_response = await client.get(
+                "https://openidconnect.googleapis.com/v1/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            profile_response.raise_for_status()
+            profile = profile_response.json()
+    except (httpx.HTTPError, ValueError):
+        return fail("Google+sign-in+could+not+be+completed.+Please+try+again.")
+    email = str(profile.get("email", "")).strip().lower()
+    if not email or profile.get("email_verified") is not True or not google_allowlisted(email, cfg):
+        return fail("This+Google+account+is+not+authorised+for+staff+access.")
+    response = RedirectResponse("/staff", status_code=302)
+    staff_cookie(response, runtime(request)["store"].staff_login(email), cfg)
+    response.delete_cookie("google_oauth_state")
+    return response
 
 
 @router.get("/staff/me")
@@ -270,6 +689,14 @@ def queue(request: Request, status: str | None = None, user=Depends(staff)):
     if status and status not in ["waiting", "in_progress", "resolved", "cancelled", "rejected"]:
         raise HTTPException(422, "Trạng thái không hợp lệ.")
     return [safe_ticket(t) for t in runtime(request)["store"].tickets(status=status)]
+
+
+@router.get("/staff/tickets/{ticket_id}")
+def staff_ticket(ticket_id: str, request: Request, user=Depends(staff)):
+    detail = runtime(request)["store"].ticket_detail(ticket_id)
+    if not detail:
+        raise HTTPException(404, "Không tìm thấy yêu cầu.")
+    return safe_ticket_detail(detail)
 
 
 @router.post("/staff/tickets/{ticket_id}/claim")

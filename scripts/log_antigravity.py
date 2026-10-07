@@ -54,8 +54,10 @@ import os
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+from auto_submit import submit_if_enabled
 
 # Fix Windows console encoding so VN diacritics in prompts print cleanly.
 if sys.platform == "win32":
@@ -385,6 +387,7 @@ def log_from_hook(transcript: Path, data: dict) -> int:
     with open(log_file, "a", encoding="utf-8") as f:
         for e in new_entries:
             f.write(json.dumps(e, ensure_ascii=False) + "\n")
+    submit_if_enabled()
     return len(new_entries)
 
 

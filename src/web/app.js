@@ -1,6 +1,21 @@
 const $ = id => document.getElementById(id);
+const accountLink=document.createElement('a');accountLink.className='staff-link';accountLink.href='/account';accountLink.textContent='Đăng nhập / đăng ký';document.querySelector('.topbar nav')?.prepend(accountLink);
+const privacyNote=document.querySelector('.privacy');if(privacyNote)privacyNote.textContent='Bạn có thể dùng ẩn danh hoặc đăng nhập để lưu lịch sử và theo dõi yêu cầu.';
 const stateNames = {waiting:'Đang chờ', in_progress:'Đang xử lý', resolved:'Đã giải quyết',cancelled:'Đã hủy',rejected:'Đã từ chối'};
 let messages = [], programs = [], requestKey = '', busy = false;
+function updateAccountNav(student){
+  if(!student){
+    if(!accountLink.isConnected)document.querySelector('.topbar nav')?.prepend(accountLink);
+    return;
+  }
+  if(!accountLink.isConnected)return;
+  const name=node('span','account-name',student.name || student.email);
+  name.title=student.email;
+  const logout=node('button','nav-link account-logout','\u0110\u0103ng xu\u1ea5t');
+  logout.type='button';
+  logout.onclick=async()=>{logout.disabled=true;try{await api('/auth/logout',{method:'POST'});location.href='/account';}catch(error){logout.disabled=false;$('chat-error').textContent=error.message;}};
+  accountLink.replaceWith(name,logout);
+}
 function updateSuggestions(){
   const code=$('program').value;const box=$('follow-up');box.replaceChildren();
   const choices=code?[[`Phương thức ${code}`,`Phương thức xét tuyển ${code} là gì?`],[`Học phí ${code}`,`Học phí ${code} là bao nhiêu?`],[`Ngoại ngữ ${code}`,`Điều kiện ngoại ngữ ${code} là gì?`]]:[['Số ngành','HUST có bao nhiêu ngành?'],['Đăng ký ĐGTD','Cách đăng ký thi đánh giá tư duy?']];
@@ -54,6 +69,7 @@ async function init() {
     programs=list;
     list.forEach(p=>{const option=node('option','',`${p.code} · ${p.name}`);option.value=p.code;$('program').append(option);});
     $('program').value=session.program || '';
+    updateAccountNav(session.student);
     updateSuggestions();
     session.messages.forEach(m=>addMessage(m.role,m));
     $('source-status').textContent=status.status==='ready'?`${status.source.pages} trang PDF · ${status.programs} chương trình · kỳ 2026`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';

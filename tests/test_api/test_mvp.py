@@ -1,3 +1,4 @@
+import asyncio
 import json
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
@@ -97,6 +98,89 @@ async def test_handover_isolation_consent_idempotency_and_staff(client):
     assert (await client.get("/api/v1/tickets")).json()
     await client.post("/api/v1/staff/logout")
     assert (await client.get("/api/v1/staff/metrics")).status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_staff_login_rate_limit_for_repeated_invalid_credentials(client):
+    for _ in range(5):
+        response = await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "wrong"})
+        assert response.status_code == 401
+    limited = await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "wrong"})
+    assert limited.status_code == 429
+
+
+@pytest.mark.asyncio
+async def test_staff_claim_is_atomic_and_only_owner_can_resolve(client):
+    created = await client.post(
+        "/api/v1/handover",
+        json={
+            "summary": "Cần xác minh điều kiện xét tuyển.",
+            "consent": True,
+            "request_key": "atomic-claim-123",
+        },
+    )
+    ticket_id = created.json()["id"]
+    store = app.state.runtime["store"]
+    first_token = store.staff_login("staff-a")
+    second_token = store.staff_login("staff-b")
+    transport = ASGITransport(app=app)
+    async with (
+        AsyncClient(transport=transport, base_url="http://test", cookies={"staff": first_token}) as first,
+        AsyncClient(transport=transport, base_url="http://test", cookies={"staff": second_token}) as second,
+    ):
+        first_claim, second_claim = await asyncio.gather(
+            first.post(f"/api/v1/staff/tickets/{ticket_id}/claim"),
+            second.post(f"/api/v1/staff/tickets/{ticket_id}/claim"),
+        )
+        assert sorted([first_claim.status_code, second_claim.status_code]) == [200, 409]
+        winner, loser = (first, second) if first_claim.status_code == 200 else (second, first)
+        assert (await loser.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Không được phép."})).status_code == 409
+        assert (await winner.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã xác minh."})).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_staff_metrics_and_payload_redaction_match_real_ticket_state(client):
+    async def create(key, summary, reason="candidate_request"):
+        response = await client.post(
+            "/api/v1/handover",
+            json={"summary": summary, "consent": True, "request_key": key, "reason": reason},
+        )
+        assert response.status_code == 200
+        return response.json()["id"]
+
+    resolved_id = await create(
+        "metrics-resolved-123",
+        "Email user@example.com, điện thoại 0912345678 cần được xác minh.",
+    )
+    rejected_id = await create("metrics-rejected-123", "Yêu cầu ngoài phạm vi tuyển sinh.", "out_of_scope")
+    assert (await client.get(f"/api/v1/staff/tickets/{resolved_id}")).status_code == 401
+    assert (await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})).status_code == 200
+
+    listing = await client.get("/api/v1/staff/tickets")
+    assert listing.status_code == 200
+    assert all("session" not in ticket and "request_key" not in ticket for ticket in listing.json())
+    assert all("user@example.com" not in str(ticket) and "0912345678" not in str(ticket) for ticket in listing.json())
+
+    detail = await client.get(f"/api/v1/staff/tickets/{resolved_id}")
+    assert detail.status_code == 200
+    detail_data = detail.json()
+    assert "session" not in detail_data and "request_key" not in detail_data
+    assert "user@example.com" not in str(detail_data)
+    assert "0912345678" not in str(detail_data)
+
+    assert (await client.post(f"/api/v1/staff/tickets/{resolved_id}/claim")).status_code == 200
+    assert (await client.post(f"/api/v1/staff/tickets/{resolved_id}/resolve", json={"reply": "Đã kiểm tra."})).status_code == 200
+    assert (await client.post(f"/api/v1/staff/tickets/{rejected_id}/reject", json={"reply": "Ngoài phạm vi tuyển sinh."})).status_code == 200
+
+    metrics = (await client.get("/api/v1/staff/metrics")).json()
+    assert metrics["tickets"] == {
+        "waiting": 0,
+        "in_progress": 0,
+        "resolved": 1,
+        "rejected": 1,
+        "cancelled": 0,
+    }
+    assert metrics["ticket_metrics"]["oldest_waiting"] is None
 
 
 @pytest.mark.asyncio
@@ -234,6 +318,45 @@ async def test_cancel_and_reject_ticket_lifecycle(client):
     assert result["status"] == "rejected" and result["reply"] == "Không thuộc phạm vi tuyển sinh."
     assert (await client.post(f"/api/v1/tickets/{second}/cancel")).status_code == 409
     assert (await client.post(f"/api/v1/staff/tickets/{second}/claim")).status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_staff_detail_history_and_actionable_metrics(client):
+    created = await client.post(
+        "/api/v1/handover",
+        json={
+            "summary": "Câu hỏi: Học bổng?\n\nCâu trả lời cần kiểm tra: Chưa đủ nguồn.",
+            "consent": True,
+            "request_key": "detail-test-123",
+            "reason": "candidate_request",
+        },
+    )
+    ticket_id = created.json()["id"]
+
+    assert (await client.get(f"/api/v1/staff/tickets/{ticket_id}")).status_code == 401
+    assert (
+        await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})
+    ).status_code == 200
+
+    detail = (await client.get(f"/api/v1/staff/tickets/{ticket_id}")).json()
+    assert detail["shared_content"].startswith("Câu hỏi:")
+    assert detail["context_available"] is False
+    assert "session" not in detail and "request_key" not in detail
+    assert [event["action"] for event in detail["events"]] == ["created"]
+
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/claim")).status_code == 200
+    assert (
+        await client.post(
+            f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã kiểm tra nguồn."}
+        )
+    ).status_code == 200
+    detail = (await client.get(f"/api/v1/staff/tickets/{ticket_id}")).json()
+    assert [event["action"] for event in detail["events"]] == ["created", "claimed", "resolved"]
+
+    metrics = (await client.get("/api/v1/staff/metrics")).json()
+    assert set(["waiting", "in_progress", "resolved", "rejected", "cancelled"]).issubset(metrics["tickets"])
+    assert metrics["ticket_metrics"]["resolved_today"] >= 1
+    assert metrics["ticket_metrics"]["average_handling_seconds"] is not None
 
 
 @pytest.mark.asyncio

@@ -19,15 +19,23 @@ Examples:
   # Quick interactive mode
   python scripts/log_manual.py
 """
+import argparse
 import json
 import os
-import sys
 import subprocess
-import argparse
-from datetime import datetime, timezone, timedelta
+import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from auto_submit import submit_if_enabled
+
 VN_TZ = timezone(timedelta(hours=7))
+
+# Windows PowerShell may expose a legacy code page; keep Vietnamese prompts and
+# status messages from crashing after the entry has already been written.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 def git(cmd):
@@ -82,7 +90,7 @@ def main():
     if not student:
         student = os.environ.get("USERNAME", os.environ.get("USER", "unknown"))
         print(f"[log] ⚠️  git email not set! Using fallback: {student}", file=sys.stderr)
-        print(f"[log] Run: git config user.email \"your@vinuni.edu.vn\"", file=sys.stderr)
+        print("[log] Run: git config user.email \"your@vinuni.edu.vn\"", file=sys.stderr)
 
     entry = {
         "ts": ts,
@@ -104,6 +112,8 @@ def main():
 
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    submit_if_enabled()
 
     print(f"\n[log] ✅ Logged: [{tool}] {prompt[:80]}")
     print(f"[log] 📁 Saved to: {log_file}")

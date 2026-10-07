@@ -7,7 +7,23 @@
             "name": "log-prompt",
             "type": "command",
             "command": "python scripts/log_hook.py --tool=codex",
+            "commandWindows": ".\\.venv\\Scripts\\python.exe scripts\\log_hook.py --tool=codex",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "log-tool-use",
+            "type": "command",
+            "command": "python scripts/log_hook.py --tool=codex",
+            "commandWindows": ".\\.venv\\Scripts\\python.exe scripts\\log_hook.py --tool=codex",
+            "timeout": 10,
+            "async": true
           }
         ]
       }
@@ -19,7 +35,22 @@
             "name": "log-stop",
             "type": "command",
             "command": "python scripts/log_hook.py --tool=codex",
+            "commandWindows": ".\\.venv\\Scripts\\python.exe scripts\\log_hook.py --tool=codex",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "name": "log-session-end",
+            "type": "command",
+            "command": "python scripts/log_hook.py --tool=codex",
+            "commandWindows": ".\\.venv\\Scripts\\python.exe scripts\\log_hook.py --tool=codex",
+            "timeout": 10,
+            "async": true
           }
         ]
       }

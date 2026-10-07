@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tài khoản học viên · Trợ lý X</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/account.css">
+  <script src="/assets/account.js" defer></script>
+</head>
+<body class="account-page">
+  <header class="topbar">
+    <a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>HUST · ĐẠI HỌC CHÍNH QUY 2026</small></span></a>
+    <nav><a class="staff-link" href="/">← Về trang hỏi đáp</a></nav>
+  </header>
+  <main class="account-main">
+    <section class="account-card" aria-live="polite">
+      <div class="eyebrow">TÀI KHOẢN HỌC VIÊN</div>
+      <h1 id="auth-title">Chào mừng trở lại</h1>
+      <p id="auth-subtitle" class="account-subtitle">Đăng nhập để tiếp tục hành trình tìm hiểu và ứng tuyển vào HUST.</p>
+      <a id="google-login" class="google-login" href="/api/v1/auth/google/start"><span class="google-mark" aria-hidden="true">G</span><strong>Tiếp tục với Google</strong><span class="login-arrow" aria-hidden="true">›</span></a>
+      <div id="account-divider" class="login-divider"><span>hoặc tiếp tục bằng email</span></div>
+      <div class="account-tabs" id="auth-tabs"><button type="button" class="active" data-view="login">Đăng nhập</button><button type="button" data-view="register">Tạo tài khoản</button></div>
+
+      <form id="login-view" class="account-form auth-view">
+        <label for="login-email">Email</label><input id="login-email" type="email" autocomplete="email" required>
+        <label for="login-password">Mật khẩu</label><input id="login-password" type="password" autocomplete="current-password" required>
+        <button class="primary" type="submit">Đăng nhập →</button>
+        <button class="text-button" id="forgot-open" type="button">Quên mật khẩu?</button>
+      </form>
+
+      <form id="register-view" class="account-form auth-view" hidden>
+        <label for="register-name">Họ và tên</label><input id="register-name" autocomplete="name" maxlength="120">
+        <label for="register-email">Email</label><input id="register-email" type="email" autocomplete="email" required>
+        <label for="register-password">Mật khẩu <span class="field-note">tối thiểu 10 ký tự</span></label><input id="register-password" type="password" autocomplete="new-password" minlength="10" required>
+        <button class="primary" type="submit">Tạo tài khoản →</button>
+      </form>
+
+      <form id="verify-view" class="account-form auth-view" hidden>
+        <p class="code-note">Mã 6 số đã được gửi đến <strong id="verify-email-label"></strong>.</p>
+        <label for="verify-code">Mã xác nhận</label><input id="verify-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
+        <button class="primary" type="submit">Xác nhận email →</button>
+        <button class="text-button" id="resend-code" type="button">Gửi lại mã</button>
+      </form>
+
+      <form id="forgot-view" class="account-form auth-view" hidden>
+        <p class="code-note">Nhập email đã đăng ký để nhận mã đặt lại mật khẩu.</p>
+        <label for="forgot-email">Email</label><input id="forgot-email" type="email" autocomplete="email" required>
+        <button class="primary" type="submit">Gửi mã đặt lại →</button>
+      </form>
+
+      <form id="reset-view" class="account-form auth-view" hidden>
+        <label for="reset-email">Email</label><input id="reset-email" type="email" autocomplete="email" required>
+        <label for="reset-code">Mã đặt lại</label><input id="reset-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
+        <label for="reset-password">Mật khẩu mới <span class="field-note">tối thiểu 10 ký tự</span></label><input id="reset-password" type="password" autocomplete="new-password" minlength="10" required>
+        <button class="primary" type="submit">Đổi mật khẩu →</button>
+      </form>
+
+      <p id="auth-feedback" class="error-text" role="alert"></p>
+      <p id="auth-switch" class="auth-switch">Chưa có tài khoản? <button id="register-link" type="button">Tạo tài khoản miễn phí</button></p>
+      <div class="security-note"><span class="security-icon" aria-hidden="true">♧</span><div><strong>Dữ liệu đăng nhập được bảo vệ</strong><small>Mật khẩu được mã hóa và mã OTP không được lưu dưới dạng nguyên văn.</small></div></div>
+      <p class="account-footnote">Bạn chỉ cần email đã xác nhận để sử dụng tài khoản. Không gửi CCCD hoặc thông tin nhạy cảm vào khung hỏi đáp.</p>
+    </section>
+  </main>
+</body>
+</html>
