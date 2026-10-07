@@ -1,11 +1,14 @@
 """SMTP delivery for student account verification and password reset codes."""
 
+import logging
 import smtplib
 import ssl
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from email.utils import formataddr
 from html import escape
+
+logger = logging.getLogger(__name__)
 
 
 class EmailDeliveryError(RuntimeError):
@@ -148,4 +151,13 @@ class SmtpMailer:
                     server.login(self.settings.smtp_user, self.settings.smtp_password)
                     server.send_message(message)
         except (OSError, smtplib.SMTPException) as exc:
+            logger.warning(
+                "SMTP delivery failed: exception=%s code=%s host=%s port=%s security=%s starttls=%s",
+                type(exc).__name__,
+                getattr(exc, "smtp_code", "-"),
+                self.settings.smtp_host,
+                self.settings.smtp_port,
+                self.settings.smtp_security,
+                self.settings.smtp_starttls,
+            )
             raise EmailDeliveryError("SMTP delivery failed.") from exc
