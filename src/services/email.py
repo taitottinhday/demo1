@@ -1,4 +1,4 @@
-"""SMTP delivery for student account verification and password reset codes."""
+"""Email delivery through Resend HTTPS, with SMTP kept as a fallback."""
 
 import logging
 import smtplib
@@ -7,6 +7,8 @@ from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from email.utils import formataddr
 from html import escape
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +22,7 @@ class SmtpMailer:
         self.settings = settings
 
     @property
-    def configured(self):
+    def smtp_configured(self):
         return bool(
             self.settings.smtp_host
             and self.settings.smtp_user
@@ -28,9 +30,27 @@ class SmtpMailer:
             and self.settings.smtp_from
         )
 
+    @property
+    def resend_configured(self):
+        return bool(self.settings.resend_api_key and self._sender_address)
+
+    @property
+    def configured(self):
+        return self.resend_configured or self.smtp_configured
+
+    @property
+    def _sender_address(self):
+        return self.settings.resend_from or self.settings.smtp_from
+
+    @property
+    def _from_header(self):
+        if self.settings.resend_from:
+            return self.settings.resend_from
+        return formataddr((self.settings.smtp_from_name, self.settings.smtp_from))
+
     def send_code(self, recipient: str, code: str, purpose: str, name: str = "") -> None:
         if not self.configured:
-            raise EmailDeliveryError("SMTP is not configured.")
+            raise EmailDeliveryError("Email provider is not configured.")
         if purpose == "verify":
             subject = "Confirm your admissions account email"
             title = "Confirm your email address"
@@ -54,7 +74,7 @@ class SmtpMailer:
         )
         message = EmailMessage()
         message["Subject"] = subject
-        message["From"] = formataddr((self.settings.smtp_from_name, self.settings.smtp_from))
+        message["From"] = self._from_header
         message["To"] = recipient
         message.set_content(text)
         message.add_alternative(html, subtype="html")
@@ -65,7 +85,7 @@ class SmtpMailer:
     ) -> None:
         """Send a one-time password setup link; never email a plaintext password."""
         if not self.configured:
-            raise EmailDeliveryError("SMTP is not configured.")
+            raise EmailDeliveryError("Email provider is not configured.")
         greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
         subject = "Mời truy cập khu vực cán bộ tuyển sinh"
         expiry = f"Liên kết có hiệu lực trong {expires_hours} giờ."
@@ -91,7 +111,7 @@ class SmtpMailer:
         )
         message = EmailMessage()
         message["Subject"] = subject
-        message["From"] = formataddr((self.settings.smtp_from_name, self.settings.smtp_from))
+        message["From"] = self._from_header
         message["To"] = recipient
         message.set_content(text)
         message.add_alternative(html, subtype="html")
@@ -100,7 +120,7 @@ class SmtpMailer:
     def send_login_notice(self, recipient: str, name: str = "", method: str = "Google", ip: str = "") -> None:
         """Notify the account owner after a successful sign-in."""
         if not self.configured:
-            raise EmailDeliveryError("SMTP is not configured.")
+            raise EmailDeliveryError("Email provider is not configured.")
         local_time = datetime.now(timezone(timedelta(hours=7))).strftime("%d/%m/%Y %H:%M:%S")
         greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
         location = ip or "Không xác định"
@@ -123,13 +143,49 @@ class SmtpMailer:
         )
         message = EmailMessage()
         message["Subject"] = subject
-        message["From"] = formataddr((self.settings.smtp_from_name, self.settings.smtp_from))
+        message["From"] = self._from_header
         message["To"] = recipient
         message.set_content(text)
         message.add_alternative(html, subtype="html")
         self._deliver(message)
 
     def _deliver(self, message: EmailMessage) -> None:
+        if self.resend_configured:
+            self._deliver_resend(message)
+            return
+        self._deliver_smtp(message)
+
+    def _deliver_resend(self, message: EmailMessage) -> None:
+        plain = message.get_body(preferencelist=("plain",))
+        html = message.get_body(preferencelist=("html",))
+        payload = {
+            "from": message["From"],
+            "to": [message["To"]],
+            "subject": str(message["Subject"]),
+            "text": plain.get_content() if plain else "",
+            "html": html.get_content() if html else "",
+        }
+        try:
+            with httpx.Client(timeout=self.settings.smtp_timeout) as client:
+                response = client.post(
+                    "https://api.resend.com/emails",
+                    headers={
+                        "Authorization": f"Bearer {self.settings.resend_api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                )
+                response.raise_for_status()
+        except (OSError, httpx.HTTPError) as exc:
+            response = getattr(exc, "response", None)
+            logger.warning(
+                "Resend delivery failed: exception=%s status=%s",
+                type(exc).__name__,
+                getattr(response, "status_code", "-"),
+            )
+            raise EmailDeliveryError("Email delivery failed.") from exc
+
+    def _deliver_smtp(self, message: EmailMessage) -> None:
         try:
             context = ssl.create_default_context()
             if self.settings.smtp_security == "ssl" or not self.settings.smtp_starttls:

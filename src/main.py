@@ -34,15 +34,14 @@ def create_app(settings=None):
         for item in cfg.cors_origins.split(",")
         if item.strip()
     }
+    smtp_ready = bool(cfg.smtp_host and cfg.smtp_user and cfg.smtp_password and cfg.smtp_from)
+    resend_ready = bool(cfg.resend_api_key and (cfg.resend_from or cfg.smtp_from))
     if cfg.app_env == "production" and (
         cfg.staff_password == "Demo@2026!"
         or len(cfg.staff_password) < 12
         or not cfg.secure_cookies
         or len(cfg.auth_secret) < 32
-        or not cfg.smtp_host
-        or not cfg.smtp_user
-        or not cfg.smtp_password
-        or not cfg.smtp_from
+        or not (smtp_ready or resend_ready)
     ):
         raise ValueError("Production cần STAFF_PASSWORD riêng ≥12 ký tự và SECURE_COOKIES=true với HTTPS.")
     if cfg.app_env == "production" and (cfg.admin_password == "Admin@2026!" or len(cfg.admin_password) < 12):

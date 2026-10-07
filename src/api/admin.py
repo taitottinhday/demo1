@@ -128,7 +128,7 @@ async def create_officer(body: OfficerInput, request: Request, user=Depends(admi
     rt = runtime(request)
     mailer = rt.get("mailer")
     if (not mailer or not mailer.configured) and rt["settings"].app_env != "test":
-        raise HTTPException(503, "SMTP chưa được cấu hình để gửi thư mời cán bộ.")
+        raise HTTPException(503, "Chưa cấu hình nhà cung cấp email để gửi thư mời cán bộ.")
     officer, token = admins(request).create_officer(
         body.username,
         body.name,
@@ -168,7 +168,7 @@ async def resend_officer_invite(officer_id: int, request: Request, user=Depends(
     rt = runtime(request)
     mailer = rt.get("mailer")
     if not mailer or not mailer.configured:
-        raise HTTPException(503, "SMTP chưa được cấu hình để gửi thư mời cán bộ.")
+        raise HTTPException(503, "Chưa cấu hình nhà cung cấp email để gửi thư mời cán bộ.")
     officer, token = admins(request).resend_officer_invite(officer_id, rt["settings"].staff_invite_hours)
     await send_staff_invite(rt, officer, token)
     return {**officer, "invite_sent": True}

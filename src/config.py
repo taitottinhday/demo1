@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     smtp_security: Literal["starttls", "ssl"] = "starttls"
     smtp_starttls: bool = Field(default=True, validation_alias=AliasChoices("SMTP_STARTTLS"))
     smtp_timeout: int = Field(default=15, ge=3, le=60)
+    # Resend uses HTTPS and works on Railway plans where outbound SMTP is blocked.
+    resend_api_key: str = ""
+    resend_from: str = Field(default="", validation_alias=AliasChoices("RESEND_FROM"))
     public_base_url: str = "http://127.0.0.1:8000"
     verification_code_minutes: int = Field(default=10, ge=5, le=60)
     verification_max_attempts: int = Field(default=5, ge=1, le=10)
