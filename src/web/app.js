@@ -25,7 +25,7 @@ async function api(path, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 23000);
   try {
-    const response = await fetch('/api/v1' + path, {...options, credentials:'same-origin', signal:controller.signal, headers:{'Content-Type':'application/json', ...(options.headers || {})}});
+    const response = await fetch('/api/v1' + path, {...options, credentials:'include', signal:controller.signal, headers:{'Content-Type':'application/json', ...(options.headers || {})}});
     const data = await response.json();
     if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Nội dung chưa hợp lệ. Vui lòng kiểm tra rồi thử lại.');
     return data;

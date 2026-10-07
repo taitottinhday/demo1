@@ -1,7 +1,7 @@
 const $=id=>document.getElementById(id);
 let currentEmail='';
 async function api(path, options={}){
-  const response=await fetch('/api/v1'+path,{...options,credentials:'same-origin',headers:{'Content-Type':'application/json',...(options.headers||{})}});
+  const response=await fetch('/api/v1'+path,{...options,credentials:'include',headers:{'Content-Type':'application/json',...(options.headers||{})}});
   const data=await response.json();
   if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Không thể hoàn tất yêu cầu.');
   return data;

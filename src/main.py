@@ -27,6 +27,11 @@ mimetypes.add_type("text/css", ".css")
 
 def create_app(settings=None):
     cfg = settings or get_settings()
+    allowed_origins = {
+        item.strip().rstrip("/")
+        for item in cfg.cors_origins.split(",")
+        if item.strip()
+    }
     if cfg.app_env == "production" and (
         cfg.staff_password == "Demo@2026!"
         or len(cfg.staff_password) < 12
@@ -81,7 +86,9 @@ def create_app(settings=None):
     async def safeguards(request: Request, call_next):
         if request.method in {"POST", "PUT", "DELETE", "PATCH"}:
             origin = request.headers.get("origin")
-            if origin and urlparse(origin).netloc != request.headers.get("host"):
+            normalized_origin = origin.rstrip("/") if origin else ""
+            same_host = origin and urlparse(origin).netloc == request.headers.get("host")
+            if origin and not same_host and normalized_origin not in allowed_origins:
                 return JSONResponse({"detail": "Chỉ cho phép thao tác từ cùng website."}, status_code=403)
             try:
                 size = int(request.headers.get("content-length", "0"))

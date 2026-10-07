@@ -65,7 +65,7 @@ async function api(path, options = {}) {
   const response = await fetch(`/api/v1${path}`, {
     ...options,
     headers,
-    credentials: 'same-origin',
+    credentials: 'include',
   });
   const raw = await response.text();
   let data = {};
