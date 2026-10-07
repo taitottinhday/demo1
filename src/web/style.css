@@ -187,3 +187,38 @@ dialog::backdrop { background:#131b3866; backdrop-filter:blur(4px) }dialog h2 { 
 @media(max-width:1100px) { .metrics { grid-template-columns:repeat(3,1fr) }.queue-layout { grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr) } }
 @media(max-width:760px) { .topbar { height:auto; min-height:76px; padding:12px 15px; align-items:flex-start }.staff-nav { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px }.staff-identity { flex-basis:100%; max-width:100%; text-align:right }.staff-main { padding:22px 13px 35px }.login-panel { padding:27px 22px 25px; margin:20px auto }.login-panel h1 { font-size:35px }.dashboard-heading { align-items:flex-start; flex-direction:column; gap:14px }.dashboard-heading h1 { font-size:26px }.dashboard-heading #refresh { align-self:stretch; justify-content:center }.metrics { grid-template-columns:repeat(2,1fr); gap:9px }.metric { min-height:108px; padding:14px 13px 12px 18px }.metric-value { font-size:25px }.queue-layout { grid-template-columns:1fr }.queue-panel,.ticket-detail { min-height:0; padding:17px }.ticket-detail { min-height:480px }.detail-fields { grid-template-columns:1fr 1fr }.detail-field:last-child { grid-column:1/-1 }.event-list li { flex-direction:column; gap:3px }.event-list small { text-align:left }.queue-filters { grid-template-columns:1fr 1fr } }
 @media(max-width:430px) { .brand { font-size:13px }.brand small { font-size:8px }.staff-link { font-size:10px }.nav-link { font-size:10px }.metrics { grid-template-columns:1fr 1fr }.metric:first-child { grid-column:1/-1 }.detail-fields { grid-template-columns:1fr }.detail-field:last-child { grid-column:auto }.queue-filters { grid-template-columns:1fr }.queue-filters select { width:100% } }
+/* Admin */
+.admin-tabs {display:flex;gap:6px;margin:18px 0 6px;border-bottom:1px solid var(--line)}
+.admin-tabs button {background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px;color:var(--muted);font-weight:600;cursor:pointer}
+.admin-tabs button[aria-selected="true"] {color:var(--green);border-bottom-color:var(--green)}
+.admin-filters {display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:14px 0}
+.admin-filters label {margin:0}
+.admin-filters input,.admin-filters select {width:auto}
+.admin-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.admin-grid>*,.queue-layout>* {min-width:0}
+.admin-block {margin-top:16px}
+.bar-chart {display:grid;gap:10px;margin-top:12px}
+.bar-row {display:grid;grid-template-columns:minmax(90px,150px) 1fr 36px;align-items:center;gap:10px;font-size:13px}
+.bar-label {color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track {height:12px;background:var(--soft);border-radius:6px;overflow:hidden}
+.bar-fill {height:100%;min-width:2px;background:#8d7ced;border-radius:6px}
+.bar-fill.waiting {background:#f3b44f}.bar-fill.in_progress {background:#4a91ed}.bar-fill.resolved {background:#42b896}.bar-fill.rejected {background:#d96a6a}.bar-fill.cancelled {background:#a3acbb}
+.bar-row b {text-align:right}
+.table-scroll {overflow-x:auto}
+.admin-table {border-collapse:collapse;width:100%;font-size:13px}
+.admin-table th,.admin-table td {padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.admin-table th {color:var(--muted);font-weight:600;font-size:12px}
+.admin-table .nowrap,.admin-table .badge {white-space:nowrap}
+.admin-table tr.clickable {cursor:pointer}
+.admin-table tr.clickable:hover,.admin-table tr.selected {background:var(--soft)}
+.pager {display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.facts {display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:14px 0;font-size:13px}
+.facts dt {color:var(--muted)}
+.facts dd {margin:0}
+.timeline {padding-left:18px;font-size:13px;display:grid;gap:8px}
+.timeline span {color:var(--muted)}
+.stack-form {display:grid;gap:6px}
+.stack-form .primary {margin-top:10px}
+.switch {display:inline-flex;align-items:center;gap:6px;margin:0;font-size:12px}
+.ticket-detail .message {max-width:none}
+@media(max-width:1050px){.admin-grid {grid-template-columns:1fr}}

@@ -6,6 +6,7 @@ from httpx import ASGITransport, AsyncClient
 
 from src.config import Settings
 from src.main import app
+from src.services.accounts import seed_accounts
 from src.services.admissions import Admissions
 from src.services.knowledge import Knowledge
 from src.services.store import Store
@@ -23,6 +24,7 @@ async def client(tmp_path, knowledge):
     """Async HTTP client for testing API endpoints."""
     cfg = Settings(_env_file=None, answer_mode="extractive", app_env="test")
     store = Store(tmp_path / "test.db")
+    seed_accounts(store, cfg)
     app.state.runtime = {
         "settings": cfg,
         "store": store,

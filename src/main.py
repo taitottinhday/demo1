@@ -9,8 +9,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from src.api.admin import router as admin_router
 from src.api.routes import router
 from src.config import get_settings
+from src.services.accounts import seed_accounts
 from src.services.admissions import Admissions
 from src.services.email import SmtpMailer
 from src.services.knowledge import Knowledge
@@ -43,6 +45,8 @@ def create_app(settings=None):
         or not cfg.smtp_from
     ):
         raise ValueError("Production cần STAFF_PASSWORD riêng ≥12 ký tự và SECURE_COOKIES=true với HTTPS.")
+    if cfg.app_env == "production" and (cfg.admin_password == "Admin@2026!" or len(cfg.admin_password) < 12):
+        raise ValueError("Production cần ADMIN_PASSWORD riêng ≥12 ký tự.")
 
     @asynccontextmanager
     async def lifespan(app):
@@ -50,6 +54,7 @@ def create_app(settings=None):
         if not data_dir.is_absolute():
             data_dir = ROOT / data_dir
         store = Store(data_dir / "mvp.db")
+        seed_accounts(store, cfg)
         knowledge = Knowledge(data_dir)
         source_error = None
         try:
@@ -107,6 +112,7 @@ def create_app(settings=None):
         return response
 
     app.include_router(router, prefix="/api/v1")
+    app.include_router(admin_router, prefix="/api/v1")
     app.mount("/assets", StaticFiles(directory=ROOT / "src" / "web"), name="assets")
 
     @app.get("/")
@@ -120,6 +126,10 @@ def create_app(settings=None):
     @app.get("/account")
     async def account_page():
         return FileResponse(ROOT / "src" / "web" / "account.html")
+
+    @app.get("/admin")
+    async def admin_page():
+        return FileResponse(ROOT / "src" / "web" / "admin.html")
 
     @app.get("/health")
     async def health():

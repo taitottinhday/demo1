@@ -1,0 +1,29 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quản trị · Trợ lý X</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css"><script src="/assets/admin.js" defer></script></head><body>
+<header class="topbar"><a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>KHÔNG GIAN QUẢN TRỊ</small></span></a><nav><a class="staff-link" href="/staff">Trang cán bộ</a><button class="nav-link" id="logout" hidden>Đăng xuất</button></nav></header>
+<main class="staff-main">
+<section id="login-panel" class="login-panel"><div class="eyebrow">CỔNG QUẢN TRỊ</div><h1>Đăng nhập quản trị</h1><p>Chỉ tài khoản có vai trò admin được truy cập.</p><form id="login-form"><label for="username">Tài khoản</label><input id="username" autocomplete="username" required><label for="password">Mật khẩu</label><input type="password" id="password" autocomplete="current-password" required><div id="login-error" role="alert" class="error-text"></div><button type="submit" class="primary">Đăng nhập →</button></form></section>
+<section id="dashboard" hidden>
+<div class="dashboard-heading"><div><div class="eyebrow">TUYỂN SINH HUST 2026</div><h1>Quản trị hỗ trợ ứng viên</h1></div><button id="refresh" class="secondary">Làm mới dữ liệu ↻</button></div>
+<nav class="admin-tabs" role="tablist"><button role="tab" data-tab="overview" aria-selected="true">Tổng quan</button><button role="tab" data-tab="tickets" aria-selected="false">Ticket</button><button role="tab" data-tab="officers" aria-selected="false">Cán bộ</button></nav>
+<div id="admin-error" class="error-text" role="alert"></div>
+
+<section id="tab-overview" class="admin-tab">
+<form id="range-form" class="admin-filters"><label for="from">Từ ngày</label><input type="date" id="from"><label for="to">Đến ngày</label><input type="date" id="to"><button class="secondary" type="submit">Áp dụng</button></form>
+<div id="metrics" class="metrics"></div>
+<div class="admin-grid"><section class="queue-panel"><h2>Ticket theo trạng thái</h2><div id="status-chart" class="bar-chart"></div></section><section class="queue-panel"><h2>Tải của cán bộ</h2><div id="load-chart" class="bar-chart"></div></section></div>
+<section class="queue-panel admin-block"><h2 id="stale-title">Ticket chờ quá lâu</h2><div id="stale"></div></section>
+<p id="rate-note" class="hint"></p>
+</section>
+
+<section id="tab-tickets" class="admin-tab" hidden>
+<div class="admin-filters"><label for="status-filter">Trạng thái</label><select id="status-filter"><option value="">Tất cả</option><option value="waiting">Đang chờ</option><option value="in_progress">Đang xử lý</option><option value="resolved">Đã giải quyết</option><option value="rejected">Đã từ chối</option><option value="cancelled">Đã hủy</option></select><label for="officer-filter">Cán bộ</label><select id="officer-filter"><option value="">Tất cả cán bộ</option></select></div>
+<div class="queue-layout"><section class="queue-panel"><div class="table-scroll"><table class="admin-table"><thead><tr><th>Mã</th><th>Nội dung</th><th>Trạng thái</th><th>Cán bộ</th><th>Tạo lúc</th></tr></thead><tbody id="ticket-rows"></tbody></table></div><div class="pager"><button id="prev" class="small-action">← Trước</button><span id="page-info" class="hint"></span><button id="next" class="small-action">Sau →</button></div></section>
+<section class="ticket-detail" id="detail"><p class="empty-state">Chọn một ticket để xem chi tiết,<br>lịch sử và phân công lại.</p></section></div>
+</section>
+
+<section id="tab-officers" class="admin-tab" hidden>
+<div class="admin-grid"><section class="queue-panel"><h2>Danh sách cán bộ</h2><div class="table-scroll"><table class="admin-table"><thead><tr><th>Tên</th><th>Tài khoản</th><th>Email</th><th>Đang giữ</th><th>Hoạt động</th></tr></thead><tbody id="officer-rows"></tbody></table></div></section>
+<section class="queue-panel"><h2>Tạo tài khoản cán bộ</h2><form id="officer-form" class="stack-form"><label for="o-name">Họ tên</label><input id="o-name" required maxlength="100"><label for="o-username">Tài khoản</label><input id="o-username" required pattern="[a-zA-Z0-9_.\-]{3,40}" title="3–40 ký tự: chữ, số, _ . -"><label for="o-email">Email</label><input id="o-email" type="email" required maxlength="120"><label for="o-password">Mật khẩu tạm</label><input id="o-password" type="password" required minlength="8" autocomplete="new-password"><div id="officer-error" class="error-text" role="alert"></div><button class="primary" type="submit">Tạo cán bộ →</button></form></section></div>
+</section>
+</section></main>
+<footer class="page-footer"><span>EDU-12 · Quản trị handover</span><span>HUST 2026 · Admin</span></footer></body></html>

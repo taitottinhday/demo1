@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     public_base_url: str = "http://127.0.0.1:8000"
     verification_code_minutes: int = Field(default=10, ge=5, le=60)
     verification_max_attempts: int = Field(default=5, ge=1, le=10)
+    admin_username: str = "admin"
+    admin_password: str = "Admin@2026!"
+    admin_stale_hours: int = Field(default=24, ge=1, le=720)
     mvp_data_dir: str = "data"
     session_hours: int = Field(default=24, ge=1, le=168)
     secure_cookies: bool = False

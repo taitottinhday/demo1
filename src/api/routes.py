@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 
+from src.services.accounts import authenticate
 from src.services.admissions import redact
 from src.services.email import EmailDeliveryError
 from src.services.product_features import compare_programs
@@ -584,10 +585,7 @@ def login(body: LoginInput, request: Request, response: Response):
     if not rt["store"].allowed("login:" + ip, count=5, window=60):
         raise HTTPException(429, "Vui lòng chờ một phút trước khi đăng nhập lại.")
     cfg = rt["settings"]
-    if not (
-        secrets.compare_digest(body.username.encode(), cfg.staff_username.encode())
-        and secrets.compare_digest(body.password.encode(), cfg.staff_password.encode())
-    ):
+    if not authenticate(rt["store"], body.username, body.password, "officer"):
         raise HTTPException(401, "Thông tin đăng nhập không hợp lệ.")
     token = rt["store"].staff_login(body.username)
     staff_cookie(response, token, cfg)
