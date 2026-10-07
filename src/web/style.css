@@ -222,3 +222,4 @@ dialog::backdrop { background:#131b3866; backdrop-filter:blur(4px) }dialog h2 { 
 .switch {display:inline-flex;align-items:center;gap:6px;margin:0;font-size:12px}
 .ticket-detail .message {max-width:none}
 @media(max-width:1050px){.admin-grid {grid-template-columns:1fr}}
+.password-input{display:flex;align-items:center;gap:6px}.password-input input{min-width:0;flex:1}.password-toggle{flex:0 0 auto;border:0;background:transparent;color:var(--green);font-size:12px;font-weight:800;cursor:pointer}.password-reset{display:grid;gap:5px;min-width:190px;margin-top:7px}.password-reset[hidden]{display:none}.password-reset .password-input{min-width:190px}.password-reset .error-text{margin:0;font-size:10px}

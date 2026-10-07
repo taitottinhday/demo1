@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 
 from fastapi import HTTPException
 
-from src.services.accounts import create_user
+from src.services.accounts import create_user, hash_password
 from src.services.store import digest, ticket_event
 
 STATUSES = ["waiting", "in_progress", "resolved", "rejected", "cancelled"]
@@ -194,6 +194,20 @@ class AdminStore:
                     if self.move(db, ticket_id, "in_progress", row["username"], None, "Khóa cán bộ", actor):
                         released += 1
         return {**self.officer(officer_id), "released_tickets": released}
+
+    def reset_officer_password(self, officer_id, password):
+        with self.store.connect() as db:
+            row = db.execute(
+                "SELECT username FROM users WHERE id=? AND role='officer'", (officer_id,)
+            ).fetchone()
+            if not row:
+                raise HTTPException(404, "Không tìm thấy cán bộ.")
+            db.execute(
+                "UPDATE users SET password_hash=? WHERE id=?",
+                (hash_password(password), officer_id),
+            )
+            db.execute("DELETE FROM staff_sessions WHERE username=?", (row["username"],))
+        return self.officer(officer_id)
 
     # Metrics --------------------------------------------------------------
     def metrics(self, date_from=None, date_to=None, stale_hours=24):

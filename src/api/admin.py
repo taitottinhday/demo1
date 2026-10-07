@@ -40,6 +40,10 @@ class OfficerPatch(BaseModel):
     active: bool | None = None
 
 
+class OfficerPasswordInput(BaseModel):
+    password: str = Field(min_length=8, max_length=200)
+
+
 def runtime(request: Request):
     return request.app.state.runtime
 
@@ -129,6 +133,13 @@ def update_officer(officer_id: int, body: OfficerPatch, request: Request, user=D
     if name == "":
         raise HTTPException(422, "Cần nhập tên.")
     return admins(request).update_officer(officer_id, name, body.active, user)
+
+
+@router.post("/officers/{officer_id}/password")
+def reset_officer_password(
+    officer_id: int, body: OfficerPasswordInput, request: Request, user=Depends(admin)
+):
+    return admins(request).reset_officer_password(officer_id, body.password)
 
 
 @router.get("/metrics")

@@ -99,6 +99,38 @@ function renderDetail(t,history){
 }
 
 // Officers -----------------------------------------------------------------
+function bindPasswordToggle(button,input){
+  button.onclick=()=>{
+    const hidden=input.type==='password';
+    input.type=hidden?'text':'password';
+    button.textContent=hidden?'Ẩn':'Hiện';
+    button.setAttribute('aria-label',hidden?'Ẩn mật khẩu':'Hiện mật khẩu');
+  };
+}
+function passwordResetCell(o){
+  const cell=node('td');
+  const open=node('button','small-action','Đặt lại');open.type='button';open.title='Đặt mật khẩu mới cho cán bộ';
+  const form=node('form','password-reset');form.hidden=true;
+  const wrap=node('div','password-input');
+  const input=document.createElement('input');input.type='password';input.minLength=8;input.maxLength=200;input.autocomplete='new-password';input.placeholder='Mật khẩu mới';input.required=true;
+  const eye=node('button','password-toggle','Hiện');eye.type='button';eye.setAttribute('aria-label','Hiện mật khẩu');bindPasswordToggle(eye,input);
+  wrap.append(input,eye);
+  const save=node('button','small-action','Lưu');save.type='submit';
+  const error=node('p','error-text');error.setAttribute('role','alert');
+  form.append(wrap,save,error);
+  open.onclick=()=>{form.hidden=!form.hidden;if(!form.hidden)input.focus();};
+  form.onsubmit=async event=>{
+    event.preventDefault();error.textContent='';
+    if(input.value.length<8){error.textContent='Mật khẩu mới phải có ít nhất 8 ký tự.';input.focus();return;}
+    save.disabled=true;
+    try{
+      await api('/admin/officers/'+o.id+'/password',{method:'POST',body:JSON.stringify({password:input.value})});
+      input.value='';form.hidden=true;open.textContent='Đã đặt lại';
+    }catch(err){error.textContent=err.message;}
+    finally{save.disabled=false;}
+  };
+  cell.append(open,form);return cell;
+}
 async function loadOfficers(){
   officers=await api('/admin/officers');
   const current=$('officer-filter').value;$('officer-filter').replaceChildren(new Option('Tất cả cán bộ',''));
@@ -109,8 +141,9 @@ async function loadOfficers(){
       if(!input.checked){const msg=o.open_tickets?`Khóa ${o.name}? ${o.open_tickets} ticket sẽ được trả về hàng chờ.`:`Khóa ${o.name}?`;if(!confirm(msg)){input.checked=true;return;}}
       input.disabled=true;try{await api('/admin/officers/'+o.id,{method:'PATCH',body:JSON.stringify({active:input.checked})});await refresh();}catch(e){fail(e);input.checked=!input.checked;input.disabled=false;}};
     label.append(input,node('span','',o.active?'Hoạt động':'Đã khóa'));toggle.append(label);
-    tr.append(node('td','',o.name),node('td','',o.username),node('td','',o.email),node('td','',String(o.open_tickets)),toggle);$('officer-rows').append(tr);});
+    tr.append(node('td','',o.name),node('td','',o.username),node('td','',o.email),node('td','',String(o.open_tickets)),passwordResetCell(o),toggle);$('officer-rows').append(tr);});
 }
+document.querySelectorAll('[data-password-toggle]').forEach(button=>bindPasswordToggle(button,$(button.dataset.passwordToggle)));
 $('officer-form').addEventListener('submit',async e=>{e.preventDefault();$('officer-error').textContent='';const button=e.submitter;button.disabled=true;
   try{await api('/admin/officers',{method:'POST',body:JSON.stringify({name:$('o-name').value,username:$('o-username').value,email:$('o-email').value,password:$('o-password').value})});e.target.reset();await loadOfficers();}
   catch(error){$('officer-error').textContent=error.message;}finally{button.disabled=false;}});

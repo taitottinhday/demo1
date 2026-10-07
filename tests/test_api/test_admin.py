@@ -196,6 +196,27 @@ async def test_create_officer_validation(client):
 
 
 @pytest.mark.asyncio
+async def test_admin_can_reset_officer_password_without_exposing_it(client):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as staff_client:
+        assert (await staff_client.post("/api/v1/staff/login", json=STAFF)).status_code == 200
+        await login_admin(client)
+        officer = next(o for o in (await client.get("/api/v1/admin/officers")).json() if o["username"] == "canbo")
+        response = await client.post(
+            f"/api/v1/admin/officers/{officer['id']}/password",
+            json={"password": "NewOfficer@123"},
+        )
+        assert response.status_code == 200
+        assert "password" not in response.json() and "password_hash" not in response.json()
+        assert (await staff_client.get("/api/v1/staff/tickets")).status_code == 401
+        assert (await staff_client.post("/api/v1/staff/login", json=STAFF)).status_code == 401
+        assert (
+            await staff_client.post(
+                "/api/v1/staff/login", json={"username": "canbo", "password": "NewOfficer@123"}
+            )
+        ).status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_metrics_with_sample_data(client):
     now = time.time()
     hour = 3600
