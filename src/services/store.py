@@ -36,7 +36,26 @@ class Store:
                 CREATE TABLE IF NOT EXISTS budgets (day TEXT PRIMARY KEY, calls INTEGER NOT NULL);
                 CREATE TABLE IF NOT EXISTS limits (
                     key TEXT PRIMARY KEY, start REAL NOT NULL, count INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY, username TEXT UNIQUE NOT NULL, name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK (role IN ('officer','admin')),
+                    active INTEGER NOT NULL DEFAULT 1, password_hash TEXT NOT NULL, created REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS admin_sessions (
+                    token TEXT PRIMARY KEY, username TEXT NOT NULL, expires REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS ticket_events (
+                    id INTEGER PRIMARY KEY, ticket_id TEXT NOT NULL, actor_id INTEGER REFERENCES users(id),
+                    action TEXT NOT NULL CHECK (action IN
+                        ('created','claimed','resolved','rejected','reassigned','cancelled')),
+                    from_officer_id INTEGER REFERENCES users(id), to_officer_id INTEGER REFERENCES users(id),
+                    note TEXT, created REAL NOT NULL);
+                CREATE INDEX IF NOT EXISTS idx_events_ticket ON ticket_events(ticket_id);
+                CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
+                CREATE INDEX IF NOT EXISTS idx_tickets_owner ON tickets(owner);
             """)
+            columns = {r["name"] for r in db.execute("PRAGMA table_info(tickets)")}
+            for column in ["claimed_at", "resolved_at"]:
+                if column not in columns:
+                    db.execute(f"ALTER TABLE tickets ADD COLUMN {column} REAL")
 
     @contextmanager
     def connect(self):
@@ -112,27 +131,37 @@ class Store:
     def create_ticket(self, sid, key, summary, reason):
         now = time.time()
         with self.connect() as db:
-            db.execute(
-                "INSERT OR IGNORE INTO tickets VALUES(?,?,?,?,?,'waiting',NULL,'',?,?)",
+            created = db.execute(
+                "INSERT OR IGNORE INTO tickets(id,session,request_key,summary,reason,status,owner,reply,created,updated)"
+                " VALUES(?,?,?,?,?,'waiting',NULL,'',?,?)",
                 ("TS-" + secrets.token_hex(4).upper(), sid, key, summary, reason, now, now),
-            )
+            ).rowcount
             row = db.execute("SELECT * FROM tickets WHERE session=? AND request_key=?", (sid, key)).fetchone()
+            if created:
+                ticket_event(db, row["id"], "created")
         return dict(row)
 
     def claim(self, ticket, owner):
         with self.connect() as db:
+            now = time.time()
             result = db.execute(
-                "UPDATE tickets SET status='in_progress',owner=?,updated=? WHERE id=? AND status='waiting'",
-                (owner, time.time(), ticket),
+                "UPDATE tickets SET status='in_progress',owner=?,updated=?,claimed_at=? WHERE id=? AND status='waiting'",
+                (owner, now, now, ticket),
             )
+            if result.rowcount == 1:
+                ticket_event(db, ticket, "claimed", actor=owner, to_owner=owner)
             return result.rowcount == 1
 
     def resolve(self, ticket, owner, reply):
         with self.connect() as db:
+            now = time.time()
             result = db.execute(
-                "UPDATE tickets SET status='resolved',reply=?,updated=? WHERE id=? AND status='in_progress' AND owner=?",
-                (reply, time.time(), ticket, owner),
+                "UPDATE tickets SET status='resolved',reply=?,updated=?,resolved_at=?"
+                " WHERE id=? AND status='in_progress' AND owner=?",
+                (reply, now, now, ticket, owner),
             )
+            if result.rowcount == 1:
+                ticket_event(db, ticket, "resolved", actor=owner)
             return result.rowcount == 1
 
     def staff_login(self, username):
@@ -143,28 +172,37 @@ class Store:
 
     def cancel(self, ticket, sid):
         with self.connect() as db:
-            return (
+            done = (
                 db.execute(
                     "UPDATE tickets SET status='cancelled',updated=? WHERE id=? AND session=? AND status IN ('waiting','in_progress')",
                     (time.time(), ticket, sid),
                 ).rowcount
                 == 1
             )
+            if done:
+                ticket_event(db, ticket, "cancelled")
+            return done
 
     def reject(self, ticket, owner, reason):
         with self.connect() as db:
-            return (
+            now = time.time()
+            done = (
                 db.execute(
-                    "UPDATE tickets SET status='rejected',owner=?,reply=?,updated=? WHERE id=? AND (status='waiting' OR (status='in_progress' AND owner=?))",
-                    (owner, reason, time.time(), ticket, owner),
+                    "UPDATE tickets SET status='rejected',owner=?,reply=?,updated=?,resolved_at=? WHERE id=? AND (status='waiting' OR (status='in_progress' AND owner=?))",
+                    (owner, reason, now, now, ticket, owner),
                 ).rowcount
                 == 1
             )
+            if done:
+                ticket_event(db, ticket, "rejected", actor=owner)
+            return done
 
     def staff_user(self, token):
         with self.connect() as db:
             row = db.execute(
-                "SELECT username FROM staff_sessions WHERE token=? AND expires>?", (digest(token or ""), time.time())
+                "SELECT s.username FROM staff_sessions s JOIN users u ON u.username=s.username"
+                " WHERE s.token=? AND s.expires>? AND u.role='officer' AND u.active=1",
+                (digest(token or ""), time.time()),
             ).fetchone()
             return row[0] if row else None
 
@@ -226,8 +264,23 @@ class Store:
             db.execute("DELETE FROM messages WHERE session IN (SELECT id FROM sessions WHERE updated<?)", (cutoff,))
             db.execute("DELETE FROM sessions WHERE updated<?", (cutoff,))
             db.execute("DELETE FROM staff_sessions WHERE expires<?", (time.time(),))
+            db.execute("DELETE FROM admin_sessions WHERE expires<?", (time.time(),))
+            db.execute(
+                "DELETE FROM ticket_events WHERE ticket_id IN (SELECT id FROM tickets WHERE updated<?)",
+                (time.time() - 30 * 86400,),
+            )
             db.execute("DELETE FROM tickets WHERE updated<?", (time.time() - 30 * 86400,))
             db.execute("DELETE FROM limits WHERE start<?", (time.time() - 86400,))
+
+
+def ticket_event(db, ticket, action, actor=None, from_owner=None, to_owner=None, note=None):
+    """Append an audit row; officers are stored as users.id, the candidate as NULL."""
+    user = "(SELECT id FROM users WHERE username=?)"
+    db.execute(
+        "INSERT INTO ticket_events(ticket_id,actor_id,action,from_officer_id,to_officer_id,note,created)"
+        f" VALUES(?,{user},?,{user},{user},?,?)",
+        (ticket, actor, action, from_owner, to_owner, note, time.time()),
+    )
 
 
 def math_index(length):

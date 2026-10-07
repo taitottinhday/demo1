@@ -60,6 +60,33 @@ Không gửi key trong chat hoặc commit `.env`. Chế độ LLM dùng Response
 5. Chuyển cán bộ → sửa nội dung → đồng ý → gửi. Mở `/staff`, đăng nhập → nhận xử lý → phản hồi và đóng.
 6. Quay về ứng viên → **Yêu cầu của tôi → Làm mới** để xem phản hồi. Tải lại trang để kiểm tra dữ liệu còn được lưu.
 
+## Trang quản trị (Admin)
+
+Mở **http://127.0.0.1:8000/admin**, đăng nhập `admin` / `Admin@2026!` (đổi bằng `ADMIN_USERNAME`, `ADMIN_PASSWORD` trong `.env`). Đặc tả đầy đủ ở `ADMIN_SPEC.md`.
+
+- Tài khoản nằm trong bảng `users`. Khi server khởi động, `canbo` (role officer) và `admin` được tạo từ `.env` nếu chưa có. Đổi mật khẩu trong `.env` sau lần chạy đầu không cập nhật tài khoản đã có.
+- `/staff/login` chỉ nhận officer đang hoạt động. `/admin/login` chỉ nhận admin. Hai loại cookie tách riêng.
+- Chức năng: xem và lọc toàn bộ ticket, xem chi tiết kèm hội thoại, nguồn và lịch sử (`ticket_events`). Phân công lại hoặc trả về hàng chờ. Tạo, khóa hoặc mở cán bộ: khóa thì ticket họ đang giữ tự trả về hàng chờ. Có thêm metrics.
+- `ADMIN_STALE_HOURS` (mặc định `24`) là ngưỡng hiển thị "ticket chờ quá lâu".
+- Dữ liệu demo gồm 3 cán bộ (mật khẩu `Demo@2026!`) và 10 ticket `TS-DEMO..` đủ trạng thái. Chạy được nhiều lần, không tạo trùng; không chạy khi `APP_ENV=production`:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\seed_admin_demo.py
+```
+
+Kịch bản demo admin, khoảng 2 phút:
+
+1. Tab **Ticket**, lọc "Đang chờ", mở `TS-DEMO01`: xem lý do chuyển, hội thoại và nguồn.
+2. Tab **Tổng quan**: thời gian chờ trung bình, tải từng cán bộ, ticket chờ quá lâu.
+3. Mở `TS-DEMO05`, phân công cho cán bộ khác, rồi xem sự kiện mới trong **Lịch sử**.
+4. Tab **Cán bộ**: khóa Nguyễn Thị Lan. Hộp xác nhận nêu số ticket sẽ về hàng chờ.
+
+Giới hạn hiện tại:
+
+- `confidence_score` luôn `null`.
+- `handover_rate` trả `null` cho đến khi bên AI ghi bảng `chat_logs`.
+- Ticket tạo trước khi có phần admin không có lịch sử và mốc thời gian nhận.
+
 G1 vẫn là hồ sơ thiết kế; bản demo dùng SQLite/BM25 và giao diện web trực tiếp thay cho Next.js/pgvector đề xuất. Code LangGraph mẫu không được gọi trong luồng chat.
 
 ## Hồ sơ Gate 2

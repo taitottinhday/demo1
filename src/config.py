@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     answer_mode: Literal["extractive", "llm"] = "extractive"
     staff_username: str = "canbo"
     staff_password: str = "Demo@2026!"
+    admin_username: str = "admin"
+    admin_password: str = "Admin@2026!"
+    admin_stale_hours: int = Field(default=24, ge=1, le=720)
     mvp_data_dir: str = "data"
     session_hours: int = Field(default=24, ge=1, le=168)
     secure_cookies: bool = False
