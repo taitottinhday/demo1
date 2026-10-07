@@ -23,9 +23,10 @@ def verify_password(password, stored):
 
 
 def create_user(db, username, name, email, role, password):
+    now = time.time()
     return db.execute(
-        "INSERT INTO users(username,name,email,role,active,password_hash,created) VALUES(?,?,?,?,1,?,?)",
-        (username, name, email, role, hash_password(password), time.time()),
+        "INSERT INTO users(username,name,email,role,active,password_hash,created,password_set_at) VALUES(?,?,?,?,1,?,?,?)",
+        (username, name, email, role, hash_password(password), now, now),
     ).lastrowid
 
 

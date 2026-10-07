@@ -45,6 +45,11 @@ class LoginInput(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
+class StaffActivateInput(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    password: str = Field(min_length=10, max_length=200)
+
+
 class ReplyInput(BaseModel):
     reply: str = Field(min_length=1, max_length=4000)
 
@@ -590,6 +595,18 @@ def login(body: LoginInput, request: Request, response: Response):
     token = rt["store"].staff_login(body.username)
     staff_cookie(response, token, cfg)
     return {"username": body.username}
+
+
+@router.post("/staff/activate")
+def activate_staff(body: StaffActivateInput, request: Request):
+    rt = runtime(request)
+    ip = request.client.host if request.client else "unknown"
+    if not rt["store"].allowed("staff-activate:" + ip, count=10, window=600):
+        raise HTTPException(429, "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau.")
+    username = rt["store"].activate_staff_invite(body.token, body.password)
+    if not username:
+        raise HTTPException(422, "Liên kết không hợp lệ, đã hết hạn hoặc đã được sử dụng.")
+    return {"ok": True, "username": username, "message": "Mật khẩu đã được thiết lập. Bạn có thể đăng nhập."}
 
 
 @router.post("/tickets/{ticket_id}/cancel")

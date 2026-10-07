@@ -54,12 +54,18 @@ class Store:
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY, username TEXT UNIQUE NOT NULL, name TEXT NOT NULL,
                     email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK (role IN ('officer','admin')),
-                    active INTEGER NOT NULL DEFAULT 1, password_hash TEXT NOT NULL, created REAL NOT NULL);
+                    active INTEGER NOT NULL DEFAULT 1, password_hash TEXT NOT NULL, created REAL NOT NULL,
+                    password_set_at REAL, invite_sent_at REAL);
                 CREATE TABLE IF NOT EXISTS admin_sessions (
                     token TEXT PRIMARY KEY, username TEXT NOT NULL, expires REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS staff_invites (
+                    token_hash TEXT PRIMARY KEY, officer_id INTEGER NOT NULL,
+                    expires REAL NOT NULL, used_at REAL, created REAL NOT NULL,
+                    FOREIGN KEY (officer_id) REFERENCES users(id));
                 CREATE INDEX IF NOT EXISTS idx_events_ticket ON ticket_events(ticket_id);
                 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
                 CREATE INDEX IF NOT EXISTS idx_tickets_owner ON tickets(owner);
+                CREATE INDEX IF NOT EXISTS idx_staff_invites_officer ON staff_invites(officer_id);
             """)
             columns = {row[1] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
             if "student_id" not in columns:
@@ -77,6 +83,12 @@ class Store:
             }.items():
                 if column not in event_columns:
                     db.execute(f"ALTER TABLE ticket_events ADD COLUMN {column} {definition}")
+            user_columns = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
+            if "password_set_at" not in user_columns:
+                db.execute("ALTER TABLE users ADD COLUMN password_set_at REAL")
+                db.execute("UPDATE users SET password_set_at=created WHERE password_set_at IS NULL")
+            if "invite_sent_at" not in user_columns:
+                db.execute("ALTER TABLE users ADD COLUMN invite_sent_at REAL")
 
     @contextmanager
     def connect(self):
@@ -262,6 +274,56 @@ class Store:
     def reset_password(self, email, password):
         with self.connect() as db:
             db.execute("UPDATE students SET password_hash=?, updated=? WHERE email=?", (self._password_hash(password), time.time(), email))
+
+    def create_staff_invite(self, officer_id, hours):
+        token = secrets.token_urlsafe(32)
+        now = time.time()
+        with self.connect() as db:
+            officer = db.execute(
+                "SELECT id FROM users WHERE id=? AND role='officer' AND active=1", (officer_id,)
+            ).fetchone()
+            if not officer:
+                return None
+            db.execute(
+                "UPDATE staff_invites SET used_at=? WHERE officer_id=? AND used_at IS NULL", (now, officer_id)
+            )
+            db.execute(
+                "INSERT INTO staff_invites(token_hash,officer_id,expires,created) VALUES(?,?,?,?)",
+                (digest(token), officer_id, now + hours * 3600, now),
+            )
+            db.execute(
+                "UPDATE users SET password_set_at=NULL, invite_sent_at=? WHERE id=?",
+                (now, officer_id),
+            )
+        return token
+
+    def activate_staff_invite(self, token, password):
+        now = time.time()
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT i.officer_id,u.username FROM staff_invites i JOIN users u ON u.id=i.officer_id "
+                "WHERE i.token_hash=? AND i.expires>? AND i.used_at IS NULL "
+                "AND u.role='officer' AND u.active=1",
+                (digest(token or ""), now),
+            ).fetchone()
+            if not row:
+                return None
+            db.execute(
+                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL WHERE id=?",
+                (self._account_password_hash(password), now, row["officer_id"]),
+            )
+            db.execute(
+                "UPDATE staff_invites SET used_at=? WHERE token_hash=? AND used_at IS NULL",
+                (now, digest(token or "")),
+            )
+            db.execute("DELETE FROM staff_sessions WHERE username=?", (row["username"],))
+        return row["username"]
+
+    @staticmethod
+    def _account_password_hash(password):
+        salt = secrets.token_bytes(16)
+        value = hashlib.scrypt(password.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32)
+        return f"scrypt${salt.hex()}${value.hex()}"
 
     def context(self, sid, value):
         with self.connect() as db:

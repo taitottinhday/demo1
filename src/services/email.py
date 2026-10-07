@@ -57,6 +57,43 @@ class SmtpMailer:
         message.add_alternative(html, subtype="html")
         self._deliver(message)
 
+    def send_staff_invite(
+        self, recipient: str, name: str, username: str, activate_url: str, expires_hours: int
+    ) -> None:
+        """Send a one-time password setup link; never email a plaintext password."""
+        if not self.configured:
+            raise EmailDeliveryError("SMTP is not configured.")
+        greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
+        subject = "Mời truy cập khu vực cán bộ tuyển sinh"
+        expiry = f"Liên kết có hiệu lực trong {expires_hours} giờ."
+        text = (
+            f"{greeting}\n\n"
+            "Bạn đã được tạo tài khoản cán bộ tuyển sinh.\n"
+            f"Tài khoản: {username}\n\n"
+            "Bấm liên kết dưới đây để tự đặt mật khẩu riêng:\n"
+            f"{activate_url}\n\n{expiry}\n"
+            "Nếu bạn không mong đợi email này, hãy liên hệ quản trị viên."
+        )
+        html = (
+            '<!doctype html><html lang="vi"><body style="font-family:Arial,sans-serif;color:#123b3d">'
+            f"<h2>{escape(subject)}</h2><p>{escape(greeting)}</p>"
+            "<p>Bạn đã được tạo tài khoản cán bộ tuyển sinh.</p>"
+            f"<p><b>Tài khoản:</b> {escape(username)}</p>"
+            f'<p><a href="{escape(activate_url, quote=True)}" '
+            'style="display:inline-block;padding:12px 18px;background:#5b4ee8;color:#fff;text-decoration:none;border-radius:8px">'
+            "Đặt mật khẩu cán bộ</a></p>"
+            f"<p>{escape(expiry)}</p>"
+            "<p>Không chia sẻ liên kết này. Nếu bạn không mong đợi email này, hãy liên hệ quản trị viên.</p>"
+            "</body></html>"
+        )
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = formataddr((self.settings.smtp_from_name, self.settings.smtp_from))
+        message["To"] = recipient
+        message.set_content(text)
+        message.add_alternative(html, subtype="html")
+        self._deliver(message)
+
     def send_login_notice(self, recipient: str, name: str = "", method: str = "Google", ip: str = "") -> None:
         """Notify the account owner after a successful sign-in."""
         if not self.configured:

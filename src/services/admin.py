@@ -154,22 +154,47 @@ class AdminStore:
     def officers(self):
         with self.store.connect() as db:
             rows = db.execute(
-                "SELECT u.id,u.username,u.name,u.email,u.active,u.created,COUNT(t.id) AS open_tickets"
+                "SELECT u.id,u.username,u.name,u.email,u.active,u.created,u.password_set_at,u.invite_sent_at,"
+                "COUNT(t.id) AS open_tickets"
                 " FROM users u LEFT JOIN tickets t ON t.owner=u.username AND t.status='in_progress'"
                 " WHERE u.role='officer' GROUP BY u.id ORDER BY u.name, u.id"
             ).fetchall()
-        return [{**dict(r), "active": bool(r["active"])} for r in rows]
+        result = []
+        for row in rows:
+            officer = {**dict(row), "active": bool(row["active"])}
+            officer["password_status"] = "ready" if row["password_set_at"] else "invite_sent"
+            result.append(officer)
+        return result
 
     def officer(self, officer_id):
         return next((o for o in self.officers() if o["id"] == officer_id), None)
 
-    def create_officer(self, username, name, email, password):
+    def create_officer(self, username, name, email, password, invite_hours):
+        password = password or secrets.token_urlsafe(24)
         try:
             with self.store.connect() as db:
                 officer_id = create_user(db, username, name, email, "officer", password)
         except sqlite3.IntegrityError:
             raise HTTPException(409, "Tài khoản hoặc email đã tồn tại.") from None
-        return self.officer(officer_id)
+        token = self.store.create_staff_invite(officer_id, invite_hours)
+        return self.officer(officer_id), token
+
+    def resend_officer_invite(self, officer_id, invite_hours):
+        officer = self.officer(officer_id)
+        if not officer:
+            raise HTTPException(404, "Không tìm thấy cán bộ.")
+        if not officer["active"]:
+            raise HTTPException(409, "Cán bộ đang bị khóa, không thể gửi lời mời.")
+        if officer["password_status"] == "ready":
+            raise HTTPException(409, "Cán bộ đã thiết lập mật khẩu. Hãy dùng chức năng đặt lại mật khẩu.")
+        token = self.store.create_staff_invite(officer_id, invite_hours)
+        return self.officer(officer_id), token
+
+    def remove_officer(self, officer_id):
+        with self.store.connect() as db:
+            db.execute("DELETE FROM staff_invites WHERE officer_id=?", (officer_id,))
+            db.execute("DELETE FROM staff_sessions WHERE username=(SELECT username FROM users WHERE id=?)", (officer_id,))
+            db.execute("DELETE FROM users WHERE id=? AND role='officer'", (officer_id,))
 
     def update_officer(self, officer_id, name, active, actor):
         released = 0
@@ -203,10 +228,11 @@ class AdminStore:
             if not row:
                 raise HTTPException(404, "Không tìm thấy cán bộ.")
             db.execute(
-                "UPDATE users SET password_hash=? WHERE id=?",
-                (hash_password(password), officer_id),
+                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL WHERE id=?",
+                (hash_password(password), time.time(), officer_id),
             )
             db.execute("DELETE FROM staff_sessions WHERE username=?", (row["username"],))
+            db.execute("UPDATE staff_invites SET used_at=? WHERE officer_id=? AND used_at IS NULL", (time.time(), officer_id))
         return self.officer(officer_id)
 
     # Metrics --------------------------------------------------------------

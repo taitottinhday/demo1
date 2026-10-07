@@ -107,8 +107,21 @@ function bindPasswordToggle(button,input){
     button.setAttribute('aria-label',hidden?'Ẩn mật khẩu':'Hiện mật khẩu');
   };
 }
+function passwordStatusCell(o){
+  const cell=node('td');
+  const labels={ready:'Đã thiết lập',invite_sent:'Chờ cán bộ đặt'};
+  cell.append(node('span','password-status '+o.password_status,labels[o.password_status]||'Chưa xác định'));
+  if(o.invite_sent_at)cell.append(node('small','hint','Email: '+when(o.invite_sent_at)));
+  if(o.password_set_at)cell.append(node('small','hint','Cập nhật: '+when(o.password_set_at)));
+  return cell;
+}
 function passwordResetCell(o){
   const cell=node('td');
+  if(o.password_status!=='ready'){
+    const send=node('button','small-action','Gửi lại email');send.type='button';send.title='Gửi lại email thiết lập mật khẩu';
+    send.onclick=async()=>{send.disabled=true;try{await api('/admin/officers/'+o.id+'/invite',{method:'POST'});await loadOfficers();}catch(error){fail(error);send.disabled=false;}};
+    cell.append(send);return cell;
+  }
   const open=node('button','small-action','Đặt lại');open.type='button';open.title='Đặt mật khẩu mới cho cán bộ';
   const form=node('form','password-reset');form.hidden=true;
   const wrap=node('div','password-input');
@@ -141,11 +154,11 @@ async function loadOfficers(){
       if(!input.checked){const msg=o.open_tickets?`Khóa ${o.name}? ${o.open_tickets} ticket sẽ được trả về hàng chờ.`:`Khóa ${o.name}?`;if(!confirm(msg)){input.checked=true;return;}}
       input.disabled=true;try{await api('/admin/officers/'+o.id,{method:'PATCH',body:JSON.stringify({active:input.checked})});await refresh();}catch(e){fail(e);input.checked=!input.checked;input.disabled=false;}};
     label.append(input,node('span','',o.active?'Hoạt động':'Đã khóa'));toggle.append(label);
-    tr.append(node('td','',o.name),node('td','',o.username),node('td','',o.email),node('td','',String(o.open_tickets)),passwordResetCell(o),toggle);$('officer-rows').append(tr);});
+    tr.append(node('td','',o.name),node('td','',o.username),node('td','',o.email),node('td','',String(o.open_tickets)),passwordStatusCell(o),passwordResetCell(o),toggle);$('officer-rows').append(tr);});
 }
 document.querySelectorAll('[data-password-toggle]').forEach(button=>bindPasswordToggle(button,$(button.dataset.passwordToggle)));
 $('officer-form').addEventListener('submit',async e=>{e.preventDefault();$('officer-error').textContent='';const button=e.submitter;button.disabled=true;
-  try{await api('/admin/officers',{method:'POST',body:JSON.stringify({name:$('o-name').value,username:$('o-username').value,email:$('o-email').value,password:$('o-password').value})});e.target.reset();await loadOfficers();}
+  try{await api('/admin/officers',{method:'POST',body:JSON.stringify({name:$('o-name').value,username:$('o-username').value,email:$('o-email').value})});e.target.reset();await loadOfficers();}
   catch(error){$('officer-error').textContent=error.message;}finally{button.disabled=false;}});
 
 // Wiring -------------------------------------------------------------------

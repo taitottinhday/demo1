@@ -123,6 +123,10 @@ def create_app(settings=None):
     async def staff_page():
         return FileResponse(ROOT / "src" / "web" / "staff.html")
 
+    @app.get("/staff/activate")
+    async def staff_activate_page():
+        return FileResponse(ROOT / "src" / "web" / "staff-activate.html")
+
     @app.get("/account")
     async def account_page():
         return FileResponse(ROOT / "src" / "web" / "account.html")

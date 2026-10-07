@@ -1,5 +1,7 @@
+import asyncio
 from datetime import date
 from typing import Literal
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field, field_validator
@@ -7,6 +9,7 @@ from pydantic import BaseModel, Field, field_validator
 from src.services.accounts import authenticate
 from src.services.admin import AdminStore
 from src.services.admissions import redact
+from src.services.email import EmailDeliveryError
 
 router = APIRouter(prefix="/admin")
 
@@ -25,7 +28,7 @@ class OfficerInput(BaseModel):
     username: str = Field(pattern=r"^[a-zA-Z0-9_.-]{3,40}$")
     name: str = Field(min_length=1, max_length=100)
     email: str = Field(max_length=120, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-    password: str = Field(min_length=8, max_length=200)
+    password: str | None = Field(default=None, min_length=8, max_length=200)
 
     @field_validator("name")
     @classmethod
@@ -121,8 +124,26 @@ def officers(request: Request, user=Depends(admin)):
 
 
 @router.post("/officers", status_code=201)
-def create_officer(body: OfficerInput, request: Request, user=Depends(admin)):
-    return admins(request).create_officer(body.username, body.name, body.email.lower(), body.password)
+async def create_officer(body: OfficerInput, request: Request, user=Depends(admin)):
+    rt = runtime(request)
+    mailer = rt.get("mailer")
+    if (not mailer or not mailer.configured) and rt["settings"].app_env != "test":
+        raise HTTPException(503, "SMTP chưa được cấu hình để gửi thư mời cán bộ.")
+    officer, token = admins(request).create_officer(
+        body.username,
+        body.name,
+        body.email.lower(),
+        body.password,
+        rt["settings"].staff_invite_hours,
+    )
+    if not mailer or not mailer.configured:
+        return {**officer, "invite_sent": False}
+    try:
+        await send_staff_invite(rt, officer, token)
+    except HTTPException:
+        admins(request).remove_officer(officer["id"])
+        raise
+    return {**officer, "invite_sent": True}
 
 
 @router.patch("/officers/{officer_id}")
@@ -142,6 +163,17 @@ def reset_officer_password(
     return admins(request).reset_officer_password(officer_id, body.password)
 
 
+@router.post("/officers/{officer_id}/invite")
+async def resend_officer_invite(officer_id: int, request: Request, user=Depends(admin)):
+    rt = runtime(request)
+    mailer = rt.get("mailer")
+    if not mailer or not mailer.configured:
+        raise HTTPException(503, "SMTP chưa được cấu hình để gửi thư mời cán bộ.")
+    officer, token = admins(request).resend_officer_invite(officer_id, rt["settings"].staff_invite_hours)
+    await send_staff_invite(rt, officer, token)
+    return {**officer, "invite_sent": True}
+
+
 @router.get("/metrics")
 def metrics(
     request: Request,
@@ -153,3 +185,22 @@ def metrics(
         raise HTTPException(422, "Ngày bắt đầu phải trước ngày kết thúc.")
     hours = runtime(request)["settings"].admin_stale_hours
     return admins(request).metrics(date_from, date_to, hours)
+
+
+async def send_staff_invite(rt, officer, token):
+    activate_url = (
+        rt["settings"].public_base_url.rstrip("/")
+        + "/staff/activate?token="
+        + quote(token, safe="")
+    )
+    try:
+        await asyncio.to_thread(
+            rt["mailer"].send_staff_invite,
+            officer["email"],
+            officer["name"],
+            officer["username"],
+            activate_url,
+            rt["settings"].staff_invite_hours,
+        )
+    except EmailDeliveryError as exc:
+        raise HTTPException(503, "Không thể gửi thư mời cán bộ. Kiểm tra cấu hình SMTP rồi thử lại.") from exc

@@ -4,7 +4,9 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from src.main import app
+from src.services.accounts import authenticate
 from src.services.admin import AdminStore
+from src.services.store import Store
 
 STAFF = {"username": "canbo", "password": "Demo@2026!"}
 ADMIN = {"username": "admin", "password": "Admin@2026!"}
@@ -255,3 +257,15 @@ async def test_metrics_with_sample_data(client):
     assert (await client.get("/api/v1/admin/metrics", params={"from": "hôm qua"})).status_code == 422
     bad_range = {"from": "2026-02-01", "to": "2026-01-01"}
     assert (await client.get("/api/v1/admin/metrics", params=bad_range)).status_code == 422
+
+
+def test_staff_invitation_activation_lifecycle(tmp_path):
+    staff_store = Store(tmp_path / "staff-invite.db")
+    admins = AdminStore(staff_store)
+    officer, token = admins.create_officer("invitee", "Cán bộ thử nghiệm", "invitee@example.test", None, 48)
+
+    assert token and officer["password_status"] == "invite_sent"
+    assert staff_store.activate_staff_invite(token, "InviteePass@123") == "invitee"
+    assert authenticate(staff_store, "invitee", "InviteePass@123", "officer") == "invitee"
+    assert admins.officer(officer["id"])["password_status"] == "ready"
+    assert staff_store.activate_staff_invite(token, "AnotherPass@123") is None

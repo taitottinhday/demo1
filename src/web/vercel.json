@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/staff", "destination": "/staff.html" },
+    { "source": "/staff/activate", "destination": "/staff-activate.html" },
     { "source": "/account", "destination": "/account.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/assets/:path*", "destination": "/:path*" },
