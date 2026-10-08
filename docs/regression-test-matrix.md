@@ -81,3 +81,12 @@ Smoke test chức năng cũ `scripts/check_browser.py` dừng ở assertion staf
 ## Kiểm tra sau push
 
 Phần này được cập nhật sau khi commit được push lên repository đích và Railway hoàn tất hoặc báo lỗi deployment. Các thao tác production có thể làm thay đổi dữ liệu (tạo ticket, claim, gửi email, khóa tài khoản) không được chạy nếu không có tài khoản/dữ liệu kiểm thử riêng.
+
+Kết quả thực tế ngày 2026-10-08:
+
+- GitHub: commit `9671d42` đã được push lên `taitottinhday/demo1`, nhánh `fix/staff-ticket-visibility`; `main` không bị thay đổi.
+- Railway: service `demo1` đã chuyển branch production từ `main` sang `fix/staff-ticket-visibility` và deployment mới thành công; `/health` trả 200, `source_ready=true`.
+- Vercel: preview của commit `9671d42` đã được promote lên `demo1-alpha-tan.vercel.app`; asset frontend mới và API rewrite đều trả 200.
+- Production smoke: `/api/v1/status` 200; compare hợp lệ 200; compare trùng/sai mã 422; `/api/v1/staff/tickets` và `/api/v1/admin/tickets` không đăng nhập trả 401.
+- Production browser audit: PASS tại 1366×768, 1440×900, 1280×1024, 768×1024, 390×844; keyboard/focus/accessibility PASS.
+- Không chạy các thao tác làm thay đổi dữ liệu production như tạo ticket, claim/reply/reject, gửi email, khóa tài khoản hoặc đăng nhập bằng tài khoản thật.
