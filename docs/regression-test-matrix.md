@@ -69,12 +69,30 @@ Kết quả: `Responsive/accessibility/keyboard audit passed for 5 applicant vie
 
 Smoke test chức năng cũ `scripts/check_browser.py` dừng ở assertion staff queue: test kỳ vọng 1 item nhưng store local có 18–19 ticket. Kiểm tra riêng bằng mã ticket vẫn lọc đúng 1 item. Cần cô lập/reset dữ liệu demo trước khi dùng smoke test này làm gate.
 
+### Smoke với bộ tài khoản cô lập
+
+Đã tạo bộ tài khoản local trong dữ liệu tạm `.tmp-regression-accounts-2` (không commit, không kết nối production): một admin, ba cán bộ, một cán bộ chính cho UI smoke và một ứng viên. Sau khi chạy server với bộ dữ liệu này:
+
+- `scripts/check_browser.py`: **PASS** — desktop/mobile, chat, nguồn, compare, handover, claim, auto-refresh giữ draft, reply, cancel, reject, persistence và admin dashboard.
+- Candidate isolation: **PASS** — ứng viên A chỉ thấy ticket của A; ứng viên B chỉ thấy ticket của B.
+- Claim cạnh tranh: **PASS** — hai cán bộ cùng claim một ticket nhận lần lượt `200` và `409`; chỉ người claim thành công thấy ticket đã claim; admin vẫn thấy ticket.
+- Sửa selector nút đăng nhập admin trong `scripts/check_browser.py` từ `Đăng nhập` thành `Đăng nhập →` để khớp giao diện hiện tại.
+
+Lệnh smoke đã chạy:
+
+```text
+python -m scripts.check_browser --url http://127.0.0.1:8002 --browser "C:/Program Files/Google/Chrome/Application/chrome.exe"
+```
+
+Kết quả: `UI passed: desktop + mobile, chat, source, handover, reply, cancellation, rejection, persistence.`
+
 ## Chưa thể kiểm chứng
 
 - Chưa kiểm thử tài khoản, email, token và dữ liệu thực tế trên Railway/Vercel production.
 - Chưa kiểm tra Gmail mobile/Chrome mobile bằng tài khoản thật trong đợt này.
 - Chưa chạy được toàn bộ pytest async vì lỗi tạo event loop của môi trường Windows.
 - Chưa kết luận SLA, SMTP/Resend delivery hoặc trạng thái domain production.
+- Các tài khoản kiểm thử ở trên chỉ tồn tại trong DB local tạm; chưa tạo tài khoản cán bộ/ứng viên trên Railway để tránh ghi dữ liệu thật.
 
 Đợt kiểm thử local ban đầu không push/deploy. Kết quả kiểm tra sau khi push lên nhánh triển khai được ghi ở phần dưới đây.
 
