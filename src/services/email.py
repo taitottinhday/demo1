@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class EmailDeliveryError(RuntimeError):
-    """The configured SMTP server could not accept a message."""
+    """The configured email provider could not accept a message."""
 
 
 class SmtpMailer:
@@ -52,24 +52,24 @@ class SmtpMailer:
         if not self.configured:
             raise EmailDeliveryError("Email provider is not configured.")
         if purpose == "verify":
-            subject = "Confirm your admissions account email"
-            title = "Confirm your email address"
-            intro = "Use the code below to finish creating your student account:"
+            subject = "Xác nhận email tài khoản tuyển sinh"
+            title = "Xác nhận địa chỉ email"
+            intro = "Dùng mã dưới đây để hoàn tất việc tạo tài khoản học viên:"
         else:
-            subject = "Reset your admissions account password"
-            title = "Reset your password"
-            intro = "Use the code below to create a new password:"
-        greeting = f"Hello {name}," if name else "Hello,"
+            subject = "Đặt lại mật khẩu tài khoản tuyển sinh"
+            title = "Đặt lại mật khẩu"
+            intro = "Dùng mã dưới đây để tạo mật khẩu mới:"
+        greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
         minutes = self.settings.verification_code_minutes
         text = (
             f"{greeting}\n\n{intro}\n\n{code}\n\n"
-            f"This code expires in {minutes} minutes. If you did not request this, ignore this email."
+            f"Mã có hiệu lực trong {minutes} phút. Nếu bạn không yêu cầu thao tác này, hãy bỏ qua email."
         )
         html = (
             '<!doctype html><html><body style="font-family:Arial,sans-serif;color:#123b3d">'
             f"<h2>{escape(title)}</h2><p>{escape(greeting)}</p><p>{escape(intro)}</p>"
             f'<p style="font-size:30px;letter-spacing:8px;font-weight:700">{code}</p>'
-            f"<p>This code expires in <b>{minutes} minutes</b>. If you did not request this, ignore this email.</p>"
+            f"<p>Mã có hiệu lực trong <b>{minutes} phút</b>. Nếu bạn không yêu cầu thao tác này, hãy bỏ qua email.</p>"
             "</body></html>"
         )
         message = EmailMessage()
@@ -81,7 +81,13 @@ class SmtpMailer:
         self._deliver(message)
 
     def send_staff_invite(
-        self, recipient: str, name: str, username: str, activate_url: str, expires_hours: int
+        self,
+        recipient: str,
+        name: str,
+        username: str,
+        activate_url: str,
+        expires_hours: int,
+        reset_url: str | None = None,
     ) -> None:
         """Send a one-time password setup link; never email a plaintext password."""
         if not self.configured:
@@ -89,12 +95,15 @@ class SmtpMailer:
         greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
         subject = "Mời truy cập khu vực cán bộ tuyển sinh"
         expiry = f"Liên kết có hiệu lực trong {expires_hours} giờ."
+        reset_url = reset_url or activate_url
         text = (
             f"{greeting}\n\n"
             "Bạn đã được tạo tài khoản cán bộ tuyển sinh.\n"
             f"Tài khoản: {username}\n\n"
             "Bấm liên kết dưới đây để tự đặt mật khẩu riêng:\n"
             f"{activate_url}\n\n{expiry}\n"
+            "Nếu cần đặt lại mật khẩu sau này, dùng liên kết đặt lại dưới đây:\n"
+            f"{reset_url}\n\n"
             "Nếu bạn không mong đợi email này, hãy liên hệ quản trị viên."
         )
         html = (
@@ -104,7 +113,10 @@ class SmtpMailer:
             f"<p><b>Tài khoản:</b> {escape(username)}</p>"
             f'<p><a href="{escape(activate_url, quote=True)}" '
             'style="display:inline-block;padding:12px 18px;background:#5b4ee8;color:#fff;text-decoration:none;border-radius:8px">'
-            "Đặt mật khẩu cán bộ</a></p>"
+            "Kích hoạt tài khoản</a></p>"
+            f'<p><a href="{escape(reset_url, quote=True)}" '
+            'style="display:inline-block;padding:10px 16px;border:1px solid #5b4ee8;color:#5b4ee8;text-decoration:none;border-radius:8px">'
+            "Đặt lại mật khẩu</a></p>"
             f"<p>{escape(expiry)}</p>"
             "<p>Không chia sẻ liên kết này. Nếu bạn không mong đợi email này, hãy liên hệ quản trị viên.</p>"
             "</body></html>"

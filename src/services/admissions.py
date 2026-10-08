@@ -4,16 +4,41 @@ import time
 
 from openai import AsyncOpenAI
 
-from src.services.answer_formatter import format_answer
+from src.services.answer_formatter import format_answer, structure_answer
 from src.services.knowledge import normalize
 
 
 def redact(text):
+    text = re.sub(r"(?i)(mật khẩu|password)\s*[:=]\s*[^\s,;]+", r"\1: [đã ẩn mật khẩu]", text)
     text = re.sub(r"[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}", "[đã ẩn email]", text)
     return re.sub(r"(?<!\w)(?:\+84|0)?\d[\d .-]{7,}\d(?!\w)", "[đã ẩn số định danh/liên hệ]", text)
 
 
 FALLBACK = "Mình chưa có đủ căn cứ trong tài liệu HUST 2026 để trả lời chính xác câu hỏi này. Bạn có thể chuyển nội dung cho cán bộ tuyển sinh để được kiểm tra."
+
+GENERAL_SCOPE_MARKERS = (
+    "toan truong",
+    "toan bo",
+    "cac phuong thuc tuyen sinh",
+    "phuong thuc tuyen sinh nao",
+    "phuong thuc xet tuyen nao",
+    "bao nhieu nganh",
+    "so nganh",
+    "bao nhieu chuong trinh",
+)
+
+PROGRAM_SCOPE_MARKERS = (
+    "hoc phi",
+    "chi tieu",
+    "to hop",
+    "ngoai ngu",
+    "ielts",
+    "vstep",
+    "ma nganh",
+    "nganh nao",
+    "chuong trinh",
+    "hoc bong",
+)
 
 
 class Admissions:
@@ -22,6 +47,61 @@ class Admissions:
         self.store = store
         self.settings = settings
         self.cache = {}
+
+    def classify_scope(self, question, context=""):
+        """Resolve explicit program mentions before falling back to session context."""
+        normalized = normalize(question)
+        explicit = self.k.program_matches(question)
+        selected = context if context in {p["code"] for p in self.k.programs} else ""
+        if len(explicit) > 1:
+            return {"scope": "ambiguous", "program": "", "explicit": True}
+        if explicit:
+            return {"scope": "program", "program": explicit[0]["code"], "explicit": True}
+        if any(marker in normalized for marker in GENERAL_SCOPE_MARKERS):
+            return {"scope": "general", "program": "", "explicit": False}
+        if selected and self._is_program_follow_up(normalized):
+            return {"scope": "program", "program": selected, "explicit": False}
+        if self._is_program_dependent(normalized):
+            return {"scope": "ambiguous", "program": "", "explicit": False}
+        return {"scope": "general", "program": "", "explicit": False}
+
+    @staticmethod
+    def _is_program_dependent(normalized):
+        return any(marker in normalized for marker in PROGRAM_SCOPE_MARKERS)
+
+    @staticmethod
+    def _is_program_follow_up(normalized):
+        return any(
+            marker in normalized
+            for marker in (
+                "hoc phi",
+                "chi tieu",
+                "to hop",
+                "ngoai ngu",
+                "ielts",
+                "vstep",
+                "ma nganh",
+                "hoc bong",
+            )
+        )
+
+    @staticmethod
+    def _merge_source_chunks(chunks):
+        """Merge adjacent chunks that point to the same document location."""
+        merged = []
+        by_source = {}
+        for chunk in chunks:
+            key = (chunk.get("page"), chunk.get("end_page"), chunk.get("title"), chunk.get("kind"), chunk.get("code"))
+            existing = by_source.get(key)
+            if existing is None:
+                existing = dict(chunk)
+                by_source[key] = existing
+                merged.append(existing)
+                continue
+            if chunk.get("text") and chunk["text"] not in existing["text"]:
+                existing["text"] = existing["text"].rstrip() + "\n" + chunk["text"].lstrip()
+            existing["end_page"] = max(existing.get("end_page", existing["page"]), chunk.get("end_page", chunk["page"]))
+        return merged
 
     def guard(self, question):
         q = normalize(question)
@@ -87,9 +167,27 @@ class Admissions:
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
-    async def answer(self, question, context="", history=None):
+    async def answer(self, question, context="", history=None, scope=None):
+        result = await self._answer(question, context, history, scope)
+        if "answer_sections" not in result:
+            result["answer_sections"] = structure_answer(
+                result.get("response", ""),
+                result.get("sources", []),
+                result.get("next_steps")
+                or [
+                    "Xem tài liệu tuyển sinh 2026 và kiểm tra trang nguồn liên quan",
+                    "Chuyển cán bộ nếu câu hỏi cần xác minh trường hợp cụ thể",
+                ],
+                self.k.manifest,
+            )
+        return result
+
+    async def _answer(self, question, context="", history=None, scope=None):
         question = redact(question)
         q = normalize(question)
+        classification = self.classify_scope(question, context)
+        scope = scope or classification["scope"]
+        answer_program = classification["program"] if scope == "program" else ""
         base = {
             "response": "",
             "sources": [],
@@ -98,6 +196,7 @@ class Admissions:
             "reason": "insufficient_source",
             "tokens": 0,
             "cached": False,
+            "scope": scope,
         }
         employment = any(
             re.search(r"\b" + re.escape(t) + r"\b", q)
@@ -127,9 +226,17 @@ class Admissions:
                 reason="greeting",
                 response="Chào bạn! Mình có thể giúp tìm hiểu ngành, phương thức xét tuyển, ngoại ngữ và học phí HUST 2026. Bạn muốn tìm hiểu nội dung nào?",
             )
+        if scope == "ambiguous":
+            if "hoc phi" in q:
+                message = "Bạn muốn hỏi học phí của chương trình nào? Hãy chọn mã chương trình hoặc ghi rõ tên chương trình để tránh nhầm giữa chương trình chuẩn, tiên tiến và hợp tác quốc tế."
+            elif any(marker in q for marker in ["ngoai ngu", "ielts", "vstep"]):
+                message = "Điều kiện ngoại ngữ phụ thuộc chương trình. Hãy chọn hoặc ghi rõ mã chương trình, ví dụ IT1 hoặc ITE10."
+            else:
+                message = "Nội dung này phụ thuộc chương trình. Hãy chọn hoặc ghi rõ mã/tên chương trình để mình tra cứu chính xác."
+            return dict(base, kind="clarification", reason="ambiguous_program", response=message)
         if (
             "hoc phi" in q
-            and not context
+            and not answer_program
             and not any(p["code"].lower() in q.split() for p in self.k.programs)
             and len(q.split()) < 9
         ):
@@ -175,8 +282,8 @@ class Admissions:
                 response="Mình hỗ trợ tuyển sinh đại học HUST 2026. Bạn hãy hỏi về ngành, phương thức xét tuyển, học phí hoặc quy trình đăng ký.",
                 reason="out_of_scope",
             )
-        # A follow-up uses program context; free-form previous user instructions are not trusted.
-        chunks = self.k.search(question, context, limit=2)
+        # A follow-up uses only the resolved program context; free-form previous user instructions are not trusted.
+        chunks = self._merge_source_chunks(self.k.search(question, answer_program, limit=2))
         if not chunks:
             return dict(base, response=FALLBACK)
         if chunks[0]["kind"] == "program" and not any(
@@ -196,7 +303,7 @@ class Admissions:
             return dict(base, response=FALLBACK)
         if "hoc phi" in q:
             if (
-                not context
+                not answer_program
                 and not re.search(r"\b(?:IT|EE|ME|ITE|BF|EM|ET|FL|MS)\w*\b", question, re.I)
                 and len(chunks) > 1
             ):
@@ -208,14 +315,14 @@ class Admissions:
                         response="Bạn hỏi chương trình chuẩn, tiên tiến hay hợp tác quốc tế? Hãy chọn mã chương trình để tránh nhầm mức học phí.",
                         reason="ambiguous_program",
                     )
-        key = (self.k.manifest["version"], normalize(question), context, self.settings.answer_mode)
+        key = (self.k.manifest["version"], normalize(question), answer_program, self.settings.answer_mode)
         if key in self.cache:
             value, created = self.cache[key]
             if time.time() - created < 3600:
                 return dict(value, cached=True, tokens=0)
-        sources = [self.k.citation(c) for c in chunks]
         if chunks[0]["kind"] in ["program", "fee"]:
-            chunks, sources = chunks[:1], sources[:1]
+            chunks = chunks[:1]
+        sources = [self.k.citation(c) for c in chunks]
         result = dict(base, kind="answered", reason="grounded", sources=sources)
         if self.settings.answer_mode == "llm":
             if not self.settings.openai_api_key or "your-key" in self.settings.openai_api_key:
@@ -245,7 +352,7 @@ class Admissions:
                     reason="llm_unavailable",
                 )
         else:
-            rendered = format_answer(question, chunks, self.k.resolve_program(question, context))
+            rendered = format_answer(question, chunks, answer_program)
             if not rendered:
                 return dict(base, response=FALLBACK)
             result["response"] = rendered
@@ -254,6 +361,9 @@ class Admissions:
             "Hỏi tiếp về điều kiện hoặc học phí của chương trình",
             "Chuyển cán bộ nếu cần xét trường hợp cá nhân",
         ]
+        result["answer_sections"] = structure_answer(
+            result["response"], result["sources"], result["next_steps"], self.k.manifest
+        )
         # Only non-personal questions are cached. Cache is bounded and versioned.
         if "[đã ẩn" not in question and not any(t in q for t in ["toi", "em", "minh"]):
             if len(self.cache) >= 200:
@@ -317,7 +427,8 @@ class Admissions:
             data = json.loads(response.output_text)
             if not data.get("supported") or not 0 < len(data.get("claims", [])) <= 5:
                 return None
-            rendered = []
+            claims_by_source = {}
+            seen_claims = set()
             for claim in data["claims"]:
                 n = claim["source"]
                 if not 1 <= n <= len(chunks) or len(claim["quote"]) < 12:
@@ -329,7 +440,14 @@ class Admissions:
                     return None
                 if self.guard(claim["text"]):
                     return None
-                rendered.append(f"{claim['text']} [{n}]")
+                claim_key = normalize(claim["text"])
+                if claim_key in seen_claims:
+                    continue
+                seen_claims.add(claim_key)
+                claims_by_source.setdefault(n, []).append(claim["text"])
+            if not claims_by_source:
+                return None
+            rendered = [" ".join(claims) + f" [{source}]" for source, claims in claims_by_source.items()]
             return {"response": "\n\n".join(rendered), "tokens": response.usage.total_tokens if response.usage else 0}
         finally:
             await client.close()

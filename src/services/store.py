@@ -28,7 +28,8 @@ class Store:
                 CREATE TABLE IF NOT EXISTS tickets (
                     id TEXT PRIMARY KEY, session TEXT NOT NULL, request_key TEXT NOT NULL,
                     summary TEXT NOT NULL, reason TEXT NOT NULL, status TEXT NOT NULL,
-                    owner TEXT, reply TEXT NOT NULL DEFAULT '', created REAL NOT NULL,
+                    owner TEXT, reply TEXT NOT NULL DEFAULT '', question TEXT NOT NULL DEFAULT '',
+                    ai_answer TEXT NOT NULL DEFAULT '', sources_json TEXT NOT NULL DEFAULT '[]', created REAL NOT NULL,
                     updated REAL NOT NULL, UNIQUE(session, request_key));
                 CREATE TABLE IF NOT EXISTS ticket_events (
                     id INTEGER PRIMARY KEY, ticket_id TEXT NOT NULL, actor TEXT NOT NULL,
@@ -51,29 +52,44 @@ class Store:
                     used_at REAL, created REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS student_sessions (
                     token TEXT PRIMARY KEY, student_id TEXT NOT NULL, expires REAL NOT NULL, created REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS student_checklists (
+                    student_id TEXT PRIMARY KEY, guide_version TEXT NOT NULL,
+                    completed_json TEXT NOT NULL DEFAULT '[]', updated REAL NOT NULL,
+                    FOREIGN KEY (student_id) REFERENCES students(id));
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY, username TEXT UNIQUE NOT NULL, name TEXT NOT NULL,
                     email TEXT UNIQUE NOT NULL, role TEXT NOT NULL CHECK (role IN ('officer','admin')),
                     active INTEGER NOT NULL DEFAULT 1, password_hash TEXT NOT NULL, created REAL NOT NULL,
-                    password_set_at REAL, invite_sent_at REAL);
+                    password_set_at REAL, invite_sent_at REAL, reset_requested_at REAL);
                 CREATE TABLE IF NOT EXISTS admin_sessions (
                     token TEXT PRIMARY KEY, username TEXT NOT NULL, expires REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS staff_invites (
                     token_hash TEXT PRIMARY KEY, officer_id INTEGER NOT NULL,
                     expires REAL NOT NULL, used_at REAL, created REAL NOT NULL,
                     FOREIGN KEY (officer_id) REFERENCES users(id));
+                CREATE TABLE IF NOT EXISTS admin_audit_events (
+                    id INTEGER PRIMARY KEY, action TEXT NOT NULL, actor TEXT NOT NULL,
+                    actor_id INTEGER REFERENCES users(id), target_type TEXT NOT NULL,
+                    target_id TEXT, note TEXT, created REAL NOT NULL);
                 CREATE INDEX IF NOT EXISTS idx_events_ticket ON ticket_events(ticket_id);
                 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
                 CREATE INDEX IF NOT EXISTS idx_tickets_owner ON tickets(owner);
                 CREATE INDEX IF NOT EXISTS idx_staff_invites_officer ON staff_invites(officer_id);
+                CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_events(created);
             """)
             columns = {row[1] for row in db.execute("PRAGMA table_info(sessions)").fetchall()}
             if "student_id" not in columns:
                 db.execute("ALTER TABLE sessions ADD COLUMN student_id TEXT")
             columns = {row[1] for row in db.execute("PRAGMA table_info(tickets)").fetchall()}
-            for column in ["claimed_at", "resolved_at"]:
+            for column, definition in {
+                "claimed_at": "REAL",
+                "resolved_at": "REAL",
+                "question": "TEXT NOT NULL DEFAULT ''",
+                "ai_answer": "TEXT NOT NULL DEFAULT ''",
+                "sources_json": "TEXT NOT NULL DEFAULT '[]'",
+            }.items():
                 if column not in columns:
-                    db.execute(f"ALTER TABLE tickets ADD COLUMN {column} REAL")
+                    db.execute(f"ALTER TABLE tickets ADD COLUMN {column} {definition}")
             event_columns = {row[1] for row in db.execute("PRAGMA table_info(ticket_events)").fetchall()}
             for column, definition in {
                 "actor_id": "INTEGER REFERENCES users(id)",
@@ -89,6 +105,8 @@ class Store:
                 db.execute("UPDATE users SET password_set_at=created WHERE password_set_at IS NULL")
             if "invite_sent_at" not in user_columns:
                 db.execute("ALTER TABLE users ADD COLUMN invite_sent_at REAL")
+            if "reset_requested_at" not in user_columns:
+                db.execute("ALTER TABLE users ADD COLUMN reset_requested_at REAL")
 
     @contextmanager
     def connect(self):
@@ -176,6 +194,19 @@ class Store:
             )
             return dict(db.execute("SELECT * FROM students WHERE id=?", (student_id,)).fetchone())
 
+    def rollback_unverified_student(self, email):
+        """Remove a pending registration when the verification email was not delivered."""
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT id FROM students WHERE email=? AND verified_at IS NULL", (email,)
+            ).fetchone()
+            if not row:
+                return False
+            db.execute("DELETE FROM verification_codes WHERE email=?", (email,))
+            db.execute("DELETE FROM student_sessions WHERE student_id=?", (row["id"],))
+            db.execute("DELETE FROM students WHERE id=? AND verified_at IS NULL", (row["id"],))
+            return True
+
     def student(self, email):
         with self.connect() as db:
             row = db.execute("SELECT * FROM students WHERE email=?", (email,)).fetchone()
@@ -192,6 +223,13 @@ class Store:
                 (email, student["id"] if student else None, purpose, self._code_hash(email, purpose, code, secret), now + minutes * 60, now),
             )
         return code
+
+    def invalidate_codes(self, email, purpose):
+        with self.connect() as db:
+            db.execute(
+                "UPDATE verification_codes SET used_at=COALESCE(used_at, ?) WHERE email=? AND purpose=? AND used_at IS NULL",
+                (time.time(), email, purpose),
+            )
 
     def verify_code(self, email, purpose, code, secret, max_attempts):
         now = time.time()
@@ -265,6 +303,39 @@ class Store:
         with self.connect() as db:
             db.execute("DELETE FROM student_sessions WHERE token=?", (digest(token or ""),))
 
+    def get_student_checklist(self, student_id, guide_version):
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT guide_version,completed_json,updated FROM student_checklists WHERE student_id=?",
+                (student_id,),
+            ).fetchone()
+        if not row or row["guide_version"] != guide_version:
+            return {"guide_version": guide_version, "completed": [], "updated_at": None, "storage": "account"}
+        try:
+            completed = json.loads(row["completed_json"])
+        except (TypeError, ValueError):
+            completed = []
+        if not isinstance(completed, list):
+            completed = []
+        return {
+            "guide_version": row["guide_version"],
+            "completed": list(dict.fromkeys(str(item) for item in completed if str(item).strip())),
+            "updated_at": row["updated"],
+            "storage": "account",
+        }
+
+    def save_student_checklist(self, student_id, guide_version, completed):
+        now = time.time()
+        values = list(dict.fromkeys(str(item).strip() for item in completed if str(item).strip()))
+        with self.connect() as db:
+            db.execute(
+                "INSERT INTO student_checklists(student_id,guide_version,completed_json,updated) VALUES(?,?,?,?) "
+                "ON CONFLICT(student_id) DO UPDATE SET guide_version=excluded.guide_version, "
+                "completed_json=excluded.completed_json, updated=excluded.updated",
+                (student_id, guide_version, json.dumps(values, ensure_ascii=False), now),
+            )
+        return {"guide_version": guide_version, "completed": values, "updated_at": now, "storage": "account"}
+
     def link_session(self, token, student_id):
         if not token:
             return
@@ -273,9 +344,14 @@ class Store:
 
     def reset_password(self, email, password):
         with self.connect() as db:
+            student = db.execute("SELECT id FROM students WHERE email=?", (email,)).fetchone()
+            if not student:
+                return False
             db.execute("UPDATE students SET password_hash=?, updated=? WHERE email=?", (self._password_hash(password), time.time(), email))
+            db.execute("DELETE FROM student_sessions WHERE student_id=?", (student["id"],))
+            return True
 
-    def create_staff_invite(self, officer_id, hours):
+    def create_staff_invite(self, officer_id, hours, reset_requested=False):
         token = secrets.token_urlsafe(32)
         now = time.time()
         with self.connect() as db:
@@ -292,10 +368,25 @@ class Store:
                 (digest(token), officer_id, now + hours * 3600, now),
             )
             db.execute(
-                "UPDATE users SET password_set_at=NULL, invite_sent_at=? WHERE id=?",
-                (now, officer_id),
+                "UPDATE users SET password_set_at=CASE WHEN ? THEN password_set_at ELSE NULL END, "
+                "invite_sent_at=?, reset_requested_at=CASE WHEN ? THEN ? ELSE NULL END WHERE id=?",
+                (reset_requested, now, reset_requested, now if reset_requested else None, officer_id),
             )
         return token
+
+    def invalidate_staff_invite(self, token, officer_id, reset_requested_at=None):
+        """Invalidate a token after a delivery failure without exposing its value."""
+        token_hash = digest(token or "")
+        with self.connect() as db:
+            db.execute(
+                "UPDATE staff_invites SET used_at=COALESCE(used_at, ?) WHERE token_hash=? AND officer_id=?",
+                (time.time(), token_hash, officer_id),
+            )
+            db.execute(
+                "UPDATE users SET reset_requested_at=? WHERE id=? AND role='officer'",
+                (reset_requested_at, officer_id),
+            )
+            return db.total_changes > 0
 
     def activate_staff_invite(self, token, password):
         now = time.time()
@@ -309,7 +400,7 @@ class Store:
             if not row:
                 return None
             db.execute(
-                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL WHERE id=?",
+                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL,reset_requested_at=NULL WHERE id=?",
                 (self._account_password_hash(password), now, row["officer_id"]),
             )
             db.execute(
@@ -391,9 +482,12 @@ class Store:
                     return True
         return False
 
-    def tickets(self, sid=None, status=None, owner=None):
+    def tickets(self, sid=None, status=None, owner=None, student_id=None):
         sql, args = "SELECT * FROM tickets WHERE 1=1", []
-        if sid:
+        if student_id:
+            sql += " AND session IN (SELECT id FROM sessions WHERE student_id=?)"
+            args.append(student_id)
+        elif sid:
             sql += " AND session=?"
             args.append(sid)
         if status:
@@ -429,13 +523,14 @@ class Store:
             "events": [dict(event) for event in events],
         }
 
-    def create_ticket(self, sid, key, summary, reason):
+    def create_ticket(self, sid, key, summary, reason, question="", ai_answer="", sources=None):
         now = time.time()
+        sources_json = json.dumps(sources or [], ensure_ascii=False)
         with self.connect() as db:
             created = db.execute(
-                "INSERT OR IGNORE INTO tickets(id,session,request_key,summary,reason,status,owner,reply,created,updated)"
-                " VALUES(?,?,?,?,?,'waiting',NULL,'',?,?)",
-                ("TS-" + secrets.token_hex(4).upper(), sid, key, summary, reason, now, now),
+                "INSERT OR IGNORE INTO tickets(id,session,request_key,summary,reason,status,owner,reply,question,ai_answer,sources_json,created,updated)"
+                " VALUES(?,?,?,?,?,'waiting',NULL,'',?,?,?,?,?)",
+                ("TS-" + secrets.token_hex(4).upper(), sid, key, summary, reason, question, ai_answer, sources_json, now, now),
             ).rowcount
             row = db.execute("SELECT * FROM tickets WHERE session=? AND request_key=?", (sid, key)).fetchone()
             if created:
@@ -462,6 +557,7 @@ class Store:
                 (reply, now, now, ticket, owner),
             )
             if result.rowcount == 1:
+                ticket_event(db, ticket, "reply", actor=owner)
                 ticket_event(db, ticket, "resolved", actor=owner)
             return result.rowcount == 1
 
@@ -471,12 +567,19 @@ class Store:
             db.execute("INSERT INTO staff_sessions VALUES(?,?,?)", (digest(token), username, time.time() + 8 * 3600))
         return token
 
-    def cancel(self, ticket, sid):
+    def cancel(self, ticket, sid, student_id=None):
         with self.connect() as db:
             now = time.time()
+            ownership = "session=?"
+            ownership_args = [sid]
+            if student_id:
+                ownership = "(session=? OR session IN (SELECT id FROM sessions WHERE student_id=?))"
+                ownership_args = [sid, student_id]
             result = db.execute(
-                "UPDATE tickets SET status='cancelled',updated=? WHERE id=? AND session=? AND status IN ('waiting','in_progress')",
-                (now, ticket, sid),
+                "UPDATE tickets SET status='cancelled',updated=? WHERE id=? AND "
+                + ownership
+                + " AND status IN ('waiting','in_progress')",
+                (now, ticket, *ownership_args),
             )
             if result.rowcount == 1:
                 ticket_event(db, ticket, "cancelled", actor="candidate")
@@ -491,6 +594,7 @@ class Store:
                 (owner, reason, now, now, ticket, owner),
             )
             if result.rowcount == 1:
+                ticket_event(db, ticket, "reply", actor=owner)
                 ticket_event(db, ticket, "rejected", actor=owner)
             return result.rowcount == 1
 
@@ -633,6 +737,7 @@ class Store:
             db.execute("DELETE FROM limits WHERE start<?", (time.time() - 86400,))
             db.execute("DELETE FROM verification_codes WHERE expires<? OR used_at<?", (time.time(), time.time() - 86400))
             db.execute("DELETE FROM student_sessions WHERE expires<?", (time.time(),))
+            db.execute("DELETE FROM staff_invites WHERE expires<? OR used_at<?", (time.time(), time.time() - 86400))
 
 
 def ticket_event(db, ticket, action, actor=None, from_owner=None, to_owner=None, note=None):
@@ -642,6 +747,16 @@ def ticket_event(db, ticket, action, actor=None, from_owner=None, to_owner=None,
         "INSERT INTO ticket_events(ticket_id,actor,actor_id,action,from_officer_id,to_officer_id,note,created)"
         f" VALUES(?,?,{user},?,{user},{user},?,?)",
         (ticket, actor or "candidate", actor, action, from_owner, to_owner, note, time.time()),
+    )
+
+
+def admin_audit(db, action, actor, target_type, target_id=None, note=None):
+    """Record an admin mutation with the human actor and affected resource."""
+    actor_name = actor or "system"
+    actor_row = db.execute("SELECT id FROM users WHERE username=?", (actor_name,)).fetchone()
+    db.execute(
+        "INSERT INTO admin_audit_events(action,actor,actor_id,target_type,target_id,note,created) VALUES(?,?,?,?,?,?,?)",
+        (action, actor_name, actor_row[0] if actor_row else None, target_type, str(target_id) if target_id is not None else None, note, time.time()),
     )
 
 

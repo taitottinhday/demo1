@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Tài khoản học viên · Trợ lý X</title>
-  <link rel="stylesheet" href="/assets/style.css">
-  <link rel="stylesheet" href="/assets/account.css">
-  <script src="/assets/account.js" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261008">
+  <link rel="stylesheet" href="/assets/account.css?v=20261008">
+  <script src="/assets/account.js?v=20261008" defer></script>
 </head>
 <body class="account-page">
   <header class="topbar">
     <a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>HUST · ĐẠI HỌC CHÍNH QUY 2026</small></span></a>
-    <nav><a class="staff-link" href="/">← Về trang hỏi đáp</a></nav>
+    <nav aria-label="Điều hướng tài khoản"><a class="staff-link" href="/">← Về trang hỏi đáp</a></nav>
   </header>
   <main class="account-main">
     <section class="account-card" aria-live="polite">
@@ -22,44 +22,46 @@
       <div id="account-divider" class="login-divider"><span>hoặc tiếp tục bằng email</span></div>
       <div class="account-tabs" id="auth-tabs"><button type="button" class="active" data-view="login">Đăng nhập</button><button type="button" data-view="register">Tạo tài khoản</button></div>
 
-      <form id="login-view" class="account-form auth-view">
-        <label for="login-email">Email</label><input id="login-email" type="email" autocomplete="email" required>
-        <label for="login-password">Mật khẩu</label><input id="login-password" type="password" autocomplete="current-password" required>
+      <form id="login-view" class="account-form auth-view" novalidate>
+        <label for="login-email">Email</label><input id="login-email" name="email" type="email" autocomplete="email" required aria-describedby="login-email-error"><p id="login-email-error" class="field-error" role="alert"></p>
+        <label for="login-password">Mật khẩu</label><input id="login-password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-password-error"><p id="login-password-error" class="field-error" role="alert"></p>
         <button class="primary" type="submit">Đăng nhập →</button>
         <button class="text-button" id="forgot-open" type="button">Quên mật khẩu?</button>
       </form>
 
-      <form id="register-view" class="account-form auth-view" hidden>
-        <label for="register-name">Họ và tên</label><input id="register-name" autocomplete="name" maxlength="120">
-        <label for="register-email">Email</label><input id="register-email" type="email" autocomplete="email" required>
-        <label for="register-password">Mật khẩu <span class="field-note">tối thiểu 10 ký tự</span></label><input id="register-password" type="password" autocomplete="new-password" minlength="10" required>
+      <form id="register-view" class="account-form auth-view" hidden novalidate>
+        <label for="register-name">Họ và tên</label><input id="register-name" name="name" autocomplete="name" maxlength="120" aria-describedby="register-name-error"><p id="register-name-error" class="field-error" role="alert"></p>
+        <label for="register-email">Email</label><input id="register-email" name="email" type="email" autocomplete="email" required aria-describedby="register-email-error"><p id="register-email-error" class="field-error" role="alert"></p>
+        <label for="register-password">Mật khẩu <span class="field-note">tối thiểu 10 ký tự</span></label><input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required aria-describedby="register-password-error"><p id="register-password-error" class="field-error" role="alert"></p>
         <button class="primary" type="submit">Tạo tài khoản →</button>
       </form>
 
-      <form id="verify-view" class="account-form auth-view" hidden>
-        <p class="code-note">Mã 6 số đã được gửi đến <strong id="verify-email-label"></strong>.</p>
-        <label for="verify-code">Mã xác nhận</label><input id="verify-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
+      <form id="verify-view" class="account-form auth-view" hidden novalidate>
+        <p class="code-note">Mã 6 số đã được gửi đến <strong id="verify-email-label"></strong>.</p><p id="verify-otp-meta" class="otp-meta" role="status"></p>
+        <label for="verify-code">Mã xác nhận</label><input id="verify-code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required aria-describedby="verify-code-error"><p id="verify-code-error" class="field-error" role="alert"></p>
         <button class="primary" type="submit">Xác nhận email →</button>
-        <button class="text-button" id="resend-code" type="button">Gửi lại mã</button>
+        <button class="text-button" id="resend-code" type="button" disabled>Gửi lại mã</button>
       </form>
 
-      <form id="forgot-view" class="account-form auth-view" hidden>
+      <form id="forgot-view" class="account-form auth-view" hidden novalidate>
         <p class="code-note">Nhập email đã đăng ký để nhận mã đặt lại mật khẩu.</p>
-        <label for="forgot-email">Email</label><input id="forgot-email" type="email" autocomplete="email" required>
+        <label for="forgot-email">Email</label><input id="forgot-email" name="email" type="email" autocomplete="email" required aria-describedby="forgot-email-error"><p id="forgot-email-error" class="field-error" role="alert"></p>
         <button class="primary" type="submit">Gửi mã đặt lại →</button>
       </form>
 
-      <form id="reset-view" class="account-form auth-view" hidden>
-        <label for="reset-email">Email</label><input id="reset-email" type="email" autocomplete="email" required>
-        <label for="reset-code">Mã đặt lại</label><input id="reset-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
-        <label for="reset-password">Mật khẩu mới <span class="field-note">tối thiểu 10 ký tự</span></label><input id="reset-password" type="password" autocomplete="new-password" minlength="10" required>
+      <form id="reset-view" class="account-form auth-view" hidden novalidate>
+        <p id="reset-otp-meta" class="otp-meta" role="status"></p>
+        <label for="reset-email">Email</label><input id="reset-email" name="email" type="email" autocomplete="email" required aria-describedby="reset-email-error"><p id="reset-email-error" class="field-error" role="alert"></p>
+        <label for="reset-code">Mã đặt lại</label><input id="reset-code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required aria-describedby="reset-code-error"><p id="reset-code-error" class="field-error" role="alert"></p>
+        <label for="reset-password">Mật khẩu mới <span class="field-note">tối thiểu 10 ký tự</span></label><input id="reset-password" name="password" type="password" autocomplete="new-password" minlength="10" required aria-describedby="reset-password-error"><p id="reset-password-error" class="field-error" role="alert"></p>
         <button class="primary" type="submit">Đổi mật khẩu →</button>
+        <button class="text-button" id="resend-reset-code" type="button" disabled>Gửi lại mã</button>
       </form>
 
       <p id="auth-feedback" class="error-text" role="alert"></p>
       <p id="auth-switch" class="auth-switch">Chưa có tài khoản? <button id="register-link" type="button">Tạo tài khoản miễn phí</button></p>
       <div class="security-note"><span class="security-icon" aria-hidden="true">♧</span><div><strong>Dữ liệu đăng nhập được bảo vệ</strong><small>Mật khẩu được mã hóa và mã OTP không được lưu dưới dạng nguyên văn.</small></div></div>
-      <p class="account-footnote">Bạn chỉ cần email đã xác nhận để sử dụng tài khoản. Không gửi CCCD hoặc thông tin nhạy cảm vào khung hỏi đáp.</p>
+      <p class="account-footnote">Bạn chỉ cần email đã xác nhận để sử dụng tài khoản. Tiến độ checklist sẽ được đồng bộ sau khi đăng nhập; không gửi CCCD hoặc thông tin nhạy cảm vào khung hỏi đáp.</p>
     </section>
   </main>
 </body>

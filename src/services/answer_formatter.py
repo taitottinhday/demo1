@@ -5,6 +5,63 @@ import re
 from src.services.knowledge import normalize, tokens
 
 
+def structure_answer(response, sources, next_steps, manifest):
+    """Expose a stable presentation contract without changing the raw response."""
+    paragraphs = []
+    seen = set()
+    for paragraph in re.split(r"\n\s*\n", response or ""):
+        lines = []
+        for raw_line in paragraph.splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            claim_key = normalize(re.sub(r"\s*\[\d+\]\s*$", "", line))
+            if claim_key and claim_key not in seen:
+                seen.add(claim_key)
+                lines.append(line)
+        if not lines:
+            continue
+        paragraphs.append(lines)
+    if not paragraphs:
+        paragraphs = [[response.strip()]] if response and response.strip() else []
+    first = paragraphs[0] if paragraphs else [""]
+    short_answer = first[0]
+    conditions = first[1:] + [line for paragraph in paragraphs[1:] for line in paragraph]
+    source_refs = []
+    source_seen = set()
+    for index, source in enumerate(sources or [], 1):
+        key = (source.get("url"), source.get("page"), source.get("end_page"), source.get("version"))
+        if key in source_seen:
+            continue
+        source_seen.add(key)
+        source_refs.append(
+            {
+                "ref": len(source_refs) + 1,
+                "title": source.get("title", "Tài liệu tuyển sinh"),
+                "page": source.get("page"),
+                "end_page": source.get("end_page"),
+                "version": source.get("version"),
+            }
+        )
+    version = (manifest or {}).get("version", "")[:12]
+    return {
+        "short_answer": short_answer,
+        "conditions": conditions,
+        "source_note": " · ".join(
+            value
+            for value in [
+                (manifest or {}).get("title"),
+                "kỳ tuyển sinh 2026",
+                f"phiên bản {version}" if version else "",
+                (manifest or {}).get("status"),
+            ]
+            if value
+        ),
+        "source_refs": source_refs,
+        "next_steps": list(dict.fromkeys(next_steps or [])),
+    }
+
+
 def format_answer(question, chunks, program=""):
     q = normalize(question)
     first = chunks[0]
@@ -21,6 +78,20 @@ def format_answer(question, chunks, program=""):
                     "Nếu bạn hỏi phương thức khác hoặc tình trạng công bố hiện tại, cần kiểm tra thông báo chính thức đúng phương thức."
                 )
         return None
+    if not program and "phuong thuc" in q:
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(r"thức tuyển sinh:\s*(.+?)(?:\s+2\.1\.|$)", chunk["text"], re.S)
+            if not match:
+                continue
+            methods = []
+            for item in re.split(r"•\s*", match.group(1)):
+                item = re.sub(r"[;\s]+$", "", item.strip())
+                if item and item not in methods:
+                    methods.append(item)
+            if len(methods) >= 3:
+                return "Các phương thức tuyển sinh chung trong tài liệu HUST 2026:\n\n" + "\n".join(
+                    f"• {item} [{i}]" for item in methods
+                )
     if first["kind"] in {"fee", "overview"}:
         return first["text"] + " [1]"
     if first["kind"] == "program" and any(t in q for t in ["phuong thuc", "to hop", "xet tuyen"]):
@@ -105,6 +176,7 @@ def format_answer(question, chunks, program=""):
     # Pick complete relevant sentences; never dump an entire retrieved PDF chunk.
     query = set(tokens(question))
     paragraphs = []
+    seen = set()
     for i, chunk in enumerate(chunks, 1):
         text = re.sub(r"^\d+\s+", "", chunk["text"])
         sentences = re.split(r"(?<=[.;])\s+(?=[A-ZÀ-Ỹ(•+-])", text)
@@ -118,7 +190,10 @@ def format_answer(question, chunks, program=""):
             sentence = sentences[index].strip()
             if len(sentence) <= 850:
                 sentence = re.sub(r"\s+\d+\.$", "", sentence)
-                paragraphs.append(f"{sentence} [{i}]")
+                key = normalize(sentence)
+                if key and key not in seen:
+                    seen.add(key)
+                    paragraphs.append(f"{sentence} [{i}]")
         if len(paragraphs) >= 3:
             break
     return "\n\n".join(paragraphs[:3]) or None

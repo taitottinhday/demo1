@@ -1,10 +1,11 @@
 import asyncio
+import json
 import logging
 import re
 import secrets
 import time
 from typing import Literal
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -34,7 +35,10 @@ class ChatInput(BaseModel):
 
 
 class TicketInput(BaseModel):
-    summary: str = Field(min_length=1, max_length=3000)
+    summary: str = Field(default="", max_length=3000)
+    question: str = Field(default="", max_length=3000)
+    ai_answer: str = Field(default="", max_length=6000)
+    sources: list[dict] = Field(default_factory=list, max_length=20)
     consent: bool = False
     reason: str = Field(default="user_request", max_length=60)
     request_key: str = Field(min_length=8, max_length=80, pattern=r"^[a-zA-Z0-9_-]+$")
@@ -60,6 +64,16 @@ class FeedbackInput(BaseModel):
 
 class ComparisonInput(BaseModel):
     codes: list[str] = Field(min_length=2, max_length=3)
+
+
+class ChecklistInput(BaseModel):
+    guide_version: str = Field(min_length=1, max_length=80)
+    completed: list[str] = Field(default_factory=list, max_length=10)
+
+    @field_validator("completed")
+    @classmethod
+    def unique_step_ids(cls, value):
+        return list(dict.fromkeys(item.strip() for item in value if item.strip()))
 
 
 class StudentRegisterInput(BaseModel):
@@ -88,6 +102,10 @@ class StudentEmailInput(BaseModel):
         return value
 
 
+class StudentResendInput(StudentEmailInput):
+    purpose: Literal["verify", "reset"] = "verify"
+
+
 class StudentVerifyInput(StudentEmailInput):
     code: str = Field(min_length=6, max_length=6, pattern=r"^\d{6}$")
 
@@ -105,7 +123,7 @@ def student_google_start(request: Request):
     cfg = runtime(request)["settings"]
     redirect_uri = google_redirect_uri(request, cfg, "student")
     if not google_oauth_ready(cfg, redirect_uri):
-        raise HTTPException(503, "Google sign-in is not configured for students.")
+        raise HTTPException(503, "Đăng nhập Google cho học viên chưa được cấu hình.")
     state = secrets.token_urlsafe(32)
     params = urlencode({
         "client_id": cfg.google_client_id,
@@ -128,15 +146,15 @@ async def student_google_callback(request: Request, code: str | None = None, sta
     redirect_uri = google_redirect_uri(request, cfg, "student")
 
     def fail(message: str):
-        response = RedirectResponse("/account?login_error=" + message, status_code=302)
+        response = RedirectResponse("/account?login_error=" + quote(message, safe=""), status_code=302)
         response.delete_cookie("student_google_state")
         return response
 
     saved_state = request.cookies.get("student_google_state", "")
     if error or not code or not state or not secrets.compare_digest(saved_state, state):
-        return fail("Google+sign-in+was+cancelled+or+could+not+be+verified.")
+        return fail("Đăng nhập Google đã bị hủy hoặc không thể xác minh.")
     if not google_oauth_ready(cfg, redirect_uri):
-        return fail("Google+sign-in+is+not+configured.")
+        return fail("Đăng nhập Google chưa được cấu hình.")
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             token_response = await client.post(
@@ -158,13 +176,13 @@ async def student_google_callback(request: Request, code: str | None = None, sta
             profile_response.raise_for_status()
             profile = profile_response.json()
     except (httpx.HTTPError, ValueError):
-        return fail("Google+sign-in+could+not+be+completed.+Please+try+again.")
+        return fail("Không thể hoàn tất đăng nhập Google. Vui lòng thử lại.")
     email = str(profile.get("email", "")).strip().lower()
     if not email or profile.get("email_verified") is not True:
-        return fail("Google+did+not+return+a+verified+email+address.")
+        return fail("Google không trả về địa chỉ email đã xác minh.")
     token, student = runtime(request)["store"].student_google_login(email, str(profile.get("name", "")), cfg.session_hours)
     if not token:
-        return fail("This+Google+account+cannot+access+the+student+area.")
+        return fail("Tài khoản Google này không được phép vào khu vực học viên.")
     await send_login_notice(runtime(request), student, "Google", request.client.host if request.client else "")
     response = RedirectResponse("/", status_code=302)
     student_cookie(response, token, cfg)
@@ -176,7 +194,8 @@ async def student_google_callback(request: Request, code: str | None = None, sta
 @router.post("/auth/register")
 async def student_register(body: StudentRegisterInput, request: Request):
     rt = runtime(request)
-    if not rt["mailer"].configured:
+    mailer = rt.get("mailer")
+    if not mailer or not mailer.configured:
         raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã xác nhận.")
     if not auth_rate_allowed(rt, "auth-register:", body.email):
         raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
@@ -184,8 +203,12 @@ async def student_register(body: StudentRegisterInput, request: Request):
     if student is None:
         raise HTTPException(409, "Email này đã đăng ký. Hãy đăng nhập hoặc dùng Quên mật khẩu.")
     code = rt["store"].issue_code(body.email, "verify", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
-    await send_student_code(rt, body.email, code, "verify", body.name.strip())
-    return {"ok": True, "email": body.email, "message": "Mã xác nhận đã được gửi đến email của bạn."}
+    try:
+        await send_student_code(rt, body.email, code, "verify", body.name.strip())
+    except HTTPException:
+        rt["store"].rollback_unverified_student(body.email)
+        raise
+    return {"ok": True, "message": "Mã xác nhận đã được gửi đến email của bạn.", "otp": otp_metadata(body.email, rt["settings"])}
 
 
 @router.post("/auth/verify-email")
@@ -201,16 +224,23 @@ def verify_student_email(body: StudentVerifyInput, request: Request):
 
 
 @router.post("/auth/resend-code")
-async def resend_student_code(body: StudentEmailInput, request: Request):
+async def resend_student_code(body: StudentResendInput, request: Request):
     rt = runtime(request)
     if not auth_rate_allowed(rt, "auth-resend:", body.email):
         raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
     student = rt["store"].student(body.email)
-    if student and not student["verified_at"]:
-        if not rt["mailer"].configured:
+    eligible = student and ((body.purpose == "verify" and not student["verified_at"]) or (body.purpose == "reset" and bool(student["verified_at"])))
+    if eligible:
+        mailer = rt.get("mailer")
+        if not mailer or not mailer.configured:
             raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã xác nhận.")
-        code = rt["store"].issue_code(body.email, "verify", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
-        await send_student_code(rt, body.email, code, "verify", student["display_name"])
+        code = rt["store"].issue_code(body.email, body.purpose, rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
+        try:
+            await send_student_code(rt, body.email, code, body.purpose, student["display_name"])
+        except HTTPException:
+            rt["store"].invalidate_codes(body.email, body.purpose)
+            raise
+        return {"ok": True, "message": "Mã mới đã được gửi đến email của bạn.", "otp": otp_metadata(body.email, rt["settings"])}
     return {"ok": True, "message": "Nếu email có tài khoản chưa xác nhận, mã mới đã được gửi."}
 
 
@@ -249,10 +279,16 @@ async def forgot_student_password(body: StudentEmailInput, request: Request):
         raise HTTPException(429, "Bạn đã yêu cầu quá nhiều mã. Vui lòng thử lại sau.")
     student = rt["store"].student(body.email)
     if student and student["verified_at"]:
-        if not rt["mailer"].configured:
+        mailer = rt.get("mailer")
+        if not mailer or not mailer.configured:
             raise HTTPException(503, "SMTP chưa được cấu hình để gửi mã đặt lại mật khẩu.")
         code = rt["store"].issue_code(body.email, "reset", rt["settings"].auth_secret, rt["settings"].verification_code_minutes)
-        await send_student_code(rt, body.email, code, "reset", student["display_name"])
+        try:
+            await send_student_code(rt, body.email, code, "reset", student["display_name"])
+        except HTTPException:
+            rt["store"].invalidate_codes(body.email, "reset")
+            raise
+        return {"ok": True, "message": "Mã đặt lại mật khẩu đã được gửi đến email của bạn.", "otp": otp_metadata(body.email, rt["settings"])}
     return {"ok": True, "message": "Nếu email đã đăng ký, mã đặt lại mật khẩu đã được gửi."}
 
 
@@ -265,7 +301,8 @@ def reset_student_password(body: StudentResetInput, request: Request):
     if status != "ok":
         detail = {"invalid": "Mã không đúng.", "locked": "Mã đã bị khóa do thử quá nhiều lần.", "expired": "Mã đã hết hạn."}.get(status, "Mã không hợp lệ.")
         raise HTTPException(422, detail)
-    rt["store"].reset_password(body.email, body.password)
+    if not rt["store"].reset_password(body.email, body.password):
+        raise HTTPException(422, "Không thể cập nhật tài khoản này.")
     return {"ok": True, "message": "Mật khẩu đã được cập nhật. Bạn có thể đăng nhập."}
 
 
@@ -303,6 +340,23 @@ def public_student(student):
     return {"id": student["id"], "email": student["email"], "name": student["display_name"], "verified": bool(student["verified_at"])}
 
 
+def mask_email(email):
+    local, _, domain = email.partition("@")
+    if not domain:
+        return "***"
+    visible = local[:2] if len(local) > 2 else local[:1]
+    return f"{visible}{'*' * max(2, len(local) - len(visible))}@{domain}"
+
+
+def otp_metadata(email, settings):
+    minutes = settings.verification_code_minutes
+    return {
+        "email": mask_email(email),
+        "expires_in": minutes * 60,
+        "resend_after": getattr(settings, "otp_resend_seconds", 30),
+    }
+
+
 def student_cookie(response: Response, token: str, settings) -> None:
     response.set_cookie(
         "student", token, httponly=True, samesite="strict", secure=settings.secure_cookies,
@@ -319,9 +373,12 @@ async def send_student_code(rt, email, code, purpose, name=""):
 
 async def send_login_notice(rt, student, method, ip=""):
     """Send a best-effort security alert without blocking successful login."""
+    mailer = rt.get("mailer")
+    if not mailer or not mailer.configured:
+        return
     try:
         await asyncio.to_thread(
-            rt["mailer"].send_login_notice,
+            mailer.send_login_notice,
             student["email"],
             student.get("display_name", ""),
             method,
@@ -347,8 +404,33 @@ _SAFE_TICKET_FIELDS = {
     "reply",
     "created",
     "updated",
+    "question",
+    "ai_answer",
+    "sources",
 }
-_REDACTED_TICKET_FIELDS = {"summary", "reason", "reply"}
+_REDACTED_TICKET_FIELDS = {"summary", "reason", "reply", "question", "ai_answer"}
+
+
+def safe_handover_sources(raw_sources):
+    """Keep only source metadata needed by the candidate/staff preview."""
+    allowed = {"title", "page", "end_page", "excerpt", "local_url", "url", "year", "version", "document_status"}
+    result = []
+    for source in raw_sources if isinstance(raw_sources, list) else []:
+        if not isinstance(source, dict):
+            continue
+        item = {}
+        for key in allowed:
+            if key not in source or source[key] in (None, ""):
+                continue
+            value = source[key]
+            if key in {"title", "excerpt", "document_status"}:
+                value = redact(str(value))[:3000]
+            elif key in {"local_url", "url"}:
+                value = str(value)[:1000]
+            item[key] = value
+        if item:
+            result.append(item)
+    return result[:20]
 
 
 def safe_ticket(ticket):
@@ -361,9 +443,15 @@ def safe_ticket(ticket):
     """
     safe = {}
     for key in _SAFE_TICKET_FIELDS:
-        if key not in ticket:
+        if key != "sources" and key not in ticket:
             continue
-        value = ticket[key]
+        value = ticket.get(key)
+        if key == "sources":
+            raw = ticket.get("sources_json", "[]")
+            try:
+                value = safe_handover_sources(json.loads(raw or "[]"))
+            except (TypeError, ValueError):
+                value = []
         safe[key] = redact(str(value)) if key in _REDACTED_TICKET_FIELDS and value else value
     return safe
 
@@ -446,10 +534,11 @@ def answer_feedback(request_id: str, body: FeedbackInput, request: Request, row=
 def session(request: Request, row=Depends(candidate)):
     rt = runtime(request)
     student = rt["store"].student_user(request.cookies.get("student"))
+    student_id = student["id"] if student else None
     return {
         "messages": rt["store"].student_messages(student["id"]) if student else rt["store"].messages(row["id"]),
         "program": row["context"],
-        "tickets": [safe_ticket(t) for t in rt["store"].tickets(row["id"])],
+        "tickets": [safe_ticket(t) for t in rt["store"].tickets(row["id"], student_id=student_id)],
         "student": public_student(student) if student else None,
     }
 
@@ -491,28 +580,65 @@ def guide(request: Request):
     source = next((c for c in k.chunks if c["page"] == 18 and "tsa.hust.edu.vn/dk" in c["text"]), None)
     if not source:
         raise HTTPException(503, "Chưa có nguồn cho hướng dẫn đăng ký ĐGTD.")
+    citation = k.citation(source)
+    document_version = k.manifest.get("version", "")[:12]
+    guide_version = f"hust-2026-guide-{document_version}"
+    checked_at = time.strftime("%Y-%m-%d", time.localtime())
+    steps = [
+        {
+            "id": "eligibility",
+            "title": "Đối chiếu điều kiện dự tuyển",
+            "text": "Tài liệu nêu: đã tốt nghiệp THPT, có điểm ĐGTD năm 2025 hoặc 2026 và đạt ngưỡng nhận hồ sơ do HUST quy định.",
+            "url": "/api/v1/source/pdf#page=18",
+        },
+        {
+            "id": "test-registration",
+            "title": "Phân biệt đăng ký dự thi và xét tuyển",
+            "text": "Đăng ký dự thi ĐGTD tại địa chỉ được tài liệu dẫn; việc dự thi không thay thế đăng ký nguyện vọng.",
+            "url": "https://tsa.hust.edu.vn/dk",
+        },
+        {
+            "id": "application-registration",
+            "title": "Đăng ký nguyện vọng theo kế hoạch chung",
+            "text": "Tài liệu dẫn hệ thống của Bộ để đăng ký nguyện vọng bằng tài khoản thí sinh. Kiểm tra thông báo đang có hiệu lực trước thao tác.",
+            "url": "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login",
+        },
+    ]
+    for step in steps:
+        step["source"] = citation
     return {
         "title": "Chuẩn bị xét tuyển theo Đánh giá tư duy",
         "note": "Danh sách tự kiểm tra dựa trên mục 6.2, PDF trang 18. Không phải hồ sơ đã nộp hoặc xác nhận đủ điều kiện.",
-        "steps": [
-            {
-                "title": "Đối chiếu điều kiện dự tuyển",
-                "text": "Tài liệu nêu: đã tốt nghiệp THPT, có điểm ĐGTD năm 2025 hoặc 2026 và đạt ngưỡng nhận hồ sơ do HUST quy định.",
-                "url": "/api/v1/source/pdf#page=18",
-            },
-            {
-                "title": "Phân biệt đăng ký dự thi và xét tuyển",
-                "text": "Đăng ký dự thi ĐGTD tại địa chỉ được tài liệu dẫn; việc dự thi không thay thế đăng ký nguyện vọng.",
-                "url": "https://tsa.hust.edu.vn/dk",
-            },
-            {
-                "title": "Đăng ký nguyện vọng theo kế hoạch chung",
-                "text": "Tài liệu dẫn hệ thống của Bộ để đăng ký nguyện vọng bằng tài khoản thí sinh. Kiểm tra thông báo đang có hiệu lực trước thao tác.",
-                "url": "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login",
-            },
-        ],
-        "source": k.citation(source),
+        "checked_at": checked_at,
+        "guide_version": guide_version,
+        "document_version": document_version,
+        "document_title": k.manifest.get("title", "Tài liệu tuyển sinh"),
+        "document_status": k.manifest.get("status", "Chưa xác định trạng thái nguồn"),
+        "source": citation,
+        "steps": steps,
     }
+
+
+def student_required(request: Request):
+    student = runtime(request)["store"].student_user(request.cookies.get("student"))
+    if not student:
+        raise HTTPException(401, "Phiên đăng nhập đã hết hạn. Tiến độ local vẫn được giữ; hãy đăng nhập lại để đồng bộ checklist.")
+    return student
+
+
+@router.get("/guide/checklist")
+def get_guide_checklist(request: Request, guide_version: str):
+    student = student_required(request)
+    return runtime(request)["store"].get_student_checklist(student["id"], guide_version)
+
+
+@router.put("/guide/checklist")
+def update_guide_checklist(body: ChecklistInput, request: Request):
+    student = student_required(request)
+    valid_steps = {"eligibility", "test-registration", "application-registration"}
+    if not set(body.completed).issubset(valid_steps):
+        raise HTTPException(422, "Checklist có bước không hợp lệ.")
+    return runtime(request)["store"].save_student_checklist(student["id"], body.guide_version, body.completed)
 
 
 @router.get("/source/pdf")
@@ -528,16 +654,17 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
     rt = runtime(request)
     if not rt["store"].allowed("chat:" + row["id"]):
         raise HTTPException(429, "Bạn đã gửi nhiều câu hỏi; vui lòng chờ một phút rồi thử lại.")
-    program = body.program if body.program is not None else row["context"]
-    codes = {p["code"] for p in rt["knowledge"].programs}
-    mentioned = [
-        code for code in re.findall(r"\b[A-Z]{2,8}\d{0,3}(?:-[A-Z]+)?\b", body.message.upper()) if code in codes
-    ]
-    if len(set(mentioned)) == 1:
-        program = mentioned[0]
-    if program and program not in {p["code"] for p in rt["knowledge"].programs}:
+    selected_program = body.program if body.program is not None else row["context"]
+    selected_program = selected_program or ""
+    if selected_program and selected_program not in {p["code"] for p in rt["knowledge"].programs}:
         raise HTTPException(422, "Mã chương trình chưa có trong nguồn.")
-    rt["store"].context(row["id"], program)
+    classification = rt["admissions"].classify_scope(body.message, selected_program)
+    scope = classification["scope"]
+    answer_program = classification["program"] if scope == "program" else ""
+    # Keep an explicitly selected program as the next-turn context even when the
+    # current question is general; the answer itself must still use general scope.
+    stored_program = answer_program or selected_program
+    rt["store"].context(row["id"], stored_program)
     started = time.perf_counter()
     if rt.get("source_error"):
         answer = {
@@ -547,13 +674,16 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
             "mode": "extractive",
             "tokens": 0,
             "reason": "source_unavailable",
+            "scope": scope,
         }
     else:
-        answer = await rt["admissions"].answer(body.message, program)
+        answer = await rt["admissions"].answer(body.message, answer_program, scope=scope)
     elapsed = (time.perf_counter() - started) * 1000
     answer["latency_ms"] = round(elapsed, 1)
     answer["request_id"] = secrets.token_hex(8)
-    answer["program"] = program
+    answer["program"] = stored_program or None
+    answer["scope"] = scope
+    answer["scope_program"] = answer_program or None
     rt["store"].add_message(row["id"], "user", {"response": redact(body.message)})
     rt["store"].add_message(row["id"], "assistant", answer)
     rt["store"].record(answer["kind"], answer["mode"], elapsed, answer.get("tokens", 0))
@@ -562,22 +692,47 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
 
 @router.post("/handover")
 def handover(body: TicketInput, request: Request, row=Depends(candidate)):
-    if not body.consent or not body.summary.strip():
+    question = body.question.strip()
+    ai_answer = body.ai_answer.strip()
+    note = body.summary.strip()
+    if not body.consent or not (note or question or ai_answer):
         raise HTTPException(422, "Cần có nội dung và đồng ý chuyển trước khi tạo yêu cầu.")
     store = runtime(request)["store"]
     if not store.allowed("ticket:" + row["id"], count=10, window=3600):
         raise HTTPException(429, "Quá nhiều yêu cầu trong giờ; vui lòng chờ.")
-    return safe_ticket(store.create_ticket(row["id"], body.request_key, redact(body.summary.strip()), body.reason))
+    sources = safe_handover_sources(body.sources)
+    summary = redact(note)
+    if not summary:
+        summary = redact(f"Câu hỏi: {question}\n\nCâu trả lời AI: {ai_answer}")
+    return safe_ticket(
+        store.create_ticket(
+            row["id"],
+            body.request_key,
+            summary,
+            body.reason,
+            question=redact(question),
+            ai_answer=redact(ai_answer),
+            sources=sources,
+        )
+    )
 
 
 @router.get("/tickets")
 def tickets(request: Request, row=Depends(candidate)):
-    return [safe_ticket(t) for t in runtime(request)["store"].tickets(row["id"])]
+    rt = runtime(request)
+    student = rt["store"].student_user(request.cookies.get("student"))
+    return [safe_ticket(t) for t in rt["store"].tickets(row["id"], student_id=student["id"] if student else None)]
 
 
 @router.get("/tickets/{ticket_id}")
 def ticket(ticket_id: str, request: Request, row=Depends(candidate)):
-    matches = [t for t in runtime(request)["store"].tickets(row["id"]) if t["id"] == ticket_id]
+    rt = runtime(request)
+    student = rt["store"].student_user(request.cookies.get("student"))
+    matches = [
+        t
+        for t in rt["store"].tickets(row["id"], student_id=student["id"] if student else None)
+        if t["id"] == ticket_id
+    ]
     if not matches:
         raise HTTPException(404, "Không tìm thấy yêu cầu trong phiên của bạn.")
     return safe_ticket(matches[0])
@@ -612,7 +767,8 @@ def activate_staff(body: StaffActivateInput, request: Request):
 @router.post("/tickets/{ticket_id}/cancel")
 def cancel_ticket(ticket_id: str, request: Request, row=Depends(candidate)):
     ticket(ticket_id, request, row)
-    if not runtime(request)["store"].cancel(ticket_id, row["id"]):
+    student = runtime(request)["store"].student_user(request.cookies.get("student"))
+    if not runtime(request)["store"].cancel(ticket_id, row["id"], student_id=student["id"] if student else None):
         raise HTTPException(409, "Chỉ có thể hủy yêu cầu đang chờ hoặc đang xử lý.")
     return {"ok": True}
 
@@ -623,7 +779,7 @@ def google_start(request: Request):
     cfg = runtime(request)["settings"]
     redirect_uri = google_redirect_uri(request, cfg, "staff")
     if not google_oauth_ready(cfg, redirect_uri) or not (cfg.google_allowed_emails.strip() or cfg.google_allowed_email_domains.strip()):
-        raise HTTPException(503, "Google sign-in is not configured. Contact an administrator.")
+        raise HTTPException(503, "Đăng nhập Google chưa được cấu hình. Hãy liên hệ quản trị viên.")
     state = secrets.token_urlsafe(32)
     params = urlencode({
         "client_id": cfg.google_client_id,
@@ -647,15 +803,15 @@ async def google_callback(request: Request, code: str | None = None, state: str 
     redirect_uri = google_redirect_uri(request, cfg, "staff")
 
     def fail(message: str):
-        response = RedirectResponse("/staff?login_error=" + message, status_code=302)
+        response = RedirectResponse("/staff?login_error=" + quote(message, safe=""), status_code=302)
         response.delete_cookie("google_oauth_state")
         return response
 
     saved_state = request.cookies.get("google_oauth_state", "")
     if error or not code or not state or not secrets.compare_digest(saved_state, state):
-        return fail("Google+sign-in+was+cancelled+or+could+not+be+verified.")
+        return fail("Đăng nhập Google đã bị hủy hoặc không thể xác minh.")
     if not google_oauth_ready(cfg, redirect_uri) or not (cfg.google_allowed_emails.strip() or cfg.google_allowed_email_domains.strip()):
-        return fail("Google+sign-in+is+not+configured.")
+        return fail("Đăng nhập Google chưa được cấu hình.")
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             token_response = await client.post(
@@ -677,10 +833,10 @@ async def google_callback(request: Request, code: str | None = None, state: str 
             profile_response.raise_for_status()
             profile = profile_response.json()
     except (httpx.HTTPError, ValueError):
-        return fail("Google+sign-in+could+not+be+completed.+Please+try+again.")
+        return fail("Không thể hoàn tất đăng nhập Google. Vui lòng thử lại.")
     email = str(profile.get("email", "")).strip().lower()
     if not email or profile.get("email_verified") is not True or not google_allowlisted(email, cfg):
-        return fail("This+Google+account+is+not+authorised+for+staff+access.")
+        return fail("Tài khoản Google này chưa được cấp quyền cán bộ.")
     response = RedirectResponse("/staff", status_code=302)
     staff_cookie(response, runtime(request)["store"].staff_login(email), cfg)
     response.delete_cookie("google_oauth_state")

@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Cán bộ tuyển sinh · Trợ lý X</title>
-  <link rel="stylesheet" href="/assets/style.css?v=20261006">
-  <script src="/assets/staff.js?v=20261006" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261008-2">
+  <script src="/assets/staff.js?v=20261008-2" defer></script>
 </head>
-<body>
+<body class="staff-page">
   <header class="topbar">
     <a class="brand" href="/">
       <span class="mark">X<span aria-hidden="true">✦</span></span>
       <span>Trợ lý tuyển sinh <b>X</b><small>KHÔNG GIAN CÁN BỘ</small></span>
     </a>
-    <nav class="staff-nav">
+    <nav class="staff-nav" aria-label="Điều hướng cán bộ">
       <span id="staff-identity" class="staff-identity" hidden></span>
       <a class="staff-link" href="/">← Về trang ứng viên</a>
+      <a class="staff-link" href="/admin">Trang quản trị ↗</a>
       <button class="nav-link" id="logout" type="button" hidden>Đăng xuất</button>
     </nav>
   </header>
@@ -31,12 +32,13 @@
       </div>
       <form id="login-form" novalidate>
         <label for="username">Tài khoản cán bộ</label>
-        <input id="username" name="username" autocomplete="username" placeholder="Nhập tài khoản" required>
+        <input id="username" name="username" autocomplete="username" placeholder="Nhập tài khoản" required aria-describedby="username-error"><p id="username-error" class="field-error" role="alert"></p>
         <label for="password">Mật khẩu</label>
         <div class="password-field">
-          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required aria-describedby="password-error">
           <button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
         </div>
+        <p id="password-error" class="field-error" role="alert"></p>
         <p id="login-error" role="alert" class="error-text"></p>
         <button type="submit" class="primary login-submit" id="login-submit">
           <span class="button-label">Đăng nhập</span><span aria-hidden="true">→</span>
@@ -51,6 +53,7 @@
           <div class="eyebrow">TRUNG TÂM XỬ LÝ TICKET</div>
           <h1 id="dashboard-title">Hàng chờ cán bộ</h1>
           <p class="dashboard-subtitle">Ưu tiên yêu cầu đang chờ, xử lý từng ticket và lưu lại phản hồi rõ ràng.</p>
+        <p id="live-status" class="hint" role="status" aria-live="polite">Tự động cập nhật mỗi 5 giây</p>
         </div>
         <button id="refresh" class="secondary" type="button"><span aria-hidden="true">↻</span> Làm mới</button>
       </div>
@@ -88,9 +91,11 @@
             </select>
           </div>
           <label class="search-field" for="queue-search">
+            <span class="sr-only">Tìm ticket theo mã hoặc nội dung</span>
             <span aria-hidden="true">⌕</span>
-            <input id="queue-search" type="search" autocomplete="off" placeholder="Tìm mã ticket hoặc nội dung…">
+            <input id="queue-search" type="search" autocomplete="off" aria-controls="queue" aria-describedby="queue-search-help" placeholder="Tìm mã ticket hoặc nội dung…">
           </label>
+          <p id="queue-search-help" class="sr-only">Kết quả được cập nhật tự động mà không xóa từ khóa hiện tại.</p>
           <div id="queue" class="queue" aria-live="polite"></div>
         </section>
 
@@ -105,6 +110,6 @@
     </section>
   </main>
 
-  <footer class="page-footer"><span>EDU-12 · Handover có sự đồng ý</span><span>HUST 2026 · Yêu cầu tư vấn</span></footer>
+  <footer class="page-footer"><span>Không gian xử lý yêu cầu tuyển sinh</span><span>HUST 2026 · Yêu cầu tư vấn</span></footer>
 </body>
 </html>

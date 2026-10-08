@@ -1,3 +1,35 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thiết lập mật khẩu · Trợ lý X</title><link rel="stylesheet" href="/assets/style.css"><script src="/assets/staff-activate.js" defer></script></head><body>
-<header class="topbar"><a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>KHU VỰC CÁN BỘ</small></span></a><nav><a class="staff-link" href="/staff">Đăng nhập cán bộ</a></nav></header>
-<main class="staff-main"><section class="login-panel"><div class="eyebrow">KÍCH HOẠT TÀI KHOẢN</div><h1>Đặt mật khẩu riêng</h1><p>Liên kết này chỉ dùng một lần. Hãy tạo mật khẩu mới để đăng nhập khu vực cán bộ.</p><form id="activate-form"><label for="password">Mật khẩu mới</label><div class="password-field"><input id="password" type="password" minlength="10" maxlength="200" autocomplete="new-password" required placeholder="Tối thiểu 10 ký tự"><button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button></div><label for="password-confirm">Nhập lại mật khẩu</label><input id="password-confirm" type="password" minlength="10" maxlength="200" autocomplete="new-password" required placeholder="Nhập lại mật khẩu"><div id="activate-error" class="error-text" role="alert"></div><div id="activate-success" class="success-text" role="status" hidden></div><button type="submit" id="activate-submit" class="primary">Lưu mật khẩu →</button></form></section></main><footer class="page-footer"><span>EDU-12 · Kích hoạt cán bộ</span><span>HUST 2026</span></footer></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Thiết lập mật khẩu · Trợ lý X</title>
+  <link rel="stylesheet" href="/assets/style.css?v=20261008">
+  <script src="/assets/staff-activate.js?v=20261008" defer></script>
+</head>
+<body class="staff-activate-page">
+  <header class="topbar">
+    <a class="brand" href="/"><span class="mark">X<span aria-hidden="true">✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>KHU VỰC CÁN BỘ</small></span></a>
+    <nav aria-label="Điều hướng kích hoạt"><a class="staff-link" href="/staff">Đăng nhập cán bộ</a></nav>
+  </header>
+  <main class="staff-main">
+    <section class="login-panel" aria-labelledby="activate-title">
+      <div class="eyebrow" id="activate-kicker">KÍCH HOẠT TÀI KHOẢN</div>
+      <h1 id="activate-title">Đặt mật khẩu riêng</h1>
+      <p id="activate-intro">Liên kết này chỉ dùng một lần. Hãy tạo mật khẩu mới để đăng nhập khu vực cán bộ.</p>
+      <form id="activate-form" novalidate>
+        <label for="password">Mật khẩu mới</label>
+        <div class="password-field"><input id="password" name="password" type="password" minlength="10" maxlength="200" autocomplete="new-password" required aria-describedby="password-error" placeholder="Tối thiểu 10 ký tự"><button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button></div>
+        <p id="password-error" class="field-error" role="alert"></p>
+        <label for="password-confirm">Nhập lại mật khẩu</label>
+        <input id="password-confirm" name="password-confirm" type="password" minlength="10" maxlength="200" autocomplete="new-password" required aria-describedby="password-confirm-error" placeholder="Nhập lại mật khẩu">
+        <p id="password-confirm-error" class="field-error" role="alert"></p>
+        <div id="activate-error" class="error-text" role="alert"></div>
+        <div id="activate-success" class="success-text" role="status" hidden></div>
+        <button type="submit" id="activate-submit" class="primary">Lưu mật khẩu →</button>
+      </form>
+    </section>
+  </main>
+  <footer class="page-footer"><span>Thiết lập tài khoản cán bộ</span><span>HUST 2026</span></footer>
+</body>
+</html>

@@ -11,9 +11,11 @@ const STATUS_NAMES = {
 const EVENT_NAMES = {
   created: 'Đã tạo yêu cầu',
   claimed: 'Đã nhận xử lý',
+  reply: 'Đã gửi phản hồi',
   resolved: 'Đã gửi phản hồi và đóng',
   rejected: 'Đã từ chối yêu cầu',
   cancelled: 'Đã hủy yêu cầu',
+  reassigned: 'Đã phân công lại',
 };
 
 const state = {
@@ -22,7 +24,12 @@ const state = {
   detail: null,
   username: '',
   loading: false,
+  refreshing: false,
+  actionInProgress: false,
+  pollTimer: null,
 };
+
+const POLL_INTERVAL_MS = 5000;
 
 function node(tag, className = '', text = '') {
   const element = document.createElement(tag);
@@ -78,12 +85,16 @@ async function api(path, options = {}) {
     showLogin('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
   }
   if (!response.ok) {
-    throw new Error(typeof data.detail === 'string' ? data.detail : 'Không thể hoàn tất yêu cầu.');
+    const detail = data.detail;
+    const error = new Error(typeof detail === 'string' ? detail : detail?.message || 'Không thể hoàn tất yêu cầu.');
+    error.fields = typeof detail === 'object' ? detail.fields || {} : {};
+    throw error;
   }
   return data;
 }
 
 function showLogin(message = '') {
+  stopAutoRefresh();
   $('dashboard').hidden = true;
   $('login-panel').hidden = false;
   $('logout').hidden = true;
@@ -97,6 +108,35 @@ function showDashboard() {
   $('logout').hidden = false;
   $('staff-identity').hidden = false;
   $('staff-identity').textContent = state.username;
+}
+
+function stopAutoRefresh() {
+  if (state.pollTimer) {
+    window.clearInterval(state.pollTimer);
+    state.pollTimer = null;
+  }
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  state.pollTimer = window.setInterval(() => {
+    if (document.hidden || state.refreshing || state.actionInProgress) return;
+    refreshDashboard(true, true).catch((error) => renderGlobalError(error.message));
+  }, POLL_INTERVAL_MS);
+}
+
+function hasStaffDraft() {
+  return ['staff-reply', 'reject-reason'].some((id) => {
+    const field = $(id);
+    return field && (document.activeElement === field || field.value.trim());
+  });
+}
+
+function markLiveUpdated() {
+  const status = $('live-status');
+  if (status) {
+    status.textContent = `Đã cập nhật ${new Date().toLocaleTimeString('vi-VN')} · Tự động mỗi 5 giây`;
+  }
 }
 
 function setDashboardLoading(loading) {
@@ -157,23 +197,95 @@ function sortTickets(tickets) {
   });
 }
 
+function staffCanSeeTicket(ticket) {
+  // The API remains the authority for access control. This client-side guard
+  // prevents an accidentally broad response from exposing another owner's
+  // claimed ticket in the queue UI.
+  return ticket.status === 'waiting' || !ticket.owner || ticket.owner === state.username;
+}
+
+function filteredTickets() {
+  const query = normalizeSearch($('queue-search').value);
+  const status = $('status-filter').value;
+  return sortTickets(state.tickets.filter((ticket) => {
+    return staffCanSeeTicket(ticket) && (!status || ticket.status === status) && ticketMatches(ticket, query);
+  }));
+}
+
+function renderEmptyDetail({ query = '', status = '' } = {}) {
+  const detail = $('detail');
+  detail.replaceChildren();
+  const empty = node('div', 'empty-detail');
+  empty.append(node('span', 'empty-detail-icon', query || status ? '⌕' : '✓'));
+  empty.append(node('h2', '', 'Chưa có ticket phù hợp'));
+  let explanation = 'Ticket mới sẽ xuất hiện tại đây khi ứng viên chuyển yêu cầu và hệ thống ghi nhận thành công.';
+  if (query) explanation = `Không có ticket khớp từ khóa “${$('queue-search').value.trim()}” trong bộ lọc hiện tại.`;
+  else if (status) explanation = status === 'waiting'
+    ? 'Ticket mới sẽ xuất hiện trong hàng chờ “Đang chờ” sau khi ứng viên gửi yêu cầu có đồng ý chuyển cho cán bộ.'
+    : 'Ticket mới sẽ xuất hiện trong mục “Đang chờ”; ticket đã nhận chỉ hiện với cán bộ phụ trách.';
+  empty.append(node('p', '', explanation));
+  detail.append(empty);
+}
+
+function queueActionLabel(ticket) {
+  if (ticket.status === 'waiting') return 'Nhận xử lý';
+  if (ticket.status === 'in_progress') return 'Mở để phản hồi';
+  return 'Xem chi tiết';
+}
+
 function renderQueue() {
   const container = $('queue');
   const query = normalizeSearch($('queue-search').value);
   const status = $('status-filter').value;
-  const filtered = sortTickets(state.tickets.filter((ticket) => {
-    return (!status || ticket.status === status) && ticketMatches(ticket, query);
-  }));
+  const filtered = filteredTickets();
 
   $('queue-count').textContent = `${filtered.length}/${state.tickets.length}`;
   container.replaceChildren();
   if (!filtered.length) {
     const empty = node('div', 'queue-empty');
     empty.append(node('span', 'queue-empty-icon', query || status ? '⌕' : '✓'));
-    empty.append(node('strong', '', query ? 'Không tìm thấy ticket phù hợp' : 'Không có ticket trong hàng chờ'));
-    empty.append(node('p', '', query ? 'Thử tìm bằng mã ticket hoặc cụm từ khác.' : 'Các yêu cầu mới sẽ xuất hiện tại đây.'));
+    empty.append(node('strong', '', query ? 'Không tìm thấy ticket' : 'Chưa có ticket phù hợp'));
+    empty.append(node('p', '', query
+      ? 'Thử từ khóa khác hoặc xóa bộ lọc để xem lại hàng chờ.'
+      : 'Ticket mới sẽ xuất hiện trong hàng chờ “Đang chờ” sau khi ứng viên chuyển yêu cầu.'));
+    const controls = node('div', 'queue-empty-actions');
+    if (query) {
+      const clearSearch = node('button', 'secondary small-action', 'Xóa từ khóa');
+      clearSearch.type = 'button';
+      clearSearch.id = 'clear-search';
+      clearSearch.addEventListener('click', () => {
+        $('queue-search').value = '';
+        renderQueue();
+        $('queue-search').focus();
+      });
+      controls.append(clearSearch);
+    }
+    if (status) {
+      const clearFilter = node('button', 'secondary small-action', 'Xóa bộ lọc');
+      clearFilter.type = 'button';
+      clearFilter.id = 'clear-filter';
+      clearFilter.addEventListener('click', () => {
+        $('status-filter').value = '';
+        renderQueue();
+        $('status-filter').focus();
+      });
+      controls.append(clearFilter);
+    }
+    if (controls.children.length) empty.append(controls);
     container.append(empty);
+    if (!hasStaffDraft()) {
+      state.selectedId = '';
+      state.detail = null;
+      renderEmptyDetail({ query, status });
+    }
     return;
+  }
+
+  const selectedIsVisible = filtered.some((ticket) => ticket.id === state.selectedId);
+  if (state.selectedId && !selectedIsVisible && !hasStaffDraft()) {
+    state.selectedId = '';
+    state.detail = null;
+    renderEmptyDetail({ query, status });
   }
 
   filtered.forEach((ticket) => {
@@ -186,8 +298,9 @@ function renderQueue() {
     item.append(node('p', 'ticket-summary', ticket.summary || 'Không có nội dung tóm tắt.'));
     const meta = node('div', 'ticket-meta');
     meta.append(node('span', '', `Cập nhật ${formatDate(ticket.updated || ticket.created)}`));
-    if (ticket.owner) meta.append(node('span', '', ticket.owner));
+    meta.append(node('span', 'ticket-owner', `Phụ trách: ${ticket.owner || 'Chưa nhận'}`));
     item.append(meta);
+    item.append(node('span', 'queue-item-action', queueActionLabel(ticket)));
     item.addEventListener('click', () => selectTicket(ticket.id));
     container.append(item);
   });
@@ -244,6 +357,7 @@ function appendActions(container, ticket) {
     const replyLabel = node('label', 'action-label', 'Phản hồi cho ứng viên');
     const reply = node('textarea', 'action-textarea');
     reply.id = 'staff-reply';
+    replyLabel.htmlFor = reply.id;
     reply.maxLength = 4000;
     reply.placeholder = 'Nhập phản hồi dựa trên thông tin đã kiểm tra…';
     const resolve = node('button', 'primary action-button', 'Gửi phản hồi và đóng');
@@ -258,6 +372,7 @@ function appendActions(container, ticket) {
     const rejectLabel = node('label', 'action-label reject-label', 'Lý do từ chối');
     const rejectReason = node('textarea', 'action-textarea reject-textarea');
     rejectReason.id = 'reject-reason';
+    rejectLabel.htmlFor = rejectReason.id;
     rejectReason.maxLength = 4000;
     rejectReason.placeholder = 'Nêu rõ lý do để ứng viên biết hướng xử lý tiếp theo…';
     const reject = node('button', 'secondary danger action-button', 'Từ chối yêu cầu');
@@ -287,8 +402,18 @@ async function performAction(ticketId, button, action, reply = '', errorNode = n
     return;
   }
   const actionButtons = [...$('detail').querySelectorAll('button, textarea')];
+  const originalLabel = button.textContent;
+  const loadingLabels = {
+    claim: 'Đang nhận ticket…',
+    resolve: 'Đang gửi phản hồi…',
+    reject: 'Đang từ chối…',
+  };
   actionButtons.forEach((element) => { element.disabled = true; });
+  button.classList.add('is-loading');
+  button.setAttribute('aria-busy', 'true');
+  button.textContent = loadingLabels[action] || 'Đang xử lý…';
   if (errorNode) errorNode.textContent = '';
+  state.actionInProgress = true;
   try {
     const body = action === 'claim' ? undefined : JSON.stringify({ reply: reply.trim() });
     await api(`/staff/tickets/${encodeURIComponent(ticketId)}/${action}`, { method: 'POST', body });
@@ -297,7 +422,12 @@ async function performAction(ticketId, button, action, reply = '', errorNode = n
   } catch (error) {
     if (errorNode) errorNode.textContent = error.message;
     else renderGlobalError(error.message);
+    button.classList.remove('is-loading');
+    button.removeAttribute('aria-busy');
+    button.textContent = originalLabel;
     actionButtons.forEach((element) => { element.disabled = false; });
+  } finally {
+    state.actionInProgress = false;
   }
 }
 
@@ -345,10 +475,10 @@ function renderDetail(detail) {
   }
 }
 
-async function selectTicket(ticketId) {
+async function selectTicket(ticketId, silent = false) {
   state.selectedId = ticketId;
   renderQueue();
-  renderDetailLoading();
+  if (!silent) renderDetailLoading();
   try {
     const detail = await api(`/staff/tickets/${encodeURIComponent(ticketId)}`);
     if (state.selectedId !== ticketId) return;
@@ -365,23 +495,29 @@ function renderGlobalError(message) {
   $('staff-error').textContent = message || '';
 }
 
-async function refreshDashboard(keepDetail = true) {
-  renderGlobalError('');
-  setDashboardLoading(true);
+async function refreshDashboard(keepDetail = true, silent = false) {
+  if (state.refreshing) return;
+  state.refreshing = true;
+  if (!silent) {
+    renderGlobalError('');
+    setDashboardLoading(true);
+  }
   try {
     const [tickets, metrics] = await Promise.all([api('/staff/tickets'), api('/staff/metrics')]);
     state.tickets = Array.isArray(tickets) ? tickets : [];
     renderMetrics(metrics);
     renderQueue();
-    if (keepDetail && state.selectedId) {
-      await selectTicket(state.selectedId);
+    markLiveUpdated();
+    if (keepDetail && state.selectedId && !(silent && hasStaffDraft())) {
+      await selectTicket(state.selectedId, silent);
     } else if (!state.selectedId) {
-      $('detail').replaceChildren(node('div', 'empty-detail', 'Chọn một ticket để xem chi tiết.'));
+      renderEmptyDetail({ query: normalizeSearch($('queue-search').value), status: $('status-filter').value });
     }
   } catch (error) {
     renderGlobalError(error.message);
   } finally {
-    setDashboardLoading(false);
+    state.refreshing = false;
+    if (!silent) setDashboardLoading(false);
   }
 }
 
@@ -390,8 +526,15 @@ async function login(event) {
   const username = $('username').value.trim();
   const password = $('password').value;
   $('login-error').textContent = '';
+  $('username-error').textContent = '';
+  $('password-error').textContent = '';
+  $('username').removeAttribute('aria-invalid');
+  $('password').removeAttribute('aria-invalid');
   if (!username || !password) {
-    $('login-error').textContent = 'Vui lòng nhập đầy đủ tài khoản và mật khẩu.';
+    const first = !username ? $('username') : $('password');
+    first.setAttribute('aria-invalid', 'true');
+    $(`${first.id}-error`).textContent = !username ? 'Tài khoản là bắt buộc.' : 'Mật khẩu là bắt buộc.';
+    first.focus();
     return;
   }
   const button = $('login-submit');
@@ -403,8 +546,14 @@ async function login(event) {
     $('password').value = '';
     showDashboard();
     await refreshDashboard(false);
+    startAutoRefresh();
   } catch (error) {
-    $('login-error').textContent = error.message;
+    if (error.fields?.username || error.fields?.password) {
+      const first = error.fields.username ? $('username') : $('password');
+      first.setAttribute('aria-invalid', 'true');
+      $(`${first.id}-error`).textContent = error.fields[first.name];
+      first.focus();
+    } else $('login-error').textContent = error.message;
   } finally {
     button.disabled = false;
     button.querySelector('.button-label').textContent = 'Đăng nhập';
@@ -445,6 +594,7 @@ if (loginError) $('login-error').textContent = decodeURIComponent(loginError.rep
     state.username = me.username || '';
     showDashboard();
     await refreshDashboard(false);
+    startAutoRefresh();
   } catch {
     // The login panel is the expected state for an unauthenticated visitor.
   }

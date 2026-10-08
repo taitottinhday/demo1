@@ -59,11 +59,13 @@ class Settings(BaseSettings):
     resend_from: str = Field(default="", validation_alias=AliasChoices("RESEND_FROM"))
     public_base_url: str = "http://127.0.0.1:8000"
     verification_code_minutes: int = Field(default=10, ge=5, le=60)
+    otp_resend_seconds: int = Field(default=30, ge=10, le=300)
     verification_max_attempts: int = Field(default=5, ge=1, le=10)
     staff_invite_hours: int = Field(default=48, ge=1, le=168)
     admin_username: str = "admin"
     admin_password: str = "Admin@2026!"
     admin_stale_hours: int = Field(default=24, ge=1, le=720)
+    reporting_timezone: str = "Asia/Ho_Chi_Minh"
     mvp_data_dir: str = "data"
     session_hours: int = Field(default=24, ge=1, le=168)
     secure_cookies: bool = False

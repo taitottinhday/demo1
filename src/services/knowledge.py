@@ -200,18 +200,26 @@ class Knowledge:
         )
         return self.manifest
 
-    def resolve_program(self, question, context=""):
+    def program_matches(self, question):
+        """Return explicit program matches in the question, without using session context."""
         q = normalize(question)
         codes = set(re.findall(r"\b[A-Z]{2,8}\d{0,3}(?:-[A-Z]+)?\b", question.upper()))
-        explicit = [p for p in self.programs if p["code"] in codes]
+        matches = [p for p in self.programs if p["code"] in codes]
+        matched_codes = {p["code"] for p in matches}
+        for program in self.programs:
+            names = {
+                normalize(program["name"].replace("CNTT: ", "")),
+                normalize(program["name"].replace("CNTT: ", "").split("(")[0]).strip(),
+            }
+            if any(len(name) >= 5 and name in q for name in names) and program["code"] not in matched_codes:
+                matches.append(program)
+                matched_codes.add(program["code"])
+        return matches
+
+    def resolve_program(self, question, context=""):
+        explicit = self.program_matches(question)
         if len(explicit) == 1:
             return explicit[0]["code"]
-        named = [p for p in self.programs if normalize(p["name"].replace("CNTT: ", "")) in q]
-        if named:
-            longest = max(len(p["name"]) for p in named)
-            best = [p for p in named if len(p["name"]) == longest]
-            if len(best) == 1:
-                return best[0]["code"]
         return context if not explicit else ""
 
     def search(self, question: str, program: str = "", limit=4):
@@ -339,4 +347,7 @@ class Knowledge:
             "excerpt": chunk["text"],
             "version": self.manifest["version"][:12],
             "year": 2026,
+            "document_title": self.manifest.get("title", "Tài liệu tuyển sinh"),
+            "document_status": self.manifest.get("status", ""),
+            "indexed_pages": self.manifest.get("indexed_pages", ""),
         }

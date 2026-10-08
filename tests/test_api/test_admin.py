@@ -119,6 +119,12 @@ async def test_reassign_rules(client):
     assert reassigned[1]["from_officer_id"] == second["id"] and reassigned[1]["to_officer_id"] == staff_id
     assert reassigned[2]["to_officer_id"] is None and reassigned[2]["note"] == "Trả hàng chờ"
     assert all(e["actor_id"] == officer_id("admin") for e in reassigned)
+    with store().connect() as db:
+        audit = db.execute(
+            "SELECT action,actor,target_type,target_id FROM admin_audit_events WHERE target_id=? ORDER BY id",
+            (ticket_id,),
+        ).fetchall()
+    assert len(audit) == 3 and all(row[0] == "reassign" and row[1] == "admin" for row in audit)
 
     # Finished tickets cannot be reassigned.
     await client.post(url, json={"to_officer_id": staff_id})
@@ -181,6 +187,14 @@ async def test_lock_officer_releases_tickets(client):
     assert (
         await client.patch(f"/api/v1/admin/officers/{officer_id('admin')}", json={"active": False})
     ).status_code == 404
+    with store().connect() as db:
+        audit = db.execute(
+            "SELECT action,actor,target_id,note FROM admin_audit_events WHERE target_type='officer' AND target_id=? ORDER BY id",
+            (str(staff_id),),
+        ).fetchall()
+    assert [row[0] for row in audit] == ["lock", "unlock"]
+    assert all(row[1] == "admin" for row in audit)
+    assert "hàng chờ" in audit[0][3]
 
 
 @pytest.mark.asyncio
@@ -195,6 +209,12 @@ async def test_create_officer_validation(client):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as other:
         login = {"username": "moi_canbo", "password": "Matkhau@123"}
         assert (await other.post("/api/v1/staff/login", json=login)).status_code == 200
+    with store().connect() as db:
+        audit = db.execute(
+            "SELECT action,actor,target_id FROM admin_audit_events WHERE action='invite' AND target_type='officer' AND target_id=?",
+            (str(officer["id"]),),
+        ).fetchall()
+    assert audit and audit[-1][1] == "admin"
 
 
 @pytest.mark.asyncio
@@ -215,7 +235,13 @@ async def test_admin_can_reset_officer_password_without_exposing_it(client):
             await staff_client.post(
                 "/api/v1/staff/login", json={"username": "canbo", "password": "NewOfficer@123"}
             )
-        ).status_code == 200
+            ).status_code == 200
+    with store().connect() as db:
+        audit = db.execute(
+            "SELECT action,actor,target_id FROM admin_audit_events WHERE action='reset_password' AND target_id=? ORDER BY id DESC LIMIT 1",
+            (str(officer["id"]),),
+        ).fetchone()
+    assert audit and audit[1] == "admin"
 
 
 @pytest.mark.asyncio
@@ -248,12 +274,19 @@ async def test_metrics_with_sample_data(client):
     assert m["reject_rate"] == pytest.approx(1 / 3, abs=1e-3)
     assert [t["id"] for t in m["stale_waiting"]] == ["TS-W-OLD"]
     assert next(o for o in m["officer_load"] if o["name"] == "Cán bộ tuyển sinh")["open_tickets"] == 1
-    assert m["direct_answer_rate"] == 0.75 and m["handover_rate"] is None
+    assert m["direct_answer_rate"] == 0.75
+    assert m["handover_rate"]["value"] == 0.0
+    assert m["handover_rate"]["numerator"] == 0 and m["handover_rate"]["denominator"] == 4
+    assert m["handover_rate"]["status"] == "Đã đo"
+    assert any(k["key"] == "handover_rate" and k["formula"] for k in m["kpis"])
+    assert all({"label", "formula", "numerator", "denominator", "time_window", "timezone", "last_updated", "source"} <= set(k) for k in m["kpis"])
+    assert m["data_timezone"] == "Asia/Ho_Chi_Minh"
 
     today = time.strftime("%Y-%m-%d")
     assert (await client.get("/api/v1/admin/metrics", params={"from": today, "to": today})).status_code == 200
     future = (await client.get("/api/v1/admin/metrics", params={"from": "2099-01-01"})).json()
     assert sum(future["tickets_by_status"].values()) == 0 and future["reject_rate"] is None
+    assert future["handover_rate"]["value"] is None and future["handover_rate"]["status"] == "Chưa đủ dữ liệu"
     assert (await client.get("/api/v1/admin/metrics", params={"from": "hôm qua"})).status_code == 422
     bad_range = {"from": "2026-02-01", "to": "2026-01-01"}
     assert (await client.get("/api/v1/admin/metrics", params=bad_range)).status_code == 422

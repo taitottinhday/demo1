@@ -2,16 +2,18 @@ import json
 import secrets
 import sqlite3
 import time
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 
 from src.services.accounts import create_user, hash_password
-from src.services.store import digest, ticket_event
+from src.services.store import admin_audit, digest, ticket_event
 
 STATUSES = ["waiting", "in_progress", "resolved", "rejected", "cancelled"]
 TICKET_SELECT = (
-    "SELECT t.id,t.summary,t.reason,t.status,t.reply,t.created,t.updated,t.claimed_at,t.resolved_at,"
+    "SELECT t.id,t.summary,t.reason,t.status,t.reply,t.question,t.ai_answer,t.sources_json,"
+    "t.created,t.updated,t.claimed_at,t.resolved_at,"
     " u.id AS officer_id, COALESCE(u.name,t.owner) AS officer_name"
     " FROM tickets t LEFT JOIN users u ON u.username=t.owner"
 )
@@ -60,7 +62,13 @@ class AdminStore:
                 TICKET_SELECT + where + " ORDER BY t.created DESC LIMIT ? OFFSET ?",
                 [*args, page_size, (page - 1) * page_size],
             ).fetchall()
-        return {"items": [dict(r) for r in rows], "total": total, "page": page, "page_size": page_size}
+        return {"items": [self._public_ticket_row(r) for r in rows], "total": total, "page": page, "page_size": page_size}
+
+    @staticmethod
+    def _public_ticket_row(row):
+        value = dict(row)
+        value.pop("sources_json", None)
+        return value
 
     def ticket(self, ticket_id):
         with self.store.connect() as db:
@@ -74,20 +82,24 @@ class AdminStore:
                 (session, row["created"]),
             ).fetchall()
         conversation = []
-        for m in reversed(messages):
-            payload = json.loads(m["payload"])
-            conversation.append(
-                {
-                    "role": m["role"],
-                    "text": payload.get("response", ""),
-                    "kind": payload.get("kind"),
-                    "sources": payload.get("sources") or [],
-                    "created": m["created"],
-                }
-            )
+        if row["question"] or row["ai_answer"] or row["sources_json"] not in (None, "", "[]"):
+            conversation.append({"role": "user", "text": row["question"] or row["summary"], "kind": None, "sources": [], "created": row["created"]})
+            conversation.append({"role": "assistant", "text": row["ai_answer"], "kind": None, "sources": json.loads(row["sources_json"] or "[]"), "created": row["created"]})
+        else:
+            for m in reversed(messages):
+                payload = json.loads(m["payload"])
+                conversation.append(
+                    {
+                        "role": m["role"],
+                        "text": payload.get("response", ""),
+                        "kind": payload.get("kind"),
+                        "sources": payload.get("sources") or [],
+                        "created": m["created"],
+                    }
+                )
         answer = next((m for m in reversed(conversation) if m["role"] == "assistant"), None)
         return {
-            **dict(row),
+            **self._public_ticket_row(row),
             "handover_reason": row["reason"],
             "ai_answer": answer["text"] if answer else None,
             "ai_sources": answer["sources"] if answer else [],
@@ -128,6 +140,7 @@ class AdminStore:
                 raise HTTPException(409, "Ticket đã ở đúng trạng thái này.")
             if not self.move(db, ticket_id, row["status"], row["owner"], target, note, actor):
                 raise HTTPException(409, "Ticket vừa được người khác thay đổi, vui lòng tải lại.")
+            admin_audit(db, "reassign", actor, "ticket", ticket_id, note or "Phân công lại ticket")
         return self.ticket(ticket_id)
 
     def move(self, db, ticket_id, status, owner, target, note, actor):
@@ -154,7 +167,7 @@ class AdminStore:
     def officers(self):
         with self.store.connect() as db:
             rows = db.execute(
-                "SELECT u.id,u.username,u.name,u.email,u.active,u.created,u.password_set_at,u.invite_sent_at,"
+                "SELECT u.id,u.username,u.name,u.email,u.active,u.created,u.password_set_at,u.invite_sent_at,u.reset_requested_at,"
                 "COUNT(t.id) AS open_tickets"
                 " FROM users u LEFT JOIN tickets t ON t.owner=u.username AND t.status='in_progress'"
                 " WHERE u.role='officer' GROUP BY u.id ORDER BY u.name, u.id"
@@ -163,6 +176,13 @@ class AdminStore:
         for row in rows:
             officer = {**dict(row), "active": bool(row["active"])}
             officer["password_status"] = "ready" if row["password_set_at"] else "invite_sent"
+            officer["account_status"] = (
+                "reset_requested"
+                if row["reset_requested_at"] and row["password_set_at"]
+                else "activated"
+                if row["password_set_at"]
+                else "not_activated"
+            )
             result.append(officer)
         return result
 
@@ -176,7 +196,7 @@ class AdminStore:
                 officer_id = create_user(db, username, name, email, "officer", password)
         except sqlite3.IntegrityError:
             raise HTTPException(409, "Tài khoản hoặc email đã tồn tại.") from None
-        token = self.store.create_staff_invite(officer_id, invite_hours)
+        token = self.store.create_staff_invite(officer_id, invite_hours, reset_requested=False)
         return self.officer(officer_id), token
 
     def resend_officer_invite(self, officer_id, invite_hours):
@@ -187,8 +207,26 @@ class AdminStore:
             raise HTTPException(409, "Cán bộ đang bị khóa, không thể gửi lời mời.")
         if officer["password_status"] == "ready":
             raise HTTPException(409, "Cán bộ đã thiết lập mật khẩu. Hãy dùng chức năng đặt lại mật khẩu.")
-        token = self.store.create_staff_invite(officer_id, invite_hours)
+        token = self.store.create_staff_invite(officer_id, invite_hours, reset_requested=False)
         return self.officer(officer_id), token
+
+    def request_password_reset(self, officer_id, invite_hours):
+        officer = self.officer(officer_id)
+        if not officer:
+            raise HTTPException(404, "Không tìm thấy cán bộ.")
+        if not officer["active"]:
+            raise HTTPException(409, "Cán bộ đang bị khóa, không thể gửi liên kết đặt lại.")
+        if officer["password_status"] != "ready":
+            raise HTTPException(409, "Cán bộ chưa kích hoạt. Hãy gửi lại email kích hoạt.")
+        token = self.store.create_staff_invite(officer_id, invite_hours, reset_requested=True)
+        return self.officer(officer_id), token
+
+    def invalidate_invite_delivery(self, officer_id, token, reset_requested_at=None):
+        self.store.invalidate_staff_invite(token, officer_id, reset_requested_at=reset_requested_at)
+
+    def record_audit(self, action, actor, target_type, target_id=None, note=None):
+        with self.store.connect() as db:
+            admin_audit(db, action, actor, target_type, target_id, note)
 
     def remove_officer(self, officer_id):
         with self.store.connect() as db:
@@ -208,6 +246,8 @@ class AdminStore:
                 db.execute("UPDATE users SET name=? WHERE id=?", (name, officer_id))
             if active is True:
                 db.execute("UPDATE users SET active=1 WHERE id=?", (officer_id,))
+                if not row["active"]:
+                    admin_audit(db, "unlock", actor, "officer", officer_id, "Mở khóa tài khoản cán bộ")
             if active is False and row["active"]:
                 # Lock first so the officer cannot claim more while their tickets are released.
                 db.execute("UPDATE users SET active=0 WHERE id=?", (officer_id,))
@@ -218,9 +258,17 @@ class AdminStore:
                 for (ticket_id,) in held:
                     if self.move(db, ticket_id, "in_progress", row["username"], None, "Khóa cán bộ", actor):
                         released += 1
+                admin_audit(
+                    db,
+                    "lock",
+                    actor,
+                    "officer",
+                    officer_id,
+                    f"Khóa tài khoản; trả {released} ticket về hàng chờ.",
+                )
         return {**self.officer(officer_id), "released_tickets": released}
 
-    def reset_officer_password(self, officer_id, password):
+    def reset_officer_password(self, officer_id, password, actor=None):
         with self.store.connect() as db:
             row = db.execute(
                 "SELECT username FROM users WHERE id=? AND role='officer'", (officer_id,)
@@ -228,34 +276,37 @@ class AdminStore:
             if not row:
                 raise HTTPException(404, "Không tìm thấy cán bộ.")
             db.execute(
-                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL WHERE id=?",
+                "UPDATE users SET password_hash=?,password_set_at=?,invite_sent_at=NULL,reset_requested_at=NULL WHERE id=?",
                 (hash_password(password), time.time(), officer_id),
             )
             db.execute("DELETE FROM staff_sessions WHERE username=?", (row["username"],))
             db.execute("UPDATE staff_invites SET used_at=? WHERE officer_id=? AND used_at IS NULL", (time.time(), officer_id))
+            admin_audit(db, "reset_password", actor, "officer", officer_id, "Admin đặt lại mật khẩu cán bộ")
         return self.officer(officer_id)
 
     # Metrics --------------------------------------------------------------
-    def metrics(self, date_from=None, date_to=None, stale_hours=24):
-        start = day_start(date_from) if date_from else 0
-        end = day_start(date_to + timedelta(days=1)) if date_to else time.time() + 1
+    def metrics(self, date_from=None, date_to=None, stale_hours=24, timezone_name="Asia/Ho_Chi_Minh"):
+        start = day_start(date_from, timezone_name) if date_from else 0
+        end = day_start(date_to + timedelta(days=1), timezone_name) if date_to else time.time() + 1
         span = (start, end)
         now = time.time()
+        eligible_kinds = ("answered", "fallback", "clarification", "error")
         with self.store.connect() as db:
             by_status = dict.fromkeys(STATUSES, 0)
             for status, count in db.execute(
                 "SELECT status,COUNT(*) FROM tickets WHERE created>=? AND created<? GROUP BY status", span
             ):
                 by_status[status] = count
-            avg_wait = db.execute(
-                "SELECT AVG(claimed_at-created) FROM tickets WHERE claimed_at IS NOT NULL AND created>=? AND created<?",
+            wait_stats = db.execute(
+                "SELECT COALESCE(SUM(claimed_at-created),0),COUNT(*) FROM tickets "
+                "WHERE claimed_at IS NOT NULL AND created>=? AND created<?",
                 span,
-            ).fetchone()[0]
-            avg_resolve = db.execute(
-                "SELECT AVG(resolved_at-claimed_at) FROM tickets WHERE status='resolved'"
+            ).fetchone()
+            resolve_stats = db.execute(
+                "SELECT COALESCE(SUM(resolved_at-claimed_at),0),COUNT(*) FROM tickets WHERE status='resolved'"
                 " AND claimed_at IS NOT NULL AND resolved_at IS NOT NULL AND created>=? AND created<?",
                 span,
-            ).fetchone()[0]
+            ).fetchone()
             stale = db.execute(
                 TICKET_SELECT + " WHERE t.status='waiting' AND t.created<? ORDER BY t.created",
                 (now - stale_hours * 3600,),
@@ -264,7 +315,45 @@ class AdminStore:
             answered = db.execute(
                 "SELECT COUNT(*) FROM events WHERE kind='answered' AND created>=? AND created<?", span
             ).fetchone()[0]
+            handover_numerator = db.execute(
+                "SELECT COUNT(*) FROM ticket_events WHERE action='created' AND created>=? AND created<?", span
+            ).fetchone()[0]
+            handover_denominator = db.execute(
+                "SELECT COUNT(*) FROM events WHERE kind IN (?,?,?,?) AND created>=? AND created<?",
+                [*eligible_kinds, *span],
+            ).fetchone()[0]
         closed = by_status["resolved"] + by_status["rejected"]
+        wait_sum, wait_count = wait_stats
+        resolve_sum, resolve_count = resolve_stats
+        avg_wait = wait_sum / wait_count if wait_count else None
+        avg_resolve = resolve_sum / resolve_count if resolve_count else None
+        window = {"from": iso_time(start, timezone_name) if start else None, "to": iso_time(end, timezone_name)}
+        updated = iso_time(now, timezone_name)
+
+        def kpi(key, label, value, numerator, denominator, formula, source, measured=True):
+            return {
+                "key": key,
+                "label": label,
+                "value": round(value, 4) if isinstance(value, float) else value,
+                "numerator": numerator,
+                "denominator": denominator,
+                "formula": formula,
+                "time_window": window,
+                "timezone": timezone_name,
+                "last_updated": updated,
+                "source": source,
+                "status": "Đã đo" if measured else "Chưa đủ dữ liệu",
+            }
+
+        source = "Dữ liệu ticket và kết quả xử lý câu hỏi đã ghi nhận"
+        kpis = [
+            kpi("waiting", "Ticket đang chờ", by_status["waiting"], by_status["waiting"], None, "Đếm ticket đang ở trạng thái Đang chờ", "Nhật ký ticket"),
+            kpi("avg_wait", "Thời gian chờ trung bình", avg_wait, wait_sum, wait_count, "Tổng thời gian từ lúc tạo đến lúc nhận / số ticket đã được nhận", "Nhật ký ticket", bool(wait_count)),
+            kpi("avg_resolve", "Thời gian xử lý trung bình", avg_resolve, resolve_sum, resolve_count, "Tổng thời gian từ lúc nhận đến lúc giải quyết / số ticket đã giải quyết", "Nhật ký ticket", bool(resolve_count)),
+            kpi("reject_rate", "Tỷ lệ từ chối", by_status["rejected"] / closed if closed else None, by_status["rejected"], closed, "Ticket bị từ chối / (ticket đã giải quyết + ticket bị từ chối)", "Nhật ký ticket", bool(closed)),
+            kpi("direct_answer_rate", "Tỷ lệ trả lời trực tiếp", answered / chats if chats else None, answered, chats, "Câu hỏi có câu trả lời trực tiếp / câu hỏi đã được ghi nhận", source, bool(chats)),
+            kpi("handover_rate", "Tỷ lệ chuyển cán bộ", handover_numerator / handover_denominator if handover_denominator else None, handover_numerator, handover_denominator, "Ticket chuyển cán bộ / câu hỏi đủ điều kiện trong khoảng thời gian", "Nhật ký ticket và kết quả xử lý câu hỏi", bool(handover_denominator)),
+        ]
         return {
             "tickets_by_status": by_status,
             "avg_wait_seconds": round(avg_wait, 1) if avg_wait is not None else None,
@@ -276,13 +365,38 @@ class AdminStore:
             ],
             "stale_hours": stale_hours,
             "stale_waiting": [{**dict(r), "waiting_seconds": round(now - r["created"])} for r in stale],
-            # chat_logs does not exist yet: the direct-answer rate comes from per-chat outcome events.
             "direct_answer_rate": round(answered / chats, 4) if chats else None,
-            # Tickets can be opened without chatting, so tickets/chats is not a rate; null until chat_logs exists.
-            "handover_rate": None,
-            "rates_source": "events",
+            "handover_rate": {
+                "value": round(handover_numerator / handover_denominator, 4) if handover_denominator else None,
+                "numerator": handover_numerator,
+                "denominator": handover_denominator,
+                "status": "Đã đo" if handover_denominator else "Chưa đủ dữ liệu",
+                "time_window": window,
+                "timezone": timezone_name,
+                "last_updated": updated,
+                "formula": "Ticket chuyển cán bộ / câu hỏi đủ điều kiện trong khoảng thời gian",
+            },
+            "rates_source": "Nhật ký ticket và kết quả xử lý câu hỏi",
+            "kpis": kpis,
+            "data_window": window,
+            "data_timezone": timezone_name,
+            "data_last_updated": updated,
+            "data_source": source,
         }
 
 
-def day_start(value: date):
-    return datetime(value.year, value.month, value.day).timestamp()
+def zone(name):
+    try:
+        return ZoneInfo(name)
+    except Exception:
+        if name in {"Asia/Ho_Chi_Minh", "Asia/Saigon"}:
+            return timezone(timedelta(hours=7), name)
+        return UTC
+
+
+def iso_time(value, timezone_name):
+    return datetime.fromtimestamp(value, zone(timezone_name)).isoformat(timespec="seconds")
+
+
+def day_start(value: date, timezone_name="Asia/Ho_Chi_Minh"):
+    return datetime(value.year, value.month, value.day, tzinfo=zone(timezone_name)).timestamp()

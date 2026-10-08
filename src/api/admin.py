@@ -1,7 +1,7 @@
 import asyncio
 from datetime import date
 from typing import Literal
-from urllib.parse import quote
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field, field_validator
@@ -137,12 +137,14 @@ async def create_officer(body: OfficerInput, request: Request, user=Depends(admi
         rt["settings"].staff_invite_hours,
     )
     if not mailer or not mailer.configured:
+        admins(request).record_audit("invite", user, "officer", officer["id"], "Tạo lời mời; email chưa được gửi")
         return {**officer, "invite_sent": False}
     try:
         await send_staff_invite(rt, officer, token)
     except HTTPException:
         admins(request).remove_officer(officer["id"])
         raise
+    admins(request).record_audit("invite", user, "officer", officer["id"], "Gửi email mời cán bộ")
     return {**officer, "invite_sent": True}
 
 
@@ -160,7 +162,7 @@ def update_officer(officer_id: int, body: OfficerPatch, request: Request, user=D
 def reset_officer_password(
     officer_id: int, body: OfficerPasswordInput, request: Request, user=Depends(admin)
 ):
-    return admins(request).reset_officer_password(officer_id, body.password)
+    return admins(request).reset_officer_password(officer_id, body.password, user)
 
 
 @router.post("/officers/{officer_id}/invite")
@@ -170,7 +172,28 @@ async def resend_officer_invite(officer_id: int, request: Request, user=Depends(
     if not mailer or not mailer.configured:
         raise HTTPException(503, "Chưa cấu hình nhà cung cấp email để gửi thư mời cán bộ.")
     officer, token = admins(request).resend_officer_invite(officer_id, rt["settings"].staff_invite_hours)
-    await send_staff_invite(rt, officer, token)
+    try:
+        await send_staff_invite(rt, officer, token)
+    except HTTPException:
+        admins(request).invalidate_invite_delivery(officer["id"], token)
+        raise
+    admins(request).record_audit("invite", user, "officer", officer["id"], "Gửi lại email mời cán bộ")
+    return {**officer, "invite_sent": True}
+
+
+@router.post("/officers/{officer_id}/password-reset")
+async def request_officer_password_reset(officer_id: int, request: Request, user=Depends(admin)):
+    rt = runtime(request)
+    mailer = rt.get("mailer")
+    if not mailer or not mailer.configured:
+        raise HTTPException(503, "Chưa cấu hình nhà cung cấp email để gửi liên kết đặt lại.")
+    officer, token = admins(request).request_password_reset(officer_id, rt["settings"].staff_invite_hours)
+    try:
+        await send_staff_invite(rt, officer, token, reset=True)
+    except HTTPException:
+        admins(request).invalidate_invite_delivery(officer["id"], token, reset_requested_at=None)
+        raise
+    admins(request).record_audit("reset_password", user, "officer", officer["id"], "Gửi liên kết đặt lại mật khẩu")
     return {**officer, "invite_sent": True}
 
 
@@ -184,15 +207,16 @@ def metrics(
     if date_from and date_to and date_from > date_to:
         raise HTTPException(422, "Ngày bắt đầu phải trước ngày kết thúc.")
     hours = runtime(request)["settings"].admin_stale_hours
-    return admins(request).metrics(date_from, date_to, hours)
+    return admins(request).metrics(date_from, date_to, hours, runtime(request)["settings"].reporting_timezone)
 
 
-async def send_staff_invite(rt, officer, token):
-    activate_url = (
-        rt["settings"].public_base_url.rstrip("/")
-        + "/staff/activate?token="
-        + quote(token, safe="")
-    )
+async def send_staff_invite(rt, officer, token, reset=False):
+    base = rt["settings"].public_base_url.rstrip("/")
+    # Keep the one-time value in the URL fragment so normal HTTP access logs,
+    # referrers, and proxy logs do not receive the credential.
+    token_fragment = "#" + urlencode({"token": token})
+    activate_url = base + "/staff/activate" + token_fragment
+    reset_url = base + "/staff/reset" + token_fragment
     try:
         await asyncio.to_thread(
             rt["mailer"].send_staff_invite,
@@ -201,6 +225,7 @@ async def send_staff_invite(rt, officer, token):
             officer["username"],
             activate_url,
             rt["settings"].staff_invite_hours,
+            reset_url,
         )
     except EmailDeliveryError as exc:
         raise HTTPException(503, "Không thể gửi thư mời cán bộ. Kiểm tra cấu hình SMTP rồi thử lại.") from exc

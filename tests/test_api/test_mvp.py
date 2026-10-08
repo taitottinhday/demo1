@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
@@ -23,9 +24,49 @@ async def test_source_and_grounded_program(client):
     assert "300" in response["response"]
     assert response["sources"][0]["page"] == 10
     assert "IT1" in response["sources"][0]["excerpt"]
+    assert response["answer_sections"]["short_answer"]
+    assert "phiên bản" in response["answer_sections"]["source_note"]
+    source_keys = {
+        (source["url"], source["page"], source["end_page"], source["version"])
+        for source in response["sources"]
+    }
+    assert len(source_keys) == len(response["sources"])
     assert (await client.get("/api/v1/source/pdf")).headers["content-type"] == "application/pdf"
     guide = (await client.get("/api/v1/guide")).json()
     assert len(guide["steps"]) == 3 and guide["source"]["page"] == 18
+    assert guide["checked_at"] and guide["document_version"] and guide["document_status"]
+    assert "Không phải hồ sơ" in guide["note"]
+    assert all(step["id"] and step["source"]["page"] == 18 for step in guide["steps"])
+
+
+@pytest.mark.asyncio
+async def test_candidate_checklist_requires_account_and_syncs_progress(client):
+    guide = (await client.get("/api/v1/guide")).json()
+    version = guide["guide_version"]
+    assert (await client.get("/api/v1/guide/checklist", params={"guide_version": version})).status_code == 401
+
+    store = app.state.runtime["store"]
+    student = store.student_register("checklist@example.test", "password12345", "Ứng viên kiểm thử")
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=? WHERE id=?", (time.time(), student["id"]))
+    token, _ = store.student_login("checklist@example.test", "password12345", 2)
+    client.cookies.set("student", token)
+
+    empty = await client.get("/api/v1/guide/checklist", params={"guide_version": version})
+    assert empty.status_code == 200 and empty.json()["storage"] == "account"
+    saved = await client.put(
+        "/api/v1/guide/checklist",
+        json={"guide_version": version, "completed": ["eligibility", "eligibility"]},
+    )
+    assert saved.status_code == 200 and saved.json()["completed"] == ["eligibility"]
+    loaded = await client.get("/api/v1/guide/checklist", params={"guide_version": version})
+    assert loaded.json()["completed"] == ["eligibility"] and loaded.json()["updated_at"]
+
+    invalid = await client.put(
+        "/api/v1/guide/checklist",
+        json={"guide_version": version, "completed": ["unknown-step"]},
+    )
+    assert invalid.status_code == 422
 
 
 @pytest.mark.asyncio
@@ -37,6 +78,49 @@ async def test_auto_program_context_and_missing_information(client):
     for question in ["IELTS 6.5 quy đổi bao nhiêu điểm?", "Hồ sơ cần giấy tờ gì?", "Hôm nay còn nộp hồ sơ không?"]:
         data = (await client.post("/api/v1/chat", json={"message": question})).json()
         assert data["kind"] == "fallback" and not data["sources"]
+
+
+@pytest.mark.asyncio
+async def test_chat_scope_prioritizes_explicit_program_and_handles_general_questions(client):
+    selected = await client.post(
+        "/api/v1/chat", json={"message": "IT1 có chỉ tiêu bao nhiêu?", "program": "IT1"}
+    )
+    assert selected.status_code == 200
+
+    general = (
+        await client.post(
+            "/api/v1/chat",
+            json={"message": "HUST 2026 có những phương thức tuyển sinh nào?", "program": "IT1"},
+        )
+    ).json()
+    assert general["scope"] == "general"
+    assert general["scope_program"] is None
+    assert general["program"] == "IT1"
+    assert all(method in general["response"] for method in ["XTTN", "ĐGTD", "THPT"])
+
+    specific = (
+        await client.post(
+            "/api/v1/chat",
+            json={"message": "Phương thức xét tuyển IT1 là gì?", "program": "IT1"},
+        )
+    ).json()
+    assert specific["scope"] == "program"
+    assert specific["scope_program"] == "IT1"
+    assert "IT1" in specific["response"]
+
+    follow_up = (
+        await client.post("/api/v1/chat", json={"message": "Học phí bao nhiêu?", "program": "IT1"})
+    ).json()
+    assert follow_up["scope"] == "program"
+    assert follow_up["scope_program"] == "IT1"
+    assert "28 - 40" in follow_up["response"]
+
+    await client.delete("/api/v1/session/messages")
+    ambiguous = (await client.post("/api/v1/chat", json={"message": "Học phí bao nhiêu?"})).json()
+    assert ambiguous["scope"] == "ambiguous"
+    assert ambiguous["kind"] == "clarification"
+    assert not ambiguous["sources"]
+    assert "chương trình" in ambiguous["response"]
 
 
 @pytest.mark.asyncio
@@ -99,6 +183,59 @@ async def test_handover_isolation_consent_idempotency_and_staff(client):
     assert (await client.get("/api/v1/tickets")).json()
     await client.post("/api/v1/staff/logout")
     assert (await client.get("/api/v1/staff/metrics")).status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_handover_preview_is_stored_and_candidate_can_restore_after_session_loss(client):
+    payload = {
+        "summary": "Nhờ cán bộ kiểm tra lại điều kiện.",
+        "question": "IT1 có yêu cầu ngoại ngữ nào?",
+        "ai_answer": "Câu trả lời AI cần cán bộ xác minh.",
+        "sources": [{"title": "Tài liệu tuyển sinh HUST 2026", "page": 16, "excerpt": "Nguồn liên quan."}],
+        "consent": True,
+        "request_key": "preview-session-123",
+    }
+    store = app.state.runtime["store"]
+    email = "candidate@example.test"
+    store.student_register(email, "Candidate@123", "Ứng viên")
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=? WHERE email=?", (time.time(), email))
+    student_token, _ = store.student_login(email, "Candidate@123", 24)
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test", cookies={"student": student_token}) as account:
+        created = await account.post("/api/v1/handover", json=payload)
+        assert created.status_code == 200
+        ticket = created.json()
+        assert ticket["question"] == payload["question"]
+        assert ticket["ai_answer"] == payload["ai_answer"]
+        assert ticket["sources"][0]["page"] == 16
+        assert ticket["status"] == "waiting" and ticket["updated"]
+    async with AsyncClient(transport=transport, base_url="http://test", cookies={"student": student_token}) as account:
+        restored = await account.get("/api/v1/tickets")
+        assert restored.status_code == 200
+        assert any(item["id"] == ticket["id"] for item in restored.json())
+
+
+@pytest.mark.asyncio
+async def test_handover_audit_events_and_metrics_formula(client):
+    await client.post("/api/v1/chat", json={"message": "IT1 có chỉ tiêu bao nhiêu?"})
+    created = await client.post(
+        "/api/v1/handover",
+        json={"summary": "Cần cán bộ kiểm tra.", "consent": True, "request_key": "audit-metrics-123"},
+    )
+    ticket_id = created.json()["id"]
+    assert (await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})).status_code == 200
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/claim")).status_code == 200
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã xác minh."})).status_code == 200
+    history = (await client.get(f"/api/v1/staff/tickets/{ticket_id}")).json()["events"]
+    assert [event["action"] for event in history] == ["created", "claimed", "reply", "resolved"]
+    await client.post("/api/v1/staff/logout")
+    assert (await client.post("/api/v1/admin/login", json={"username": "admin", "password": "Admin@2026!"})).status_code == 200
+    metrics = (await client.get("/api/v1/admin/metrics")).json()
+    rate = metrics["handover_rate"]
+    assert rate["numerator"] >= 1 and rate["denominator"] >= 1
+    assert rate["value"] is not None and rate["timezone"] == "Asia/Ho_Chi_Minh"
+    assert "ticket_events(action=created)" in rate["formula"]
 
 
 @pytest.mark.asyncio
@@ -241,10 +378,11 @@ async def test_validation_origin_and_rate_limit(client):
 
 
 def test_redaction():
-    value = redact("Email user@example.com, CCCD 012345678901, điện thoại 0912345678")
+    value = redact("Email user@example.com, CCCD 012345678901, điện thoại 0912345678, password=secret123")
     assert "user@example.com" not in value
     assert "012345678901" not in value
     assert "0912345678" not in value
+    assert "secret123" not in value
 
 
 def test_production_rejects_demo_credentials():
@@ -269,6 +407,26 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
         result = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
         assert result["kind"] == "fallback" and not result["sources"]
+    fake.responses.create.side_effect = None
+    fake.responses.create.return_value = SimpleNamespace(
+        output_text=json.dumps(
+            {
+                "supported": True,
+                "claims": [
+                    {"text": "IT1 có chỉ tiêu năm 2026 là 300.", "source": 1, "quote": "Chỉ tiêu năm 2026: 300."},
+                    {"text": "IT1 có chỉ tiêu năm 2026 là 300.", "source": 1, "quote": "Chỉ tiêu năm 2026: 300."},
+                ],
+            }
+        ),
+        usage=SimpleNamespace(total_tokens=50),
+    )
+    service.cache.clear()
+    with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
+        result = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
+        assert result["kind"] == "answered"
+        assert result["response"].count("IT1 có chỉ tiêu năm 2026 là 300.") == 1
+        assert result["response"].count("[1]") == 1
+        assert len(result["answer_sections"]["source_refs"]) == 1
     service.cache.clear()
     fake.responses.create.side_effect = TimeoutError()
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
@@ -337,6 +495,20 @@ async def test_comparison_is_grounded_and_validated(client):
 
 
 @pytest.mark.asyncio
+async def test_comparison_reports_invalid_selection_in_vietnamese(client):
+    cases = [
+        {"codes": []},
+        {"codes": ["IT1"]},
+        {"codes": ["IT1", "IT1"]},
+        {"codes": ["IT1", "NOT_A_PROGRAM"]},
+    ]
+    for payload in cases:
+        response = await client.post("/api/v1/programs/compare", json=payload)
+        assert response.status_code == 422
+        assert response.json()["detail"]
+
+
+@pytest.mark.asyncio
 async def test_cancel_and_reject_ticket_lifecycle(client):
     async def create(key):
         return (
@@ -396,7 +568,7 @@ async def test_staff_detail_history_and_actionable_metrics(client):
         )
     ).status_code == 200
     detail = (await client.get(f"/api/v1/staff/tickets/{ticket_id}")).json()
-    assert [event["action"] for event in detail["events"]] == ["created", "claimed", "resolved"]
+    assert [event["action"] for event in detail["events"]] == ["created", "claimed", "reply", "resolved"]
 
     metrics = (await client.get("/api/v1/staff/metrics")).json()
     assert set(["waiting", "in_progress", "resolved", "rejected", "cancelled"]).issubset(metrics["tickets"])

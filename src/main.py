@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -36,6 +37,13 @@ def create_app(settings=None):
     }
     smtp_ready = bool(cfg.smtp_host and cfg.smtp_user and cfg.smtp_password and cfg.smtp_from)
     resend_ready = bool(cfg.resend_api_key and (cfg.resend_from or cfg.smtp_from))
+    public_url = urlparse(cfg.public_base_url)
+    sender = cfg.resend_from or cfg.smtp_from
+    sender_valid = bool(sender and "@" in sender and "." in sender.rsplit("@", 1)[-1])
+    if cfg.resend_api_key and not sender_valid:
+        raise ValueError("RESEND_FROM phải là địa chỉ email thuộc domain đã xác minh trên Resend.")
+    if cfg.app_env == "production" and (public_url.scheme != "https" or not public_url.netloc):
+        raise ValueError("PUBLIC_BASE_URL trên production phải là URL HTTPS hợp lệ.")
     if cfg.app_env == "production" and (
         cfg.staff_password == "Demo@2026!"
         or len(cfg.staff_password) < 12
@@ -43,7 +51,7 @@ def create_app(settings=None):
         or len(cfg.auth_secret) < 32
         or not (smtp_ready or resend_ready)
     ):
-        raise ValueError("Production cần STAFF_PASSWORD riêng ≥12 ký tự và SECURE_COOKIES=true với HTTPS.")
+        raise ValueError("Production cần mật khẩu cán bộ riêng ≥12 ký tự, SECURE_COOKIES=true, HTTPS và email provider hợp lệ.")
     if cfg.app_env == "production" and (cfg.admin_password == "Admin@2026!" or len(cfg.admin_password) < 12):
         raise ValueError("Production cần ADMIN_PASSWORD riêng ≥12 ký tự.")
 
@@ -86,6 +94,50 @@ def create_app(settings=None):
 
     app = FastAPI(title="Trợ lý tuyển sinh X — HUST 2026", version="0.1.0", lifespan=lifespan)
 
+    @app.exception_handler(RequestValidationError)
+    async def structured_validation_error(request: Request, exc: RequestValidationError):
+        labels = {
+            "email": "Email",
+            "password": "Mật khẩu",
+            "code": "Mã xác nhận",
+            "name": "Họ và tên",
+            "username": "Tài khoản",
+            "token": "Liên kết bảo mật",
+            "password-confirm": "Nhập lại mật khẩu",
+        }
+        fields = {}
+        for error in exc.errors():
+            loc = error.get("loc") or ()
+            field = str(loc[-1]) if loc else "form"
+            if field in fields:
+                continue
+            error_type = error.get("type", "")
+            label = labels.get(field, "Thông tin")
+            if error_type == "missing":
+                message = f"{label} là bắt buộc."
+            elif field == "email":
+                message = "Email không đúng định dạng."
+            elif field == "code":
+                message = "Mã xác nhận phải gồm đúng 6 chữ số."
+            elif field == "password":
+                message = "Mật khẩu phải có ít nhất 10 ký tự và không vượt quá 200 ký tự."
+            elif error_type in {"string_too_short", "too_short"}:
+                message = f"{label} chưa đủ độ dài tối thiểu."
+            elif error_type in {"string_too_long", "too_long"}:
+                message = f"{label} vượt quá độ dài cho phép."
+            elif error_type in {"string_pattern_mismatch", "value_error"}:
+                message = str(error.get("msg", "Giá trị không hợp lệ."))
+                if ", " in message and message.lower().startswith(("value error", "assertion error")):
+                    message = message.split(", ", 1)[1]
+            else:
+                message = f"{label} không hợp lệ."
+            fields[field] = message
+        first_field = next(iter(fields), "form")
+        return JSONResponse(
+            {"detail": {"message": "Dữ liệu chưa hợp lệ.", "fields": fields, "first_field": first_field}},
+            status_code=422,
+        )
+
     @app.middleware("http")
     async def safeguards(request: Request, call_next):
         if request.method in {"POST", "PUT", "DELETE", "PATCH"}:
@@ -124,6 +176,10 @@ def create_app(settings=None):
 
     @app.get("/staff/activate")
     async def staff_activate_page():
+        return FileResponse(ROOT / "src" / "web" / "staff-activate.html")
+
+    @app.get("/staff/reset")
+    async def staff_reset_page():
         return FileResponse(ROOT / "src" / "web" / "staff-activate.html")
 
     @app.get("/account")

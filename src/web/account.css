@@ -3,6 +3,11 @@
 .account-subtitle { font-size:15px; }
 .account-tabs { display:none; }
 .account-form input { background:#eaf2ff; border-color:#b9d0d3; border-radius:14px; padding:16px 15px; }
+.account-form input[aria-invalid="true"] { border-color:#c53d55; outline:3px solid #c53d5518; }
+.field-error { min-height:0; margin:4px 0 0; color:#b9344b; font-size:12px; }
+.field-error:empty { display:none; }
+.otp-meta { margin:8px 0 0; color:#5b4bc2; font-size:12px; }
+.text-button:disabled { color:#9aa8b0; cursor:not-allowed; }
 .account-form .primary { min-height:55px; border-radius:14px; font-size:16px; box-shadow:0 10px 24px #07595d22; }
 .auth-switch { margin:28px 0 0; color:#78908f; font-size:13px; text-align:center; }
 .auth-switch button { border:0; padding:0; background:transparent; color:#07595d; font-weight:800; cursor:pointer; }
