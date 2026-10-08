@@ -391,7 +391,7 @@ class Store:
                     return True
         return False
 
-    def tickets(self, sid=None, status=None):
+    def tickets(self, sid=None, status=None, owner=None):
         sql, args = "SELECT * FROM tickets WHERE 1=1", []
         if sid:
             sql += " AND session=?"
@@ -399,6 +399,9 @@ class Store:
         if status:
             sql += " AND status=?"
             args.append(status)
+        if owner:
+            sql += " AND (owner=? OR (status='waiting' AND owner IS NULL))"
+            args.append(owner)
         with self.connect() as db:
             return [dict(r) for r in db.execute(sql + " ORDER BY created DESC", args).fetchall()]
 
@@ -407,9 +410,14 @@ class Store:
             row = db.execute("SELECT * FROM tickets WHERE id=?", (ticket_id,)).fetchone()
         return dict(row) if row else None
 
-    def ticket_detail(self, ticket_id):
+    def ticket_detail(self, ticket_id, owner=None):
         with self.connect() as db:
-            ticket = db.execute("SELECT * FROM tickets WHERE id=?", (ticket_id,)).fetchone()
+            sql = "SELECT * FROM tickets WHERE id=?"
+            args = [ticket_id]
+            if owner:
+                sql += " AND (owner=? OR (status='waiting' AND owner IS NULL))"
+                args.append(owner)
+            ticket = db.execute(sql, args).fetchone()
             if not ticket:
                 return None
             events = db.execute(
@@ -526,27 +534,46 @@ class Store:
                 (kind, mode, latency, token_count, time.time()),
             )
 
-    def metrics(self):
+    def metrics(self, owner=None):
         with self.connect() as db:
             counts = {r[0]: r[1] for r in db.execute("SELECT kind,COUNT(*) FROM events GROUP BY kind")}
-            states = {r[0]: r[1] for r in db.execute("SELECT status,COUNT(*) FROM tickets GROUP BY status")}
+            ticket_where = ""
+            ticket_args = []
+            if owner:
+                ticket_where = " WHERE owner=? OR (status='waiting' AND owner IS NULL)"
+                ticket_args.append(owner)
+            states = {
+                r[0]: r[1]
+                for r in db.execute(
+                    "SELECT status,COUNT(*) FROM tickets" + ticket_where + " GROUP BY status", ticket_args
+                )
+            }
             latencies = [r[0] for r in db.execute("SELECT latency FROM events ORDER BY latency")]
             total_tokens = db.execute("SELECT COALESCE(SUM(tokens),0) FROM events").fetchone()[0]
             calls = db.execute("SELECT COALESCE(SUM(calls),0) FROM budgets").fetchone()[0]
             oldest = db.execute(
-                "SELECT id,created,updated FROM tickets WHERE status='waiting' ORDER BY created LIMIT 1"
+                "SELECT id,created,updated FROM tickets WHERE status='waiting' AND owner IS NULL"
+                " ORDER BY created LIMIT 1"
             ).fetchone()
             local_now = time.localtime()
             today_start = time.mktime((local_now.tm_year, local_now.tm_mon, local_now.tm_mday, 0, 0, 0, -1, -1, -1))
+            event_ticket_filter = ""
+            event_ticket_args = []
+            if owner:
+                event_ticket_filter = " AND (t.owner=? OR (t.status='waiting' AND t.owner IS NULL))"
+                event_ticket_args.append(owner)
             today_actions = {
                 r[0]: r[1]
                 for r in db.execute(
-                    "SELECT action,COUNT(*) FROM ticket_events WHERE created>=? GROUP BY action",
-                    (today_start,),
+                    "SELECT e.action,COUNT(*) FROM ticket_events e JOIN tickets t ON t.id=e.ticket_id"
+                    " WHERE e.created>=?" + event_ticket_filter + " GROUP BY e.action",
+                    [today_start, *event_ticket_args],
                 )
             }
             event_rows = db.execute(
-                "SELECT ticket_id,action,created FROM ticket_events ORDER BY created"
+                "SELECT e.ticket_id,e.action,e.created FROM ticket_events e JOIN tickets t ON t.id=e.ticket_id"
+                " WHERE 1=1" + event_ticket_filter + " ORDER BY e.created",
+                event_ticket_args,
             ).fetchall()
         total = sum(counts.values())
         response_starts = {}

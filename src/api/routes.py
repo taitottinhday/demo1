@@ -703,12 +703,12 @@ def logout(request: Request, response: Response):
 def queue(request: Request, status: str | None = None, user=Depends(staff)):
     if status and status not in ["waiting", "in_progress", "resolved", "cancelled", "rejected"]:
         raise HTTPException(422, "Trạng thái không hợp lệ.")
-    return [safe_ticket(t) for t in runtime(request)["store"].tickets(status=status)]
+    return [safe_ticket(t) for t in runtime(request)["store"].tickets(status=status, owner=user)]
 
 
 @router.get("/staff/tickets/{ticket_id}")
 def staff_ticket(ticket_id: str, request: Request, user=Depends(staff)):
-    detail = runtime(request)["store"].ticket_detail(ticket_id)
+    detail = runtime(request)["store"].ticket_detail(ticket_id, owner=user)
     if not detail:
         raise HTTPException(404, "Không tìm thấy yêu cầu.")
     return safe_ticket_detail(detail)
@@ -732,7 +732,7 @@ def resolve(ticket_id: str, body: ReplyInput, request: Request, user=Depends(sta
 
 @router.get("/staff/metrics")
 def metrics(request: Request, user=Depends(staff)):
-    return runtime(request)["store"].metrics()
+    return runtime(request)["store"].metrics(owner=user)
 
 
 @router.post("/staff/tickets/{ticket_id}/reject")

@@ -8,6 +8,7 @@ from httpx import ASGITransport, AsyncClient
 
 from src.config import Settings
 from src.main import app, create_app
+from src.services.accounts import create_user
 from src.services.admissions import Admissions, redact
 from src.services.store import Store
 
@@ -136,6 +137,50 @@ async def test_staff_claim_is_atomic_and_only_owner_can_resolve(client):
         winner, loser = (first, second) if first_claim.status_code == 200 else (second, first)
         assert (await loser.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Không được phép."})).status_code == 409
         assert (await winner.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã xác minh."})).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_staff_queue_is_scoped_to_owner_but_keeps_shared_waiting_queue(client):
+    async def create_ticket(key):
+        response = await client.post(
+            "/api/v1/handover",
+            json={"summary": "Ticket " + key, "consent": True, "request_key": key},
+        )
+        assert response.status_code == 200
+        return response.json()["id"]
+
+    store = app.state.runtime["store"]
+    with store.connect() as db:
+        create_user(db, "staff-b", "Cán bộ B", "staff-b@example.test", "officer", "StaffB@123")
+    own_id = await create_ticket("owner-a")
+    other_id = await create_ticket("owner-b")
+    waiting_id = await create_ticket("waiting-shared")
+    assert store.claim(own_id, "canbo")
+    assert store.claim(other_id, "staff-b")
+
+    transport = ASGITransport(app=app)
+    first_token = store.staff_login("canbo")
+    second_token = store.staff_login("staff-b")
+    async with (
+        AsyncClient(transport=transport, base_url="http://test", cookies={"staff": first_token}) as first,
+        AsyncClient(transport=transport, base_url="http://test", cookies={"staff": second_token}) as second,
+    ):
+        first_ids = {ticket["id"] for ticket in (await first.get("/api/v1/staff/tickets")).json()}
+        second_ids = {ticket["id"] for ticket in (await second.get("/api/v1/staff/tickets")).json()}
+        assert first_ids == {own_id, waiting_id}
+        assert second_ids == {other_id, waiting_id}
+        assert (await first.get(f"/api/v1/staff/tickets/{other_id}")).status_code == 404
+        assert (await second.get(f"/api/v1/staff/tickets/{own_id}")).status_code == 404
+
+        first_metrics = (await first.get("/api/v1/staff/metrics")).json()
+        second_metrics = (await second.get("/api/v1/staff/metrics")).json()
+        assert first_metrics["tickets"] == second_metrics["tickets"] == {
+            "waiting": 1,
+            "in_progress": 1,
+            "resolved": 0,
+            "rejected": 0,
+            "cancelled": 0,
+        }
 
 
 @pytest.mark.asyncio
