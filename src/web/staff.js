@@ -1,5 +1,19 @@
 const $ = (id) => document.getElementById(id);
 
+function setRoleSidebarOpen(open, restoreFocus = false) {
+  document.body.classList.toggle('role-sidebar-open', open);
+  $('role-menu-toggle')?.setAttribute('aria-expanded', String(open));
+  if (open) requestAnimationFrame(() => $('role-sidebar')?.querySelector('a')?.focus());
+  else if (restoreFocus) $('role-menu-toggle')?.focus();
+}
+
+$('role-menu-toggle')?.addEventListener('click', () => setRoleSidebarOpen(true));
+$('role-sidebar-backdrop')?.addEventListener('click', () => setRoleSidebarOpen(false));
+$('role-sidebar')?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setRoleSidebarOpen(false)));
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') setRoleSidebarOpen(false, true);
+});
+
 const STATUS_NAMES = {
   waiting: 'Đang chờ',
   in_progress: 'Đang xử lý',
@@ -84,6 +98,7 @@ async function api(path, options = {}) {
 }
 
 function showLogin(message = '') {
+  setRoleSidebarOpen(false);
   $('dashboard').hidden = true;
   $('login-panel').hidden = false;
   $('logout').hidden = true;
@@ -92,6 +107,7 @@ function showLogin(message = '') {
 }
 
 function showDashboard() {
+  setRoleSidebarOpen(false);
   $('dashboard').hidden = false;
   $('login-panel').hidden = true;
   $('logout').hidden = false;
@@ -244,6 +260,7 @@ function appendActions(container, ticket) {
     const replyLabel = node('label', 'action-label', 'Phản hồi cho ứng viên');
     const reply = node('textarea', 'action-textarea');
     reply.id = 'staff-reply';
+    replyLabel.htmlFor = reply.id;
     reply.maxLength = 4000;
     reply.placeholder = 'Nhập phản hồi dựa trên thông tin đã kiểm tra…';
     const resolve = node('button', 'primary action-button', 'Gửi phản hồi và đóng');
@@ -258,6 +275,7 @@ function appendActions(container, ticket) {
     const rejectLabel = node('label', 'action-label reject-label', 'Lý do từ chối');
     const rejectReason = node('textarea', 'action-textarea reject-textarea');
     rejectReason.id = 'reject-reason';
+    rejectLabel.htmlFor = rejectReason.id;
     rejectReason.maxLength = 4000;
     rejectReason.placeholder = 'Nêu rõ lý do để ứng viên biết hướng xử lý tiếp theo…';
     const reject = node('button', 'secondary danger action-button', 'Từ chối yêu cầu');

@@ -1,4 +1,9 @@
 const $=id=>document.getElementById(id);
+function setRoleSidebarOpen(open,restoreFocus=false){document.body.classList.toggle('role-sidebar-open',open);$('role-menu-toggle')?.setAttribute('aria-expanded',String(open));if(open)requestAnimationFrame(()=>$('role-sidebar')?.querySelector('[role="tab"]')?.focus());else if(restoreFocus)$('role-menu-toggle')?.focus();}
+$('role-menu-toggle')?.addEventListener('click',()=>setRoleSidebarOpen(true));
+$('role-sidebar-backdrop')?.addEventListener('click',()=>setRoleSidebarOpen(false));
+$('role-sidebar')?.querySelectorAll('a,[role="tab"]').forEach(link=>link.addEventListener('click',()=>setRoleSidebarOpen(false)));
+document.addEventListener('keydown',event=>{if(event.key==='Escape')setRoleSidebarOpen(false,true);});
 const names={waiting:'Đang chờ',in_progress:'Đang xử lý',resolved:'Đã giải quyết',rejected:'Đã từ chối',cancelled:'Đã hủy'};
 const reasons={user_request:'Ứng viên yêu cầu',low_confidence:'AI không chắc chắn',sensitive:'Câu hỏi nhạy cảm'};
 const actions={created:'Tạo ticket',claimed:'Nhận xử lý',resolved:'Giải quyết',rejected:'Từ chối',reassigned:'Phân công lại',cancelled:'Ứng viên hủy'};
@@ -15,13 +20,26 @@ async function api(path,options={}){
   if(!r.ok)throw new Error(typeof data.detail==='string'?data.detail:'Nội dung chưa hợp lệ.');
   return data;
 }
-function showDashboard(){$('dashboard').hidden=false;$('login-panel').hidden=true;$('logout').hidden=false;}
+function showDashboard(){setRoleSidebarOpen(false);$('dashboard').hidden=false;$('login-panel').hidden=true;$('logout').hidden=false;}
 function fail(error){$('admin-error').textContent=error.message;}
 
 // Tabs ---------------------------------------------------------------------
-document.querySelectorAll('[data-tab]').forEach(tab=>tab.onclick=()=>{
-  document.querySelectorAll('[data-tab]').forEach(t=>t.setAttribute('aria-selected',String(t===tab)));
-  document.querySelectorAll('.admin-tab').forEach(s=>s.hidden=s.id!=='tab-'+tab.dataset.tab);
+const adminTabs=[...document.querySelectorAll('[data-tab]')];
+function activateAdminTab(tab){
+  adminTabs.forEach(t=>t.setAttribute('aria-selected',String(t===tab)));
+  document.querySelectorAll('.admin-tab').forEach(panel=>panel.hidden=panel.id!=='tab-'+tab.dataset.tab);
+}
+adminTabs.forEach((tab,index)=>{
+  tab.onclick=()=>activateAdminTab(tab);
+  tab.addEventListener('keydown',event=>{
+    let next=index;
+    if(event.key==='ArrowDown'||event.key==='ArrowRight')next=(index+1)%adminTabs.length;
+    else if(event.key==='ArrowUp'||event.key==='ArrowLeft')next=(index+adminTabs.length-1)%adminTabs.length;
+    else if(event.key==='Home')next=0;
+    else if(event.key==='End')next=adminTabs.length-1;
+    else return;
+    event.preventDefault();adminTabs[next].focus();adminTabs[next].click();
+  });
 });
 
 // Overview -----------------------------------------------------------------
@@ -125,7 +143,7 @@ function passwordResetCell(o){
   const open=node('button','small-action','Đặt lại');open.type='button';open.title='Đặt mật khẩu mới cho cán bộ';
   const form=node('form','password-reset');form.hidden=true;
   const wrap=node('div','password-input');
-  const input=document.createElement('input');input.type='password';input.minLength=8;input.maxLength=200;input.autocomplete='new-password';input.placeholder='Mật khẩu mới';input.required=true;
+  const input=document.createElement('input');input.type='password';input.minLength=8;input.maxLength=200;input.autocomplete='new-password';input.placeholder='Mật khẩu mới';input.setAttribute('aria-label','Mật khẩu mới');input.required=true;
   const eye=node('button','password-toggle','Hiện');eye.type='button';eye.setAttribute('aria-label','Hiện mật khẩu');bindPasswordToggle(eye,input);
   wrap.append(input,eye);
   const save=node('button','small-action','Lưu');save.type='submit';

@@ -3,104 +3,137 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
   <title>Cán bộ tuyển sinh · Trợ lý X</title>
-  <link rel="stylesheet" href="/assets/style.css?v=20261006">
-  <script src="/assets/staff.js?v=20261006" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261009">
+  <link rel="stylesheet" href="/assets/refined.css?v=20261009j">
+  <script src="/assets/staff.js?v=20261009h" defer></script>
 </head>
-<body>
+<body class="staff-page">
+  <a class="skip-link" href="#main-content">Bỏ qua đến nội dung chính</a>
   <header class="topbar">
     <a class="brand" href="/">
       <span class="mark">X<span aria-hidden="true">✦</span></span>
       <span>Trợ lý tuyển sinh <b>X</b><small>KHÔNG GIAN CÁN BỘ</small></span>
     </a>
-    <nav class="staff-nav">
-      <span id="staff-identity" class="staff-identity" hidden></span>
-      <a class="staff-link" href="/">← Về trang ứng viên</a>
-      <button class="nav-link" id="logout" type="button" hidden>Đăng xuất</button>
+    <nav class="staff-nav" aria-label="Điều hướng cán bộ">
+      <a class="staff-link" href="/"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M16 10H4m0 0 5-5m-5 5 5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Về trang ứng viên</span></a>
+      <button class="nav-link role-mobile-menu" id="role-menu-toggle" type="button" aria-controls="role-sidebar" aria-expanded="false"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Danh mục</span></button>
     </nav>
   </header>
 
-  <main class="staff-main">
-    <section id="login-panel" class="login-panel" aria-labelledby="login-title">
-      <p class="login-kicker">KHU VỰC CÁN BỘ</p>
-      <h1 id="login-title">Đăng nhập để xử lý ticket</h1>
-      <p class="login-intro">Theo dõi hàng chờ, nhận yêu cầu và gửi phản hồi tuyển sinh có kiểm tra.</p>
-      <div class="login-security-note">
-        <span aria-hidden="true">✓</span>
-        <span>Chỉ tài khoản cán bộ được quản trị cấp mới có quyền truy cập.</span>
-      </div>
-      <form id="login-form" novalidate>
-        <label for="username">Tài khoản cán bộ</label>
-        <input id="username" name="username" autocomplete="username" placeholder="Nhập tài khoản" required>
-        <label for="password">Mật khẩu</label>
-        <div class="password-field">
-          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
-          <button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
+  <main class="staff-main" id="main-content">
+    <section id="login-panel" class="login-stage staff-login-stage" aria-labelledby="login-title">
+      <div class="login-story">
+        <div class="login-story-label"><span class="login-story-mark" aria-hidden="true">X</span><span>HUST · KHÔNG GIAN CÁN BỘ</span></div>
+        <div class="login-story-copy">
+          <p class="login-kicker">HỖ TRỢ THÍ SINH</p>
+          <h1>Đồng hành qua từng câu hỏi.</h1>
+          <p>Tiếp nhận yêu cầu tư vấn và theo sát phản hồi trong một hàng chờ thống nhất.</p>
         </div>
-        <p id="login-error" role="alert" class="error-text"></p>
-        <button type="submit" class="primary login-submit" id="login-submit">
-          <span class="button-label">Đăng nhập</span><span aria-hidden="true">→</span>
-        </button>
-      </form>
-      <p class="login-help">Chưa có quyền truy cập? Liên hệ quản trị viên để được cấp tài khoản.</p>
+        <ol class="login-process" aria-label="Quy trình hỗ trợ">
+          <li><span>01</span><div><b>Tiếp nhận</b><small>Xem yêu cầu đang chờ</small></div></li>
+          <li><span>02</span><div><b>Xử lý</b><small>Phản hồi theo từng hồ sơ</small></div></li>
+          <li><span>03</span><div><b>Hoàn tất</b><small>Lưu lại kết quả hỗ trợ</small></div></li>
+        </ol>
+      </div>
+      <div class="login-card">
+        <div class="login-card-heading">
+          <span class="login-role-icon" aria-hidden="true">✳</span>
+          <p class="login-kicker">ĐĂNG NHẬP CÁN BỘ</p>
+        </div>
+        <h2 id="login-title">Chào mừng trở lại</h2>
+        <p class="login-intro">Đăng nhập để mở hàng chờ tư vấn.</p>
+        <form id="login-form" novalidate>
+          <label for="username">Tài khoản cán bộ</label>
+          <input id="username" name="username" autocomplete="username" placeholder="Nhập tài khoản" required>
+          <label for="password">Mật khẩu</label>
+          <div class="password-field">
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
+            <button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
+          </div>
+          <p id="login-error" role="alert" class="error-text"></p>
+          <button type="submit" class="primary login-submit" id="login-submit">
+            <span class="button-label">Đăng nhập</span><span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <p class="login-help">Chưa có tài khoản? Liên hệ quản trị viên.</p>
+      </div>
     </section>
 
-    <section id="dashboard" hidden aria-labelledby="dashboard-title">
-      <div class="dashboard-heading">
-        <div>
-          <div class="eyebrow">TRUNG TÂM XỬ LÝ TICKET</div>
-          <h1 id="dashboard-title">Hàng chờ cán bộ</h1>
-          <p class="dashboard-subtitle">Ưu tiên yêu cầu đang chờ, xử lý từng ticket và lưu lại phản hồi rõ ràng.</p>
+    <section id="dashboard" class="role-workspace staff-workspace" hidden aria-labelledby="dashboard-title">
+      <aside class="role-sidebar" id="role-sidebar" aria-label="Điều hướng cán bộ">
+        <div class="role-sidebar-main">
+          <p class="role-sidebar-label">KHÔNG GIAN CÁN BỘ</p>
+          <p class="role-sidebar-title">Điều hướng</p>
+          <nav class="role-side-nav" aria-label="Chức năng cán bộ">
+            <a class="role-side-link active" href="#dashboard-title" aria-current="page"><span class="role-nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><rect x="3.5" y="3" width="13" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span><span>Hàng chờ xử lý</span></a>
+            <a class="role-side-link" href="/"><span class="role-nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="m3 9 7-6 7 6v7a1 1 0 0 1-1 1h-4v-5H8v5H4a1 1 0 0 1-1-1V9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span><span>Trang ứng viên</span></a>
+          </nav>
         </div>
-        <button id="refresh" class="secondary" type="button"><span aria-hidden="true">↻</span> Làm mới</button>
-      </div>
+        <div class="role-sidebar-footer">
+          <div class="role-profile"><span class="role-avatar" aria-hidden="true">CB</span><span id="staff-identity" class="staff-identity" hidden></span></div>
+          <button class="role-logout" id="logout" type="button" hidden><span aria-hidden="true">↪</span> Đăng xuất</button>
+        </div>
+      </aside>
+      <button class="role-sidebar-backdrop" id="role-sidebar-backdrop" type="button" tabindex="-1" aria-label="Đóng danh mục"></button>
+      <div class="role-content">
+        <div class="dashboard-heading">
+          <div>
+            <div class="eyebrow">TRUNG TÂM XỬ LÝ TICKET</div>
+            <h1 id="dashboard-title">Hàng chờ cán bộ</h1>
+            <p class="dashboard-subtitle">Ưu tiên yêu cầu đang chờ, xử lý từng ticket và lưu lại phản hồi rõ ràng.</p>
+          </div>
+          <button id="refresh" class="secondary" type="button"><span aria-hidden="true">↻</span> Làm mới</button>
+        </div>
 
-      <div id="metrics" class="metrics" aria-label="Số lượng ticket theo trạng thái"></div>
-      <div id="oldest-waiting" class="oldest-waiting" hidden></div>
-      <div id="staff-error" class="error-text staff-error" role="alert"></div>
-      <div id="dashboard-loading" class="loading-bar" role="status" aria-live="polite" hidden>
-        <span class="loading-spinner" aria-hidden="true"></span><span>Đang tải dữ liệu…</span>
-      </div>
+        <div id="metrics" class="metrics" aria-label="Số lượng ticket theo trạng thái"></div>
+        <div id="oldest-waiting" class="oldest-waiting" hidden></div>
+        <div id="staff-error" class="error-text staff-error" role="alert"></div>
+        <div id="dashboard-loading" class="loading-bar" role="status" aria-live="polite" hidden>
+          <span class="loading-spinner" aria-hidden="true"></span><span>Đang tải dữ liệu…</span>
+        </div>
 
-      <div class="queue-layout">
-        <section class="queue-panel" aria-labelledby="queue-title">
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">DANH SÁCH XỬ LÝ</p>
-              <h2 id="queue-title">Ticket cần quan tâm</h2>
+        <div class="queue-layout">
+          <section class="queue-panel" aria-labelledby="queue-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-label">DANH SÁCH XỬ LÝ</p>
+                <h2 id="queue-title">Ticket cần quan tâm</h2>
+              </div>
+              <span id="queue-count" class="queue-count" aria-live="polite"></span>
             </div>
-            <span id="queue-count" class="queue-count" aria-live="polite"></span>
-          </div>
-          <div class="queue-filters">
-            <label class="sr-only" for="status-filter">Lọc theo trạng thái</label>
-            <select id="status-filter">
-              <option value="waiting" selected>Đang chờ</option>
-              <option value="">Tất cả</option>
-              <option value="in_progress">Đang xử lý</option>
-              <option value="resolved">Đã giải quyết</option>
-              <option value="rejected">Đã từ chối</option>
-              <option value="cancelled">Đã hủy</option>
-            </select>
-            <label class="sr-only" for="queue-sort">Sắp xếp</label>
-            <select id="queue-sort">
-              <option value="newest">Mới nhất</option>
-              <option value="oldest">Cũ nhất</option>
-            </select>
-          </div>
-          <label class="search-field" for="queue-search">
-            <span aria-hidden="true">⌕</span>
-            <input id="queue-search" type="search" autocomplete="off" placeholder="Tìm mã ticket hoặc nội dung…">
-          </label>
-          <div id="queue" class="queue" aria-live="polite"></div>
-        </section>
+            <div class="queue-filters">
+              <label class="sr-only" for="status-filter">Lọc theo trạng thái</label>
+              <select id="status-filter">
+                <option value="waiting" selected>Đang chờ</option>
+                <option value="">Tất cả</option>
+                <option value="in_progress">Đang xử lý</option>
+                <option value="resolved">Đã giải quyết</option>
+                <option value="rejected">Đã từ chối</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+              <label class="sr-only" for="queue-sort">Sắp xếp</label>
+              <select id="queue-sort">
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+              </select>
+            </div>
+            <label class="search-field" for="queue-search">
+              <span aria-hidden="true">⌕</span>
+              <input id="queue-search" type="search" autocomplete="off" placeholder="Tìm mã ticket hoặc nội dung…">
+            </label>
+            <div id="queue" class="queue" aria-live="polite"></div>
+          </section>
 
-        <section class="ticket-detail" id="detail" aria-labelledby="detail-title">
-          <div class="empty-detail">
-            <span class="empty-detail-icon" aria-hidden="true">⌁</span>
-            <h2 id="detail-title">Chọn một ticket</h2>
-            <p>Chọn yêu cầu ở hàng chờ để xem nội dung được đồng ý chia sẻ và bắt đầu xử lý.</p>
-          </div>
-        </section>
+          <section class="ticket-detail" id="detail" aria-labelledby="detail-title">
+            <div class="empty-detail">
+              <span class="empty-detail-icon" aria-hidden="true">⌁</span>
+              <h2 id="detail-title">Chọn một ticket</h2>
+              <p>Chọn yêu cầu ở hàng chờ để xem nội dung được đồng ý chia sẻ và bắt đầu xử lý.</p>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
   </main>

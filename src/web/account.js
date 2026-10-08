@@ -19,7 +19,7 @@ function show(view){
   $('auth-switch').firstChild.textContent=view==='login'?'Chưa có tài khoản? ':'Đã có tài khoản? ';
   $('register-link').textContent=view==='login'?'Tạo tài khoản miễn phí':'Đăng nhập';
   document.querySelectorAll('.account-tabs button').forEach(button=>button.classList.toggle('active',button.dataset.view===view));
-  const titles={login:['Đăng nhập để tiếp tục','Lưu lịch sử hỏi đáp và theo dõi yêu cầu hỗ trợ của bạn.'],register:['Tạo tài khoản học viên','Xác nhận email để bảo vệ tài khoản của bạn.'],verify:['Xác nhận email','Kiểm tra hộp thư để hoàn tất đăng ký.'],forgot:['Lấy lại mật khẩu','Bạn sẽ nhận một mã xác nhận qua email.'],reset:['Đặt lại mật khẩu','Chọn mật khẩu mới cho tài khoản của bạn.']};
+  const titles={login:['Đăng nhập để tiếp tục','Theo dõi yêu cầu hỗ trợ và lịch sử hỏi đáp.'],register:['Tạo tài khoản học viên','Xác nhận email để hoàn tất đăng ký.'],verify:['Xác nhận email','Kiểm tra hộp thư để hoàn tất đăng ký.'],forgot:['Lấy lại mật khẩu','Nhận mã xác nhận qua email.'],reset:['Đặt lại mật khẩu','Chọn mật khẩu mới cho tài khoản của bạn.']};
   $('auth-title').textContent=titles[view][0];$('auth-subtitle').textContent=titles[view][1];feedback('');
 }
 document.querySelectorAll('.account-tabs button').forEach(button=>button.onclick=()=>show(button.dataset.view));
