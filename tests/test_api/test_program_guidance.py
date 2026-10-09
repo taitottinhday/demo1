@@ -44,7 +44,8 @@ def test_guidance_returns_up_to_three_source_linked_programs(guidance_runtime):
         assert suggestion["badge"]
         assert suggestion["reasons"]
         assert suggestion["source"]["page"] > 0
-        assert suggestion["source"]["local_url"].startswith("/api/v1/source/pdf#page=")
+        assert suggestion["source"]["local_url"].startswith("/api/v1/source/pdf?source_id=")
+        assert "#page=" in suggestion["source"]["local_url"]
         assert "score" not in suggestion
         assert "percent" not in json.dumps(suggestion, ensure_ascii=False).lower()
     assert "chưa mô tả đầy đủ" in data["notice"]

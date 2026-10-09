@@ -432,7 +432,10 @@ _REDACTED_TICKET_FIELDS = {"summary", "reason", "reply", "question", "ai_answer"
 
 def safe_handover_sources(raw_sources):
     """Keep only source metadata needed by the candidate/staff preview."""
-    allowed = {"title", "page", "end_page", "excerpt", "local_url", "url", "year", "version", "document_status"}
+    allowed = {
+        "title", "section", "page", "end_page", "excerpt", "local_url", "url", "year", "version",
+        "document_status", "source_id", "source_type", "scope",
+    }
     result = []
     for source in raw_sources if isinstance(raw_sources, list) else []:
         if not isinstance(source, dict):
@@ -442,7 +445,7 @@ def safe_handover_sources(raw_sources):
             if key not in source or source[key] in (None, ""):
                 continue
             value = source[key]
-            if key in {"title", "excerpt", "document_status"}:
+            if key in {"title", "section", "excerpt", "document_status", "scope"}:
                 value = redact(str(value))[:3000]
             elif key in {"local_url", "url"}:
                 value = str(value)[:1000]
@@ -661,11 +664,12 @@ def update_guide_checklist(body: ChecklistInput, request: Request):
 
 
 @router.get("/source/pdf")
-def pdf(request: Request):
+def pdf(request: Request, source_id: str | None = None):
     k = runtime(request)["knowledge"]
-    if not k.pdf or not k.pdf.exists():
+    path = k.source_path(source_id or "")
+    if not path or not path.exists() or path.suffix.lower() != ".pdf":
         raise HTTPException(404, "Chưa có tài liệu nguồn.")
-    return FileResponse(k.pdf, media_type="application/pdf", content_disposition_type="inline", filename=k.pdf.name)
+    return FileResponse(path, media_type="application/pdf", content_disposition_type="inline", filename=path.name)
 
 
 @router.post("/chat")

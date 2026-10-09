@@ -33,9 +33,17 @@ Thumbs.db
 # Data (never commit large data)
 data/*
 !data/sources.md
+!data/source_catalog.json
 !data/raw/
 data/raw/*
 !data/raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
+!data/raw/admission_regulation_2026.pdf
+!data/raw/english_k71_2026.pdf
+!data/raw/talent_admission_2026.pdf
+!data/raw/tsa_regulation_2026.pdf
+!data/raw/tuition_2026_2027.pdf
+!data/normalized/
+!data/evaluation/
 *.db
 *.sqlite3
 *.db-wal

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "source_id": "hust-cutoffs-2026",
+  "cycle": 2026,
+  "published_date": "2026-08-09",
+  "retrieved_on": "2026-10-10",
+  "official_url": "https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026",
+  "method": "THPT graduation examination score",
+  "coverage": "summary_only",
+  "full_table_locally_available": false,
+  "overall": {
+    "program_count": 68,
+    "minimum_score": 20.06,
+    "maximum_score": 29.54,
+    "evidence": "công bố điểm chuẩn xét tuyển đại học vào 68 chương trình đào tạo năm 2026, theo đó, mức điểm chuẩn dao động từ 20,06 đến 29,54 theo điểm thi tốt nghiệp THPT."
+  },
+  "program_scores": [
+    {
+      "program_code": "IT-E10",
+      "program_name": "Khoa học dữ liệu và Trí tuệ nhân tạo (chương trình tiên tiến)",
+      "score": 29.54,
+      "evidence": "Chương trình tiên tiến Khoa học dữ liệu và Trí tuệ nhân tạo (IT-E10) tiếp tục có mức điểm chuẩn cao nhất năm nay là 29,54 điểm theo điểm thi tốt nghiệp THPT."
+    },
+    {
+      "program_code": "IT1",
+      "program_name": "Khoa học máy tính",
+      "score": 29.27,
+      "evidence": "Chương trình Khoa học máy tính (IT1): 29,27 điểm."
+    },
+    {
+      "program_code": "EE2",
+      "program_name": "Kỹ thuật Điều khiển - Tự động hoá",
+      "score": 28.98,
+      "evidence": "Chương trình Kỹ thuật Điều khiển - Tự động hoá (EE2) có điểm chuẩn là 28,98 điểm."
+    },
+    {
+      "program_code": "MS2",
+      "program_name": "Kỹ thuật Vi điện tử và Công nghệ nano",
+      "score": 28.64,
+      "evidence": "Chương trình Kỹ thuật Vi điện tử và Công nghệ nano (MS2) có điểm chuẩn là 28,64."
+    },
+    {
+      "program_code": "ET1",
+      "program_name": "Kỹ thuật Điện tử - Viễn thông",
+      "score": 28.57,
+      "evidence": "Chương trình Kỹ thuật Điện tử - Viễn thông (ET1) có điểm chuẩn là 28,57 điểm."
+    },
+    {
+      "program_code": "ME1",
+      "program_name": "Kỹ thuật Cơ điện tử",
+      "score": 28.47,
+      "evidence": "Chương trình Kỹ thuật Cơ điện tử (ME1) có điểm chuẩn là 28,47 điểm."
+    },
+    {
+      "program_code": "MI-E22",
+      "program_name": "Khoa học tính toán cho các hệ thống thông minh",
+      "score": 27.97,
+      "evidence": "Khoa học tính toán cho các hệ thống thông minh (MI-E22) cũng đã đạt mức điểm chuẩn rất cao là 27,97 điểm."
+    },
+    {
+      "program_code": "BF-E19",
+      "program_name": null,
+      "score": 20.06,
+      "evidence": "02 chương trình có mức điểm chuẩn thấp nhất là BF-E19 và EM-E17 với mức 20,06 điểm."
+    },
+    {
+      "program_code": "EM-E17",
+      "program_name": null,
+      "score": 20.06,
+      "evidence": "02 chương trình có mức điểm chuẩn thấp nhất là BF-E19 và EM-E17 với mức 20,06 điểm."
+    }
+  ],
+  "excluded_data_note": "Không đưa điểm quy đổi tương đương giữa THPT, XTTN và TSA vào bộ dữ liệu: nội dung trang tiếng Việt và bản tiếng Anh đang hiển thị khác nhau ở một giá trị quy đổi. Không suy ra tên chương trình còn thiếu từ riêng mã BF-E19/EM-E17; tra bảng chính thức trước khi tư vấn."
+}

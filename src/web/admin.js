@@ -161,7 +161,7 @@ function renderDetail(t,history){
   box.append(node('h3','','Hội thoại trước khi chuyển'));
   if(!t.conversation.length)box.append(node('p','hint','Không còn lịch sử chat (ứng viên đã xóa hoặc phiên đã hết hạn).'));
   t.conversation.forEach(m=>{const item=node('div','message '+m.role);item.append(node('div','speaker',m.role==='user'?'Ứng viên':'Trợ lý AI'),node('div','body',m.text));
-    m.sources.forEach(s=>{const card=node('details','source-card');card.append(node('summary','',`Nguồn · ${s.title||'Tài liệu'} · trang ${s.page}`),node('div','quote',s.excerpt||''));if(s.local_url){const a=node('a','','Mở PDF');a.href=s.local_url;a.target='_blank';a.rel='noopener';card.append(a);}item.append(card);});
+    m.sources.forEach(s=>{const card=node('details','source-card');const location=s.page?` · PDF trang ${s.page}${s.end_page&&s.end_page!==s.page?`–${s.end_page}`:''}`:s.source_type==='html'?' · Trang web':'';card.append(node('summary','',`Nguồn · ${s.title||'Tài liệu'}${location}`),node('div','quote',s.excerpt||''));if(s.local_url){const a=node('a','','Mở PDF');a.href=s.local_url;a.target='_blank';a.rel='noopener';card.append(a);}if(s.url){const a=node('a','','Nguồn chính thức');a.href=s.url;a.target='_blank';a.rel='noopener';card.append(a);}item.append(card);});
     box.append(item);});
   if(t.reply)box.append(node('h3','',t.status==='rejected'?'Lý do từ chối':'Phản hồi của cán bộ'),node('div','reply-box',t.reply));
   box.append(node('h3','','Lịch sử'));const list=node('ol','timeline');

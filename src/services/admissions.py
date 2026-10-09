@@ -14,7 +14,7 @@ def redact(text):
     return re.sub(r"(?<!\w)(?:\+84|0)?\d[\d .-]{7,}\d(?!\w)", "[đã ẩn số định danh/liên hệ]", text)
 
 
-FALLBACK = "Mình chưa có đủ căn cứ trong tài liệu HUST 2026 để trả lời chính xác câu hỏi này. Bạn có thể chuyển nội dung cho cán bộ tuyển sinh để được kiểm tra."
+FALLBACK = "Mình chưa tìm thấy đủ căn cứ trong các nguồn HUST đã nạp để trả lời chính xác câu hỏi này. Bạn có thể chuyển nội dung cho cán bộ tuyển sinh để được kiểm tra."
 
 GENERAL_SCOPE_MARKERS = (
     "toan truong",
@@ -53,11 +53,20 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        normalized_postgraduate_fee = "hoc phi" in normalized and any(
+            term in normalized for term in ["thac si", "tien si", "sau dai hoc"]
+        )
+        if normalized_postgraduate_fee:
+            return {"scope": "general", "program": "", "explicit": False}
         if len(explicit) > 1:
             return {"scope": "ambiguous", "program": "", "explicit": True}
         if explicit:
             return {"scope": "program", "program": explicit[0]["code"], "explicit": True}
         if any(marker in normalized for marker in GENERAL_SCOPE_MARKERS):
+            return {"scope": "general", "program": "", "explicit": False}
+        if any(marker in normalized for marker in ["dau ra", "tot nghiep", "hust ept", "k71"]):
+            if selected and "dau vao" in normalized:
+                return {"scope": "program", "program": selected, "explicit": False}
             return {"scope": "general", "program": "", "explicit": False}
         if selected and self._is_program_follow_up(normalized):
             return {"scope": "program", "program": selected, "explicit": False}
@@ -105,7 +114,15 @@ class Admissions:
         merged = []
         by_source = {}
         for chunk in chunks:
-            key = (chunk.get("page"), chunk.get("end_page"), chunk.get("title"), chunk.get("kind"), chunk.get("code"))
+            key = (
+                chunk.get("source_id"),
+                chunk.get("fact_id"),
+                chunk.get("page"),
+                chunk.get("end_page"),
+                chunk.get("title"),
+                chunk.get("kind"),
+                chunk.get("code"),
+            )
             existing = by_source.get(key)
             if existing is None:
                 existing = dict(chunk)
@@ -114,7 +131,12 @@ class Admissions:
                 continue
             if chunk.get("text") and chunk["text"] not in existing["text"]:
                 existing["text"] = join_text(existing["text"], chunk["text"])
-            existing["end_page"] = max(existing.get("end_page", existing["page"]), chunk.get("end_page", chunk["page"]))
+            pages = [
+                page
+                for page in (existing.get("end_page"), existing.get("page"), chunk.get("end_page"), chunk.get("page"))
+                if isinstance(page, int)
+            ]
+            existing["end_page"] = max(pages) if pages else None
         return merged
 
     def guard(self, question):
@@ -153,6 +175,9 @@ class Admissions:
             ]
         ):
             return "Mình không thể cam kết trúng tuyển hoặc đưa ra quyết định cho trường hợp cá nhân. Cán bộ tuyển sinh cần kiểm tra và phản hồi trường hợp này."
+        postgraduate_fee_request = "hoc phi" in q and any(
+            term in q for term in ["thac si", "tien si", "sau dai hoc"]
+        )
         if any(
             s in q
             for s in [
@@ -165,7 +190,7 @@ class Admissions:
                 "truong khac",
                 "bach khoa tphcm",
             ]
-        ):
+        ) and not postgraduate_fee_request:
             return "Phạm vi hiện tại là tuyển sinh từ THPT vào đại học chính quy HUST năm 2026. Nội dung bạn hỏi cần nguồn riêng hoặc cán bộ hỗ trợ."
         if "hoc bong" in q:
             return "Bộ nguồn hiện tại chưa đủ thông tin về điều kiện và mức học bổng để tư vấn chắc chắn. Mình không thể hứa cấp học bổng; bạn có thể nhờ cán bộ kiểm tra."
@@ -175,9 +200,14 @@ class Admissions:
             return "Mình chỉ có tài liệu tuyển sinh 2026 đã được nhóm cung cấp, chưa xác minh lịch đang có hiệu lực hôm nay. Cán bộ cần kiểm tra thông báo mới nhất trước khi bạn nộp hồ sơ."
         if "ho so" in q and any(s in q for s in ["giay to", "can gi", "gom gi", "nhung gi"]):
             return "Bộ nguồn hiện tại chưa đủ danh sách giấy tờ chi tiết cho hồ sơ bạn hỏi. Mình có thể hướng dẫn kênh đăng ký ĐGTD hoặc chuyển cán bộ kiểm tra danh sách hồ sơ đúng phương thức."
-        if ("diem chuan" in q or "diem san" in q) and not any(s in q for s in ["thong bao", "khi nao"]):
-            return "Mình chưa có thông báo điểm chuẩn/ngưỡng đầu vào chính thức cuối cùng của năm 2026. Không dùng điểm năm 2024/2025 để kết luận cho năm 2026; bạn có thể chuyển cán bộ kiểm tra."
-        if re.search(r"\b20(?:2[0-57-9]|[0134]\d)\b", q):
+        requested_years = set(re.findall(r"\b20\d{2}\b", q))
+        unsupported_years = requested_years - {"2026"}
+        supported_academic_year = (
+            "hoc phi" in q
+            and "2026" in requested_years
+            and unsupported_years.issubset({"2027"})
+        )
+        if unsupported_years and not supported_academic_year:
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
@@ -251,6 +281,7 @@ class Admissions:
         if (
             "hoc phi" in q
             and not answer_program
+            and not any(term in q for term in ["thac si", "tien si", "sau dai hoc"])
             and not any(p["code"].lower() in q.split() for p in self.k.programs)
             and len(q.split()) < 9
         ):
@@ -280,6 +311,16 @@ class Admissions:
                 "thpt",
                 "sat",
                 "act",
+                "xttn",
+                "xet tuyen tai nang",
+                "diem chuan",
+                "diem trung tuyen",
+                "ngoai ngu",
+                "tieng anh",
+                "tieng trung",
+                "tieng han",
+                "dau ra",
+                "tot nghiep",
                 "dia chi",
                 "lien he",
                 "so dien thoai",
@@ -297,7 +338,7 @@ class Admissions:
                 reason="out_of_scope",
             )
         # A follow-up uses only the resolved program context; free-form previous user instructions are not trusted.
-        chunks = self._merge_source_chunks(self.k.search(question, answer_program, limit=2))
+        chunks = self._merge_source_chunks(self.k.search(question, answer_program, limit=4))
         if not chunks:
             return dict(base, response=FALLBACK)
         if chunks[0]["kind"] == "program" and not any(

@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-10-10",
+  "facts": [
+    {
+      "id": "admission-methods-regular-2026",
+      "topic": "admission_methods",
+      "claim_vi": "Quy chế liệt kê ba phương thức tuyển sinh đại học chính quy: XTTN, xét theo kết quả thi ĐGTD, xét theo kết quả thi tốt nghiệp THPT; có phương thức khác dành cho một số đối tượng đặc biệt.",
+      "scope_vi": "Tuyển sinh đại học chính quy; phân biệt nhóm đối tượng đặc biệt.",
+      "source_id": "hust-admission-regulation-2026",
+      "page": 5,
+      "evidence": "Các phương thức tuyển sinh ĐHCQ bao gồm: a) Phương thức XTTN; b) Phương thức xét tuyển dựa trên kết quả Kỳ thi ĐGTD; c) Phương thức xét tuyển dựa trên kết quả Kỳ thi tốt nghiệp trung học phổ thông (THPT); d) Phương thức xét tuyển khác dành cho các đối tượng đặc biệt"
+    },
+    {
+      "id": "xttn-categories-2026",
+      "topic": "talent_admission",
+      "claim_vi": "XTTN gồm diện 1.1 xét tuyển thẳng theo thành tích theo quy định, diện 1.2 dùng chứng chỉ quốc tế, và diện 1.3 dùng hồ sơ năng lực kết hợp phỏng vấn.",
+      "scope_vi": "Phương thức XTTN tuyển sinh đại học chính quy năm 2026.",
+      "source_id": "hust-admission-regulation-2026",
+      "page": 9,
+      "evidence": "Việc xét tuyển bằng phương thức XTTN bao gồm: a) Xét tuyển thẳng thí sinh đạt thành tích cao trong các kỳ thi, cuộc thi cấp quốc gia hoặc quốc tế theo quy định của Bộ GDĐT (sau đây gọi là diện 1.1); b) Xét tuyển dựa trên chứng chỉ quốc tế gồm: SAT, ACT, A-Level, AP và IB (sau đây gọi là diện 1.2); c) Xét tuyển dựa trên hồ sơ năng lực kết hợp phỏng vấn (sau đây gọi là diện 1.3)"
+    },
+    {
+      "id": "xttn-international-certificates-2026",
+      "topic": "talent_admission",
+      "claim_vi": "Danh sách chứng chỉ quốc tế được nêu cho diện XTTN 1.2 gồm SAT, ACT, A-Level, AP và IB; mức điểm tối thiểu theo nhóm ngành cần tra quy định chi tiết.",
+      "scope_vi": "Không suy diễn ngưỡng điểm tối thiểu từ danh sách chứng chỉ.",
+      "source_id": "hust-admission-regulation-2026",
+      "page": 9,
+      "evidence": "Thí sinh có một trong các chứng chỉ quốc tế SAT, ACT, A-Level, AP, IB được xét tuyển nếu đạt yêu cầu về mức điểm tối thiểu của từng nhóm ngành, chương trình"
+    },
+    {
+      "id": "xttn-13-conditions-2026",
+      "topic": "talent_admission",
+      "claim_vi": "Diện 1.3 yêu cầu tốt nghiệp THPT cùng năm, không thuộc hệ Giáo dục thường xuyên, điểm trung bình các môn văn hóa từng năm lớp 10–12 từ 8,00; đồng thời đáp ứng ít nhất một điều kiện thành tích/năng khiếu được quy định.",
+      "scope_vi": "Phương thức XTTN diện 1.3; cần đối chiếu đầy đủ điều kiện minh chứng ở Điều 4.",
+      "source_id": "hust-talent-admission-2026",
+      "page": 7,
+      "evidence": "Thí sinh tốt nghiệp THPT cùng năm xét tuyển (không xét đối với thí sinh tốt nghiệp hệ Giáo dục thường xuyên), có điểm TBC các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo thang điểm 10."
+    },
+    {
+      "id": "english-policy-population-2026",
+      "topic": "english_policy_scope",
+      "claim_vi": "Quy định ngoại ngữ này áp dụng với sinh viên theo học chương trình đại học chính quy và điều chỉnh phân loại đầu vào, học phần ngoại ngữ cơ bản, miễn học và chuẩn đầu ra; không phải quy định tuyển sinh chung cho mọi thí sinh.",
+      "scope_vi": "Sinh viên đang theo học; yêu cầu riêng của từng chương trình tuyển sinh phải tra tài liệu tuyển sinh.",
+      "source_id": "hust-english-policy-k71",
+      "page": 3,
+      "evidence": "Quy định này điều chỉnh việc đánh giá và phân loại trình độ ngoại ngữ đầu vào, chương trình ngoại ngữ cơ bản (NNCB), điều kiện miễn học các học phần NNCB, yêu cầu năng lực ngoại ngữ theo từng học kỳ và chuẩn ngoại ngữ đầu ra đối với sinh viên đại học hình thức chính quy"
+    },
+    {
+      "id": "english-policy-effective-date-k71",
+      "topic": "english_policy_scope",
+      "claim_vi": "Quy định có hiệu lực từ học kỳ 1 năm học 2026–2027 với sinh viên chính quy từ khóa K71 và các khóa tiếp theo; việc quy đổi chứng chỉ có điều khoản riêng áp dụng cho sinh viên khóa trước.",
+      "scope_vi": "Đọc cả ngoại lệ tại khoản 1 Điều 7 khi tư vấn sinh viên khóa trước.",
+      "source_id": "hust-english-policy-k71",
+      "page": 5,
+      "evidence": "Quy định này được áp dụng từ học kỳ 1 năm học 2026-2027 đối với sinh viên đại học hình thức chính quy và các CTĐT kể từ khóa 71 và các khóa tuyển sinh tiếp theo"
+    },
+    {
+      "id": "english-standard-program-graduation",
+      "topic": "english_graduation",
+      "claim_vi": "Chuẩn đầu ra khi xét tốt nghiệp của chương trình chuẩn (trừ chương trình nhóm ngành ngôn ngữ) yêu cầu chứng chỉ tiếng Anh quy đổi tương đương từ Bậc 3 trở lên theo bảng quy đổi của tài liệu.",
+      "scope_vi": "Chuẩn đầu ra tốt nghiệp, không đồng nhất với yêu cầu đầu vào tuyển sinh hoặc chương trình đặc biệt.",
+      "source_id": "hust-english-policy-k71",
+      "page": 11,
+      "evidence": "Có chứng chỉ tiếng Anh được quy đổi tương đương từ Bậc 3 trở lên theo Bảng 2.1, Phụ lục II"
+    },
+    {
+      "id": "english-placement-test-limit",
+      "topic": "english_graduation",
+      "claim_vi": "HUST English Placement Test chỉ phục vụ phân loại đầu vào, xếp lớp, xét miễn học ngoại ngữ cơ bản; không dùng để kết luận đạt chuẩn ngoại ngữ đầu ra.",
+      "scope_vi": "Quy định phân biệt rõ kiểm tra xếp lớp với chuẩn tốt nghiệp.",
+      "source_id": "hust-english-policy-k71",
+      "page": 13,
+      "evidence": "Kết quả HUST English Placement Test chỉ được sử dụng để phân loại trình độ đầu vào - xếp lớp - xét miễn các học phần ngoại ngữ cơ bản; không được sử dụng để xét đạt chuẩn ngoại ngữ đầu ra."
+    },
+    {
+      "id": "troy-english-entry-standard",
+      "topic": "english_program_exception",
+      "claim_vi": "Với chương trình hợp tác Đại học TROY, yêu cầu tiếng Anh đầu khóa tối thiểu là VSTEP B2 hoặc IELTS Academic 5.5 trở lên hoặc tương đương.",
+      "scope_vi": "Ngoại lệ cho chương trình hợp tác với Đại học TROY; không áp dụng đại trà cho mọi chương trình.",
+      "source_id": "hust-english-policy-k71",
+      "page": 13,
+      "evidence": "Có chứng chỉ tiếng Anh VSTEP trình độ B2 trở lên; Hoặc + Có chứng chỉ IELTS (Academic) đạt 5.5 trở lên hoặc tương đương."
+    },
+    {
+      "id": "computer-science-tuition-per-credit",
+      "topic": "tuition",
+      "claim_vi": "Trong bảng chương trình chuẩn năm học 2026–2027, Khoa học máy tính thuộc nhóm mức 700 nghìn đồng cho mỗi tín chỉ học phí (TCHP); đây là đơn giá, không phải tổng học phí năm.",
+      "scope_vi": "Chương trình chuẩn, học phần trong khung đào tạo, hai học kỳ chính; cần áp đúng loại chương trình.",
+      "source_id": "hust-tuition-2026-2027",
+      "page": 3,
+      "evidence": "KT Cơ điện tử, KT điện tử-viễn thông, KT điều khiển-tự động hóa, Khoa học máy tính, Kỹ thuật máy tính. 700",
+      "aliases": [
+        "IT1",
+        "Khoa học máy tính"
+      ]
+    },
+    {
+      "id": "tuition-unit-and-period",
+      "topic": "tuition",
+      "claim_vi": "Bảng quy định học phí theo mỗi TCHP cho các học phần trong khung chương trình ở hai học kỳ chính; đơn vị bảng là nghìn đồng. Không thể suy ra tổng năm nếu chưa có số TCHP phải đóng.",
+      "scope_vi": "Đại học chính quy; số tiền thực tế phụ thuộc tín chỉ học phí đăng ký và loại CTĐT.",
+      "source_id": "hust-tuition-2026-2027",
+      "page": 3,
+      "evidence": "Mức học phí/một Tín chỉ học phí (TCHP) đối với các học phần nằm trong khung chương trình đào tạo (CTĐT) được quy định cho 2 học kỳ chính của năm học theo đơn vị nghìn đồng"
+    },
+    {
+      "id": "summer-tuition-multiplier",
+      "topic": "tuition",
+      "claim_vi": "Học kỳ hè được tính bằng 1,5 lần mức học phí ở mục tương ứng, ngoại trừ một số học phần và chương trình kỹ sư chuyên sâu được tính mức cơ sở.",
+      "scope_vi": "Áp dụng theo điều kiện và ngoại lệ trong quyết định học phí.",
+      "source_id": "hust-tuition-2026-2027",
+      "page": 5,
+      "evidence": "Mức học phí học kỳ hè được tính bằng 1,5 lần mức học phí quy định tại mục 1, 2, 3 của Phụ lục này, ngoại trừ một số học phần và CTĐT kỹ sư chuyên sâu (KSCS)"
+    },
+    {
+      "id": "postgraduate-tuition-2026-2027",
+      "topic": "tuition",
+      "claim_vi": "Tài liệu ghi mức thạc sĩ ngành kỹ thuật/công nghệ là 790.000 đồng/TCHP, thạc sĩ ngành kinh tế là 780.000 đồng/TCHP và tiến sĩ là 28,5 triệu đồng/năm.",
+      "scope_vi": "Chỉ áp dụng nhóm sau đại học tương ứng trong năm học 2026–2027.",
+      "source_id": "hust-tuition-2026-2027",
+      "page": 6,
+      "evidence": "Thạc sĩ (các ngành kỹ thuật, công nghệ): 790.000 đồng/TCHP. - Thạc sĩ (các ngành kinh tế): 780.000 đồng/TCHP. - Tiến sĩ: 28.5 triệu đồng/năm."
+    },
+    {
+      "id": "cutoff-range-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Trang HUST công bố điểm chuẩn năm 2026 cho 68 chương trình trong khoảng 20,06–29,54 theo điểm thi tốt nghiệp THPT.",
+      "scope_vi": "Chỉ tóm tắt điểm THPT; không thay cho bảng đầy đủ hoặc điểm quy đổi phương thức.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "công bố điểm chuẩn xét tuyển đại học vào 68 chương trình đào tạo năm 2026, theo đó, mức điểm chuẩn dao động từ 20,06 đến 29,54 theo điểm thi tốt nghiệp THPT."
+    },
+    {
+      "id": "cutoff-it1-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của chương trình Khoa học máy tính (IT1) là 29,27 điểm.",
+      "scope_vi": "Điểm THPT của năm 2026, không được suy ra điểm XTTN hoặc TSA tương đương.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình Khoa học máy tính (IT1): 29,27 điểm.",
+      "aliases": [
+        "IT1",
+        "Khoa học máy tính"
+      ]
+    },
+    {
+      "id": "cutoff-it-e10-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của chương trình IT-E10 là 29,54 điểm.",
+      "scope_vi": "Điểm THPT; trang có phần bảng chi tiết dạng ảnh, bản chuẩn hóa này chỉ giữ dữ kiện được nêu trong nội dung văn bản.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình tiên tiến Khoa học dữ liệu và Trí tuệ nhân tạo (IT-E10) tiếp tục có mức điểm chuẩn cao nhất năm nay là 29,54 điểm theo điểm thi tốt nghiệp THPT.",
+      "aliases": [
+        "IT-E10",
+        "ITE10",
+        "Khoa học dữ liệu và Trí tuệ nhân tạo"
+      ]
+    },
+    {
+      "id": "cutoff-lowest-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Trang nêu BF-E19 và EM-E17 có điểm chuẩn theo điểm thi tốt nghiệp THPT thấp nhất được nêu là 20,06 điểm.",
+      "scope_vi": "Chỉ dùng tóm tắt hiện có; tra trang chính thức trước khi khẳng định toàn bộ bảng/nguyện vọng chi tiết.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "02 chương trình có mức điểm chuẩn thấp nhất là BF-E19 và EM-E17 với mức 20,06 điểm.",
+      "aliases": [
+        "BF-E19",
+        "EM-E17"
+      ]
+    }
+  ]
+}

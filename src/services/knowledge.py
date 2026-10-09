@@ -1,7 +1,4 @@
-"""Versioned local PDF ingestion, table-aware chunks and BM25 retrieval.
-
-All text is derived from the supplied PDF. No network fetch or invented admissions facts.
-"""
+"""Versioned, source-aware local ingestion and BM25 retrieval for HUST admissions data."""
 
 import hashlib
 import json
@@ -10,6 +7,7 @@ import re
 import unicodedata
 from collections import Counter
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pymupdf
 
@@ -20,6 +18,7 @@ def normalize(text: str) -> str:
 
 
 STOP = set("toi em ban cho hoi la cua va co duoc nao nhung mot nam voi xin muon ve tai truong bao nhieu".split())
+PROGRAM_CODE_RE = r"\b[A-Z]{1,8}(?:-[A-Z]{1,3})?\d{0,3}\b"
 
 
 def tokens(text: str) -> list[str]:
@@ -37,25 +36,96 @@ class Knowledge:
         self.programs = []
         self.manifest = {}
         self.pdf = None
+        self.documents = []
+        self.documents_by_id = {}
+        self.primary_source_id = ""
+        self.version = ""
+
+    def _source_path(self, source):
+        """Resolve a catalog path inside this data directory, never an arbitrary path."""
+        local_path = source.get("local_path")
+        if not local_path:
+            return None
+        relative = Path(local_path)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ValueError(f"Đường dẫn nguồn không an toàn: {source.get('id')}")
+        if relative.parts and relative.parts[0].casefold() == "data":
+            relative = Path(*relative.parts[1:])
+        path = (self.root / relative).resolve()
+        if not path.is_relative_to(self.root.resolve()):
+            raise ValueError(f"Đường dẫn nguồn nằm ngoài data/: {source.get('id')}")
+        return path
+
+    def source_path(self, source_id=""):
+        """Return the local PDF belonging to a known source, or None for web-only sources."""
+        source = self.documents_by_id.get(source_id) if source_id else self.documents_by_id.get(self.primary_source_id)
+        return self._source_path(source) if source else None
+
+    @staticmethod
+    def _split_page(text, max_chars=1500, overlap=180):
+        """Split extracted text into page-local chunks with a small context overlap."""
+        text = (text or "").strip()
+        if not text:
+            return []
+        pieces = []
+        start = 0
+        while start < len(text):
+            end = min(start + max_chars, len(text))
+            if end < len(text):
+                boundary = max(text.rfind("\n", start + max_chars // 2, end), text.rfind(". ", start + max_chars // 2, end))
+                if boundary > start:
+                    end = boundary + (1 if text[boundary] == "\n" else 2)
+            piece = text[start:end].strip()
+            if piece:
+                pieces.append(piece)
+            if end >= len(text):
+                break
+            start = max(start + 1, end - overlap)
+        return pieces
 
     def ingest(self):
         metadata = self.root / "sources.md"
-        files = sorted((self.root / "raw").glob("*.pdf"))
-        if not metadata.exists() or not files:
-            raise ValueError("Cần data/sources.md và PDF trong data/raw/.")
-        source = metadata.read_text(encoding="utf-8-sig")
-        match = re.search(r"File tương ứng:\s*(.+)", source)
-        named = self.root / match.group(1).strip() if match else None
-        if named and named.exists():
-            self.pdf = named
-        elif len(files) == 1:
-            self.pdf = files[0]
-        else:
-            raise ValueError("Có nhiều PDF: hãy sửa File tương ứng trong sources.md.")
-        url = re.search(r"URL chính thức:\s*(https://\S+)", source)
-        if not url or not url.group(1).startswith("https://hust.edu.vn/"):
-            raise ValueError("MVP này cần nguồn HTTPS thuộc hust.edu.vn.")
-        version = hashlib.sha256(self.pdf.read_bytes()).hexdigest()
+        catalog_path = self.root / "source_catalog.json"
+        if not metadata.exists() or not catalog_path.exists():
+            raise ValueError("Cần data/sources.md và data/source_catalog.json.")
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        self.documents = catalog.get("documents", [])
+        self.documents_by_id = {item.get("id"): item for item in self.documents if item.get("id")}
+        if len(self.documents_by_id) != len(self.documents):
+            raise ValueError("Danh mục nguồn thiếu ID hoặc có ID trùng.")
+        self.primary_source_id = catalog.get("runtime_ingestion", {}).get("source_id", "")
+        primary = self.documents_by_id.get(self.primary_source_id)
+        if not primary or primary.get("type") != "pdf" or not primary.get("indexable"):
+            raise ValueError("Nguồn PDF chính không hợp lệ hoặc chưa thể lập chỉ mục.")
+        self.pdf = self._source_path(primary)
+        if not self.pdf or not self.pdf.is_file():
+            raise ValueError("Không tìm thấy PDF nguồn chính.")
+
+        versions = []
+        for item in self.documents:
+            path = self._source_path(item)
+            if not path:
+                continue
+            if not path.is_file():
+                raise ValueError(f"Thiếu tệp nguồn đã khai báo: {item.get('id')}")
+            actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+            if item.get("sha256") and actual_hash != item["sha256"].lower():
+                raise ValueError(f"Checksum nguồn không khớp catalog: {item.get('id')}")
+            item["resolved_path"] = path
+            item["version"] = actual_hash
+            if item.get("indexable") and item.get("type") == "pdf":
+                pdf = pymupdf.open(path)
+                if item.get("pages") and len(pdf) != item["pages"]:
+                    raise ValueError(f"Số trang PDF không khớp catalog: {item.get('id')}")
+                if sum(len(page.get_text()) for page in pdf) < 1000:
+                    raise ValueError(f"PDF chưa có đủ lớp văn bản: {item.get('id')}")
+                pdf.close()
+            versions.append(f"{item['id']}:{actual_hash}")
+        facts_path = self.root / "normalized" / "admissions_facts_2026.json"
+        if facts_path.exists():
+            versions.append("facts:" + hashlib.sha256(facts_path.read_bytes()).hexdigest())
+        self.version = hashlib.sha256("\n".join(sorted(versions)).encode("utf-8")).hexdigest()
+
         document = pymupdf.open(self.pdf)
         if len(document) < 25:
             raise ValueError("Cần PDF đầy đủ; bản scan cũ không được dùng cho MVP này.")
@@ -64,18 +134,45 @@ class Knowledge:
             raise ValueError("PDF scan chưa có lớp chữ; cần OCR và kiểm tra trước khi lập chỉ mục.")
         self.chunks, self.programs = [], []
         self.manifest = {
-            "title": "Thông tin tuyển sinh đại học HUST 2026",
-            "url": url.group(1),
-            "version": version,
+            "title": primary["title"],
+            "url": primary["official_url"],
+            "version": self.version,
+            "source_id": self.primary_source_id,
             "pages": len(document),
-            "scope": "Đại học chính quy, tuyển sinh từ THPT, HUST 2026",
-            "status": "Nguồn do nhóm cung cấp; chưa được cán bộ tuyển sinh duyệt",
+            "scope": catalog.get("corpus_scope", "Tuyển sinh và thông tin đào tạo HUST theo phạm vi từng tài liệu."),
+            "status": "Kho nguồn gồm tài liệu chính thức; mỗi câu trả lời cần đối chiếu đúng nguồn và phạm vi áp dụng.",
             "indexed_pages": "2–25; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2",
+            "document_count": len(self.documents),
+            "indexable_pdf_count": sum(1 for item in self.documents if item.get("type") == "pdf" and item.get("indexable")),
+            "unavailable_sources": [
+                {"id": item["id"], "title": item.get("title"), "status": item.get("status")}
+                for item in self.documents
+                if item.get("type") == "pdf" and not item.get("indexable")
+            ],
         }
 
-        def add(title, text, page, end_page=None, kind="text", code=""):
+        primary_version = primary["version"]
+
+        def add(
+            title,
+            text,
+            page,
+            end_page=None,
+            kind="text",
+            code="",
+            source_id=None,
+            excerpt=None,
+            answer_vi=None,
+            scope_vi=None,
+            topic=None,
+            fact_id="",
+        ):
             if not text.strip():
                 return
+            source_id = source_id or self.primary_source_id
+            source = self.documents_by_id.get(source_id, primary)
+            source_path = source.get("resolved_path")
+            page_fragment = f"#page={page}" if page else ""
             self.chunks.append(
                 {
                     "id": f"chunk-{len(self.chunks) + 1}",
@@ -85,6 +182,19 @@ class Knowledge:
                     "end_page": end_page or page,
                     "kind": kind,
                     "code": code,
+                    "topic": topic or "",
+                    "fact_id": fact_id,
+                    "answer_vi": answer_vi or "",
+                    "scope_vi": scope_vi or "",
+                    "evidence": clean(excerpt or text),
+                    "source_id": source_id,
+                    "source_title": source.get("title", "Tài liệu HUST"),
+                    "source_url": source.get("official_url", ""),
+                    "source_type": source.get("type", "pdf"),
+                    "source_version": source.get("version", primary_version),
+                    "source_status": source.get("status", ""),
+                    "source_local": bool(source_path),
+                    "source_scope": source.get("scope", ""),
                 }
             )
 
@@ -185,6 +295,69 @@ class Knowledge:
                     )
 
         document.close()
+
+        # Index each readable supplemental PDF as page-local text. The primary
+        # admissions PDF keeps its table-aware parsing above; scans are excluded
+        # by catalog metadata until OCR output has been reviewed.
+        for source in self.documents:
+            if source.get("id") == self.primary_source_id or source.get("type") != "pdf" or not source.get("indexable"):
+                continue
+            source_path = source.get("resolved_path")
+            if not source_path:
+                continue
+            supplemental_pdf = pymupdf.open(source_path)
+            for page_index, pdf_page in enumerate(supplemental_pdf):
+                page_text = pdf_page.get_text()
+                for part_index, part in enumerate(self._split_page(page_text), 1):
+                    add(
+                        f"{source['title']} · PDF trang {page_index + 1}",
+                        part,
+                        page_index + 1,
+                        kind="document_text",
+                        source_id=source["id"],
+                        excerpt=part,
+                    )
+            supplemental_pdf.close()
+
+        # Curated, page-verified facts sit alongside raw source chunks. They
+        # improve retrieval for exact questions and retain their original quote.
+        facts_path = self.root / "normalized" / "admissions_facts_2026.json"
+        if facts_path.exists():
+            facts = json.loads(facts_path.read_text(encoding="utf-8")).get("facts", [])
+            for fact in facts:
+                source = self.documents_by_id.get(fact.get("source_id"))
+                if not source:
+                    raise ValueError(f"Dữ kiện tham chiếu nguồn chưa khai báo: {fact.get('id')}")
+                evidence = clean(fact.get("evidence", ""))
+                page = fact.get("page")
+                source_path = source.get("resolved_path")
+                if source.get("type") == "pdf":
+                    if not source_path or not source.get("indexable") or not isinstance(page, int):
+                        raise ValueError(f"Dữ kiện PDF không có trang nguồn hợp lệ: {fact.get('id')}")
+                    source_pdf = pymupdf.open(source_path)
+                    if not 1 <= page <= len(source_pdf) or normalize(evidence) not in normalize(source_pdf[page - 1].get_text()):
+                        source_pdf.close()
+                        raise ValueError(f"Trích dẫn không khớp PDF nguồn: {fact.get('id')}")
+                    source_pdf.close()
+                elif page is not None or not evidence:
+                    raise ValueError(f"Dữ kiện web phải có trích dẫn và không gán số trang PDF: {fact.get('id')}")
+                answer = clean(fact.get("claim_vi", ""))
+                scope_text = clean(fact.get("scope_vi", ""))
+                aliases = " ".join(fact.get("aliases", []))
+                text = f"{answer} Phạm vi áp dụng: {scope_text} Trích dẫn nguyên văn: {evidence} {aliases}"
+                add(
+                    fact.get("topic", "Dữ kiện đã kiểm chứng"),
+                    text,
+                    page,
+                    kind="verified_fact",
+                    source_id=fact["source_id"],
+                    excerpt=evidence,
+                    answer_vi=answer,
+                    scope_vi=scope_text,
+                    topic=fact.get("topic", ""),
+                    fact_id=fact.get("id", ""),
+                )
+
         self.counters = [Counter(tokens(c["title"] + " " + c["text"])) for c in self.chunks]
         self.df = Counter(t for c in self.counters for t in c)
         self.average = sum(sum(c.values()) for c in self.counters) / len(self.counters)
@@ -192,7 +365,15 @@ class Knowledge:
         output.mkdir(parents=True, exist_ok=True)
         (output / "knowledge.json").write_text(
             json.dumps(
-                {"manifest": self.manifest, "chunks": self.chunks, "programs": self.programs},
+                {
+                    "manifest": self.manifest,
+                    "documents": [
+                        {key: value for key, value in item.items() if key != "resolved_path"}
+                        for item in self.documents
+                    ],
+                    "chunks": self.chunks,
+                    "programs": self.programs,
+                },
                 ensure_ascii=False,
                 indent=2,
             ),
@@ -203,7 +384,7 @@ class Knowledge:
     def program_matches(self, question):
         """Return explicit program matches in the question, without using session context."""
         q = normalize(question)
-        codes = set(re.findall(r"\b[A-Z]{2,8}\d{0,3}(?:-[A-Z]+)?\b", question.upper()))
+        codes = set(re.findall(PROGRAM_CODE_RE, question.upper()))
         matches = [p for p in self.programs if p["code"] in codes]
         matched_codes = {p["code"] for p in matches}
         for program in self.programs:
@@ -234,26 +415,132 @@ class Knowledge:
             t in norm for t in ["khi nao", "bao gio", "ngay nao", "thoi gian", "thong bao", "cong bo"]
         )
         if result_date:
-            return [dict(c, score=100) for c in self.chunks if "Thông báo trúng tuyển:" in c["text"]][:limit]
+            return [
+                dict(c, score=100)
+                for c in self.chunks
+                if c.get("source_id") == self.primary_source_id and "Thông báo trúng tuyển:" in c["text"]
+            ][:limit]
         if "tsa" in query:
             query += ["dgtd", "tu", "duy"]
         if "ielts" in query:
             query += ["ngoai", "ngu"]
-        query_codes = set(re.findall(r"\b[A-Z]{2,8}\d{0,3}(?:-[A-Z]+)?\b", question.upper()))
+        query_codes = set(re.findall(PROGRAM_CODE_RE, question.upper()))
         program_codes = {p["code"] for p in self.programs}
         selected = (query_codes & program_codes) or ({program} if program in program_codes else set())
         if any(t in norm for t in ["bao nhieu nganh", "so nganh", "bao nhieu chuong trinh"]):
-            return [dict(c, score=100) for c in self.chunks if c["kind"] == "overview"]
+            return [
+                dict(c, score=100)
+                for c in self.chunks
+                if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
+            ]
         fee_query = "hoc phi" in norm
-        language_query = any(t in norm for t in ["ngoai ngu", "ielts", "vstep"]) and not any(
+        per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi"])
+        postgraduate_fee_query = fee_query and any(term in norm for term in ["thac si", "tien si", "sau dai hoc"])
+        language_query = any(t in norm for t in ["ngoai ngu", "tieng anh", "ielts", "vstep", "placement test", "hust ept", "k71"]) and not any(
             t in norm for t in ["phi", "xac thuc", "quy doi", "diem thuong"]
         )
+        graduation_language_query = language_query and any(
+            term in norm for term in ["dau ra", "tot nghiep", "placement test", "hust ept", "k71"]
+        )
+        if graduation_language_query:
+            placement_test_query = any(term in norm for term in ["placement test", "hust ept"])
+            troy_query = "troy" in norm
+            k71_query = "k71" in norm
+            ranked_facts = []
+            for chunk, counts in zip(self.chunks, self.counters, strict=True):
+                if chunk["kind"] != "verified_fact" or chunk.get("topic") not in {
+                    "english_policy_scope",
+                    "english_graduation",
+                    "english_program_exception",
+                }:
+                    continue
+                answer_text = normalize(chunk.get("answer_vi", ""))
+                if placement_test_query and "placement test" not in answer_text:
+                    continue
+                if troy_query and "troy" not in normalize(chunk.get("text", "")):
+                    continue
+                if k71_query and chunk.get("topic") != "english_policy_scope":
+                    continue
+                if not (placement_test_query or troy_query or k71_query):
+                    if chunk.get("topic") != "english_graduation" or "placement test" in answer_text:
+                        continue
+                matched = sum(1 for token in query if counts[token])
+                score = matched * 4.0
+                if any(term in norm for term in ["dau ra", "tot nghiep"]) and chunk.get("topic") == "english_graduation":
+                    score += 16
+                if "k71" in norm and chunk.get("topic") == "english_policy_scope":
+                    score += 16
+                if matched and score >= 4:
+                    ranked_facts.append((score, chunk))
+            ranked_facts.sort(key=lambda item: item[0], reverse=True)
+            if "dau vao" in norm and program:
+                entrance_rules = [
+                    chunk for chunk in self.chunks
+                    if chunk.get("source_id") == self.primary_source_id
+                    and chunk.get("page") == 16
+                    and "5.5" in chunk["text"]
+                    and "VSTEP" in chunk["text"]
+                ]
+                program_rows = [
+                    chunk for chunk in self.chunks
+                    if chunk.get("kind") == "program" and chunk.get("code") == program
+                ]
+                return [
+                    *[dict(chunk, score=100) for chunk in entrance_rules[:1]],
+                    *[dict(chunk, score=100) for chunk in program_rows[:1]],
+                    *[dict(chunk, score=score) for score, chunk in ranked_facts[:1]],
+                ][:limit]
+            return [dict(chunk, score=score) for score, chunk in ranked_facts[:limit]]
         if language_query:
             # Language conditions live in section 5.2, not in the program quota table.
-            rules = [c for c in self.chunks if c["page"] == 16 and "5.5" in c["text"] and "VSTEP" in c["text"]]
+            rules = [
+                c
+                for c in self.chunks
+                if c.get("source_id") == self.primary_source_id
+                and c["page"] == 16
+                and "5.5" in c["text"]
+                and "VSTEP" in c["text"]
+            ]
             code = self.resolve_program(question, program)
             rows = [c for c in self.chunks if c["kind"] == "program" and c["code"] == code]
             return [dict(c, score=100) for c in (rules + rows)[:limit]]
+        cutoff_query = any(term in norm for term in ["diem chuan", "diem trung tuyen", "diem trung"])
+        talent_query = "xttn" in norm or "xet tuyen tai nang" in norm or any(term in norm for term in ["1.1", "1.2", "1.3"])
+        if cutoff_query:
+            cutoff_facts = [
+                chunk for chunk in self.chunks
+                if chunk["kind"] == "verified_fact" and chunk.get("topic") == "cutoff"
+            ]
+            known_codes = {
+                code
+                for chunk in cutoff_facts
+                for code in re.findall(r"\b[A-Z]{2,4}(?:-[A-Z]{1,3})?\d{1,3}\b", chunk.get("answer_vi", "").upper())
+            }
+            asked_codes = set(re.findall(r"\b[A-Z]{2,4}(?:-[A-Z]{1,3})?\d{1,3}\b", question.upper()))
+            asked_codes.update(set(selected) & known_codes)
+            requested_program = bool(asked_codes or selected)
+            if asked_codes:
+                chosen = [
+                    chunk for chunk in cutoff_facts
+                    if any(code in chunk.get("answer_vi", "").upper() for code in asked_codes & known_codes)
+                ]
+            elif requested_program:
+                chosen = []
+            elif "thap nhat" in norm:
+                chosen = [chunk for chunk in cutoff_facts if chunk.get("fact_id") == "cutoff-lowest-2026-thpt"]
+            elif any(term in norm for term in ["cao nhat", "cao nhì", "cao nhi", "cao nhat la"]):
+                chosen = [chunk for chunk in cutoff_facts if chunk.get("fact_id") == "cutoff-it-e10-2026-thpt"]
+            else:
+                chosen = [chunk for chunk in cutoff_facts if chunk.get("fact_id") == "cutoff-range-2026-thpt"]
+            return [dict(chunk, score=100) for chunk in chosen[:limit]]
+        if "phuong thuc" in norm and not selected and not talent_query:
+            methods = [
+                chunk for chunk in self.chunks
+                if chunk.get("source_id") == self.primary_source_id
+                and chunk.get("page") == 2
+            ]
+            if methods:
+                return [dict(chunk, score=100) for chunk in methods[:limit]]
         preferred_pages = set()
         if "le phi" in norm or "phi thi" in norm or "phi dang ky" in norm or "phi xac thuc" in norm:
             preferred_pages = {20}
@@ -272,6 +559,30 @@ class Knowledge:
             length = sum(counts.values())
             if chunk["kind"] == "overview":
                 continue
+            if chunk["kind"] == "verified_fact" and not (talent_query or per_credit_fee_query or postgraduate_fee_query):
+                continue
+            if cutoff_query and (chunk["kind"] != "verified_fact" or chunk.get("topic") != "cutoff"):
+                continue
+            if talent_query and (
+                chunk["kind"] != "verified_fact" or chunk.get("topic") != "talent_admission"
+            ):
+                continue
+            if "1.3" in norm and ("dieu kien" in norm or "can gi" in norm):
+                answer_text = normalize(chunk.get("answer_vi", ""))
+                if "1.3" not in answer_text or not any(term in answer_text for term in ["yeu cau", "dieu kien"]):
+                    continue
+            if postgraduate_fee_query and (
+                chunk["kind"] != "verified_fact"
+                or chunk.get("topic") != "tuition"
+                or "sau dai hoc" not in normalize(chunk.get("scope_vi", ""))
+            ):
+                continue
+            if fee_query and per_credit_fee_query and (
+                chunk["kind"] != "verified_fact" or chunk.get("source_id") != "hust-tuition-2026-2027"
+            ):
+                continue
+            if fee_query and not per_credit_fee_query and not postgraduate_fee_query and chunk["kind"] != "fee":
+                continue
             if (
                 not selected
                 and chunk["kind"] == "program"
@@ -284,6 +595,11 @@ class Knowledge:
                 continue
             if not fee_query and chunk["kind"] == "fee":
                 continue
+            if selected and chunk["kind"] == "verified_fact":
+                code_terms = {normalize(code) for code in selected}
+                fact_text = normalize(chunk["text"])
+                if query_codes and not any(re.search(r"(?<!\w)" + re.escape(code) + r"(?!\w)", fact_text) for code in code_terms):
+                    continue
             score = 0.0
             matched = 0
             for token in query:
@@ -297,11 +613,11 @@ class Knowledge:
                     continue
                 if not fee_query and not preferred_pages:
                     score += 20
-            if preferred_pages and chunk["page"] in preferred_pages:
+            if preferred_pages and chunk.get("source_id") == self.primary_source_id and chunk["page"] in preferred_pages:
                 score += 15
-            if fee_query and chunk["kind"] != "fee":
+            if fee_query and not per_credit_fee_query and not postgraduate_fee_query and chunk["kind"] != "fee":
                 continue
-            if fee_query and selected:
+            if fee_query and selected and chunk["kind"] == "fee":
                 aliases = {
                     "IT1": "Khoa học máy tính",
                     "IT2": "Kỹ thuật máy tính",
@@ -334,6 +650,12 @@ class Knowledge:
                 if standard and "chuong trinh chuan" not in normalize(chunk["title"]):
                     continue
                 score += 15
+            if chunk["kind"] == "verified_fact":
+                score += 9
+                if chunk.get("source_id") in {"hust-admission-regulation-2026", "hust-talent-admission-2026", "hust-tuition-2026-2027"}:
+                    score += 2
+                if cutoff_query and chunk.get("topic") == "cutoff":
+                    score += 12
             if matched and score >= 3:
                 scored.append((score, chunk))
         scored.sort(key=lambda x: x[0], reverse=True)
@@ -341,17 +663,41 @@ class Knowledge:
         return [dict(c, score=round(s, 2)) for s, c in scored[:limit]]
 
     def citation(self, chunk):
+        source_id = chunk.get("source_id", self.primary_source_id)
+        source_url = chunk.get("source_url") or self.manifest["url"]
+        page = chunk.get("page")
+        end_page = chunk.get("end_page") or page
+        if chunk.get("source_type", "pdf") == "pdf" and page:
+            source_url = f"{source_url}#page={page}"
+        local_url = None
+        if chunk.get("source_local", True):
+            local_url = f"/api/v1/source/pdf?source_id={source_id}"
+            if page:
+                local_url += f"#page={page}"
+        status_labels = {
+            "primary_runtime_source": "Nguồn chính của kỳ tuyển sinh 2026.",
+            "supplemental_data_only": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+            "online_summary_only": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
+            "manual_ocr_required": "PDF scan chưa được kiểm tra OCR; không dùng làm căn cứ trả lời.",
+            "online_listing_only": "Trang danh mục trực tuyến; chưa có nội dung chi tiết của từng học bổng trong kho.",
+        }
+        source = self.documents_by_id.get(source_id, {})
+        doc_status = status_labels.get(chunk.get("source_status", ""), chunk.get("source_status", ""))
         return {
             "id": chunk["id"],
-            "title": chunk["title"],
-            "page": chunk["page"],
-            "end_page": chunk["end_page"],
-            "url": self.manifest["url"] + f"#page={chunk['page']}",
-            "local_url": f"/api/v1/source/pdf#page={chunk['page']}",
-            "excerpt": chunk["text"],
-            "version": self.manifest["version"][:12],
+            "title": chunk.get("source_title", self.manifest.get("title", "Tài liệu tuyển sinh")),
+            "section": chunk.get("title", ""),
+            "page": page,
+            "end_page": end_page,
+            "url": source_url,
+            "local_url": local_url,
+            "excerpt": chunk.get("evidence") or chunk["text"],
+            "version": chunk.get("source_version", self.version)[:12],
             "year": 2026,
-            "document_title": self.manifest.get("title", "Tài liệu tuyển sinh"),
-            "document_status": self.manifest.get("status", ""),
-            "indexed_pages": self.manifest.get("indexed_pages", ""),
+            "document_title": chunk.get("source_title", self.manifest.get("title", "Tài liệu tuyển sinh")),
+            "document_status": doc_status,
+            "source_id": source_id,
+            "source_type": chunk.get("source_type", "pdf"),
+            "scope": chunk.get("source_scope", source.get("scope", "")),
+            "indexed_pages": self.manifest.get("indexed_pages", "") if source_id == self.primary_source_id else "",
         }

@@ -134,14 +134,20 @@ function addMessage(role, data, save=true) {
   if(role==='assistant')appendStructuredAnswer(box,data);else box.append(node('div','body',data.response));
   if(role==='assistant'&&(data.sources||[]).length){
     const firstSource=data.sources[0];
-    const citation=link(`Nguồn · PDF trang ${firstSource.page||'chưa rõ'}${firstSource.end_page&&firstSource.end_page!==firstSource.page?'–'+firstSource.end_page:''} ↗`,firstSource.local_url||`/api/v1/source/pdf#page=${firstSource.page||1}`);
-    citation.className='message-citation';
-    box.append(citation,node('h3','answer-section-title source-heading','Chi tiết nguồn'));
+    const firstHref=firstSource.local_url||firstSource.url;
+    if(firstHref){
+      const citation=link(citationLabel(firstSource),firstHref);
+      citation.className='message-citation';box.append(citation);
+    }
+    box.append(node('h3','answer-section-title source-heading','Chi tiết nguồn'));
   }
   (data.sources || []).forEach((source,i)=>{
     const card=node('details','source-card');
-    card.append(node('summary','',`[${i+1}] ${source.title} · PDF trang ${source.page}${source.end_page!==source.page?'–'+source.end_page:''} · kỳ ${source.year||2026} · bản ${source.version||'chưa rõ'}`));
-    card.append(node('div','quote',source.excerpt),link('Xem PDF trong ứng dụng ↗',source.local_url),link('Nguồn chính thức ↗',source.url));
+    const version=source.version?` · bản ${source.version}`:'';
+    card.append(node('summary','',`[${i+1}] ${source.title||'Tài liệu HUST'}${sourceLocation(source)} · kỳ ${source.year||2026}${version}`));
+    card.append(node('div','quote',source.excerpt||''));
+    if(source.local_url)card.append(link('Mở PDF trong ứng dụng ↗',source.local_url));
+    if(source.url)card.append(link('Nguồn chính thức ↗',source.url));
     if(source.document_status)card.append(node('p','hint',source.document_status));
     box.append(card);
   });
@@ -162,6 +168,14 @@ function addMessage(role, data, save=true) {
   $('messages').scrollTop=$('messages').scrollHeight;
   if(save)messages.push({role,...data});
 }
+function sourceLocation(source){
+  const page=Number.isInteger(source.page)&&source.page>0?source.page:null;
+  if(page){const end=Number.isInteger(source.end_page)&&source.end_page>page?`–${source.end_page}`:'';return ` · PDF trang ${page}${end}`;}
+  return source.source_type==='html'?' · Trang web chính thức':'';
+}
+function citationLabel(source){
+  return `Nguồn · ${source.title||'Tài liệu HUST'}${sourceLocation(source)} ↗`;
+}
 async function init() {
   try {
     const [status, list, session] = await Promise.all([api('/status'),api('/programs'),api('/session')]);
@@ -174,7 +188,7 @@ async function init() {
     session.messages.forEach(m=>addMessage(m.role,m));
     const source=status.source||{};
     if(source.pages)$('source-pages').textContent=`${source.pages} trang`;
-    $('source-status').textContent=status.status==='ready'?`${source.pages} trang PDF · ${status.programs} chương trình · kỳ 2026 · bản ${source.version||'chưa rõ'} · ${source.status||'chưa rõ trạng thái'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
+    $('source-status').textContent=status.status==='ready'?`${source.document_count||1} nguồn · ${source.indexable_pdf_count||1} PDF có thể tra cứu · ${status.programs} chương trình · kỳ 2026 · bộ dữ liệu ${source.version||'chưa rõ'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
     const official=$('source-official');if(official&&source.url){official.href=source.url;official.hidden=false;}
     $('mode-label').textContent=status.mode==='llm'?'AI tổng hợp có kiểm tra trích dẫn.':'Đang dùng chế độ tra cứu tài liệu.';
     $('ticket-count').textContent=session.tickets.length;
@@ -236,7 +250,7 @@ $('clear').addEventListener('click',async()=>{
 function renderHandoverSources(sources){
   const box=$('handover-sources-preview');box.replaceChildren();
   if(!sources.length){box.append(node('p','hint','Không có nguồn liên quan trong câu trả lời AI.'));return;}
-  sources.forEach((source,index)=>{const item=node('div','preview-source');item.append(node('span','',`${index+1}. ${source.title||'Tài liệu nguồn'} · PDF trang ${source.page||'chưa rõ'}`));if(source.local_url)item.append(link('Mở PDF ↗',source.local_url));else if(source.url)item.append(link('Mở nguồn ↗',source.url));box.append(item);});
+  sources.forEach((source,index)=>{const item=node('div','preview-source');item.append(node('span','',`${index+1}. ${source.title||'Tài liệu nguồn'}${sourceLocation(source)}`));if(source.local_url)item.append(link('Mở PDF ↗',source.local_url));if(source.url)item.append(link('Nguồn chính thức ↗',source.url));box.append(item);});
 }
 function openHandover(question=null,answer=null,sources=null) {
   const lastQuestion=[...messages].reverse().find(m=>m.role==='user');
