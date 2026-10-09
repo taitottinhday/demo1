@@ -3,6 +3,7 @@ const accountLink=document.createElement('a');accountLink.className='staff-link'
 const privacyNote=document.querySelector('.privacy');if(privacyNote)privacyNote.textContent='Bạn có thể dùng ẩn danh hoặc đăng nhập để lưu lịch sử và theo dõi yêu cầu.';
 const stateNames = {waiting:'Đang chờ', in_progress:'Đang xử lý', resolved:'Đã giải quyết',cancelled:'Đã hủy',rejected:'Đã từ chối'};
 let messages = [], programs = [], requestKey = '', busy = false, currentStudent = null, guideData = null, guideCompleted = new Set(), guideStorage = null, handoverPreview = {question:'', ai_answer:'', sources:[]};
+let guidanceAreas = null, guidanceOptionsPromise = null, guidanceController = null, guidanceRequestId = 0, guidanceStep = 1;
 const guideStorageKey = 'hust-guide-checklist-v2';
 const questionDraftKey = 'hust-question-draft-v1';
 function updateAccountNav(student){
@@ -481,6 +482,125 @@ function renderComparison(data){
   const actions=node('div','comparison-actions');const change=node('button','secondary','Đổi tiêu chí');change.type='button';change.onclick=()=>{markComparisonStale();comparisonSelects()[0]?.focus();};const rawButton=node('button','secondary','Xem dữ liệu gốc');rawButton.type='button';const raw=appendComparisonRawData(result,data);rawButton.onclick=()=>{raw.hidden=!raw.hidden;rawButton.textContent=raw.hidden?'Xem dữ liệu gốc':'Ẩn dữ liệu gốc';if(!raw.hidden)raw.scrollIntoView({block:'nearest'});};const handover=node('button','secondary','Chuyển câu hỏi cho cán bộ');handover.type='button';handover.onclick=()=>openHandover(`Cần cán bộ kiểm tra so sánh chương trình: ${data.programs.map(program=>program.code).join(', ')}`, 'Bảng/API đã hiển thị nhưng cần cán bộ xác nhận các khác biệt và dữ liệu còn thiếu.');actions.append(change,rawButton,handover);result.append(actions);
 }
 function resetComparisonSelection(){comparisonSelects().forEach(select=>{select.value='';clearComparisonFieldError(select);});$('compare-error').textContent='';clearComparisonResult();$('compare-0')?.focus();}
+function guidanceStatus(message, retry=false){
+  const status=$('guidance-option-status');status.hidden=false;status.replaceChildren(document.createTextNode(message));
+  if(retry){const button=node('button','guidance-retry','Thử tải lại');button.type='button';button.onclick=()=>{guidanceOptionsPromise=null;ensureGuidanceOptions();};status.append(document.createTextNode(' '),button);}
+}
+function renderGuidanceAreas(){
+  for(const [name,id] of [['strengths','guidance-strength-options'],['interests','guidance-interest-options'],['improvements','guidance-improvement-options']]){
+    const container=$(id);container.replaceChildren();
+    guidanceAreas.forEach(area=>{
+      const label=node('label','guidance-choice');const input=document.createElement('input');input.type='checkbox';input.name=name;input.value=area.id;input.id=`guidance-${name}-${area.id}`;
+      input.addEventListener('change',()=>{
+        const selected=container.querySelectorAll('input:checked');
+        if(input.checked&&selected.length>4){input.checked=false;$('guidance-error').textContent='Mỗi nhóm bạn có thể chọn tối đa 4 lĩnh vực.';return;}
+        $('guidance-error').textContent='';
+      });
+      label.htmlFor=input.id;label.append(input,node('span','',area.label));container.append(label);
+    });
+  }
+}
+async function ensureGuidanceOptions(){
+  const dialog=$('program-guidance-dialog');
+  if(guidanceAreas){renderGuidanceAreas();$('guidance-option-status').hidden=true;$('program-guidance-form').hidden=false;renderGuidanceStep(1);return;}
+  guidanceStatus('Đang tải lĩnh vực từ danh mục chương trình…');
+  if(!guidanceOptionsPromise){
+    guidanceOptionsPromise=(async()=>{
+      const response=await fetch('/api/v1/programs/recommend/options',{credentials:'same-origin',headers:{Accept:'application/json'}});
+      let data={};try{data=await response.json();}catch{/* The error below gives a stable user-facing message. */}
+      if(!response.ok||!Array.isArray(data.areas))throw new Error('Không tải được danh mục chương trình.');
+      return data;
+    })();
+  }
+  try{
+    const data=await guidanceOptionsPromise;guidanceAreas=data.areas;
+    if(dialog.open){renderGuidanceAreas();$('guidance-option-status').hidden=true;$('program-guidance-form').hidden=false;renderGuidanceStep(1);}
+  }catch{
+    if(dialog.open)guidanceStatus('Chưa tải được danh mục. Kiểm tra kết nối rồi thử lại.',true);
+  }finally{guidanceOptionsPromise=null;}
+}
+function renderGuidanceStep(step,focus=true){
+  guidanceStep=step;document.querySelectorAll('[data-guidance-step]').forEach(section=>{section.hidden=Number(section.dataset.guidanceStep)!==step;});
+  $('guidance-step-label').textContent=`Bước ${step}/3`;
+  $('guidance-step-name').textContent=['','Thế mạnh','Sở thích','Điều muốn bồi dưỡng'][step];
+  $('guidance-progress-fill').style.width=`${step/3*100}%`;
+  const progress=document.querySelector('.guidance-progress');progress.setAttribute('aria-valuenow',String(step));progress.setAttribute('aria-valuetext',`Bước ${step} trong 3: ${$('guidance-step-name').textContent}`);
+  $('guidance-back').disabled=step===1;$('guidance-next').hidden=step===3;$('guidance-submit').hidden=step!==3;
+  $('guidance-error').textContent='';
+  if(focus)document.querySelector(`[data-guidance-step="${step}"] legend`)?.focus({preventScroll:true});
+}
+function guidanceValues(name){return [...document.querySelectorAll(`#program-guidance-form input[name="${name}"]:checked`)].map(input=>input.value);}
+function clearGuidanceProfile(){
+  guidanceRequestId++;guidanceController?.abort();guidanceController=null;
+  const form=$('program-guidance-form');form.reset();form.hidden=!guidanceAreas;
+  $('guidance-submit').disabled=false;$('guidance-submit').removeAttribute('aria-busy');
+  $('guidance-results').hidden=true;$('guidance-result-list').replaceChildren();$('guidance-result-message').textContent='';$('guidance-result-notice').textContent='';$('guidance-error').textContent='';
+  $('guidance-option-status').hidden=Boolean(guidanceAreas);$('guidance-option-status').replaceChildren();
+  renderGuidanceStep(1,false);
+}
+function renderGuidanceCard(suggestion){
+  const card=node('article','guidance-result-card');const heading=node('div','guidance-card-heading');
+  const title=node('h4','',`${suggestion.code} · ${suggestion.name}`);const badge=node('span','guidance-fit-label',suggestion.badge);heading.append(title,badge);card.append(heading);
+  const reasons=node('ul','guidance-reasons');(suggestion.reasons||[]).forEach(reason=>reasons.append(node('li','',reason)));if(reasons.children.length)card.append(reasons);
+  const matched=[...(suggestion.matched_strengths||[]).map(value=>`Thế mạnh: ${value}`),...(suggestion.matched_interests||[]).map(value=>`Sở thích: ${value}`)];
+  if(matched.length)card.append(node('p','guidance-match-detail',matched.join(' · ')));
+  if((suggestion.considerations||[]).length){const notes=node('ul','guidance-considerations');suggestion.considerations.forEach(value=>notes.append(node('li','',value)));card.append(notes);}
+  const source=suggestion.source||{};const citation=node('div','guidance-citation');
+  const page=Number.isInteger(source.page)&&source.page>0?source.page:null;const endPage=page&&Number.isInteger(source.end_page)&&source.end_page>=page?source.end_page:page;
+  const label=`Nguồn · PDF trang ${page||'—'}${endPage&&endPage!==page?`–${endPage}`:''}`;
+  const href=typeof source.local_url==='string'&&source.local_url.startsWith('/api/v1/source/pdf')?source.local_url:null;
+  if(href)citation.append(link(label,href));else citation.append(node('span','',label));
+  if(source.title)citation.append(node('span','guidance-source-title',source.title));card.append(citation);
+  const actions=node('div','guidance-card-actions');const compare=node('button','secondary','So sánh chương trình');compare.type='button';compare.onclick=()=>{
+    const code=suggestion.code;$('program-guidance-dialog').close();setProgram(code,true);$('compare-open').click();
+  };
+  const ask=node('button','guidance-ask','Hỏi trợ lý về chương trình');ask.type='button';ask.onclick=()=>{
+    const code=suggestion.code;$('program-guidance-dialog').close();setProgram(code,true);fillQuestion(`Thông tin tuyển sinh trong tài liệu về chương trình ${code} là gì?`);
+  };
+  actions.append(compare,ask);card.append(actions);return card;
+}
+function renderGuidanceResults(data){
+  const list=$('guidance-result-list');list.replaceChildren();const allowed=new Set(programs.map(program=>program.code));
+  const suggestions=(data.suggestions||[]).filter(item=>typeof item.code==='string'&&(!allowed.size||allowed.has(item.code))).slice(0,3);
+  $('guidance-result-message').textContent=data.message||'Đây là các gợi ý tham khảo dựa trên thông tin bạn đã chọn.';
+  suggestions.forEach(item=>list.append(renderGuidanceCard(item)));
+  $('guidance-result-notice').textContent=data.notice||'Hãy kiểm tra tài liệu tuyển sinh trước khi cân nhắc lựa chọn.';
+  $('program-guidance-form').hidden=true;$('guidance-results').hidden=false;$('guidance-option-status').hidden=true;$('guidance-results').focus({preventScroll:true});
+}
+async function submitGuidance(event){
+  event.preventDefault();$('guidance-error').textContent='';
+  const payload={
+    strengths:guidanceValues('strengths'),interests:guidanceValues('interests'),improvements:guidanceValues('improvements'),
+    strengths_note:$('guidance-strengths-note').value,interests_note:$('guidance-interests-note').value,
+    career_direction:$('guidance-career-direction').value,improvements_note:$('guidance-improvements-note').value,priorities:$('guidance-priorities').value,
+  };
+  const positiveInput=[...payload.strengths,...payload.interests,payload.strengths_note,payload.interests_note,payload.career_direction,payload.priorities].some(value=>String(value).trim());
+  if(!positiveInput){renderGuidanceStep(1);$('guidance-error').textContent='Hãy chọn hoặc mô tả ít nhất một thế mạnh, sở thích hay hướng bạn muốn tìm hiểu.';return;}
+  guidanceController?.abort();const controller=new AbortController();guidanceController=controller;const requestId=++guidanceRequestId;
+  const timeout=setTimeout(()=>controller.abort(),20000);const button=$('guidance-submit');button.disabled=true;button.setAttribute('aria-busy','true');
+  guidanceStatus('Đang đối chiếu câu trả lời với danh mục tuyển sinh…');
+  try{
+    const response=await fetch('/api/v1/programs/recommend',{method:'POST',credentials:'same-origin',signal:controller.signal,headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(payload)});
+    let data={};try{data=await response.json();}catch{/* Use the stable message for invalid server responses. */}
+    if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Chưa tạo được gợi ý. Vui lòng thử lại.');
+    if(requestId===guidanceRequestId&&$('program-guidance-dialog').open)renderGuidanceResults(data);
+  }catch(error){
+    if(requestId===guidanceRequestId&&$('program-guidance-dialog').open){$('guidance-option-status').hidden=true;$('guidance-error').textContent=error.name==='AbortError'?'Yêu cầu mất quá nhiều thời gian. Hãy thử lại khi kết nối ổn định.':error.message||'Chưa tạo được gợi ý. Vui lòng thử lại.';}
+  }finally{
+    clearTimeout(timeout);if(requestId===guidanceRequestId){guidanceController=null;button.disabled=false;button.removeAttribute('aria-busy');if($('program-guidance-dialog').open)$('guidance-option-status').hidden=true;}
+  }
+}
+$('recommend-open').onclick=()=>{
+  clearGuidanceProfile();$('program-guidance-dialog').showModal();
+  if(guidanceAreas){renderGuidanceAreas();$('program-guidance-form').hidden=false;$('guidance-option-status').hidden=true;renderGuidanceStep(1);}
+  else ensureGuidanceOptions();
+};
+$('program-guidance-dialog').addEventListener('close',clearGuidanceProfile);
+$('program-guidance-form').addEventListener('submit',submitGuidance);
+$('guidance-next').onclick=()=>renderGuidanceStep(Math.min(3,guidanceStep+1));
+$('guidance-back').onclick=()=>renderGuidanceStep(Math.max(1,guidanceStep-1));
+$('guidance-adjust').onclick=()=>{$('guidance-results').hidden=true;$('program-guidance-form').hidden=false;renderGuidanceStep(1);};
+$('guidance-restart').onclick=()=>clearGuidanceProfile();
 $('compare-open').onclick=()=>{
   const box=$('compare-selects');box.replaceChildren();$('compare-error').textContent='';clearComparisonResult();
   for(let i=0;i<3;i++){const label=node('label','',`Chương trình ${i+1}${i===2?' (tùy chọn)':''}`);const select=node('select');select.id='compare-'+i;select.setAttribute('aria-label',`Chương trình ${i+1}${i===2?' tùy chọn':''}`);label.htmlFor=select.id;const empty=node('option','','Chọn chương trình');empty.value='';select.append(empty);programs.forEach(program=>{const option=node('option','',program.code+' · '+program.name);option.value=program.code;select.append(option);});if(i===0)select.value=$('program').value;select.addEventListener('change',()=>{clearComparisonFieldError(select);$('compare-error').textContent='';markComparisonStale();});box.append(label,select);}

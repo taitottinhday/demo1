@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh X · HUST 2026</title><link rel="stylesheet" href="/assets/style.css?v=20261008-6"><script src="/assets/app.js?v=20261008-4" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh X · HUST 2026</title><link rel="stylesheet" href="/assets/style.css?v=20261009-1"><script src="/assets/app.js?v=20261009-1" defer></script></head>
 <body class="applicant-page">
 <header class="topbar">
   <a class="brand" href="/" aria-label="Trợ lý tuyển sinh X, HUST 2026">
@@ -88,6 +88,10 @@
       </div>
     </div>
     <div class="sidebar-actions">
+      <button class="secondary guidance-open" id="recommend-open" type="button" aria-haspopup="dialog" aria-controls="program-guidance-dialog">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 14.2 9l5.8 2.2-5.8 2.1-2.2 5.8-2.1-5.8L4 11.2 9.9 9 12 3.5Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg>
+        <span>Khám phá ngành phù hợp</span><b aria-hidden="true">›</b>
+      </button>
       <button class="secondary" id="compare-open" type="button">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg>
         <span>So sánh chương trình</span><b aria-hidden="true">›</b>
@@ -154,7 +158,75 @@
     </div>
   </section>
 </main>
-<footer class="page-footer"><span>Trợ lý tuyển sinh HUST</span><span>Nguồn: tài liệu tuyển sinh HUST 2026</span></footer><dialog id="handover-dialog"><form id="handover-form"><div class="dialog-top"><span class="eyebrow">CÁN BỘ TUYỂN SINH</span><button type="button" class="close" data-close="handover-dialog" aria-label="Đóng">×</button></div><h2>Chuyển câu hỏi của bạn</h2><p>Kiểm tra preview trước khi gửi. Chỉ các nội dung dưới đây và ghi chú bổ sung mới được chuyển.</p><section class="handover-preview" aria-labelledby="handover-preview-title"><h3 id="handover-preview-title">Preview nội dung sẽ chuyển</h3><div><b>Câu hỏi</b><p id="handover-question-preview" class="preview-text"></p></div><div><b>Câu trả lời AI</b><p id="handover-answer-preview" class="preview-text"></p></div><div><b>Nguồn liên quan</b><div id="handover-sources-preview" class="preview-sources"></div></div></section><label for="summary">Ghi chú bổ sung (tùy chọn)</label><textarea id="summary" rows="3" maxlength="3000" placeholder="Ví dụ: Tôi muốn cán bộ kiểm tra lại điều kiện này."></textarea><p class="sensitive-warning" role="note">Không gửi CCCD, số điện thoại, mật khẩu hoặc dữ liệu nhạy cảm. Hệ thống sẽ ẩn một số thông tin nhận diện trước khi lưu.</p><label class="checkbox-label"><input type="checkbox" id="consent" required><span>Tôi đồng ý chia sẻ riêng nội dung preview và ghi chú này với cán bộ tuyển sinh.</span></label><p class="hint">Sau khi gửi, bạn nhận mã ticket, trạng thái và thời gian cập nhật gần nhất. Nếu đã đăng nhập, có thể mở lại ticket sau khi tải lại hoặc mất phiên. Chưa có thời gian phản hồi được cam kết.</p><div id="handover-error" class="error-text" role="alert"></div><button class="primary" type="submit" id="handover-send">Gửi yêu cầu →</button></form></dialog>
+<footer class="page-footer"><span>Trợ lý tuyển sinh HUST</span><span>Nguồn: tài liệu tuyển sinh HUST 2026</span></footer>
+<dialog id="program-guidance-dialog" class="program-guidance-dialog" aria-labelledby="program-guidance-title">
+  <div class="guidance-dialog-top">
+    <div>
+      <p class="eyebrow">KHÁM PHÁ CHƯƠNG TRÌNH</p>
+      <h2 id="program-guidance-title">Ngành nào hợp với bạn?</h2>
+    </div>
+    <button type="button" class="close" data-close="program-guidance-dialog" aria-label="Đóng và xóa nội dung đã nhập">×</button>
+  </div>
+  <p class="guidance-lead">Chia sẻ thế mạnh, điều bạn thích và hướng muốn tìm hiểu. Bạn có thể bỏ qua thông tin chưa muốn trả lời.</p>
+  <p class="guidance-privacy" role="note">Không cần nhập tên hay thông tin liên hệ. Câu trả lời chỉ dùng để tính gợi ý trong phiên, không lưu vào lịch sử chat hoặc ticket; nội dung sẽ được xóa khi bạn đóng hoặc làm lại.</p>
+  <p id="guidance-option-status" class="hint" role="status">Đang tải lĩnh vực từ danh mục chương trình…</p>
+  <p id="guidance-error" class="error-text" role="alert"></p>
+  <div class="guidance-content">
+    <form id="program-guidance-form" hidden>
+      <div class="guidance-form-scroll">
+        <div class="guidance-progress" role="progressbar" aria-label="Tiến độ gợi ý" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-valuetext="Bước 1 trong 3: Thế mạnh">
+          <span id="guidance-step-label">Bước 1/3</span>
+          <span class="guidance-progress-track"><span id="guidance-progress-fill"></span></span>
+          <span id="guidance-step-name">Thế mạnh</span>
+        </div>
+        <fieldset class="guidance-step" data-guidance-step="1">
+          <legend tabindex="-1">Bạn thấy mình có thế mạnh ở đâu?</legend>
+          <p class="guidance-help">Chọn tối đa 4 lĩnh vực. Không có đáp án đúng hoặc sai.</p>
+          <div id="guidance-strength-options" class="guidance-options"></div>
+          <label for="guidance-strengths-note">Môn học hoặc kỹ năng bạn tự tin (không bắt buộc)</label>
+          <textarea id="guidance-strengths-note" name="strengths_note" maxlength="400" rows="2" placeholder="Ví dụ: Toán, giải quyết vấn đề, làm thí nghiệm…"></textarea>
+        </fieldset>
+        <fieldset class="guidance-step" data-guidance-step="2" hidden>
+          <legend tabindex="-1">Bạn thích tìm hiểu hoặc muốn làm gì?</legend>
+          <p class="guidance-help">Chọn tối đa 4 lĩnh vực; có thể mô tả thêm sở thích hoặc hoạt động bạn yêu thích.</p>
+          <div id="guidance-interest-options" class="guidance-options"></div>
+          <label for="guidance-interests-note">Sở thích hoặc hoạt động yêu thích (không bắt buộc)</label>
+          <textarea id="guidance-interests-note" name="interests_note" maxlength="400" rows="2" placeholder="Ví dụ: lập trình, chế tạo robot, phân tích dữ liệu…"></textarea>
+          <label for="guidance-career-direction">Hướng bạn muốn tìm hiểu (không bắt buộc)</label>
+          <input id="guidance-career-direction" name="career_direction" maxlength="240" placeholder="Ví dụ: nghiên cứu, thiết kế sản phẩm, làm việc với dữ liệu…">
+        </fieldset>
+        <fieldset class="guidance-step" data-guidance-step="3" hidden>
+          <legend tabindex="-1">Bạn muốn bồi dưỡng thêm điều gì?</legend>
+          <p class="guidance-help">Thông tin này chỉ giúp nêu lưu ý; không bị dùng để trừ điểm hoặc loại ngành.</p>
+          <div id="guidance-improvement-options" class="guidance-options"></div>
+          <label for="guidance-improvements-note">Kỹ năng hoặc môn học muốn cải thiện (không bắt buộc)</label>
+          <textarea id="guidance-improvements-note" name="improvements_note" maxlength="300" rows="2" placeholder="Ví dụ: ngoại ngữ, giao tiếp, tư duy logic…"></textarea>
+          <label for="guidance-priorities">Điều bạn ưu tiên khi chọn ngành (không bắt buộc)</label>
+          <input id="guidance-priorities" name="priorities" maxlength="240" placeholder="Ví dụ: thích thực hành, muốn học gần nhà…">
+        </fieldset>
+      </div>
+      <div class="guidance-form-actions">
+        <button id="guidance-back" class="secondary" type="button">Quay lại</button>
+        <button id="guidance-next" class="primary" type="button">Tiếp tục</button>
+        <button id="guidance-submit" class="primary" type="submit" hidden>Xem gợi ý</button>
+      </div>
+    </form>
+    <section id="guidance-results" class="guidance-results" aria-live="polite" hidden>
+      <div class="guidance-result-heading">
+        <span class="eyebrow">KẾT QUẢ THAM KHẢO</span>
+        <h3>Các chương trình có điểm giao</h3>
+      </div>
+      <p id="guidance-result-message"></p>
+      <div id="guidance-result-list" class="guidance-result-list"></div>
+      <p id="guidance-result-notice" class="guidance-result-notice"></p>
+      <div class="guidance-result-actions">
+        <button id="guidance-adjust" class="secondary" type="button">Điều chỉnh câu trả lời</button>
+        <button id="guidance-restart" class="secondary" type="button">Làm lại</button>
+      </div>
+    </section>
+  </div>
+</dialog>
+<dialog id="handover-dialog"><form id="handover-form"><div class="dialog-top"><span class="eyebrow">CÁN BỘ TUYỂN SINH</span><button type="button" class="close" data-close="handover-dialog" aria-label="Đóng">×</button></div><h2>Chuyển câu hỏi của bạn</h2><p>Kiểm tra preview trước khi gửi. Chỉ các nội dung dưới đây và ghi chú bổ sung mới được chuyển.</p><section class="handover-preview" aria-labelledby="handover-preview-title"><h3 id="handover-preview-title">Preview nội dung sẽ chuyển</h3><div><b>Câu hỏi</b><p id="handover-question-preview" class="preview-text"></p></div><div><b>Câu trả lời AI</b><p id="handover-answer-preview" class="preview-text"></p></div><div><b>Nguồn liên quan</b><div id="handover-sources-preview" class="preview-sources"></div></div></section><label for="summary">Ghi chú bổ sung (tùy chọn)</label><textarea id="summary" rows="3" maxlength="3000" placeholder="Ví dụ: Tôi muốn cán bộ kiểm tra lại điều kiện này."></textarea><p class="sensitive-warning" role="note">Không gửi CCCD, số điện thoại, mật khẩu hoặc dữ liệu nhạy cảm. Hệ thống sẽ ẩn một số thông tin nhận diện trước khi lưu.</p><label class="checkbox-label"><input type="checkbox" id="consent" required><span>Tôi đồng ý chia sẻ riêng nội dung preview và ghi chú này với cán bộ tuyển sinh.</span></label><p class="hint">Sau khi gửi, bạn nhận mã ticket, trạng thái và thời gian cập nhật gần nhất. Nếu đã đăng nhập, có thể mở lại ticket sau khi tải lại hoặc mất phiên. Chưa có thời gian phản hồi được cam kết.</p><div id="handover-error" class="error-text" role="alert"></div><button class="primary" type="submit" id="handover-send">Gửi yêu cầu →</button></form></dialog>
 <dialog id="track-dialog"><div class="dialog-top"><span class="eyebrow">THEO DÕI HỖ TRỢ</span><button class="close" data-close="track-dialog" aria-label="Đóng">×</button></div><h2>Yêu cầu của tôi</h2><p>Phản hồi của cán bộ sẽ xuất hiện tại đây. Mã yêu cầu không phải khóa truy cập.</p><p id="ticket-success" class="success-text" role="status" hidden></p><p id="ticket-notice" class="notice-text" role="status" hidden></p><button class="secondary" id="refresh-tickets">Làm mới</button><div id="tickets" aria-live="polite"></div></dialog>
 <dialog id="guide-dialog"><div class="dialog-top"><span class="eyebrow">HƯỚNG DẪN ĐĂNG KÝ</span><button class="close" data-close="guide-dialog" aria-label="Đóng">×</button></div><h2>Checklist đăng ký ĐGTD</h2><div id="guide-content"><div class="guide-summary"><div><strong id="guide-progress">0/0 bước</strong><span class="hint"> Tiến độ checklist hướng dẫn</span></div><button class="secondary guide-reset" id="guide-reset" type="button">Đặt lại checklist</button></div><p id="guide-note" class="guide-note"></p><p id="guide-meta" class="guide-meta"></p><p id="guide-storage-note" class="guide-storage-note" role="status"></p><p id="guide-session-notice" class="notice-text" role="status" hidden></p><div id="guide-steps"></div></div><p class="hint">Checklist chỉ giúp tự theo dõi các bước tham khảo, không phải xác nhận hồ sơ hợp lệ, đã nộp hoặc đã hoàn thành.</p></dialog>
 <dialog id="compare-dialog" class="compare-dialog"><div class="dialog-top"><span class="eyebrow">CHỌN CHƯƠNG TRÌNH</span><button class="close" data-close="compare-dialog" aria-label="Đóng">×</button></div><h2>So sánh chương trình</h2><p>Chọn 2–3 chương trình. Thông tin theo tài liệu tuyển sinh 2026, không phải dự đoán trúng tuyển.</p><form id="compare-form"><div id="compare-selects" class="compare-selects"></div><div class="compare-form-actions"><button class="secondary" id="compare-reset" type="button">Đặt lại lựa chọn</button><button class="primary" id="compare-submit" type="submit">So sánh →</button></div></form><p id="compare-error" class="error-text" role="alert"></p><p id="compare-stale" class="compare-stale" role="status" hidden>Đã thay đổi lựa chọn — kết quả cũ không còn cập nhật. Hãy bấm “So sánh” lại.</p><div id="comparison-result"></div></dialog></body></html>

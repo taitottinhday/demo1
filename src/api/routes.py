@@ -12,10 +12,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 
+from src.models.schemas import ProgramGuidanceInput, ProgramGuidanceResponse
 from src.services.accounts import authenticate
 from src.services.admissions import redact
 from src.services.email import EmailDeliveryError
 from src.services.product_features import compare_programs
+from src.services.program_guidance import recommend_programs, recommendation_options
 from src.services.store import digest
 
 router = APIRouter()
@@ -315,6 +317,11 @@ def comparison(body: ComparisonInput, request: Request):
     return {"programs": compare_programs(knowledge, codes), "year": 2026}
 
 
+@router.get("/programs/recommend/options")
+def program_guidance_options(request: Request):
+    return recommendation_options(runtime(request)["knowledge"])
+
+
 def runtime(request: Request):
     return request.app.state.runtime
 
@@ -334,6 +341,18 @@ def candidate(request: Request, response: Response):
         max_age=rt["settings"].session_hours * 3600,
     )
     return row
+
+
+@router.post("/programs/recommend", response_model=ProgramGuidanceResponse)
+def program_guidance(body: ProgramGuidanceInput, request: Request, row=Depends(candidate)):
+    rt = runtime(request)
+    if not rt["store"].allowed("program-guidance:" + row["id"], count=8, window=3600):
+        raise HTTPException(429, "Bạn đã dùng nhiều lượt gợi ý. Vui lòng thử lại sau.")
+    result = recommend_programs(rt["knowledge"], body)
+    allowed_codes = {program["code"] for program in rt["knowledge"].programs}
+    if any(item["code"] not in allowed_codes for item in result["suggestions"]):
+        raise HTTPException(500, "Không thể xác minh chương trình trong kết quả gợi ý.")
+    return result
 
 
 def public_student(student):
