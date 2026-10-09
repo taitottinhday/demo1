@@ -85,8 +85,10 @@ Kịch bản demo admin, khoảng 2 phút:
 Trên Railway, chạy seed sau khi đã gắn Volume `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`:
 
 ```sh
-DEMO_SEED_ENABLED=true python scripts/seed_admin_demo.py
+DEMO_SEED_ENABLED=true DEMO_SEED_FAST=true python scripts/seed_admin_demo.py
 ```
+
+`DEMO_SEED_FAST=true` chỉ dùng cho dữ liệu kiểm thử, không gọi pipeline trả lời; các ticket được gắn câu trả lời demo rõ ràng và không phải nội dung tuyển sinh chính thức.
 
 Giới hạn hiện tại:
 

@@ -156,6 +156,16 @@ def event(db, ticket, action, created, actor=None, from_owner=None, to_owner=Non
 
 def demo_answers(data_dir, store, cfg):
     """Ask the real extractive pipeline each question so answers and sources match the product."""
+    if os.getenv("DEMO_SEED_FAST", "").lower() == "true":
+        return [
+            {
+                "response": "Dữ liệu kiểm thử: câu hỏi đã được chuyển tới hàng chờ cán bộ.",
+                "kind": "demo",
+                "sources": [],
+                "mode": "demo",
+            }
+            for _ in TICKETS
+        ]
     fallback = {"response": "Nguồn tuyển sinh chưa sẵn sàng.", "kind": "error", "sources": [], "mode": "extractive"}
     knowledge = Knowledge(data_dir)
     try:
