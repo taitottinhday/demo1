@@ -770,6 +770,7 @@ body.staff-page,body.admin-page{
 .staff-page .badge.rejected,.admin-page .badge.rejected{background:#fbeaec;color:#a50f25}
 .staff-page .badge.cancelled,.admin-page .badge.cancelled{background:#eff1f4;color:#59677a}
 .staff-page :focus-visible,.admin-page :focus-visible{outline:3px solid #c47a86;outline-offset:2px}
+.staff-page .search-field input:focus-visible{outline:0;box-shadow:none}
 
 .admin-page .admin-main{max-width:1540px}
 .admin-page .admin-tabs{flex:0 0 auto;gap:4px;margin:0 0 9px;border-bottom:1px solid var(--line)}
