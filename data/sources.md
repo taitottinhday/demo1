@@ -47,11 +47,6 @@ Kỳ áp dụng: 2026
 Tên tài liệu: Học bổng năm 2026
 URL chính thức: https://ctsv.hust.edu.vn/so-tay-sv/61/hoc-bong
 Kỳ áp dụng: 2026
-Ghi chú: Dữ liệu có trên web
-
-Tên tài liệu: Học bổng năm 2026
-URL chính thức: https://ctsv.hust.edu.vn/so-tay-sv/61/hoc-bong
-Kỳ áp dụng: 2026
 Ghi chú: Dữ liệu có trên web, chi tiết quy định từng học bổng ở link trong web.
 
 
