@@ -18,6 +18,12 @@ const EVENT_NAMES = {
   reassigned: 'Đã phân công lại',
 };
 
+const ACTION_STATUS_FILTERS = {
+  claim: 'in_progress',
+  resolve: 'resolved',
+  reject: 'rejected',
+};
+
 const state = {
   tickets: [],
   selectedId: '',
@@ -424,6 +430,8 @@ async function performAction(ticketId, button, action, reply = '', errorNode = n
   try {
     const body = action === 'claim' ? undefined : JSON.stringify({ reply: reply.trim() });
     await api(`/staff/tickets/${encodeURIComponent(ticketId)}/${action}`, { method: 'POST', body });
+    const nextStatus = ACTION_STATUS_FILTERS[action];
+    if (nextStatus) $('status-filter').value = nextStatus;
     await refreshDashboard(false);
     await selectTicket(ticketId);
   } catch (error) {

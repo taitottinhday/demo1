@@ -912,12 +912,15 @@ body.staff-page,body.admin-page{
 }
 
 /* Staff and admin dashboards follow the compact portal layout from the latest design. */
+.staff-page .staff-main{padding:24px 42px 26px}
+.admin-page .staff-main{padding:24px 42px 26px}
 .staff-page .staff-context{background:transparent}
 .staff-page .staff-context-nav a.active{box-shadow:inset 3px 0 0 #b5122a;font-weight:650}
 .staff-page .queue-layout{grid-template-columns:minmax(360px,.9fr) minmax(0,1.1fr)}
 .staff-page .ticket-detail{background:#fff}
-.staff-page .staff-dashboard-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;flex:1 1 auto;min-height:0}
+.staff-page .staff-dashboard-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;flex:1 1 auto;min-height:0}
 .staff-page .staff-context,.admin-page .admin-sidebar{display:flex;flex-direction:column;gap:25px;min-width:0;min-height:0;padding:10px 20px 12px 0;border-right:1px solid var(--line);background:#fff}
+.staff-page .staff-context{padding:18px 24px 16px 12px}
 .staff-page .staff-context h2,.admin-page .admin-sidebar-intro h2{margin:0;color:var(--ink);font-size:22px;line-height:1.2;letter-spacing:-.4px}
 .staff-page .staff-context-copy,.admin-page .admin-sidebar-intro>p:last-child{margin:9px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
 .staff-page .staff-context-nav{display:flex;flex-direction:column;gap:5px}
@@ -925,8 +928,9 @@ body.staff-page,body.admin-page{
 .staff-page .staff-context-nav a:hover,.staff-page .staff-context-nav a.active{border-color:#f0dadd;background:#fff5f6;color:#a80e25}
 .staff-page .staff-dashboard-content{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
 .staff-page .staff-dashboard-content .dashboard-heading{padding:0}
-.admin-page .admin-workspace{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;flex:1 1 auto;min-height:0}
-.admin-page .admin-sidebar{padding-top:10px}
+.admin-page .admin-workspace{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;flex:1 1 auto;min-height:0}
+.admin-page .admin-sidebar{padding:18px 24px 16px 12px}
+.admin-page .admin-sidebar{padding-top:18px}
 .admin-page .admin-sidebar-intro .section-label{margin:0 0 8px;color:#a80e25;font-size:9px;letter-spacing:1px}
 .admin-page .admin-tabs{display:flex;flex-direction:column;align-items:stretch;gap:5px;margin:0;padding:0;border:0}
 .admin-page .admin-tabs button{display:flex;align-items:center;justify-content:flex-start;min-height:42px;padding:0 12px;border:1px solid transparent;border-radius:8px;color:#43516a;font-size:12px;text-align:left}

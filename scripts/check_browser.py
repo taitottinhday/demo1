@@ -160,6 +160,12 @@ def run(base_url, browser_path):
         expect(staff.locator("#dashboard")).to_be_visible()
         staff.fill("#queue-search", ticket.lower())
         expect(staff.locator(".queue-item")).to_have_count(1)
+        # Claiming from the default waiting filter must switch to the new
+        # status so the ticket remains selected and the reply form is shown.
+        staff.locator(".queue-item").filter(has_text=ticket).click()
+        staff.get_by_role("button", name="Nhận xử lý ticket →").click()
+        expect(staff.locator("#status-filter")).to_have_value("in_progress")
+        expect(staff.locator("#staff-reply")).to_be_visible()
         staff.fill("#queue-search", "__khong-co-ticket__")
         expect(staff.locator(".queue-empty strong")).to_have_text("Không tìm thấy ticket")
         expect(staff.locator("#clear-search")).to_be_visible()
@@ -171,7 +177,6 @@ def run(base_url, browser_path):
         expect(staff.locator(".queue-item")).to_have_count(1)
         staff.select_option("#queue-sort", "oldest")
         staff.locator(".queue-item").filter(has_text=ticket).click()
-        staff.get_by_role("button", name="Nhận xử lý ticket →").click()
         expect(staff.locator("#staff-reply")).to_be_visible()
         draft = "Bản nháp demo: Cán bộ sẽ kiểm tra hồ sơ theo quy định."
         staff.fill("#staff-reply", draft)
