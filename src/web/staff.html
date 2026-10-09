@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Cán bộ tuyển sinh · Trợ lý X</title>
-  <link rel="stylesheet" href="/assets/style.css?v=20261008-2">
-  <script src="/assets/staff.js?v=20261008-2" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261008-7">
+  <script src="/assets/staff.js?v=20261008-3" defer></script>
 </head>
 <body class="staff-page">
   <header class="topbar">
-    <a class="brand" href="/">
-      <span class="mark">X<span aria-hidden="true">✦</span></span>
-      <span>Trợ lý tuyển sinh <b>X</b><small>KHÔNG GIAN CÁN BỘ</small></span>
+    <a class="brand" href="/" aria-label="Trợ lý tuyển sinh X, HUST 2026">
+      <span class="mark" aria-hidden="true">X</span>
+      <span class="brand-copy"><span>Trợ lý tuyển sinh X</span><small>HUST · 2026</small></span>
     </a>
     <nav class="staff-nav" aria-label="Điều hướng cán bộ">
       <span id="staff-identity" class="staff-identity" hidden></span>
-      <a class="staff-link" href="/">← Về trang ứng viên</a>
-      <a class="staff-link" href="/admin">Trang quản trị ↗</a>
+      <a class="staff-link" href="/">Về trang ứng viên</a>
+      <a class="staff-link staff-login-link" href="/admin">Đăng nhập admin</a>
       <button class="nav-link" id="logout" type="button" hidden>Đăng xuất</button>
     </nav>
   </header>
@@ -48,6 +48,19 @@
     </section>
 
     <section id="dashboard" hidden aria-labelledby="dashboard-title">
+      <div class="staff-dashboard-layout">
+        <aside class="staff-context" aria-label="Điều hướng khu vực cán bộ">
+          <div>
+            <p class="login-kicker">CỔNG CÁN BỘ</p>
+            <h2>Hàng chờ hỗ trợ</h2>
+            <p class="staff-context-copy">Tiếp nhận và phản hồi các yêu cầu được chuyển đến cán bộ.</p>
+          </div>
+          <nav class="staff-context-nav" aria-label="Điều hướng cán bộ">
+            <a class="active" href="/staff" aria-current="page">Hàng chờ</a>
+            <a href="/">Về trang ứng viên</a>
+          </nav>
+        </aside>
+        <div class="staff-dashboard-content">
       <div class="dashboard-heading">
         <div>
           <div class="eyebrow">TRUNG TÂM XỬ LÝ TICKET</div>
@@ -106,6 +119,8 @@
             <p>Chọn yêu cầu ở hàng chờ để xem nội dung được đồng ý chia sẻ và bắt đầu xử lý.</p>
           </div>
         </section>
+      </div>
+        </div>
       </div>
     </section>
   </main>

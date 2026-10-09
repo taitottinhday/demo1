@@ -306,6 +306,13 @@ function renderQueue() {
   });
 }
 
+function renderQueueAndSelectFirst() {
+  renderQueue();
+  if (state.selectedId || hasStaffDraft()) return;
+  const first = filteredTickets()[0];
+  if (first) void selectTicket(first.id);
+}
+
 function renderDetailLoading() {
   const detail = $('detail');
   detail.replaceChildren();
@@ -511,7 +518,9 @@ async function refreshDashboard(keepDetail = true, silent = false) {
     if (keepDetail && state.selectedId && !(silent && hasStaffDraft())) {
       await selectTicket(state.selectedId, silent);
     } else if (!state.selectedId) {
-      renderEmptyDetail({ query: normalizeSearch($('queue-search').value), status: $('status-filter').value });
+      const first = filteredTickets()[0];
+      if (first) await selectTicket(first.id, silent);
+      else renderEmptyDetail({ query: normalizeSearch($('queue-search').value), status: $('status-filter').value });
     }
   } catch (error) {
     renderGlobalError(error.message);
@@ -581,9 +590,9 @@ $('toggle-password').addEventListener('click', () => {
 });
 
 $('refresh').addEventListener('click', () => refreshDashboard(true));
-$('status-filter').addEventListener('change', renderQueue);
-$('queue-sort').addEventListener('change', renderQueue);
-$('queue-search').addEventListener('input', renderQueue);
+$('status-filter').addEventListener('change', renderQueueAndSelectFirst);
+$('queue-sort').addEventListener('change', renderQueueAndSelectFirst);
+$('queue-search').addEventListener('input', renderQueueAndSelectFirst);
 
 const loginError = new URLSearchParams(window.location.search).get('login_error');
 if (loginError) $('login-error').textContent = decodeURIComponent(loginError.replaceAll('+', ' '));

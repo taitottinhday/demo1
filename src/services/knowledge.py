@@ -211,7 +211,11 @@ class Knowledge:
                 normalize(program["name"].replace("CNTT: ", "")),
                 normalize(program["name"].replace("CNTT: ", "").split("(")[0]).strip(),
             }
-            if any(len(name) >= 5 and name in q for name in names) and program["code"] not in matched_codes:
+            if any(
+                len(name) >= 5
+                and re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", q)
+                for name in names
+            ) and program["code"] not in matched_codes:
                 matches.append(program)
                 matched_codes.add(program["code"])
         return matches

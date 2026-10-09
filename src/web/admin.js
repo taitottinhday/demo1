@@ -2,13 +2,22 @@ const $=id=>document.getElementById(id);
 const names={waiting:'Đang chờ',in_progress:'Đang xử lý',resolved:'Đã giải quyết',rejected:'Đã từ chối',cancelled:'Đã hủy'};
 const reasons={user_request:'Ứng viên yêu cầu',low_confidence:'AI không chắc chắn',sensitive:'Câu hỏi nhạy cảm'};
 const actions={created:'Tạo ticket',claimed:'Nhận xử lý',reply:'Gửi phản hồi',resolved:'Giải quyết',rejected:'Từ chối',reassigned:'Phân công lại',cancelled:'Ứng viên hủy'};
-let officers=[], page=1, total=0, selected=null, pollingTimer=null, refreshInFlight=false;
+let officers=[], page=1, total=0, selected=null, pollingTimer=null, refreshInFlight=false, ticketListRequestId=0, ticketDetailRequestId=0;
 const PAGE_SIZE=15;
 const POLL_INTERVAL_MS=5000;
 document.body.classList.add('admin-page');
 function node(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined&&text!==null)n.textContent=text;return n;}
 function when(ts){return ts?new Date(ts*1000).toLocaleString('vi-VN'):'—';}
-function duration(sec){if(sec===null||sec===undefined)return '—';if(sec<3600)return Math.round(sec/60)+' phút';if(sec<86400)return (sec/3600).toFixed(1)+' giờ';return (sec/86400).toFixed(1)+' ngày';}
+function duration(sec){
+  if(sec===null||sec===undefined)return '—';
+  const value=Number(sec);
+  if(!Number.isFinite(value)||value<0)return '—';
+  if(value===0)return '0 phút';
+  if(value<60)return Math.max(1,Math.round(value))+' giây';
+  if(value<3600)return Math.max(1,Math.min(59,Math.round(value/60)))+' phút';
+  if(value<86400)return (value/3600).toFixed(1)+' giờ';
+  return (value/86400).toFixed(1)+' ngày';
+}
 function percent(v){return v===null||v===undefined?'—':Math.round(v*1000)/10+'%';}
 function kpiValue(k){
   if(k.status==='Chưa đủ dữ liệu'||k.value===null||k.value===undefined)return 'Chưa đủ dữ liệu';
@@ -91,14 +100,38 @@ async function loadOverview(){
 }
 
 // Tickets ------------------------------------------------------------------
+function ticketFilterSummary(){
+  const parts=[];
+  const status=$('status-filter').value;
+  const officer=$('officer-filter').value;
+  if(status)parts.push($('status-filter').selectedOptions[0]?.textContent||status);
+  if(officer)parts.push($('officer-filter').selectedOptions[0]?.textContent||'cán bộ đã chọn');
+  return parts.join(' · ')||'tất cả ticket';
+}
+function renderTicketEmpty(hasResults){
+  const box=$('detail');box.replaceChildren();
+  const empty=node('div','empty-detail');empty.append(node('span','empty-detail-icon','⌁'));
+  if(hasResults){
+    empty.append(node('h2','', 'Chưa có ticket được chọn'),node('p','', 'Hãy chọn một ticket trong danh sách để xem nội dung, hội thoại và lịch sử xử lý.'));
+  }else{
+    empty.append(node('h2','', 'Không có ticket phù hợp'),node('p','', `Bộ lọc hiện tại: ${ticketFilterSummary()}. Hãy đổi trạng thái hoặc cán bộ để tìm ticket khác.`));
+  }
+  box.append(empty);
+}
 async function loadTickets(){
   const params=new URLSearchParams({page,page_size:PAGE_SIZE});
   if($('status-filter').value)params.set('status',$('status-filter').value);
   if($('officer-filter').value)params.set('officer_id',$('officer-filter').value);
-  const data=await api('/admin/tickets?'+params);total=data.total;
+  const requestId=++ticketListRequestId;
+  let data;
+  try{data=await api('/admin/tickets?'+params);}catch(error){if(requestId!==ticketListRequestId)return false;throw error;}
+  if(requestId!==ticketListRequestId)return false;
+  total=data.total;
   const table=document.querySelector('#ticket-rows')?.closest('table');
   if(table){table.classList.add('admin-ticket-table');if(!table.querySelector('caption'))table.prepend(node('caption','', 'Danh sách ticket hỗ trợ'));}
   $('ticket-rows').replaceChildren();
+  const selectedVisible=selected&&data.items.some(t=>t.id===selected);
+  if(selected&&!selectedVisible){selected=null;ticketDetailRequestId++;}
   if(!data.items.length){const tr=node('tr');const td=node('td','empty-state','Không có ticket phù hợp.');td.colSpan=5;tr.append(td);$('ticket-rows').append(tr);}
   data.items.forEach(t=>{const tr=node('tr','clickable'+(selected===t.id?' selected':''));tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label',`Mở chi tiết ticket ${t.id}`);const badge=node('td');badge.dataset.label='Trạng thái';badge.append(node('span','badge '+t.status,names[t.status]));
     const idCell=node('td','nowrap',t.id);idCell.dataset.label='Mã ticket';
@@ -107,12 +140,17 @@ async function loadTickets(){
     const createdCell=node('td','nowrap',when(t.created));createdCell.dataset.label='Tạo lúc';
     tr.append(idCell,summaryCell,badge,officerCell,createdCell);
     tr.onclick=()=>openTicket(t.id);tr.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openTicket(t.id);}};$('ticket-rows').append(tr);});
+  if(!data.items.length)renderTicketEmpty(false);else if(!selected)renderTicketEmpty(true);
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   $('page-info').textContent=`Trang ${page}/${pages} · ${total} ticket`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
 }
 async function openTicket(id){
-  selected=id;document.querySelector('[data-tab="tickets"]').click();
-  try{const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);renderDetail(t,history);await loadTickets();}catch(e){fail(e);}
+  selected=id;const requestId=++ticketDetailRequestId;document.querySelector('[data-tab="tickets"]').click();
+  try{
+    const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);
+    if(requestId!==ticketDetailRequestId||selected!==id)return;
+    renderDetail(t,history);await loadTickets();
+  }catch(e){if(requestId===ticketDetailRequestId&&selected===id)fail(e);}
 }
 function renderDetail(t,history){
   const box=$('detail');box.replaceChildren();
@@ -234,7 +272,12 @@ async function refresh(options={}){
     markLiveUpdated();
   }catch(e){fail(e);}finally{refreshInFlight=false;}
 }
-async function openTicketSilently(id){const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);renderDetail(t,history);}
+async function openTicketSilently(id){
+  const requestId=++ticketDetailRequestId;
+  const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);
+  if(requestId!==ticketDetailRequestId||selected!==id)return;
+  renderDetail(t,history);
+}
 $('range-form').addEventListener('submit',e=>{e.preventDefault();persistFilters();loadOverview().catch(fail);});
 $('status-filter').onchange=$('officer-filter').onchange=()=>{persistFilters();page=1;loadTickets().catch(fail);};
 $('prev').onclick=()=>{page--;loadTickets().catch(fail);};$('next').onclick=()=>{page++;loadTickets().catch(fail);};

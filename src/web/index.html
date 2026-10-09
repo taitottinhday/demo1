@@ -1,24 +1,160 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh X · HUST 2026</title><link rel="stylesheet" href="/assets/style.css"><script src="/assets/app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh X · HUST 2026</title><link rel="stylesheet" href="/assets/style.css?v=20261008-6"><script src="/assets/app.js?v=20261008-4" defer></script></head>
 <body class="applicant-page">
-<header class="topbar"><a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>HUST · ĐẠI HỌC CHÍNH QUY 2026</small></span></a><nav aria-label="Điều hướng"><button class="nav-link" id="track-open">Yêu cầu của tôi <span id="ticket-count" class="count">0</span><span id="reply-unread" class="unread" hidden></span></button><a class="staff-link" href="/staff">Dành cho cán bộ ↗</a><a class="staff-link" href="/admin">Trang quản trị ↗</a></nav></header>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Trợ lý tuyển sinh X, HUST 2026">
+    <span class="mark" aria-hidden="true">X</span>
+    <span class="brand-copy"><span>Trợ lý tuyển sinh X</span><small>HUST · 2026</small></span>
+  </a>
+  <nav aria-label="Điều hướng">
+    <a class="header-link" id="documents-link" href="/api/v1/source/pdf" target="_blank" rel="noopener">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+      <span>Tài liệu</span>
+    </a>
+    <button class="nav-link" id="track-open" type="button">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.25h14a1.25 1.25 0 0 1 1.25 1.25v9.25A1.25 1.25 0 0 1 19 17H9l-4.25 3v-14A.75.75 0 0 1 5.5 5.25Z"/><path d="M8.5 9h7M8.5 12.5h5"/></svg>
+      <span>Yêu cầu của tôi</span>
+      <span id="ticket-count" class="count">0</span><span id="reply-unread" class="unread" hidden></span>
+    </button>
+    <a class="staff-link staff-login-link" href="/staff" aria-label="Đăng nhập khu vực cán bộ" title="Đăng nhập khu vực cán bộ">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-3.1 2.5-4.7 5.5-4.7 1.3 0 2.4.3 3.3.9M16.5 11.5v7m-3.5-3.5h7"/></svg>
+      <span>Đăng nhập cán bộ</span>
+    </a>
+    <a class="staff-link staff-login-link" href="/admin" aria-label="Đăng nhập khu vực quản trị" title="Đăng nhập khu vực quản trị">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.1c0 4.4-2.8 7.7-7 9.4-4.2-1.7-7-5-7-9.4V6l7-2.5Z"/><path d="m9 11.8 2 2 4-4.2"/></svg>
+      <span>Đăng nhập admin</span>
+    </a>
+  </nav>
+</header>
 <main class="workspace">
-<aside class="sidebar" id="program-tools" aria-label="Chương trình và công cụ tra cứu">
-<div class="sidebar-mobile-head"><span class="eyebrow">CÔNG CỤ TRA CỨU</span><button id="program-tools-close" class="close" type="button" aria-label="Đóng công cụ tra cứu">×</button></div>
-<div class="eyebrow">THÔNG TIN TUYỂN SINH</div><h1>Đại học Bách khoa<br><span>Hà Nội · 2026</span></h1><p class="intro">Tra cứu ngành, điều kiện xét tuyển, học phí và quy trình đăng ký.</p>
-<div class="context-card"><label for="program-search">Tìm chương trình theo mã hoặc tên</label><input id="program-search" type="search" list="program-options" autocomplete="off" placeholder="Ví dụ: IT1 hoặc Khoa học máy tính" aria-describedby="program-search-status"><datalist id="program-options"></datalist><p id="program-search-status" class="hint" role="status"></p><label for="program">Chương trình bạn quan tâm</label><select id="program"><option value="">Chưa chọn chương trình</option></select><div id="program-scope" class="scope-chip" hidden><span id="program-scope-label"></span><button id="program-clear" type="button">Xóa phạm vi</button></div><p class="hint">Tùy chọn · dùng để hiểu câu hỏi tiếp theo trong phiên.</p><p id="scope-status" class="hint" role="status">Phạm vi trả lời: toàn trường HUST 2026.</p></div>
-<div class="section-label">TRA CỨU NHANH</div><div class="topics"><button data-question="HUST 2026 có các phương thức tuyển sinh nào?" data-program-question="Phương thức xét tuyển {code} là gì?"><span>01</span>Phương thức xét tuyển ↗</button><button data-question="Học phí HUST 2026 là bao nhiêu?" data-program-question="Học phí {code} là bao nhiêu?"><span>02</span>Học phí & lệ phí ↗</button><button data-question="Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?" data-program-question="Điều kiện ngoại ngữ {code} là gì?"><span>03</span>Điều kiện ngoại ngữ ↗</button><button data-question="Đăng ký xét tuyển đánh giá tư duy như thế nào?"><span>04</span>Quy trình đăng ký ↗</button></div>
-<div class="sidebar-actions"><button class="secondary" id="compare-open" type="button">So sánh chương trình ↗</button><button class="secondary" id="guide-open" type="button">Checklist đăng ký ĐGTD ↗</button></div><div class="source-note"><span class="source-icon" aria-hidden="true">▤</span><div><b>Tài liệu tuyển sinh 2026</b><p id="source-status" role="status" aria-live="polite">Đang kiểm tra tài liệu…</p><a id="source-local" href="/api/v1/source/pdf" target="_blank" rel="noopener" download>Mở hoặc tải PDF ↗</a><br><a id="source-official" href="#" target="_blank" rel="noopener" hidden>Nguồn chính thức dự phòng ↗</a></div></div><p class="privacy">Không cần tài khoản ứng viên. Đừng gửi CCCD, số điện thoại hoặc hồ sơ cá nhân trong chat.</p>
-</aside>
-<section class="chat-shell" aria-label="Hội thoại tuyển sinh">
-<div class="chat-header"><div class="assistant-avatar" aria-hidden="true">✦</div><div><h2>Hỏi đáp cùng trợ lý X</h2><p><span class="dot" aria-hidden="true"></span>Thông tin HUST 2026 · có trích nguồn</p></div><button class="mobile-sidebar-toggle" id="program-tools-open" type="button" aria-controls="program-tools" aria-expanded="false">Chọn chương trình &amp; công cụ</button><button class="icon-button" id="clear" type="button" title="Xóa lịch sử và ngữ cảnh">Xóa chat</button></div>
-<div class="chat-scroll" id="messages" role="log" aria-live="polite" aria-relevant="additions"><div class="welcome" id="welcome"><span class="welcome-symbol">✦</span><div class="eyebrow">TRỢ LÝ TUYỂN SINH</div><h2>Bạn cần thông tin gì?</h2><p>Đặt câu hỏi hoặc chọn một chủ đề bên dưới. Câu trả lời kèm trang nguồn để bạn kiểm tra.</p><div class="welcome-tags"><button data-question="IT1 có chỉ tiêu và tổ hợp xét tuyển nào?">Ngành IT1 & tổ hợp ↗</button><button data-question="Lệ phí thi đánh giá tư duy là bao nhiêu?">Lệ phí ĐGTD ↗</button><button data-question="Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?" data-program-question="Điều kiện ngoại ngữ {code} là gì?">Điều kiện IELTS ↗</button></div></div></div>
-<div class="composer-area"><div id="follow-up" class="follow-up" aria-label="Gợi ý câu hỏi tiếp theo"></div><p id="question-status" class="hint question-status" role="status" aria-live="polite"></p><div id="chat-error" role="alert" class="error-text"></div><form id="chat-form"><label class="sr-only" for="question">Câu hỏi tuyển sinh</label><textarea id="question" maxlength="2000" rows="2" placeholder="Ví dụ: IT1 có chỉ tiêu và tổ hợp xét tuyển nào?"></textarea><button type="submit" id="send" aria-label="Gửi câu hỏi">↑</button></form><div class="composer-footer"><span id="char-count">0 / 2000</span><button id="handover-open" type="button">Chuyển cán bộ tuyển sinh ↗</button></div><p class="disclaimer">Trợ lý không quyết định trúng tuyển. Nguồn do nhóm cung cấp, chưa được cán bộ tuyển sinh duyệt. <span id="mode-label"></span></p></div>
-</section>
+  <aside class="sidebar" id="program-tools" aria-label="Tra cứu tuyển sinh">
+    <div class="sidebar-mobile-head">
+      <span class="eyebrow">TRA CỨU TUYỂN SINH</span>
+      <button id="program-tools-close" class="close" type="button" aria-label="Đóng công cụ tra cứu">×</button>
+    </div>
+    <h1>Tra cứu tuyển sinh</h1>
+    <p class="intro">Chọn chương trình để nhận câu trả lời chính xác và phù hợp hơn.</p>
+
+    <div class="context-card">
+      <label for="program-search">Chương trình đào tạo</label>
+      <div class="program-search-control">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg>
+        <input id="program-search" type="search" list="program-options" autocomplete="off" placeholder="IT1 · Khoa học Máy tính" aria-describedby="program-count program-search-status">
+        <svg class="program-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6.5 9 5.5 5.5L17.5 9"/></svg>
+      </div>
+      <datalist id="program-options"></datalist>
+      <p id="program-count" class="hint program-count">68 chương trình · Gợi ý theo nhóm ngành</p>
+      <p id="program-search-status" class="hint search-status" role="status"></p>
+      <select id="program" class="program-bridge" aria-label="Chọn chương trình theo nhóm ngành" tabindex="-1" aria-hidden="true">
+        <option value="">Chưa chọn chương trình</option>
+      </select>
+      <div id="program-scope" class="scope-chip" hidden>
+        <span id="program-scope-label"></span><button id="program-clear" type="button">Xóa phạm vi</button>
+      </div>
+      <p id="scope-status" class="sr-only" role="status">Phạm vi trả lời: toàn trường HUST 2026.</p>
+    </div>
+
+    <div class="section-label">Câu hỏi thường gặp</div>
+    <div class="topics">
+      <button type="button" data-question="HUST 2026 có các phương thức tuyển sinh nào?" data-program-question="Phương thức xét tuyển {code} là gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Phương thức xét tuyển</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Học phí HUST 2026 là bao nhiêu?" data-program-question="Học phí {code} là bao nhiêu?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6M4.5 11.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6"/></svg>
+        <span>Học phí &amp; lệ phí</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?" data-program-question="Điều kiện ngoại ngữ {code} là gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.75"/><path d="M3.8 12h16.4M12 3.25c2.2 2.35 3.3 5.27 3.3 8.75s-1.1 6.4-3.3 8.75c-2.2-2.35-3.3-5.27-3.3-8.75S9.8 5.6 12 3.25Z"/></svg>
+        <span>Điều kiện ngoại ngữ</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Đăng ký xét tuyển đánh giá tư duy như thế nào?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Quy trình đăng ký</span><b aria-hidden="true">›</b>
+      </button>
+    </div>
+
+    <div class="source-note">
+      <span class="source-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M6.5 3.75h8l4 4v12.5H6.5a1 1 0 0 1-1-1v-14.5a1 1 0 0 1 1-1Z"/><path d="M14.5 4v4h4M8.5 12h7M8.5 15h7"/></svg>
+      </span>
+      <div class="source-copy">
+        <b>Tài liệu tuyển sinh 2026</b>
+        <span id="source-pages" class="source-pages">51 trang</span>
+        <p id="source-status" class="sr-only" role="status" aria-live="polite">Đang kiểm tra tài liệu…</p>
+        <a id="source-local" href="/api/v1/source/pdf" target="_blank" rel="noopener">Mở PDF <span aria-hidden="true">↗</span></a>
+        <a id="source-official" href="#" target="_blank" rel="noopener" hidden>Nguồn chính thức dự phòng ↗</a>
+      </div>
+    </div>
+    <div class="sidebar-actions">
+      <button class="secondary" id="compare-open" type="button">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg>
+        <span>So sánh chương trình</span><b aria-hidden="true">›</b>
+      </button>
+      <button class="guide-link" id="guide-open" type="button">Checklist đăng ký ĐGTD <span aria-hidden="true">↗</span></button>
+    </div>
+  </aside>
+
+  <section class="chat-shell" aria-label="Hội thoại tuyển sinh">
+    <div class="chat-header">
+      <div class="chat-title">
+        <h2>Hỏi đáp tuyển sinh</h2>
+        <button class="scope-pill" id="scope-open" type="button" aria-controls="program-tools" aria-label="Đổi phạm vi câu hỏi">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.25h14a1.25 1.25 0 0 1 1.25 1.25v9.25A1.25 1.25 0 0 1 19 17H9l-4.25 3v-14A.75.75 0 0 1 5.5 5.25Z"/><path d="M8.5 9h7M8.5 12.5h5"/></svg>
+          <span class="scope-context">Phạm vi câu hỏi</span><span class="scope-divider">·</span><span id="scope-pill-label">Toàn trường</span><span class="scope-change">· Có thể đổi</span>
+        </button>
+      </div>
+      <button class="mobile-sidebar-toggle" id="program-tools-open" type="button" aria-controls="program-tools" aria-expanded="false">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/><circle cx="8" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="17" r="2"/></svg>
+        <span>Chọn chương trình</span>
+      </button>
+      <button class="icon-button" id="clear" type="button" title="Xóa lịch sử và ngữ cảnh">Xóa chat</button>
+    </div>
+    <div class="chat-scroll" id="messages" role="log" aria-live="polite" aria-relevant="additions">
+      <div class="welcome" id="welcome">
+        <div class="demo-label"><span class="demo-dot" aria-hidden="true"></span>Ví dụ câu hỏi và câu trả lời</div>
+        <article class="demo-message demo-user">
+          <span class="demo-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-3.5 3.3-5.2 7-5.2s6 1.7 7 5.2"/></svg></span>
+          <div class="demo-message-content">
+            <span class="demo-speaker">Bạn</span>
+            <div class="demo-question">Học phí IT1 là bao nhiêu?</div>
+            <time>10:24</time>
+          </div>
+        </article>
+        <article class="demo-message demo-assistant">
+          <span class="assistant-avatar" aria-hidden="true">X</span>
+          <div class="demo-message-content">
+            <span class="demo-speaker">Trợ lý tuyển sinh X</span>
+            <div class="demo-answer">
+              Theo tài liệu tuyển sinh 2026, học phí dự kiến của IT1 (chương trình chuẩn) là <strong>28–40 triệu đồng/năm học.</strong> Mức thực tế có thể thay đổi theo quy định từng năm.
+            </div>
+            <a class="demo-source" href="/api/v1/source/pdf#page=20" target="_blank" rel="noopener">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+              Nguồn · PDF trang 20 <span aria-hidden="true">↗</span>
+            </a>
+            <div class="demo-actions" aria-label="Ví dụ thao tác trên câu trả lời">
+              <span>Hữu ích</span><span>Chưa đúng</span><span>Chuyển câu hỏi cho cán bộ</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="composer-area">
+      <div id="follow-up" class="follow-up" aria-label="Gợi ý câu hỏi tiếp theo"></div>
+      <p id="question-status" class="hint question-status" role="status" aria-live="polite"></p>
+      <div id="chat-error" role="alert" class="error-text"></div>
+      <form id="chat-form">
+        <label class="sr-only" for="question">Câu hỏi tuyển sinh</label>
+        <textarea id="question" maxlength="2000" rows="1" placeholder="Đặt câu hỏi tuyển sinh…"></textarea>
+        <button type="submit" id="send" aria-label="Gửi câu hỏi"><span>Gửi</span></button>
+      </form>
+      <div class="composer-footer"><span id="char-count">0 / 2000</span><button id="handover-open" type="button">Chuyển câu hỏi cho cán bộ</button></div>
+      <p class="disclaimer">Trợ lý tham khảo tài liệu, không quyết định trúng tuyển. <span id="mode-label"></span></p>
+    </div>
+  </section>
 </main>
-<footer class="page-footer"><span>Trợ lý tuyển sinh HUST</span><span>Nguồn: tài liệu tuyển sinh HUST 2026</span></footer>
-<dialog id="handover-dialog"><form id="handover-form"><div class="dialog-top"><span class="eyebrow">CÁN BỘ TUYỂN SINH</span><button type="button" class="close" data-close="handover-dialog" aria-label="Đóng">×</button></div><h2>Chuyển câu hỏi của bạn</h2><p>Kiểm tra preview trước khi gửi. Chỉ các nội dung dưới đây và ghi chú bổ sung mới được chuyển.</p><section class="handover-preview" aria-labelledby="handover-preview-title"><h3 id="handover-preview-title">Preview nội dung sẽ chuyển</h3><div><b>Câu hỏi</b><p id="handover-question-preview" class="preview-text"></p></div><div><b>Câu trả lời AI</b><p id="handover-answer-preview" class="preview-text"></p></div><div><b>Nguồn liên quan</b><div id="handover-sources-preview" class="preview-sources"></div></div></section><label for="summary">Ghi chú bổ sung (tùy chọn)</label><textarea id="summary" rows="3" maxlength="3000" placeholder="Ví dụ: Tôi muốn cán bộ kiểm tra lại điều kiện này."></textarea><p class="sensitive-warning" role="note">Không gửi CCCD, số điện thoại, mật khẩu hoặc dữ liệu nhạy cảm. Hệ thống sẽ ẩn một số thông tin nhận diện trước khi lưu.</p><label class="checkbox-label"><input type="checkbox" id="consent" required><span>Tôi đồng ý chia sẻ riêng nội dung preview và ghi chú này với cán bộ tuyển sinh.</span></label><p class="hint">Sau khi gửi, bạn nhận mã ticket, trạng thái và thời gian cập nhật gần nhất. Nếu đã đăng nhập, có thể mở lại ticket sau khi tải lại hoặc mất phiên. Chưa có thời gian phản hồi được cam kết.</p><div id="handover-error" class="error-text" role="alert"></div><button class="primary" type="submit" id="handover-send">Gửi yêu cầu →</button></form></dialog>
+<footer class="page-footer"><span>Trợ lý tuyển sinh HUST</span><span>Nguồn: tài liệu tuyển sinh HUST 2026</span></footer><dialog id="handover-dialog"><form id="handover-form"><div class="dialog-top"><span class="eyebrow">CÁN BỘ TUYỂN SINH</span><button type="button" class="close" data-close="handover-dialog" aria-label="Đóng">×</button></div><h2>Chuyển câu hỏi của bạn</h2><p>Kiểm tra preview trước khi gửi. Chỉ các nội dung dưới đây và ghi chú bổ sung mới được chuyển.</p><section class="handover-preview" aria-labelledby="handover-preview-title"><h3 id="handover-preview-title">Preview nội dung sẽ chuyển</h3><div><b>Câu hỏi</b><p id="handover-question-preview" class="preview-text"></p></div><div><b>Câu trả lời AI</b><p id="handover-answer-preview" class="preview-text"></p></div><div><b>Nguồn liên quan</b><div id="handover-sources-preview" class="preview-sources"></div></div></section><label for="summary">Ghi chú bổ sung (tùy chọn)</label><textarea id="summary" rows="3" maxlength="3000" placeholder="Ví dụ: Tôi muốn cán bộ kiểm tra lại điều kiện này."></textarea><p class="sensitive-warning" role="note">Không gửi CCCD, số điện thoại, mật khẩu hoặc dữ liệu nhạy cảm. Hệ thống sẽ ẩn một số thông tin nhận diện trước khi lưu.</p><label class="checkbox-label"><input type="checkbox" id="consent" required><span>Tôi đồng ý chia sẻ riêng nội dung preview và ghi chú này với cán bộ tuyển sinh.</span></label><p class="hint">Sau khi gửi, bạn nhận mã ticket, trạng thái và thời gian cập nhật gần nhất. Nếu đã đăng nhập, có thể mở lại ticket sau khi tải lại hoặc mất phiên. Chưa có thời gian phản hồi được cam kết.</p><div id="handover-error" class="error-text" role="alert"></div><button class="primary" type="submit" id="handover-send">Gửi yêu cầu →</button></form></dialog>
 <dialog id="track-dialog"><div class="dialog-top"><span class="eyebrow">THEO DÕI HỖ TRỢ</span><button class="close" data-close="track-dialog" aria-label="Đóng">×</button></div><h2>Yêu cầu của tôi</h2><p>Phản hồi của cán bộ sẽ xuất hiện tại đây. Mã yêu cầu không phải khóa truy cập.</p><p id="ticket-success" class="success-text" role="status" hidden></p><p id="ticket-notice" class="notice-text" role="status" hidden></p><button class="secondary" id="refresh-tickets">Làm mới</button><div id="tickets" aria-live="polite"></div></dialog>
 <dialog id="guide-dialog"><div class="dialog-top"><span class="eyebrow">HƯỚNG DẪN ĐĂNG KÝ</span><button class="close" data-close="guide-dialog" aria-label="Đóng">×</button></div><h2>Checklist đăng ký ĐGTD</h2><div id="guide-content"><div class="guide-summary"><div><strong id="guide-progress">0/0 bước</strong><span class="hint"> Tiến độ checklist hướng dẫn</span></div><button class="secondary guide-reset" id="guide-reset" type="button">Đặt lại checklist</button></div><p id="guide-note" class="guide-note"></p><p id="guide-meta" class="guide-meta"></p><p id="guide-storage-note" class="guide-storage-note" role="status"></p><p id="guide-session-notice" class="notice-text" role="status" hidden></p><div id="guide-steps"></div></div><p class="hint">Checklist chỉ giúp tự theo dõi các bước tham khảo, không phải xác nhận hồ sơ hợp lệ, đã nộp hoặc đã hoàn thành.</p></dialog>
 <dialog id="compare-dialog" class="compare-dialog"><div class="dialog-top"><span class="eyebrow">CHỌN CHƯƠNG TRÌNH</span><button class="close" data-close="compare-dialog" aria-label="Đóng">×</button></div><h2>So sánh chương trình</h2><p>Chọn 2–3 chương trình. Thông tin theo tài liệu tuyển sinh 2026, không phải dự đoán trúng tuyển.</p><form id="compare-form"><div id="compare-selects" class="compare-selects"></div><div class="compare-form-actions"><button class="secondary" id="compare-reset" type="button">Đặt lại lựa chọn</button><button class="primary" id="compare-submit" type="submit">So sánh →</button></div></form><p id="compare-error" class="error-text" role="alert"></p><p id="compare-stale" class="compare-stale" role="status" hidden>Đã thay đổi lựa chọn — kết quả cũ không còn cập nhật. Hãy bấm “So sánh” lại.</p><div id="comparison-result"></div></dialog></body></html>

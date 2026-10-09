@@ -62,6 +62,36 @@ def structure_answer(response, sources, next_steps, manifest):
     }
 
 
+def _admission_methods(text):
+    """Extract the complete general-method list from the page-2 section."""
+    match = re.search(
+        r"C\u00e1c ph\u01b0\u01a1ng th\u1ee9c tuy\u1ec3n sinh:\s*(.*?)(?=\s+2\.1\.)",
+        text,
+        flags=re.S,
+    )
+    if not match:
+        return []
+
+    methods = []
+    seen = set()
+    for raw_item in re.split(r"\u2022\s*", match.group(1)):
+        item = re.sub(r"\s+", " ", raw_item).strip(" ;")
+        # A page-break overlap can leave the tail of the heading attached to
+        # the preceding item. It is not part of the method name.
+        item = re.sub(
+            r"\s+(?:c\u00e1c\s+)?th\u1ee9c tuy\u1ec3n sinh:\s*$",
+            "",
+            item,
+            flags=re.I,
+        ).strip(" ;")
+        key = normalize(item)
+        if not item or key in seen:
+            continue
+        seen.add(key)
+        methods.append(item)
+    return methods
+
+
 def format_answer(question, chunks, program=""):
     q = normalize(question)
     first = chunks[0]
@@ -80,16 +110,9 @@ def format_answer(question, chunks, program=""):
         return None
     if not program and "phuong thuc" in q:
         for i, chunk in enumerate(chunks, 1):
-            match = re.search(r"thức tuyển sinh:\s*(.+?)(?:\s+2\.1\.|$)", chunk["text"], re.S)
-            if not match:
-                continue
-            methods = []
-            for item in re.split(r"•\s*", match.group(1)):
-                item = re.sub(r"[;\s]+$", "", item.strip())
-                if item and item not in methods:
-                    methods.append(item)
+            methods = _admission_methods(chunk["text"])
             if len(methods) >= 3:
-                return "Các phương thức tuyển sinh chung trong tài liệu HUST 2026:\n\n" + "\n".join(
+                return "Các phương thức tuyển sinh chung toàn trường trong tài liệu HUST 2026:\n\n" + "\n".join(
                     f"• {item} [{i}]" for item in methods
                 )
     if first["kind"] in {"fee", "overview"}:

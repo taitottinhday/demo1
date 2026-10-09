@@ -11,6 +11,7 @@ from src.config import Settings
 from src.main import app, create_app
 from src.services.accounts import create_user
 from src.services.admissions import Admissions, redact
+from src.services.product_features import compare_programs
 from src.services.store import Store
 
 
@@ -121,6 +122,37 @@ async def test_chat_scope_prioritizes_explicit_program_and_handles_general_quest
     assert ambiguous["kind"] == "clarification"
     assert not ambiguous["sources"]
     assert "chương trình" in ambiguous["response"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "question",
+    [
+        "\u0048\u0055\u0053\u0054 2026 c\u00f3 nh\u1eefng ph\u01b0\u01a1ng th\u1ee9c tuy\u1ec3n sinh n\u00e0o?",
+        "N\u0103m 2026 HUST x\u00e9t tuy\u1ec3n b\u1eb1ng nh\u1eefng ph\u01b0\u01a1ng th\u1ee9c n\u00e0o?",
+    ],
+)
+async def test_general_admission_methods_do_not_duplicate_at_page_break(knowledge, tmp_path, question):
+    service = Admissions(
+        knowledge,
+        Store(tmp_path / "b02-methods.db"),
+        Settings(_env_file=None, answer_mode="extractive"),
+    )
+
+    result = await service.answer(question, context="IT1")
+
+    assert result["scope"] == "general"
+    assert {source["page"] for source in result["sources"]} == {2}
+    lines = [line.strip() for line in result["response"].splitlines() if line.strip().startswith("\u2022")]
+    assert len(lines) == 4
+    assert sum(line.startswith("\u2022 Ph\u01b0\u01a1ng th\u1ee9c x\u00e9t tuy\u1ec3n d\u1ef1a theo k\u1ebft qu\u1ea3 thi t\u1ed1t nghi\u1ec7p trung h\u1ecdc ph\u1ed5 th\u00f4ng (THPT)") for line in lines) == 1
+    assert sum("XTTN" in line for line in lines) == 1
+    assert sum("\u0110GTD" in line for line in lines) == 1
+    assert sum("x\u00e9t tuy\u1ec3n kh\u00e1c d\u00e0nh" in line.lower() for line in lines) == 1
+    assert all(line.endswith("[1]") for line in lines)
+    assert "th\u1ee9c tuy\u1ec3n sinh:" not in result["response"]
+    assert "2.1." not in result["response"]
+    assert result["sources"][0]["excerpt"].count("Ph\u01b0\u01a1ng th\u1ee9c x\u00e9t tuy\u1ec3n t\u00e0i n\u0103ng") == 1
 
 
 @pytest.mark.asyncio
@@ -235,7 +267,7 @@ async def test_handover_audit_events_and_metrics_formula(client):
     rate = metrics["handover_rate"]
     assert rate["numerator"] >= 1 and rate["denominator"] >= 1
     assert rate["value"] is not None and rate["timezone"] == "Asia/Ho_Chi_Minh"
-    assert "ticket_events(action=created)" in rate["formula"]
+    assert rate["formula"].startswith("Ticket ") and " / " in rate["formula"]
 
 
 @pytest.mark.asyncio
@@ -259,6 +291,9 @@ async def test_staff_claim_is_atomic_and_only_owner_can_resolve(client):
     )
     ticket_id = created.json()["id"]
     store = app.state.runtime["store"]
+    with store.connect() as db:
+        create_user(db, "staff-a", "Staff A", "staff-a@example.test", "officer", "StaffA@123")
+        create_user(db, "staff-b", "Staff B", "staff-b@example.test", "officer", "StaffB@123")
     first_token = store.staff_login("staff-a")
     second_token = store.staff_login("staff-b")
     transport = ASGITransport(app=app)
@@ -289,8 +324,8 @@ async def test_staff_queue_is_scoped_to_owner_but_keeps_shared_waiting_queue(cli
     store = app.state.runtime["store"]
     with store.connect() as db:
         create_user(db, "staff-b", "Cán bộ B", "staff-b@example.test", "officer", "StaffB@123")
-    own_id = await create_ticket("owner-a")
-    other_id = await create_ticket("owner-b")
+    own_id = await create_ticket("owner-a-1")
+    other_id = await create_ticket("owner-b-1")
     waiting_id = await create_ticket("waiting-shared")
     assert store.claim(own_id, "canbo")
     assert store.claim(other_id, "staff-b")
@@ -492,6 +527,51 @@ async def test_comparison_is_grounded_and_validated(client):
     assert "5.0" in advanced["language"] and "5.5" not in advanced["language"]
     for codes in [["IT1"], ["IT1", "IT1"], ["IT1", "UNKNOWN"], ["IT1", "IT2", "ITE10", "BF1"]]:
         assert (await client.post("/api/v1/programs/compare", json={"codes": codes})).status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_comparison_field_status_does_not_mark_grounded_it1_language_as_missing(client):
+    result = (await client.post("/api/v1/programs/compare", json={"codes": ["IT1", "IT2"]})).json()
+    it1, it2 = result["programs"]
+    assert it1["field_status"]["language"]["status"] == "no_specific_requirement"
+    assert it1["sources"]["language"]["page"] == 16
+    assert "không nêu" in it1["language"] and "yêu cầu riêng" in it1["language"]
+    assert it2["field_status"]["language"]["status"] == "no_specific_requirement"
+
+    class MissingKnowledge:
+        programs = [
+            {
+                "code": "ZZ1",
+                "name": "Chương trình kiểm thử",
+                "quota": "10",
+                "methods": "Phương thức XTTN",
+                "note": "",
+            }
+        ]
+        chunks = [
+            {
+                "id": "program-zz1",
+                "kind": "program",
+                "code": "ZZ1",
+                "title": "Chương trình kiểm thử",
+                "text": "Mã xét tuyển ZZ1: Chương trình kiểm thử. Chỉ tiêu năm 2026: 10. Phương thức XTTN.",
+                "page": 10,
+                "end_page": 10,
+            }
+        ]
+
+        @staticmethod
+        def search(*args, **kwargs):
+            return []
+
+        @staticmethod
+        def citation(chunk):
+            return {"id": chunk["id"], "page": chunk["page"]}
+
+    missing = compare_programs(MissingKnowledge(), ["ZZ1"])[0]
+    assert missing["field_status"]["language"]["status"] == "missing"
+    assert missing["sources"]["language"] is None
+    assert missing["field_status"]["fee"]["status"] == "missing"
 
 
 @pytest.mark.asyncio

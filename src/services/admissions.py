@@ -87,7 +87,21 @@ class Admissions:
 
     @staticmethod
     def _merge_source_chunks(chunks):
-        """Merge adjacent chunks that point to the same document location."""
+        """Merge chunks from one location without duplicating page-break overlap."""
+
+        def join_text(left, right):
+            left = re.sub(r"\s+", " ", left or "").strip()
+            right = re.sub(r"\s+", " ", right or "").strip()
+            if not left:
+                return right
+            if not right or right in left:
+                return left
+            limit = min(len(left), len(right))
+            for size in range(limit, 24, -1):
+                if normalize(left[-size:]) == normalize(right[:size]):
+                    return f"{left} {right[size:].lstrip()}".strip()
+            return f"{left} {right}".strip()
+
         merged = []
         by_source = {}
         for chunk in chunks:
@@ -99,7 +113,7 @@ class Admissions:
                 merged.append(existing)
                 continue
             if chunk.get("text") and chunk["text"] not in existing["text"]:
-                existing["text"] = existing["text"].rstrip() + "\n" + chunk["text"].lstrip()
+                existing["text"] = join_text(existing["text"], chunk["text"])
             existing["end_page"] = max(existing.get("end_page", existing["page"]), chunk.get("end_page", chunk["page"]))
         return merged
 
@@ -163,7 +177,7 @@ class Admissions:
             return "Bộ nguồn hiện tại chưa đủ danh sách giấy tờ chi tiết cho hồ sơ bạn hỏi. Mình có thể hướng dẫn kênh đăng ký ĐGTD hoặc chuyển cán bộ kiểm tra danh sách hồ sơ đúng phương thức."
         if ("diem chuan" in q or "diem san" in q) and not any(s in q for s in ["thong bao", "khi nao"]):
             return "Mình chưa có thông báo điểm chuẩn/ngưỡng đầu vào chính thức cuối cùng của năm 2026. Không dùng điểm năm 2024/2025 để kết luận cho năm 2026; bạn có thể chuyển cán bộ kiểm tra."
-        if re.search(r"\b20(?:2[0-5789]|[0134]\d)\b", q):
+        if re.search(r"\b20(?:2[0-57-9]|[0134]\d)\b", q):
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
@@ -436,7 +450,9 @@ class Admissions:
                 if normalize(claim["quote"]) not in normalize(chunks[n - 1]["text"]):
                     return None
                 # Reject numeric facts not present in the attached supporting quote.
-                if not set(re.findall(r"\d+", claim["text"])).issubset(set(re.findall(r"\d+", claim["quote"]))):
+                claim_numbers = set(re.findall(r"(?<![A-Za-z])\d+(?![A-Za-z])", claim["text"]))
+                quote_numbers = set(re.findall(r"(?<![A-Za-z])\d+(?![A-Za-z])", claim["quote"]))
+                if not claim_numbers.issubset(quote_numbers):
                     return None
                 if self.guard(claim["text"]):
                     return None

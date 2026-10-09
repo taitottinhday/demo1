@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-const accountLink=document.createElement('a');accountLink.className='staff-link';accountLink.href='/account';accountLink.textContent='Đăng nhập / đăng ký';document.querySelector('.topbar nav')?.prepend(accountLink);
+const accountLink=document.createElement('a');accountLink.className='staff-link';accountLink.href='/account';accountLink.textContent='Đăng nhập';const accountNav=document.querySelector('.topbar nav');accountNav?.insertBefore(accountLink,accountNav.querySelector('.staff-login-link'));
 const privacyNote=document.querySelector('.privacy');if(privacyNote)privacyNote.textContent='Bạn có thể dùng ẩn danh hoặc đăng nhập để lưu lịch sử và theo dõi yêu cầu.';
 const stateNames = {waiting:'Đang chờ', in_progress:'Đang xử lý', resolved:'Đã giải quyết',cancelled:'Đã hủy',rejected:'Đã từ chối'};
 let messages = [], programs = [], requestKey = '', busy = false, currentStudent = null, guideData = null, guideCompleted = new Set(), guideStorage = null, handoverPreview = {question:'', ai_answer:'', sources:[]};
@@ -7,7 +7,7 @@ const guideStorageKey = 'hust-guide-checklist-v2';
 const questionDraftKey = 'hust-question-draft-v1';
 function updateAccountNav(student){
   if(!student){
-    if(!accountLink.isConnected)document.querySelector('.topbar nav')?.prepend(accountLink);
+    if(!accountLink.isConnected){const nav=document.querySelector('.topbar nav');nav?.insertBefore(accountLink,nav.querySelector('.staff-login-link'));}
     return;
   }
   if(!accountLink.isConnected)return;
@@ -90,7 +90,17 @@ function scopeLabel(data={}){
   const selected=$('program').value;
   return selected?`Ngữ cảnh câu tiếp theo: ${programLabel(selected)}. Câu hỏi toàn trường vẫn được trả lời theo phạm vi toàn trường.`:'Phạm vi trả lời: toàn trường HUST 2026.';
 }
-function renderScope(data){$('scope-status').textContent=scopeLabel(data);renderProgramScope();}
+function renderScope(data){
+  $('scope-status').textContent=scopeLabel(data);
+  const scopePill=$('scope-pill-label');
+  if(scopePill){
+    const label=data?.scope==='program'&&data.scope_program
+      ? programLabel(data.scope_program)
+      : data?.scope==='ambiguous'?'Cần làm rõ':data?.scope==='general'?'Toàn trường':$('program').value?programLabel($('program').value):'Toàn trường';
+    scopePill.textContent=label;
+  }
+  renderProgramScope();
+}
 async function api(path, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 23000);
@@ -121,7 +131,12 @@ function addMessage(role, data, save=true) {
   const box=node('article','message '+role);
   box.append(node('div','speaker',role==='user'?'BẠN':'TRỢ LÝ X'));
   if(role==='assistant')appendStructuredAnswer(box,data);else box.append(node('div','body',data.response));
-  if(role==='assistant'&&(data.sources||[]).length)box.append(node('h3','answer-section-title source-heading','Nguồn chi tiết'));
+  if(role==='assistant'&&(data.sources||[]).length){
+    const firstSource=data.sources[0];
+    const citation=link(`Nguồn · PDF trang ${firstSource.page||'chưa rõ'}${firstSource.end_page&&firstSource.end_page!==firstSource.page?'–'+firstSource.end_page:''} ↗`,firstSource.local_url||`/api/v1/source/pdf#page=${firstSource.page||1}`);
+    citation.className='message-citation';
+    box.append(citation,node('h3','answer-section-title source-heading','Chi tiết nguồn'));
+  }
   (data.sources || []).forEach((source,i)=>{
     const card=node('details','source-card');
     card.append(node('summary','',`[${i+1}] ${source.title} · PDF trang ${source.page}${source.end_page!==source.page?'–'+source.end_page:''} · kỳ ${source.year||2026} · bản ${source.version||'chưa rõ'}`));
@@ -140,7 +155,7 @@ function addMessage(role, data, save=true) {
         b.onclick=async()=>{buttons.forEach(x=>x.disabled=true);try{await api('/answers/'+data.request_id+'/feedback',{method:'POST',body:JSON.stringify({rating})});data.feedback=rating;buttons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));status.textContent=rating==='incorrect'?'Đã ghi nhận. Bạn có thể gửi câu hỏi cho cán bộ.':'Đã ghi nhận đánh giá.';}catch(e){status.textContent=e.message;}finally{buttons.forEach(x=>x.disabled=false);}};actions.append(b);
       });actions.append(status);box.append(actions);
     }
-    if(data.request_id&&data.reason!=='out_of_scope') {const b=node('button','small-action','Chuyển câu hỏi này cho cán bộ ↗');b.type='button';b.onclick=()=>openHandover(originalQuestion,data.response,data.sources||[]);box.append(b);}
+    if(data.request_id&&data.reason!=='out_of_scope') {const b=node('button','small-action','Chuyển câu hỏi cho cán bộ');b.type='button';b.onclick=()=>openHandover(originalQuestion,data.response,data.sources||[]);box.append(b);}
   }
   $('messages').append(box);
   $('messages').scrollTop=$('messages').scrollHeight;
@@ -151,11 +166,13 @@ async function init() {
     const [status, list, session] = await Promise.all([api('/status'),api('/programs'),api('/session')]);
     programs=list;
     currentStudent=session.student || null;
+    $('program-count').textContent=`${programs.length} chương trình · Gợi ý theo nhóm ngành`;
     renderProgramOptions();
     setProgram(session.program || '');
     updateAccountNav(session.student);
     session.messages.forEach(m=>addMessage(m.role,m));
     const source=status.source||{};
+    if(source.pages)$('source-pages').textContent=`${source.pages} trang`;
     $('source-status').textContent=status.status==='ready'?`${source.pages} trang PDF · ${status.programs} chương trình · kỳ 2026 · bản ${source.version||'chưa rõ'} · ${source.status||'chưa rõ trạng thái'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
     const official=$('source-official');if(official&&source.url){official.href=source.url;official.hidden=false;}
     $('mode-label').textContent=status.mode==='llm'?'AI tổng hợp có kiểm tra trích dẫn.':'Đang dùng chế độ tra cứu tài liệu.';
@@ -193,11 +210,18 @@ function setProgramToolsOpen(open, restoreFocus=true){
   document.body.classList.toggle('sidebar-open',open);
   programTools.setAttribute('aria-hidden',String(!open));
   programToolsToggle.setAttribute('aria-expanded',String(open));
-  if(open){window.setTimeout(()=>$('program-search')?.focus(),0);}
+  if(open){
+    const focusSearch=()=>{if(programTools.classList.contains('mobile-open'))$('program-search')?.focus();};
+    window.setTimeout(focusSearch,220);
+  }
   else if(restoreFocus)programToolsToggle.focus();
 }
 programToolsToggle?.addEventListener('click',()=>setProgramToolsOpen(true));
 programToolsClose?.addEventListener('click',()=>setProgramToolsOpen(false));
+$('scope-open')?.addEventListener('click',()=>{
+  if(window.matchMedia('(max-width:900px)').matches)setProgramToolsOpen(true);
+  else $('program-search')?.focus();
+});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&programTools?.classList.contains('mobile-open'))setProgramToolsOpen(false);});
 window.addEventListener('resize',()=>setProgramToolsOpen(false,false));
 setProgramToolsOpen(false,false);
@@ -399,6 +423,22 @@ function comparisonSources(program,field){
   if(field==='language'){add(program.sources.language);add(program.sources.program);}else add(program.sources[field==='quota'||field==='methods'||field==='note'?'program':field]);
   return sources;
 }
+const comparisonFieldStates=new Set(['available','no_specific_requirement','missing']);
+function comparisonFieldState(program,field){
+  const explicit=program.field_status?.[field]?.status;
+  if(comparisonFieldStates.has(explicit))return explicit;
+  const value=String(program[field]||'').trim();
+  if(!value||!comparisonSources(program,field).length)return 'missing';
+  return /^(chưa (đủ|ghép)|cần cán bộ kiểm tra|chưa có dữ liệu)/i.test(value)?'missing':'available';
+}
+function comparisonValue(program,field){
+  const value=String(program[field]||'').trim();
+  if(value)return value;
+  return comparisonFieldState(program,field)==='no_specific_requirement'?'Nguồn không nêu yêu cầu riêng.':'Chưa có dữ liệu';
+}
+function comparisonSummaryValue(program,field){
+  return comparisonFieldState(program,field)==='no_specific_requirement'?'Nguồn không nêu yêu cầu riêng theo tài liệu.':comparisonValue(program,field);
+}
 function appendComparisonCitations(container, entries){
   const sources=[];entries.forEach(entry=>comparisonSources(entry.program,entry.field).forEach(source=>{if(!sources.some(item=>item.id===source.id))sources.push(source);}));
   if(!sources.length)return;
@@ -407,8 +447,7 @@ function appendComparisonCitations(container, entries){
   container.append(citations);
 }
 function isComparisonMissing(program,field){
-  const value=String(program[field]||'').trim();
-  return !value || !comparisonSources(program,field).length || /chưa (đủ|ghép)|cần cán bộ kiểm tra/i.test(value);
+  return comparisonFieldState(program,field)==='missing';
 }
 function appendComparisonClaim(list,text,entries){
   const item=node('li','comparison-claim');item.append(node('span','',text));appendComparisonCitations(item,entries);list.append(item);
@@ -416,10 +455,10 @@ function appendComparisonClaim(list,text,entries){
 function buildComparisonAssistant(data){
   const section=node('section','comparison-assistant');section.append(node('h3','', 'Trợ lý tổng hợp'),node('p','hint','Tổng hợp tự động từ đúng dữ liệu đã trả về trong bảng/API; không xếp hạng chương trình và không dự đoán khả năng đỗ.'));
   const common=node('div','comparison-summary-block');common.append(node('h4','', 'Điểm giống nhau'));const commonList=node('ul','comparison-summary-list');
-  comparisonFields.forEach(([field,label])=>{const values=data.programs.map(program=>String(program[field]||'').trim());if(values.length&&values.every(value=>value===values[0])&&!isComparisonMissing(data.programs[0],field))appendComparisonClaim(commonList,`${label}: ${values[0]}`,data.programs.map(program=>({program,field})));});
+  comparisonFields.forEach(([field,label])=>{const values=data.programs.map(program=>comparisonSummaryValue(program,field));if(values.length&&values.every(value=>value===values[0])&&data.programs.every(program=>!isComparisonMissing(program,field)))appendComparisonClaim(commonList,`${label}: ${values[0]}`,data.programs.map(program=>({program,field})));});
   if(!commonList.children.length)commonList.append(node('li','', 'Không có giá trị giống nhau đủ rõ trong dữ liệu hiện tại.'));common.append(commonList);section.append(common);
   const different=node('div','comparison-summary-block');different.append(node('h4','', 'Khác nhau'));const differentList=node('ul','comparison-summary-list');
-  comparisonFields.forEach(([field,label])=>{const values=data.programs.map(program=>String(program[field]||'').trim());if(new Set(values).size<2)return;const item=node('li','comparison-difference');item.append(node('b','',label));const details=node('ul','comparison-value-list');data.programs.forEach(program=>{const value=node('li','',`${program.code}: ${program[field]||'Chưa có dữ liệu'}`);appendComparisonCitations(value,[{program,field}]);details.append(value);});item.append(details);differentList.append(item);});
+  comparisonFields.forEach(([field,label])=>{const values=data.programs.map(program=>comparisonSummaryValue(program,field));if(new Set(values).size<2)return;const item=node('li','comparison-difference');item.append(node('b','',label));const details=node('ul','comparison-value-list');data.programs.forEach(program=>{const value=node('li','',`${program.code}: ${comparisonSummaryValue(program,field)}`);appendComparisonCitations(value,[{program,field}]);details.append(value);});item.append(details);differentList.append(item);});
   if(!differentList.children.length)differentList.append(node('li','', 'Các trường dữ liệu hiện có giống nhau theo phản hồi API.'));different.append(differentList);section.append(different);
   const missing=node('div','comparison-summary-block');missing.append(node('h4','', 'Dữ liệu còn thiếu'));const missingList=node('ul','comparison-summary-list');
   data.programs.forEach(program=>comparisonFields.forEach(([field,label])=>{if(isComparisonMissing(program,field))missingList.append(node('li','',`${program.code} · ${label}: chưa đủ dữ liệu có nguồn để kết luận.`));}));
@@ -429,16 +468,16 @@ function buildComparisonAssistant(data){
 }
 function appendComparisonRawData(container,data){
   const raw=node('div','comparison-raw-data');raw.hidden=true;raw.append(node('h4','', 'Dữ liệu gốc từ API'));
-  data.programs.forEach(program=>{const details=node('details','comparison-raw-item');details.append(node('summary','',`${program.code} · ${program.name}`));const list=node('ul','comparison-summary-list');comparisonFields.forEach(([field,label])=>{const item=node('li','',`${label}: ${program[field]||'Chưa có dữ liệu'}`);appendComparisonCitations(item,[{program,field}]);list.append(item);});details.append(list);raw.append(details);});container.append(raw);return raw;
+  data.programs.forEach(program=>{const details=node('details','comparison-raw-item');details.append(node('summary','',`${program.code} · ${program.name}`));const list=node('ul','comparison-summary-list');comparisonFields.forEach(([field,label])=>{const item=node('li','',`${label}: ${comparisonValue(program,field)} · trạng thái ${comparisonFieldState(program,field)}`);appendComparisonCitations(item,[{program,field}]);list.append(item);});details.append(list);raw.append(details);});container.append(raw);return raw;
 }
 function appendComparisonMobileDetails(container,data){
-  const details=node('div','comparison-mobile-details');data.programs.forEach(program=>{const item=node('details','comparison-mobile-item');item.append(node('summary','',`${program.code} · ${program.name}`));comparisonFields.forEach(([field,label])=>{const row=node('div','comparison-mobile-row');row.append(node('b','',label),node('span','',program[field]||'Chưa có dữ liệu'));appendComparisonCitations(row,[{program,field}]);item.append(row);});details.append(item);});container.append(details);
+  const details=node('div','comparison-mobile-details');data.programs.forEach(program=>{const item=node('details','comparison-mobile-item');item.append(node('summary','',`${program.code} · ${program.name}`));comparisonFields.forEach(([field,label])=>{const row=node('div','comparison-mobile-row');row.append(node('b','',label),node('span','',comparisonValue(program,field)));appendComparisonCitations(row,[{program,field}]);item.append(row);});details.append(item);});container.append(details);
 }
 function renderComparison(data){
   const result=$('comparison-result');result.replaceChildren();result.classList.remove('comparison-stale');$('compare-stale').hidden=true;
   const wrap=node('div','comparison-scroll');const table=node('table','comparison-table');const caption=node('caption','','Thông tin chương trình tuyển sinh 2026');table.append(caption);
   const header=node('tr');header.append(node('th','','Thông tin'));data.programs.forEach(program=>header.append(node('th','',`${program.code} · ${program.name}`)));table.append(header);
-  comparisonFields.forEach(([field,label])=>{const row=node('tr');row.append(node('th','',label));data.programs.forEach(program=>{const cell=node('td','',program[field]||'Chưa có dữ liệu');comparisonSources(program,field).forEach((source,index)=>cell.append(document.createElement('br'),link(`${index?'Nguồn bổ sung':'Nguồn'} · PDF trang ${source.page}`,source.local_url)));row.append(cell);});table.append(row);});wrap.append(table);result.append(wrap);appendComparisonMobileDetails(result,data);result.append(buildComparisonAssistant(data));
+  comparisonFields.forEach(([field,label])=>{const row=node('tr');row.append(node('th','',label));data.programs.forEach(program=>{const cell=node('td','',comparisonValue(program,field));comparisonSources(program,field).forEach((source,index)=>cell.append(document.createElement('br'),link(`${index?'Nguồn bổ sung':'Nguồn'} · PDF trang ${source.page}`,source.local_url)));row.append(cell);});table.append(row);});wrap.append(table);result.append(wrap);appendComparisonMobileDetails(result,data);result.append(buildComparisonAssistant(data));
   const actions=node('div','comparison-actions');const change=node('button','secondary','Đổi tiêu chí');change.type='button';change.onclick=()=>{markComparisonStale();comparisonSelects()[0]?.focus();};const rawButton=node('button','secondary','Xem dữ liệu gốc');rawButton.type='button';const raw=appendComparisonRawData(result,data);rawButton.onclick=()=>{raw.hidden=!raw.hidden;rawButton.textContent=raw.hidden?'Xem dữ liệu gốc':'Ẩn dữ liệu gốc';if(!raw.hidden)raw.scrollIntoView({block:'nearest'});};const handover=node('button','secondary','Chuyển câu hỏi cho cán bộ');handover.type='button';handover.onclick=()=>openHandover(`Cần cán bộ kiểm tra so sánh chương trình: ${data.programs.map(program=>program.code).join(', ')}`, 'Bảng/API đã hiển thị nhưng cần cán bộ xác nhận các khác biệt và dữ liệu còn thiếu.');actions.append(change,rawButton,handover);result.append(actions);
 }
 function resetComparisonSelection(){comparisonSelects().forEach(select=>{select.value='';clearComparisonFieldError(select);});$('compare-error').textContent='';clearComparisonResult();$('compare-0')?.focus();}
