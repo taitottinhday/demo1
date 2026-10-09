@@ -79,7 +79,7 @@ async function loadOverview(){
     box.append(node('span','metric-label',k.label),node('b','metric-value',kpiValue(k)));
     const facts=node('div','kpi-facts');
     facts.append(node('small','',`Công thức: ${k.formula||'Chưa xác định'}`));
-    facts.append(node('small','',`Tử số / mẫu số: ${k.numerator??'—'} / ${k.denominator??'Không áp dụng'}`));
+    facts.append(node('small','',k.denominator===null||k.denominator===undefined?`Số lượng: ${k.value??'—'}`:`Tử số / mẫu số: ${k.numerator??'—'} / ${k.denominator}`));
     facts.append(node('small','',`Khoảng: ${kpiWindow(k)}`));
     facts.append(node('small','',`Múi giờ: ${k.timezone||m.data_timezone||'—'}`));
     facts.append(node('small','',`Cập nhật: ${k.last_updated||m.data_last_updated||'—'}`));
@@ -94,8 +94,7 @@ async function loadOverview(){
   if(!m.stale_waiting.length)$('stale').append(node('p','empty-state','Không có ticket nào chờ quá lâu.'));
   m.stale_waiting.forEach(t=>{const b=node('button','queue-item');const head=node('div','ticket-head');head.append(node('b','',t.id),node('span','badge waiting','Chờ '+duration(t.waiting_seconds)));b.append(head,node('p','',t.summary.slice(0,140)));b.onclick=()=>openTicket(t.id);$('stale').append(b);});
   const handoverRate=m.handover_rate||{};
-  const handoverValue=handoverRate.value===null||handoverRate.value===undefined?'Chưa đủ dữ liệu':percent(handoverRate.value);
-  $('rate-note').textContent=`Tỷ lệ chuyển cán bộ: ${handoverValue}. Khi chưa có câu hỏi đủ điều kiện trong khoảng đã chọn, hệ thống không hiển thị phần trăm.`;
+  $('rate-note').textContent=handoverRate.reason||'Chưa thể tính tỷ lệ chuyển cán bộ vì nhật ký câu hỏi chưa liên kết định danh với ticket. Xem số yêu cầu chuyển trong KPI cùng khoảng thời gian.';
   $('data-note').textContent=`Nguồn dữ liệu: ${m.data_source||m.rates_source||'Chưa xác định'} · Khoảng: ${(m.data_window?.from||'Từ lúc bắt đầu ghi nhận')} → ${(m.data_window?.to||'Hiện tại')} · Múi giờ: ${m.data_timezone||'—'} · Cập nhật: ${m.data_last_updated||'—'}. Các chỉ số thiếu mẫu số được hiển thị là “Chưa đủ dữ liệu”.`;
 }
 
@@ -286,4 +285,4 @@ $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-
   try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard();await refresh();startAutoRefresh();}
   catch(error){const firstField=error.fields?.username?'username':error.fields?.password?'password':'';if(firstField){$(firstField).setAttribute('aria-invalid','true');$(`${firstField}-error`).textContent=error.fields[firstField];$(firstField).focus();}else $('login-error').textContent=error.message;}finally{button.disabled=false;}});
 $('logout').onclick=async()=>{try{await api('/admin/logout',{method:'POST'});location.reload();}catch(e){fail(e);}};
-(async()=>{try{await api('/admin/me');showDashboard();await refresh();startAutoRefresh();}catch{/* Login form remains visible. */}})();
+(async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard();await refresh();startAutoRefresh();}catch{/* Login form remains visible. */}})();

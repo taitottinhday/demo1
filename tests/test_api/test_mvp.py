@@ -265,9 +265,12 @@ async def test_handover_audit_events_and_metrics_formula(client):
     assert (await client.post("/api/v1/admin/login", json={"username": "admin", "password": "Admin@2026!"})).status_code == 200
     metrics = (await client.get("/api/v1/admin/metrics")).json()
     rate = metrics["handover_rate"]
-    assert rate["numerator"] >= 1 and rate["denominator"] >= 1
-    assert rate["value"] is not None and rate["timezone"] == "Asia/Ho_Chi_Minh"
-    assert rate["formula"].startswith("Ticket ") and " / " in rate["formula"]
+    assert rate["value"] is None and rate["status"] == "Chưa đủ dữ liệu"
+    assert rate["numerator"] is None and rate["denominator"] is None
+    assert rate["timezone"] == "Asia/Ho_Chi_Minh"
+    assert "chưa liên kết" in rate["reason"]
+    count_kpi = next(k for k in metrics["kpis"] if k["key"] == "handover_tickets")
+    assert count_kpi["value"] == 1
 
 
 @pytest.mark.asyncio

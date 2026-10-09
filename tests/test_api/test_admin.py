@@ -1,4 +1,6 @@
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -47,8 +49,12 @@ def officer_id(username):
 @pytest.mark.asyncio
 async def test_admin_requires_admin_role(client):
     assert (await client.get("/api/v1/admin/tickets")).status_code == 401
+    assert (await client.get("/api/v1/admin/session")).json() == {"authenticated": False, "username": None}
+    assert (await client.get("/api/v1/staff/session")).json() == {"authenticated": False, "username": None}
     assert (await client.post("/api/v1/admin/login", json=STAFF)).status_code == 401
     assert (await client.post("/api/v1/staff/login", json=STAFF)).status_code == 200
+    assert (await client.get("/api/v1/staff/session")).json() == {"authenticated": True, "username": "canbo"}
+    assert (await client.get("/api/v1/admin/session")).json() == {"authenticated": False, "username": None}
     for path in ["/api/v1/admin/tickets", "/api/v1/admin/officers", "/api/v1/admin/metrics"]:
         assert (await client.get(path)).status_code == 403
     assert (await client.post("/api/v1/admin/tickets/TS-X/reassign", json={"to_officer_id": None})).status_code == 403
@@ -56,6 +62,7 @@ async def test_admin_requires_admin_role(client):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as other:
         assert (await other.post("/api/v1/staff/login", json=ADMIN)).status_code == 401
         await login_admin(other)
+        assert (await other.get("/api/v1/admin/session")).json() == {"authenticated": True, "username": "admin"}
         assert (await other.get("/api/v1/staff/tickets")).status_code == 401
         assert (await other.get("/api/v1/admin/tickets")).status_code == 200
         await other.post("/api/v1/admin/logout")
@@ -275,10 +282,12 @@ async def test_metrics_with_sample_data(client):
     assert [t["id"] for t in m["stale_waiting"]] == ["TS-W-OLD"]
     assert next(o for o in m["officer_load"] if o["name"] == "Cán bộ tuyển sinh")["open_tickets"] == 1
     assert m["direct_answer_rate"] == 0.75
-    assert m["handover_rate"]["value"] == 0.0
-    assert m["handover_rate"]["numerator"] == 0 and m["handover_rate"]["denominator"] == 4
-    assert m["handover_rate"]["status"] == "Đã đo"
-    assert any(k["key"] == "handover_rate" and k["formula"] for k in m["kpis"])
+    assert m["handover_rate"]["value"] is None
+    assert m["handover_rate"]["numerator"] is None and m["handover_rate"]["denominator"] is None
+    assert m["handover_rate"]["status"] == "Chưa đủ dữ liệu"
+    assert "chưa liên kết" in m["handover_rate"]["reason"]
+    handover_kpi = next(k for k in m["kpis"] if k["key"] == "handover_tickets")
+    assert handover_kpi["value"] == 6 and handover_kpi["denominator"] is None
     assert all({"label", "formula", "numerator", "denominator", "time_window", "timezone", "last_updated", "source"} <= set(k) for k in m["kpis"])
     assert m["data_timezone"] == "Asia/Ho_Chi_Minh"
 
@@ -287,9 +296,49 @@ async def test_metrics_with_sample_data(client):
     future = (await client.get("/api/v1/admin/metrics", params={"from": "2099-01-01"})).json()
     assert sum(future["tickets_by_status"].values()) == 0 and future["reject_rate"] is None
     assert future["handover_rate"]["value"] is None and future["handover_rate"]["status"] == "Chưa đủ dữ liệu"
+    assert next(k for k in future["kpis"] if k["key"] == "handover_tickets")["value"] == 0
     assert (await client.get("/api/v1/admin/metrics", params={"from": "hôm qua"})).status_code == 422
     bad_range = {"from": "2026-02-01", "to": "2026-01-01"}
     assert (await client.get("/api/v1/admin/metrics", params=bad_range)).status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_unlinked_tickets_and_question_events_never_form_a_handover_rate(client):
+    hcm = ZoneInfo("Asia/Ho_Chi_Minh")
+    in_range = datetime(2026, 10, 8, 12, tzinfo=hcm).timestamp()
+    outside_range = datetime(2026, 10, 7, 12, tzinfo=hcm).timestamp()
+    with store().connect() as db:
+        for index in range(50):
+            created = in_range + index if index < 48 else outside_range + index
+            ticket_id = f"TS-KPI-{index + 1:02d}"
+            db.execute(
+                "INSERT INTO tickets(id,session,request_key,summary,reason,status,created,updated) "
+                "VALUES(?,?,?,'Ticket demo','user_request','waiting',?,?)",
+                (ticket_id, f"session-{index}", ticket_id, created, created),
+            )
+            db.execute(
+                "INSERT INTO ticket_events(ticket_id,actor,action,created) VALUES(?,'candidate','created',?)",
+                (ticket_id, created),
+            )
+        for index in range(11):
+            db.execute(
+                "INSERT INTO events(kind,mode,latency,tokens,created) VALUES('answered','extractive',1,0,?)",
+                (in_range + index,),
+            )
+
+    await login_admin(client)
+    all_time = (await client.get("/api/v1/admin/metrics")).json()
+    assert all_time["handover_rate"]["value"] is None
+    assert all_time["handover_rate"]["status"] == "Chưa đủ dữ liệu"
+    all_time_count = next(k for k in all_time["kpis"] if k["key"] == "handover_tickets")
+    assert all_time_count["value"] == 50
+    assert all_time_count["formula"] == "Số ticket được tạo trong khoảng thời gian đã chọn"
+
+    selected = (await client.get("/api/v1/admin/metrics", params={"from": "2026-10-08", "to": "2026-10-09"})).json()
+    assert selected["handover_rate"]["value"] is None
+    selected_count = next(k for k in selected["kpis"] if k["key"] == "handover_tickets")
+    assert selected_count["value"] == 48
+    assert selected_count["time_window"] == selected["data_window"]
 
 
 def test_staff_invitation_activation_lifecycle(tmp_path):

@@ -607,8 +607,9 @@ if (loginError) $('login-error').textContent = decodeURIComponent(loginError.rep
 
 (async () => {
   try {
-    const me = await api('/staff/me');
-    state.username = me.username || '';
+    const session = await api('/staff/session');
+    if (!session.authenticated) return;
+    state.username = session.username || '';
     showDashboard();
     await refreshDashboard(false);
     startAutoRefresh();

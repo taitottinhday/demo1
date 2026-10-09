@@ -867,6 +867,13 @@ def me(user=Depends(staff)):
     return {"username": user}
 
 
+@router.get("/staff/session")
+def staff_session_status(request: Request):
+    """Return a non-error auth state for the staff login page bootstrap."""
+    user = runtime(request)["store"].staff_user(request.cookies.get("staff"))
+    return {"authenticated": bool(user), "username": user}
+
+
 @router.post("/staff/logout")
 def logout(request: Request, response: Response):
     runtime(request)["store"].logout(request.cookies.get("staff"))

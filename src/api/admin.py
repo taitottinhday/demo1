@@ -91,6 +91,13 @@ def me(user=Depends(admin)):
     return {"username": user}
 
 
+@router.get("/session")
+def session_status(request: Request):
+    """Return a non-error auth state for the admin login page bootstrap."""
+    user = admins(request).user(request.cookies.get("admin"))
+    return {"authenticated": bool(user), "username": user}
+
+
 @router.get("/tickets")
 def tickets(
     request: Request,

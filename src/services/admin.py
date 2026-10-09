@@ -290,7 +290,6 @@ class AdminStore:
         end = day_start(date_to + timedelta(days=1), timezone_name) if date_to else time.time() + 1
         span = (start, end)
         now = time.time()
-        eligible_kinds = ("answered", "fallback", "clarification", "error")
         with self.store.connect() as db:
             by_status = dict.fromkeys(STATUSES, 0)
             for status, count in db.execute(
@@ -315,12 +314,8 @@ class AdminStore:
             answered = db.execute(
                 "SELECT COUNT(*) FROM events WHERE kind='answered' AND created>=? AND created<?", span
             ).fetchone()[0]
-            handover_numerator = db.execute(
-                "SELECT COUNT(*) FROM ticket_events WHERE action='created' AND created>=? AND created<?", span
-            ).fetchone()[0]
-            handover_denominator = db.execute(
-                "SELECT COUNT(*) FROM events WHERE kind IN (?,?,?,?) AND created>=? AND created<?",
-                [*eligible_kinds, *span],
+            handover_tickets = db.execute(
+                "SELECT COUNT(*) FROM tickets WHERE created>=? AND created<?", span
             ).fetchone()[0]
         closed = by_status["resolved"] + by_status["rejected"]
         wait_sum, wait_count = wait_stats
@@ -352,7 +347,7 @@ class AdminStore:
             kpi("avg_resolve", "Thời gian xử lý trung bình", avg_resolve, resolve_sum, resolve_count, "Tổng thời gian từ lúc nhận đến lúc giải quyết / số ticket đã giải quyết", "Nhật ký ticket", bool(resolve_count)),
             kpi("reject_rate", "Tỷ lệ từ chối", by_status["rejected"] / closed if closed else None, by_status["rejected"], closed, "Ticket bị từ chối / (ticket đã giải quyết + ticket bị từ chối)", "Nhật ký ticket", bool(closed)),
             kpi("direct_answer_rate", "Tỷ lệ trả lời trực tiếp", answered / chats if chats else None, answered, chats, "Câu hỏi có câu trả lời trực tiếp / câu hỏi đã được ghi nhận", source, bool(chats)),
-            kpi("handover_rate", "Tỷ lệ chuyển cán bộ", handover_numerator / handover_denominator if handover_denominator else None, handover_numerator, handover_denominator, "Ticket chuyển cán bộ / câu hỏi đủ điều kiện trong khoảng thời gian", "Nhật ký ticket và kết quả xử lý câu hỏi", bool(handover_denominator)),
+            kpi("handover_tickets", "Yêu cầu chuyển cán bộ", handover_tickets, handover_tickets, None, "Số ticket được tạo trong khoảng thời gian đã chọn", "Bảng tickets, lọc theo thời điểm tạo"),
         ]
         return {
             "tickets_by_status": by_status,
@@ -367,14 +362,15 @@ class AdminStore:
             "stale_waiting": [{**dict(r), "waiting_seconds": round(now - r["created"])} for r in stale],
             "direct_answer_rate": round(answered / chats, 4) if chats else None,
             "handover_rate": {
-                "value": round(handover_numerator / handover_denominator, 4) if handover_denominator else None,
-                "numerator": handover_numerator,
-                "denominator": handover_denominator,
-                "status": "Đã đo" if handover_denominator else "Chưa đủ dữ liệu",
+                "value": None,
+                "numerator": None,
+                "denominator": None,
+                "status": "Chưa đủ dữ liệu",
+                "reason": "Chưa thể tính tỷ lệ: nhật ký câu hỏi chưa liên kết định danh với ticket.",
                 "time_window": window,
                 "timezone": timezone_name,
                 "last_updated": updated,
-                "formula": "Ticket chuyển cán bộ / câu hỏi đủ điều kiện trong khoảng thời gian",
+                "formula": "Chưa thể tính đáng tin cậy vì chưa có liên kết định danh câu hỏi–ticket.",
             },
             "rates_source": "Nhật ký ticket và kết quả xử lý câu hỏi",
             "kpis": kpis,
