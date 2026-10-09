@@ -33,7 +33,8 @@ Sau khi sửa Python hoặc cấu hình `.env`, dừng và chạy lại server �
 | `ANSWER_MODE` | `extractive`; `llm` cần API key |
 | `OPENAI_API_KEY`, `MODEL_NAME` | Chỉ dùng khi bật LLM; không đưa key vào Git |
 | `STAFF_USERNAME`, `STAFF_PASSWORD` | Tài khoản demo; đổi mật khẩu trước khi public |
-| `MVP_DATA_DIR` | `data`; thư mục nguồn và SQLite |
+| `MVP_DATA_DIR` | `data`; thư mục nguồn tuyển sinh và dữ liệu xử lý knowledge |
+| `PERSISTENT_DATA_DIR` | Trống khi local; production phải trỏ tới Railway Volume, ví dụ `/app/state`, để giữ tài khoản, ticket, session và lịch sử |
 | `SESSION_HOURS` | `24`; thời gian phiên ứng viên không hoạt động |
 | `SECURE_COOKIES` | `false` cho local HTTP; `true` cho HTTPS production |
 | `LLM_DAILY_LIMIT`, `LLM_TIMEOUT` | `100` lượt/ngày và `15` giây |
@@ -68,7 +69,7 @@ Mở **http://127.0.0.1:8000/admin**, đăng nhập `admin` / `Admin@2026!` (đ�
 - `/staff/login` chỉ nhận officer đang hoạt động. `/admin/login` chỉ nhận admin. Hai loại cookie tách riêng.
 - Chức năng: xem và lọc toàn bộ ticket, xem chi tiết kèm hội thoại, nguồn và lịch sử (`ticket_events`). Phân công lại hoặc trả về hàng chờ. Tạo, khóa hoặc mở cán bộ: khóa thì ticket họ đang giữ tự trả về hàng chờ. Có thêm metrics.
 - `ADMIN_STALE_HOURS` (mặc định `24`) là ngưỡng hiển thị "ticket chờ quá lâu".
-- Dữ liệu demo gồm 3 cán bộ (mật khẩu `Demo@2026!`) và 10 ticket `TS-DEMO..` đủ trạng thái. Chạy được nhiều lần, không tạo trùng; không chạy khi `APP_ENV=production`:
+- Dữ liệu demo gồm 9 cán bộ demo (cùng tài khoản mặc định `canbo` là khoảng 10 cán bộ), mật khẩu demo `Demo@2026!`, và 50 ticket `TS-DEMO01` đến `TS-DEMO50` đủ trạng thái. Chạy được nhiều lần, không tạo trùng. Trong production chỉ chạy seed có chủ đích bằng `DEMO_SEED_ENABLED=true`:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\seed_admin_demo.py
@@ -80,6 +81,12 @@ Kịch bản demo admin, khoảng 2 phút:
 2. Tab **Tổng quan**: thời gian chờ trung bình, tải từng cán bộ, ticket chờ quá lâu.
 3. Mở `TS-DEMO05`, phân công cho cán bộ khác, rồi xem sự kiện mới trong **Lịch sử**.
 4. Tab **Cán bộ**: khóa Nguyễn Thị Lan. Hộp xác nhận nêu số ticket sẽ về hàng chờ.
+
+Trên Railway, chạy seed sau khi đã gắn Volume `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`:
+
+```sh
+DEMO_SEED_ENABLED=true python scripts/seed_admin_demo.py
+```
 
 Giới hạn hiện tại:
 
@@ -137,7 +144,17 @@ Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwrig
 docker compose up --build
 ```
 
-Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. SQLite nằm tại `data/mvp.db`, không đưa dữ liệu ứng viên hoặc `.env` vào Git. Hiện chỉ xác minh chạy local; chưa deploy cloud. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo.
+Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. Ở local, Docker Compose lưu state tại `/app/state` và mount từ `data/state`. Trên Railway, tạo Volume mount tại `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`; giữ `MVP_DATA_DIR=data` để Volume không che các PDF nguồn. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo.
 
 Nếu nguồn chưa sẵn sàng: kiểm tra `/api/v1/status`, đường dẫn PDF và `sources.md`, rồi khởi động lại. PDF scan cần OCR/duyệt trước lập chỉ mục. Nếu AI lỗi: kiểm tra cấu hình/quota API, hoặc đổi `ANSWER_MODE=extractive`. Nếu đăng nhập lỗi sau deploy HTTPS: kiểm tra cookie Secure và origin.
 
+## Railway persistence
+
+The mutable SQLite state (staff accounts, candidate accounts, tickets, statuses, sessions and audit history) must live on a Railway Volume. Configure the service once:
+
+1. Add a Railway Volume and mount it at `/app/state`.
+2. Set `PERSISTENT_DATA_DIR=/app/state`.
+3. Keep `MVP_DATA_DIR=data`; do not mount the Volume over `/app/data`, because that directory contains the bundled source PDF and `sources.md`.
+4. With one replica, deploy and verify that a test ticket and its status still exist after a restart.
+
+Production now refuses to start without `PERSISTENT_DATA_DIR` or when it points to the knowledge directory. This prevents a deploy from appearing healthy while silently creating a blank database. SQLite on a shared Volume is intended for one replica; use PostgreSQL before scaling horizontally.

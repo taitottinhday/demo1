@@ -27,3 +27,6 @@ tests/
 .cursor/
 .gemini/
 scripts/
+!scripts/
+scripts/*
+!scripts/seed_admin_demo.py

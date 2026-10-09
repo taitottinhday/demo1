@@ -66,6 +66,10 @@ class Settings(BaseSettings):
     admin_password: str = "Admin@2026!"
     admin_stale_hours: int = Field(default=24, ge=1, le=720)
     reporting_timezone: str = "Asia/Ho_Chi_Minh"
+    # The bundled source files live in MVP_DATA_DIR. Runtime state (accounts,
+    # tickets, sessions and audit history) must live on a persistent volume in
+    # production so a new container image cannot reset the application state.
+    persistent_data_dir: str = ""
     mvp_data_dir: str = "data"
     session_hours: int = Field(default=24, ge=1, le=168)
     secure_cookies: bool = False

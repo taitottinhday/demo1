@@ -5,6 +5,7 @@ Usage: python scripts/seed_admin_demo.py   (safe to run again; existing demo row
 
 import asyncio
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -13,16 +14,27 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from src.config import get_settings  # noqa: E402
+from src.main import runtime_data_dirs  # noqa: E402
 from src.services.accounts import create_user, seed_accounts  # noqa: E402
 from src.services.admissions import Admissions  # noqa: E402
 from src.services.knowledge import Knowledge  # noqa: E402
 from src.services.store import Store  # noqa: E402
 
-OFFICERS = [("cb_lan", "Nguyễn Thị Lan"), ("cb_minh", "Trần Văn Minh"), ("cb_hoa", "Lê Thu Hoa")]
+OFFICERS = [
+    ("cb_lan", "Nguyễn Thị Lan"),
+    ("cb_minh", "Trần Văn Minh"),
+    ("cb_hoa", "Lê Thu Hoa"),
+    ("cb_huong", "Phạm Thu Hương"),
+    ("cb_nam", "Đỗ Hoàng Nam"),
+    ("cb_linh", "Vũ Khánh Linh"),
+    ("cb_quang", "Nguyễn Minh Quang"),
+    ("cb_thao", "Trần Ngọc Thảo"),
+    ("cb_tuan", "Lê Anh Tuấn"),
+]
 DEMO_PASSWORD = "Demo@2026!"
 H = 3600
 # id, question, reason, status, officer, created (hours ago), claimed after (h), finished after claim (h)
-TICKETS = [
+BASE_TICKETS = [
     (
         "TS-DEMO01",
         "Em muốn hỏi học bổng cho sinh viên có hoàn cảnh khó khăn",
@@ -90,12 +102,55 @@ TICKETS = [
 ]
 
 
+def build_tickets():
+    """Return 50 deterministic, UTF-8 demo tickets with varied statuses."""
+    topics = [
+        ("Học phí chương trình IT1 năm 2026 là bao nhiêu?", "low_confidence"),
+        ("IT2 yêu cầu chứng chỉ ngoại ngữ đầu vào như thế nào?", "low_confidence"),
+        ("HUST 2026 có những phương thức tuyển sinh nào?", "user_request"),
+        ("Em cần chuẩn bị giấy tờ gì khi nhập học?", "user_request"),
+        ("Chỉ tiêu ngành Khoa học máy tính năm 2026 là bao nhiêu?", "low_confidence"),
+        ("Em muốn hỏi về diện ưu tiên trong tuyển sinh.", "user_request"),
+        ("Điều kiện xét tuyển tài năng gồm những gì?", "low_confidence"),
+        ("Em có thể thay đổi nguyện vọng sau khi đăng ký không?", "user_request"),
+        ("Cho em xin thông tin liên hệ của phòng tuyển sinh.", "sensitive"),
+        ("Khi nào trường công bố kết quả xét tuyển?", "low_confidence"),
+    ]
+    generated = []
+    for number in range(11, 51):
+        topic, reason = topics[(number - 11) % len(topics)]
+        if number <= 20:
+            status, owner, claim_h, finish_h = "waiting", None, None, None
+        elif number <= 30:
+            status, owner, claim_h, finish_h = "in_progress", OFFICERS[(number - 11) % len(OFFICERS)][0], 0.5, None
+        elif number <= 40:
+            status, owner, claim_h, finish_h = "resolved", OFFICERS[(number - 11) % len(OFFICERS)][0], 0.5, 2
+        else:
+            status, owner, claim_h, finish_h = "rejected", OFFICERS[(number - 11) % len(OFFICERS)][0], 0.5, 2
+        generated.append(
+            (
+                f"TS-DEMO{number:02d}",
+                f"{topic} (ca kiểm thử {number})",
+                reason,
+                status,
+                owner,
+                2 + (number % 28),
+                claim_h,
+                finish_h,
+            )
+        )
+    return BASE_TICKETS + generated
+
+
+TICKETS = build_tickets()
+
+
 def event(db, ticket, action, created, actor=None, from_owner=None, to_owner=None, note=None):
     user = "(SELECT id FROM users WHERE username=?)"
     db.execute(
-        "INSERT INTO ticket_events(ticket_id,actor_id,action,from_officer_id,to_officer_id,note,created)"
-        f" VALUES(?,{user},?,{user},{user},?,?)",
-        (ticket, actor, action, from_owner, to_owner, note, created),
+        "INSERT INTO ticket_events(ticket_id,actor,actor_id,action,from_officer_id,to_officer_id,note,created)"
+        f" VALUES(?,?,{user},?,{user},{user},?,?)",
+        (ticket, actor or "candidate", actor, action, from_owner, to_owner, note, created),
     )
 
 
@@ -118,13 +173,12 @@ def demo_answers(data_dir, store, cfg):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     cfg = get_settings()
-    if cfg.app_env == "production":
-        raise SystemExit("Không seed dữ liệu demo trong môi trường production.")
-    data_dir = Path(cfg.mvp_data_dir)
-    data_dir = data_dir if data_dir.is_absolute() else ROOT / data_dir
-    store = Store(data_dir / "mvp.db")
+    if cfg.app_env == "production" and os.getenv("DEMO_SEED_ENABLED", "").lower() != "true":
+        raise SystemExit("Không seed dữ liệu demo trong production nếu chưa đặt DEMO_SEED_ENABLED=true.")
+    knowledge_dir, state_dir = runtime_data_dirs(cfg)
+    store = Store(state_dir / "mvp.db")
     seed_accounts(store, cfg)
-    answers = demo_answers(data_dir, store, cfg)
+    answers = demo_answers(knowledge_dir, store, cfg)
     now = time.time()
     with store.connect() as db:
         for username, name in OFFICERS:
@@ -135,6 +189,9 @@ def main():
             session = f"demo-session-{i + 1}"
             existing = db.execute("SELECT created FROM tickets WHERE id=?", (tid,)).fetchone()
             created = existing[0] if existing else now - ago * H
+            answer = answers[i] if isinstance(answers[i], dict) else {"response": str(answers[i]), "sources": []}
+            answer_text = answer.get("response", "")
+            sources_json = json.dumps(answer.get("sources", []), ensure_ascii=False)
             # Conversation is refreshed on every run so demo answers follow the current knowledge source.
             db.execute("DELETE FROM messages WHERE session=?", (session,))
             for offset, role, payload in [(120, "user", {"response": question}), (110, "assistant", answers[i])]:
@@ -143,6 +200,10 @@ def main():
                     (session, role, json.dumps(payload, ensure_ascii=False), created - offset),
                 )
             if existing:
+                db.execute(
+                    "UPDATE tickets SET summary=?, question=?, ai_answer=?, sources_json=? WHERE id=?",
+                    (question, question, answer_text, sources_json, tid),
+                )
                 continue
             claimed = created + claim_h * H if claim_h is not None else None
             finished = claimed + finish_h * H if finish_h is not None else None
@@ -151,8 +212,8 @@ def main():
                 "rejected": "Ngoài phạm vi tư vấn tuyển sinh.",
             }
             db.execute(
-                "INSERT INTO tickets(id,session,request_key,summary,reason,status,owner,reply,created,updated,claimed_at,resolved_at)"
-                " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO tickets(id,session,request_key,summary,reason,status,owner,reply,question,ai_answer,sources_json,created,updated,claimed_at,resolved_at)"
+                " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     tid,
                     session,
@@ -162,6 +223,9 @@ def main():
                     status,
                     owner,
                     reply.get(status, ""),
+                    question,
+                    answer_text,
+                    sources_json,
                     created,
                     finished or claimed or created,
                     claimed,

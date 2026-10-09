@@ -21,8 +21,9 @@ RUN useradd -m appuser
 # Copy application code
 COPY . .
 
-# Create data directory with correct ownership
-RUN mkdir -p /app/data && chown -R appuser:appuser /app
+# Create source and persistent-state directories with correct ownership. On
+# Railway, mount a Volume at /app/state; source PDFs remain in /app/data.
+RUN mkdir -p /app/data /app/state && chown -R appuser:appuser /app
 
 USER appuser
 

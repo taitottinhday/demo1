@@ -28,6 +28,36 @@ mimetypes.add_type("text/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
 
 
+def runtime_data_dirs(cfg):
+    """Return (knowledge_dir, state_dir) for the current runtime.
+
+    Knowledge files are shipped with the image and may be rebuilt at startup.
+    Accounts, tickets and their states are mutable application data and must be
+    placed on a persistent Railway Volume in production. Failing closed here
+    prevents a deployment from silently starting with a fresh SQLite database.
+    """
+
+    knowledge_dir = Path(cfg.mvp_data_dir).expanduser()
+    if not knowledge_dir.is_absolute():
+        knowledge_dir = ROOT / knowledge_dir
+
+    persistent_value = (cfg.persistent_data_dir or "").strip()
+    if cfg.app_env == "production" and not persistent_value:
+        raise ValueError(
+            "Production cần PERSISTENT_DATA_DIR trỏ tới Railway Volume để không mất dữ liệu cán bộ và ticket."
+        )
+
+    state_dir = Path(persistent_value or cfg.mvp_data_dir).expanduser()
+    if not state_dir.is_absolute():
+        state_dir = ROOT / state_dir
+
+    if cfg.app_env == "production" and state_dir.resolve() == knowledge_dir.resolve():
+        raise ValueError(
+            "PERSISTENT_DATA_DIR phải khác MVP_DATA_DIR; không mount Volume đè lên thư mục nguồn tuyển sinh."
+        )
+    return knowledge_dir, state_dir
+
+
 def create_app(settings=None):
     cfg = settings or get_settings()
     allowed_origins = {
@@ -57,12 +87,11 @@ def create_app(settings=None):
 
     @asynccontextmanager
     async def lifespan(app):
-        data_dir = Path(cfg.mvp_data_dir)
-        if not data_dir.is_absolute():
-            data_dir = ROOT / data_dir
-        store = Store(data_dir / "mvp.db")
+        knowledge_dir, state_dir = runtime_data_dirs(cfg)
+        state_dir.mkdir(parents=True, exist_ok=True)
+        store = Store(state_dir / "mvp.db")
         seed_accounts(store, cfg)
-        knowledge = Knowledge(data_dir)
+        knowledge = Knowledge(knowledge_dir)
         source_error = None
         try:
             await asyncio.to_thread(knowledge.ingest)
