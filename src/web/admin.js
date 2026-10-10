@@ -2,7 +2,7 @@ const $=id=>document.getElementById(id);
 const names={waiting:'Đang chờ',in_progress:'Đang xử lý',resolved:'Đã giải quyết',rejected:'Đã từ chối',cancelled:'Đã hủy'};
 const reasons={user_request:'Ứng viên yêu cầu',low_confidence:'AI không chắc chắn',sensitive:'Câu hỏi nhạy cảm'};
 const actions={created:'Tạo ticket',claimed:'Nhận xử lý',reply:'Gửi phản hồi',resolved:'Giải quyết',rejected:'Từ chối',reassigned:'Phân công lại',cancelled:'Ứng viên hủy'};
-let officers=[], page=1, total=0, selected=null, pollingTimer=null, refreshInFlight=false, ticketListRequestId=0, ticketDetailRequestId=0;
+let officers=[], page=1, total=0, selected=null, assignmentNotice=null, pollingTimer=null, refreshInFlight=false, ticketListRequestId=0, ticketDetailRequestId=0;
 const PAGE_SIZE=15;
 const POLL_INTERVAL_MS=5000;
 document.body.classList.add('admin-page');
@@ -129,8 +129,6 @@ async function loadTickets(){
   const table=document.querySelector('#ticket-rows')?.closest('table');
   if(table){table.classList.add('admin-ticket-table');if(!table.querySelector('caption'))table.prepend(node('caption','', 'Danh sách ticket hỗ trợ'));}
   $('ticket-rows').replaceChildren();
-  const selectedVisible=selected&&data.items.some(t=>t.id===selected);
-  if(selected&&!selectedVisible){selected=null;ticketDetailRequestId++;}
   if(!data.items.length){const tr=node('tr');const td=node('td','empty-state','Không có ticket phù hợp.');td.colSpan=5;tr.append(td);$('ticket-rows').append(tr);}
   data.items.forEach(t=>{const tr=node('tr','clickable'+(selected===t.id?' selected':''));tr.tabIndex=0;tr.setAttribute('role','button');tr.setAttribute('aria-label',`Mở chi tiết ticket ${t.id}`);const badge=node('td');badge.dataset.label='Trạng thái';badge.append(node('span','badge '+t.status,names[t.status]));
     const idCell=node('td','nowrap',t.id);idCell.dataset.label='Mã ticket';
@@ -144,6 +142,7 @@ async function loadTickets(){
   $('page-info').textContent=`Trang ${page}/${pages} · ${total} ticket`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
 }
 async function openTicket(id){
+  if(selected!==id)assignmentNotice=null;
   selected=id;const requestId=++ticketDetailRequestId;document.querySelector('[data-tab="tickets"]').click();
   try{
     const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);
@@ -154,6 +153,7 @@ async function openTicket(id){
 function renderDetail(t,history){
   const box=$('detail');box.replaceChildren();
   box.append(node('span','eyebrow','CHI TIẾT TICKET'),node('h2','',t.id),node('span','badge '+t.status,names[t.status]));
+  if(assignmentNotice?.ticketId===t.id){const notice=node('p','notice-text',assignmentNotice.text);notice.setAttribute('role','status');box.append(notice);}
   const facts=node('dl','facts');
   [['Lý do chuyển',reasons[t.handover_reason]||t.handover_reason],['Độ tự tin AI',t.confidence_score===null?'Chưa ghi nhận':t.confidence_score],['Cán bộ',t.officer_name||'—'],['Tạo lúc',when(t.created)],['Nhận lúc',when(t.claimed_at)],['Kết thúc lúc',when(t.resolved_at)]]
     .forEach(([k,v])=>facts.append(node('dt','',k),node('dd','',String(v))));
@@ -180,7 +180,16 @@ function renderDetail(t,history){
     button.onclick=async()=>{err.textContent='';if(!select.value){err.textContent='Hãy chọn cán bộ nhận hoặc "Trả về hàng chờ".';select.focus();return;}
       const to=select.value==='queue'?null:Number(select.value);
       if(to===null&&!confirm(`Trả ${t.id} về hàng chờ? ${t.officer_name} sẽ không còn phụ trách ticket này.`))return;
-      button.disabled=true;try{await api('/admin/tickets/'+t.id+'/reassign',{method:'POST',body:JSON.stringify({to_officer_id:to,note:note.value})});await loadOfficers();await openTicket(t.id);}catch(e){err.textContent=e.message;button.disabled=false;}};
+      button.disabled=true;try{
+        const updated=await api('/admin/tickets/'+t.id+'/reassign',{method:'POST',body:JSON.stringify({to_officer_id:to,note:note.value})});
+        assignmentNotice={ticketId:t.id,text:updated.officer_id?`Đã phân công ${t.id} cho ${updated.officer_name}. Ticket chuyển sang “Đang xử lý”.`:`Đã trả ${t.id} về hàng chờ.`};
+        // Assignment changes the ticket's status and owner. Keep it visible after polling.
+        $('status-filter').value=updated.status;
+        $('officer-filter').value=updated.officer_id?String(updated.officer_id):'';
+        persistFilters();page=1;
+        try{await loadOfficers();}catch(refreshError){fail(refreshError);}
+        await openTicket(t.id);
+      }catch(e){err.textContent=e.message;button.disabled=false;}};
     box.append(label,select,noteLabel,note,button,err);
   }
 }
@@ -278,7 +287,7 @@ async function openTicketSilently(id){
   renderDetail(t,history);
 }
 $('range-form').addEventListener('submit',e=>{e.preventDefault();persistFilters();loadOverview().catch(fail);});
-$('status-filter').onchange=$('officer-filter').onchange=()=>{persistFilters();page=1;loadTickets().catch(fail);};
+$('status-filter').onchange=$('officer-filter').onchange=()=>{selected=null;assignmentNotice=null;ticketDetailRequestId++;persistFilters();page=1;loadTickets().catch(fail);};
 $('prev').onclick=()=>{page--;loadTickets().catch(fail);};$('next').onclick=()=>{page++;loadTickets().catch(fail);};
 $('refresh').onclick=refresh;
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').textContent='';$('username-error').textContent='';$('password-error').textContent='';const username=$('username').value.trim(),password=$('password').value;$('username').removeAttribute('aria-invalid');$('password').removeAttribute('aria-invalid');const first=!username?'username':!password?'password':'';if(first){$(first).setAttribute('aria-invalid','true');$(`${first}-error`).textContent=first==='username'?'Tài khoản là bắt buộc.':'Mật khẩu là bắt buộc.';$(first).focus();return;}const button=e.submitter;button.disabled=true;
