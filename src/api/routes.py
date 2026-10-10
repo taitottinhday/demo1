@@ -611,23 +611,32 @@ def guide(request: Request):
             "id": "eligibility",
             "title": "Đối chiếu điều kiện dự tuyển",
             "text": "Tài liệu nêu: đã tốt nghiệp THPT, có điểm ĐGTD năm 2025 hoặc 2026 và đạt ngưỡng nhận hồ sơ do HUST quy định.",
-            "url": "/api/v1/source/pdf#page=18",
+            "action_type": "pdf",
+            "action_label": "Xem điều kiện trong PDF ↗",
         },
         {
             "id": "test-registration",
             "title": "Phân biệt đăng ký dự thi và xét tuyển",
             "text": "Đăng ký dự thi ĐGTD tại địa chỉ được tài liệu dẫn; việc dự thi không thay thế đăng ký nguyện vọng.",
             "url": "https://tsa.hust.edu.vn/dk",
+            "action_type": "external",
+            "action_label": "Mở cổng đăng ký dự thi ↗",
         },
         {
             "id": "application-registration",
             "title": "Đăng ký nguyện vọng theo kế hoạch chung",
             "text": "Tài liệu dẫn hệ thống của Bộ để đăng ký nguyện vọng bằng tài khoản thí sinh. Kiểm tra thông báo đang có hiệu lực trước thao tác.",
             "url": "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login",
+            "action_type": "external",
+            "action_label": "Mở cổng đăng ký nguyện vọng ↗",
         },
     ]
     for step in steps:
         step["source"] = citation
+        if step["action_type"] == "pdf":
+            # Use the source-specific PDF URL so the action and citation open
+            # the same document and page, even when source_id is required.
+            step["url"] = citation["local_url"] or f"/api/v1/source/pdf#page={source['page']}"
     return {
         "title": "Chuẩn bị xét tuyển theo Đánh giá tư duy",
         "note": "Danh sách tự kiểm tra dựa trên mục 6.2, PDF trang 18. Không phải hồ sơ đã nộp hoặc xác nhận đủ điều kiện.",

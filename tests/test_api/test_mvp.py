@@ -41,6 +41,36 @@ async def test_source_and_grounded_program(client):
 
 
 @pytest.mark.asyncio
+async def test_guide_action_labels_match_their_destinations(client):
+    guide = (await client.get("/api/v1/guide")).json()
+    steps = {step["id"]: step for step in guide["steps"]}
+
+    eligibility = steps["eligibility"]
+    assert eligibility["action_type"] == "pdf"
+    assert eligibility["action_label"] == "Xem điều kiện trong PDF ↗"
+    assert eligibility["url"] == eligibility["source"]["local_url"]
+    assert eligibility["url"].endswith("#page=18")
+    assert "/api/v1/source/pdf" in eligibility["url"]
+
+    expected_external_actions = {
+        "test-registration": (
+            "Mở cổng đăng ký dự thi ↗",
+            "https://tsa.hust.edu.vn/dk",
+        ),
+        "application-registration": (
+            "Mở cổng đăng ký nguyện vọng ↗",
+            "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login",
+        ),
+    }
+    for step_id, (label, url) in expected_external_actions.items():
+        step = steps[step_id]
+        assert step["action_type"] == "external"
+        assert step["action_label"] == label
+        assert step["url"] == url
+        assert "/api/v1/source/pdf" not in step["url"]
+
+
+@pytest.mark.asyncio
 async def test_candidate_checklist_requires_account_and_syncs_progress(client):
     guide = (await client.get("/api/v1/guide")).json()
     version = guide["guide_version"]

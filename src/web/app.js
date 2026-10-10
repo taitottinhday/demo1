@@ -351,8 +351,18 @@ function renderGuide(guide) {
     const sourceBox=node('div','guide-source');
     sourceBox.append(node('span','',`Nguồn: ${source.document_title||guide.document_title||'Tài liệu tuyển sinh'} · PDF trang ${source.page||'chưa rõ'} · bản ${source.version||guide.document_version||'chưa rõ'}`));
     const pdfUrl=source.local_url||`/api/v1/source/pdf#page=${source.page||1}`;
-    sourceBox.append(link(`Mở PDF trang ${source.page||'chưa rõ'} ↗`,pdfUrl));
-    if(step.url&&step.url!==pdfUrl)sourceBox.append(link('Mở cổng đăng ký ↗',step.url));
+    if(step.action_type==='pdf') {
+      const actionUrl=typeof step.url==='string'&&step.url.startsWith('/api/v1/source/pdf')?step.url:pdfUrl;
+      sourceBox.append(link(step.action_label||`Mở PDF trang ${source.page||'chưa rõ'} ↗`,actionUrl));
+    } else {
+      sourceBox.append(link(`Mở PDF trang ${source.page||'chưa rõ'} ↗`,pdfUrl));
+      let officialActionUrl=null;
+      try {
+        const actionUrl=new URL(step.url||'');
+        if(actionUrl.protocol==='https:'&&['tsa.hust.edu.vn','thisinh.thitotnghiepthpt.edu.vn'].includes(actionUrl.hostname))officialActionUrl=actionUrl.href;
+      } catch {}
+      if(step.action_type==='external'&&officialActionUrl)sourceBox.append(link(step.action_label||'Mở trang chính thức ↗',officialActionUrl));
+    }
     card.append(label,node('p','',step.text),sourceBox);
     $('guide-steps').append(card);
   });
