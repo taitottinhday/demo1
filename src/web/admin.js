@@ -37,7 +37,7 @@ function showDashboard(){$('dashboard').hidden=false;$('login-panel').hidden=tru
 function fail(error){$('admin-error').textContent=error.message;}
 function stopAutoRefresh(){if(pollingTimer){window.clearInterval(pollingTimer);pollingTimer=null;}}
 function startAutoRefresh(){stopAutoRefresh();pollingTimer=window.setInterval(()=>{if(document.hidden||refreshInFlight||hasAdminDraft())return;refresh({silent:true}).catch(fail);},POLL_INTERVAL_MS);}
-function hasAdminDraft(){return ['o-name','o-username','o-email','reassign-note'].some(id=>{const field=$(id);return field&&((document.activeElement===field)||field.value.trim());});}
+function hasAdminDraft(){return ['o-name','o-username','o-email','reassign-to','reassign-note'].some(id=>{const field=$(id);return field&&((document.activeElement===field)||field.value.trim());});}
 function markLiveUpdated(){const status=$('live-status');if(status)status.textContent=`Đã cập nhật ${new Date().toLocaleTimeString('vi-VN')} · Tự động mỗi 5 giây`;}
 const FILTER_STORAGE_KEY='admin-dashboard-filters';
 function persistFilters(){
@@ -283,7 +283,9 @@ async function refresh(options={}){
 async function openTicketSilently(id){
   const requestId=++ticketDetailRequestId;
   const [t,history]=await Promise.all([api('/admin/tickets/'+id),api('/admin/tickets/'+id+'/history')]);
-  if(requestId!==ticketDetailRequestId||selected!==id)return;
+  // Polling can begin just before the admin opens the assignment menu. Never replace
+  // the detail DOM while a form field is focused or contains an unfinished value.
+  if(requestId!==ticketDetailRequestId||selected!==id||hasAdminDraft())return;
   renderDetail(t,history);
 }
 $('range-form').addEventListener('submit',e=>{e.preventDefault();persistFilters();loadOverview().catch(fail);});
