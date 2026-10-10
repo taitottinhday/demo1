@@ -162,13 +162,13 @@
 <dialog id="program-guidance-dialog" class="program-guidance-dialog" aria-labelledby="program-guidance-title">
   <div class="guidance-dialog-top">
     <div>
-      <p class="eyebrow">KHÁM PHÁ CHƯƠNG TRÌNH</p>
-      <h2 id="program-guidance-title">Ngành nào hợp với bạn?</h2>
+      <p class="eyebrow">GỢI Ý NGÀNH HỌC</p>
+      <h2 id="program-guidance-title">Khám phá ngành phù hợp</h2>
     </div>
     <button type="button" class="close" data-close="program-guidance-dialog" aria-label="Đóng và xóa nội dung đã nhập">×</button>
   </div>
-  <p class="guidance-lead">Chia sẻ thế mạnh, điều bạn thích và hướng muốn tìm hiểu. Bạn có thể bỏ qua thông tin chưa muốn trả lời.</p>
-  <p class="guidance-privacy" role="note">Không cần nhập tên hay thông tin liên hệ. Câu trả lời chỉ dùng để tính gợi ý trong phiên, không lưu vào lịch sử chat hoặc ticket; nội dung sẽ được xóa khi bạn đóng hoặc làm lại.</p>
+  <p class="guidance-lead">Chọn điều bạn làm tốt, yêu thích và muốn phát triển.</p>
+  <p class="guidance-privacy" role="note">Không cần thông tin cá nhân. Nội dung không lưu vào chat hoặc ticket.</p>
   <p id="guidance-option-status" class="hint" role="status">Đang tải lĩnh vực từ danh mục chương trình…</p>
   <p id="guidance-error" class="error-text" role="alert"></p>
   <div class="guidance-content">
@@ -180,29 +180,38 @@
           <span id="guidance-step-name">Thế mạnh</span>
         </div>
         <fieldset class="guidance-step" data-guidance-step="1">
-          <legend tabindex="-1">Bạn thấy mình có thế mạnh ở đâu?</legend>
-          <p class="guidance-help">Chọn tối đa 4 lĩnh vực. Không có đáp án đúng hoặc sai.</p>
+          <legend tabindex="-1">Bạn tự tin ở lĩnh vực nào?</legend>
+          <p class="guidance-help">Chọn tối đa 4 lĩnh vực.</p>
           <div id="guidance-strength-options" class="guidance-options"></div>
-          <label for="guidance-strengths-note">Môn học hoặc kỹ năng bạn tự tin (không bắt buộc)</label>
-          <textarea id="guidance-strengths-note" name="strengths_note" maxlength="400" rows="2" placeholder="Ví dụ: Toán, giải quyết vấn đề, làm thí nghiệm…"></textarea>
+          <details class="guidance-extra">
+            <summary>Thêm môn học hoặc kỹ năng cụ thể <span>Tùy chọn</span></summary>
+            <label for="guidance-strengths-note">Môn học hoặc kỹ năng</label>
+            <textarea id="guidance-strengths-note" name="strengths_note" maxlength="400" rows="2" placeholder="Ví dụ: Toán, giải quyết vấn đề…"></textarea>
+          </details>
         </fieldset>
         <fieldset class="guidance-step" data-guidance-step="2" hidden>
-          <legend tabindex="-1">Bạn thích tìm hiểu hoặc muốn làm gì?</legend>
-          <p class="guidance-help">Chọn tối đa 4 lĩnh vực; có thể mô tả thêm sở thích hoặc hoạt động bạn yêu thích.</p>
+          <legend tabindex="-1">Bạn muốn tìm hiểu lĩnh vực nào?</legend>
+          <p class="guidance-help">Chọn tối đa 4 lĩnh vực.</p>
           <div id="guidance-interest-options" class="guidance-options"></div>
-          <label for="guidance-interests-note">Sở thích hoặc hoạt động yêu thích (không bắt buộc)</label>
-          <textarea id="guidance-interests-note" name="interests_note" maxlength="400" rows="2" placeholder="Ví dụ: lập trình, chế tạo robot, phân tích dữ liệu…"></textarea>
-          <label for="guidance-career-direction">Hướng bạn muốn tìm hiểu (không bắt buộc)</label>
-          <input id="guidance-career-direction" name="career_direction" maxlength="240" placeholder="Ví dụ: nghiên cứu, thiết kế sản phẩm, làm việc với dữ liệu…">
+          <details class="guidance-extra">
+            <summary>Thêm sở thích hoặc định hướng <span>Tùy chọn</span></summary>
+            <label for="guidance-interests-note">Hoạt động bạn yêu thích</label>
+            <textarea id="guidance-interests-note" name="interests_note" maxlength="400" rows="2" placeholder="Ví dụ: lập trình, làm robot…"></textarea>
+            <label for="guidance-career-direction">Định hướng bạn quan tâm</label>
+            <input id="guidance-career-direction" name="career_direction" maxlength="240" placeholder="Ví dụ: nghiên cứu, thiết kế sản phẩm…">
+          </details>
         </fieldset>
         <fieldset class="guidance-step" data-guidance-step="3" hidden>
-          <legend tabindex="-1">Bạn muốn bồi dưỡng thêm điều gì?</legend>
-          <p class="guidance-help">Thông tin này chỉ giúp nêu lưu ý; không bị dùng để trừ điểm hoặc loại ngành.</p>
+          <legend tabindex="-1">Bạn muốn phát triển thêm điều gì?</legend>
+          <p class="guidance-help">Chỉ để bổ sung lưu ý, không dùng để trừ điểm.</p>
           <div id="guidance-improvement-options" class="guidance-options"></div>
-          <label for="guidance-improvements-note">Kỹ năng hoặc môn học muốn cải thiện (không bắt buộc)</label>
-          <textarea id="guidance-improvements-note" name="improvements_note" maxlength="300" rows="2" placeholder="Ví dụ: ngoại ngữ, giao tiếp, tư duy logic…"></textarea>
-          <label for="guidance-priorities">Điều bạn ưu tiên khi chọn ngành (không bắt buộc)</label>
-          <input id="guidance-priorities" name="priorities" maxlength="240" placeholder="Ví dụ: thích thực hành, muốn học gần nhà…">
+          <details class="guidance-extra">
+            <summary>Thêm kỹ năng cần bồi dưỡng hoặc tiêu chí chọn ngành <span>Tùy chọn</span></summary>
+            <label for="guidance-improvements-note">Kỹ năng hoặc môn học</label>
+            <textarea id="guidance-improvements-note" name="improvements_note" maxlength="300" rows="2" placeholder="Ví dụ: ngoại ngữ, giao tiếp…"></textarea>
+            <label for="guidance-priorities">Tiêu chí bạn ưu tiên</label>
+            <input id="guidance-priorities" name="priorities" maxlength="240" placeholder="Ví dụ: nhiều thực hành, gần nhà…">
+          </details>
         </fieldset>
       </div>
       <div class="guidance-form-actions">

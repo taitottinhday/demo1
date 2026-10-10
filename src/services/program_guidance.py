@@ -174,9 +174,8 @@ AREAS = (
 
 AREA_BY_ID = {area["id"]: area for area in AREAS}
 NOTICE = (
-    "Gợi ý được đối chiếu cục bộ từ chủ đề bạn chọn với tên các chương trình trong tài liệu tuyển sinh HUST 2026. "
-    "Nguồn hiện có chưa mô tả đầy đủ môn học, nội dung đào tạo hay nghề nghiệp; kết quả không đánh giá năng lực, "
-    "không dự đoán trúng tuyển và không thay thế tư vấn của HUST. Thông tin bạn nhập không được gửi sang dịch vụ AI bên ngoài."
+    "Kết quả đối chiếu chủ đề bạn chọn với tên chương trình trong tài liệu HUST 2026. Tài liệu chưa mô tả đầy đủ nội dung học hoặc nghề nghiệp; "
+    "đây không phải đánh giá năng lực hay dự đoán trúng tuyển. Thông tin không được gửi tới dịch vụ AI bên ngoài."
 )
 
 
@@ -250,25 +249,25 @@ def recommend_programs(knowledge, profile):
 
         reasons = []
         if matched_interests:
-            reasons.append("Lĩnh vực bạn quan tâm có điểm giao với tên chương trình.")
+            reasons.append("Có điểm giao với lĩnh vực bạn quan tâm.")
         if matched_strengths:
-            reasons.append("Lĩnh vực bạn tự tin có điểm giao với tên chương trình.")
+            reasons.append("Có điểm giao với thế mạnh bạn chọn.")
         matched_improvements = sorted(improvements & program_areas)
         considerations = []
         if matched_improvements:
             labels = ", ".join(AREA_BY_ID[key]["label"] for key in matched_improvements)
             considerations.append(
-                f"Bạn muốn bồi dưỡng {labels}. Tài liệu hiện có chưa đủ chi tiết để xác định các lĩnh vực này được học ở mức nào trong chương trình."
+                f"Muốn phát triển: {labels}. Tài liệu chưa nêu rõ mức độ đào tạo."
             )
         if profile.improvements or profile.improvements_note:
-            considerations.append("Điều bạn muốn cải thiện không bị dùng để trừ điểm hay loại chương trình khỏi gợi ý.")
+            considerations.append("Mục tiêu phát triển không làm giảm mức gợi ý.")
 
         if matched_interests and matched_strengths:
-            badge = "Có điểm giao với sở thích và thế mạnh"
+            badge = "Giao với sở thích + thế mạnh"
         elif matched_interests:
-            badge = "Có điểm giao với sở thích"
+            badge = "Giao với sở thích"
         else:
-            badge = "Có điểm giao với thế mạnh"
+            badge = "Giao với thế mạnh"
 
         citation = knowledge.citation(chunk)
         ranked.append(
@@ -299,8 +298,8 @@ def recommend_programs(knowledge, profile):
         "suggestions": suggestions,
         "notice": NOTICE,
         "message": (
-            "Các gợi ý dưới đây có từ khóa lĩnh vực giao với tên chương trình. Hãy mở nguồn và tìm hiểu thêm về chương trình học trước khi cân nhắc lựa chọn."
+            "Các gợi ý dựa trên điểm giao giữa chủ đề bạn chọn và tên chương trình. Mở tài liệu để tìm hiểu thêm."
             if suggestions
-            else "Chưa tìm thấy điểm giao rõ trong tên chương trình từ thông tin đã nhập. Tài liệu tuyển sinh hiện có không đủ mô tả để đối chiếu sâu hơn; bạn có thể thử một lĩnh vực khác hoặc hỏi cán bộ tuyển sinh."
+            else "Chưa thấy điểm giao rõ với tên chương trình. Hãy thử lĩnh vực khác hoặc hỏi cán bộ tuyển sinh."
         ),
     }
