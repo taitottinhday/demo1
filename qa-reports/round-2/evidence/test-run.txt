@@ -1,0 +1,22 @@
+Repository root: E:\AI1\P-051
+Code revision under test: 783acec872a0a02bed6ce8d3a69981b97c45c1f5
+
+pytest -q
+Result: 94 passed, 1 failed in 28.28 seconds.
+Failure: tests/test_api/test_mvp.py::test_llm_quote_validation_and_failure
+Observed mismatch: test expects an LLM quote-validation path for a quota query, while the current deterministic quota route answers without invoking the mocked LLM.
+
+pytest -q tests/test_api/test_mvp.py -k quota
+Result: 1 passed, 40 deselected.
+
+pytest -q tests/test_api/test_auth.py tests/test_api/test_admin.py tests/test_api/test_multi_source_knowledge.py tests/test_data/test_admissions_source_data.py
+Result: 27 passed.
+
+Focused selection excluding the one failing quote test:
+Result: 62 passed, 1 deselected.
+
+ruff check src tests
+Result: 3 errors: F401 and F841 in src/services/knowledge.py; I001 in tests/test_data/test_admissions_source_data.py.
+
+git diff --check
+Result: pass; no whitespace issue reported.

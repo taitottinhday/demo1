@@ -1,0 +1,10 @@
+Production page: /staff (authenticated)
+Observed at: 2026-10-10 13:09:24 Asia/Ho_Chi_Minh
+QA_TEST ticket: TS-AC57CE06
+Before action: waiting, unassigned; answer IT2 quota 200; source PDF page 10.
+After claim: in progress; assigned to current staff role session.
+After reply: resolved; reply appears in the ticket detail.
+Queue counts after resolution: waiting 11; in progress 3; resolved 2; rejected 0; canceled 0.
+History: ticket created, accepted by staff, reply sent, reply sent and ticket closed.
+
+Credential values are deliberately omitted. The screenshot-provided staff account value was rejected; the user supplied corrected credentials, which opened the queue. No guessing or repeated login attempts were made.

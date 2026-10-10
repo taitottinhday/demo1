@@ -1,0 +1,6 @@
+"Viewport","Horizontal document overflow","Vertical page overflow","Composer visible","Result","Notes"
+"1920x1080","No","No observed","Yes","PASS","IAB viewport override"
+"1366x768","No","No observed","Yes","PASS","IAB viewport override"
+"768x1024","No","No observed","Yes","PARTIAL","Drawer/breakpoint behavior not fully established"
+"390x844","No","No observed","Yes","PASS","Mobile viewport"
+"375x667","No","No observed","Yes","PASS","Small mobile viewport"

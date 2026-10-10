@@ -1,0 +1,4 @@
+Production URL: https://demo1-production-f54e.up.railway.app/
+Pages sampled: applicant home, /staff, /admin
+Result: no console warnings or errors returned by the browser log reader during the observed sessions.
+Limit: this is a browser-console sample only; it does not cover server logs, all routes, or network failures.

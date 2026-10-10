@@ -1,0 +1,16 @@
+Production page: /admin (authenticated)
+Observed at: 2026-10-10 13:11:52 Asia/Ho_Chi_Minh
+Selected range: 2026-10-08 through 2026-10-09 inclusive
+Effective interval: 2026-10-08T00:00:00+07:00 -> 2026-10-10T00:00:00+07:00
+Timezone: Asia/Ho_Chi_Minh
+
+Metrics visible in accessibility tree:
+- Waiting tickets: 11
+- Average wait: 57 minutes; numerator/denominator 126400.29961800575 / 37 seconds-based source values
+- Average handling: 1.9 hours; numerator/denominator 82814.60320711136 / 12
+- Decline rate: 47.8%; 11 / 23 (declined / resolved + declined)
+- Direct answer rate: 100%; 11 / 11
+- Staff-transfer requests: 48 (count of tickets created in selected interval; not a percentage)
+- Dashboard states values with source, range, timezone and last-updated timestamp.
+
+No “Tỷ lệ chuyển cán bộ” percentage KPI was shown. The range end is exclusive at midnight on 2026-10-10. No percentage above 100 was visible.
