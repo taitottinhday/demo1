@@ -90,7 +90,7 @@
     <div class="sidebar-actions">
       <button class="secondary guidance-open" id="recommend-open" type="button" aria-haspopup="dialog" aria-controls="program-guidance-dialog">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 14.2 9l5.8 2.2-5.8 2.1-2.2 5.8-2.1-5.8L4 11.2 9.9 9 12 3.5Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg>
-        <span>Khám phá ngành phù hợp</span><b aria-hidden="true">›</b>
+        <span>Gợi ý ngành tham khảo</span><b aria-hidden="true">›</b>
       </button>
       <button class="secondary" id="compare-open" type="button">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg>
@@ -163,12 +163,12 @@
   <div class="guidance-dialog-top">
     <div>
       <p class="eyebrow">GỢI Ý NGÀNH HỌC</p>
-      <h2 id="program-guidance-title">Khám phá ngành phù hợp</h2>
+      <h2 id="program-guidance-title">Gợi ý ngành tham khảo</h2>
     </div>
     <button type="button" class="close" data-close="program-guidance-dialog" aria-label="Đóng và xóa nội dung đã nhập">×</button>
   </div>
   <p class="guidance-lead">Chọn điều bạn làm tốt, yêu thích và muốn phát triển.</p>
-  <p class="guidance-privacy" role="note">Không cần thông tin cá nhân. Nội dung không lưu vào chat hoặc ticket.</p>
+  <p class="guidance-privacy" role="note">Không cần nhập thông tin cá nhân. Câu trả lời được gửi tới máy chủ website để đối chiếu danh mục; không gửi tới AI bên ngoài và không lưu vào hội thoại hoặc ticket.</p>
   <p id="guidance-option-status" class="hint" role="status">Đang tải lĩnh vực từ danh mục chương trình…</p>
   <p id="guidance-error" class="error-text" role="alert"></p>
   <div class="guidance-content">
@@ -223,9 +223,11 @@
     <section id="guidance-results" class="guidance-results" aria-live="polite" hidden>
       <div class="guidance-result-heading">
         <span class="eyebrow">KẾT QUẢ THAM KHẢO</span>
-        <h3>Các chương trình có điểm giao</h3>
+      <h3>Chương trình có từ khóa giao nhau</h3>
       </div>
       <p id="guidance-result-message"></p>
+    <section id="guidance-profile-summary" class="guidance-profile-summary" aria-label="Tóm tắt câu trả lời của bạn"></section>
+    <section id="guidance-unmatched" class="guidance-unmatched" aria-label="Tiêu chí chưa đủ dữ liệu để đối chiếu" hidden></section>
       <div id="guidance-result-list" class="guidance-result-list"></div>
       <p id="guidance-result-notice" class="guidance-result-notice"></p>
       <div class="guidance-result-actions">

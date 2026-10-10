@@ -1023,17 +1023,29 @@ body.staff-page,body.admin-page{
 .applicant-page .guidance-results{padding:2px 3px 3px 0}
 .applicant-page .guidance-result-heading h3{margin:4px 0 6px;color:#172640;font-size:18px}
 .applicant-page #guidance-result-message{margin:0 0 12px;color:#58677d;font-size:11px;line-height:1.55}
+.applicant-page .guidance-profile-summary{margin:0 0 9px;padding:10px 11px;border:1px solid #e3e7ec;border-radius:8px;background:#f8f9fb}
+.applicant-page .guidance-profile-summary h4,.applicant-page .guidance-unmatched h4{margin:0 0 6px;color:#263650;font-size:11px}
+.applicant-page .guidance-profile-list{display:grid;gap:4px;margin:0}
+.applicant-page .guidance-profile-row{display:grid;grid-template-columns:125px minmax(0,1fr);gap:8px;font-size:10px;line-height:1.45}
+.applicant-page .guidance-profile-row dt{color:#68768a;font-weight:650}
+.applicant-page .guidance-profile-row dd{min-width:0;margin:0;color:#35435a;overflow-wrap:anywhere}
+.applicant-page .guidance-unmatched{margin:0 0 9px;padding:9px 11px;border-left:2px solid #b17c1d;border-radius:5px;background:#fffaf0;color:#5f4a23}
+.applicant-page .guidance-unmatched[hidden]{display:none!important}
+.applicant-page .guidance-unmatched-item{margin:4px 0 0;font-size:10px;line-height:1.5;overflow-wrap:anywhere}
+.applicant-page .guidance-unmatched-item b{color:#57451f}
+.applicant-page .guidance-unmatched-message{display:block;padding-left:0;color:#786747}
 .applicant-page .guidance-result-list{display:grid;gap:9px}
 .applicant-page .guidance-result-card{padding:13px 14px;border:1px solid #e2e6eb;border-radius:9px;background:#fff}
 .applicant-page .guidance-card-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .applicant-page .guidance-card-heading h4{margin:0;color:#172640;font-size:14px;line-height:1.4}
 .applicant-page .guidance-fit-label{flex:0 0 auto;padding:4px 7px;border:1px solid #f0dadd;border-radius:99px;background:#fff6f7;color:#9f1027;font-size:9px;font-weight:650;line-height:1.35}
+.applicant-page .guidance-evidence-heading{margin:8px 0 4px;color:#68768a;font-size:9px;font-weight:700}
 .applicant-page .guidance-match-list{display:grid;gap:4px;margin-top:8px}
 .applicant-page .guidance-match-item{display:grid;grid-template-columns:90px minmax(0,1fr);gap:8px;margin:0;color:#46556d;font-size:10px;line-height:1.45}
 .applicant-page .guidance-match-item b{color:#68768a;font-weight:600}
-.applicant-page .guidance-considerations{margin:8px 0 0;padding:7px 9px 7px 24px;color:#46556d;font-size:10px;line-height:1.5}
-.applicant-page .guidance-considerations li{margin:3px 0}
-.applicant-page .guidance-considerations{border-radius:6px;background:#f8f9fb}
+.applicant-page .guidance-insufficient{margin-top:8px;padding:7px 9px;border-radius:6px;background:#f8f9fb;color:#59677b;font-size:10px;line-height:1.5}
+.applicant-page .guidance-insufficient>b{color:#43516a;font-size:9px}
+.applicant-page .guidance-insufficient p{margin:3px 0 0}
 .applicant-page .guidance-citation{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 8px;margin-top:9px;padding-top:7px;border-top:1px solid #edf0f3;font-size:10px}
 .applicant-page .guidance-citation a{color:#1752a0;text-decoration:underline;text-underline-offset:2px}
 .applicant-page .guidance-source-title{color:#788497;font-size:9px}
@@ -1049,6 +1061,7 @@ body.staff-page,body.admin-page{
   .applicant-page .guidance-options{grid-template-columns:1fr;gap:6px}
   .applicant-page .guidance-choice{min-height:38px;padding:8px 9px}
   .applicant-page .guidance-result-card{padding:11px}
+  .applicant-page .guidance-profile-row{grid-template-columns:95px minmax(0,1fr)}
   .applicant-page .guidance-card-heading{flex-direction:column;gap:5px}
   .applicant-page .guidance-match-item{grid-template-columns:76px minmax(0,1fr)}
   .applicant-page .guidance-card-actions button,.applicant-page .guidance-result-actions button{flex:1 1 100%;min-height:38px}

@@ -60,6 +60,28 @@ class ProgramGuidanceSource(BaseModel):
     document_status: str
 
 
+class ProgramGuidanceProfileSummary(BaseModel):
+    strengths: list[str]
+    interests: list[str]
+    direction: list[str]
+    development_goals: list[str]
+    priorities: list[str]
+
+
+class ProgramGuidanceCriteriaMatch(BaseModel):
+    group: str
+    criteria: list[str]
+    topic: str
+    program_name_terms: list[str]
+
+
+class ProgramGuidanceUnmatchedCriteria(BaseModel):
+    group: str
+    criteria: list[str]
+    message: str
+    topic: str = ""
+
+
 class ProgramGuidanceSuggestion(BaseModel):
     code: str
     name: str
@@ -67,11 +89,16 @@ class ProgramGuidanceSuggestion(BaseModel):
     reasons: list[str]
     matched_strengths: list[str]
     matched_interests: list[str]
+    criteria_matches: list[ProgramGuidanceCriteriaMatch]
+    unmatched_criteria: list[ProgramGuidanceUnmatchedCriteria]
+    insufficient_data: list[str]
     considerations: list[str]
     source: ProgramGuidanceSource
 
 
 class ProgramGuidanceResponse(BaseModel):
     suggestions: list[ProgramGuidanceSuggestion] = Field(max_length=3)
+    profile_summary: ProgramGuidanceProfileSummary
+    unmatched_criteria: list[ProgramGuidanceUnmatchedCriteria]
     notice: str
     message: str

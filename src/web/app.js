@@ -619,7 +619,7 @@ function clearGuidanceProfile(){
   guidanceRequestId++;guidanceController?.abort();guidanceController=null;
   const form=$('program-guidance-form');form.reset();form.hidden=!guidanceAreas;
   $('guidance-submit').disabled=false;$('guidance-submit').removeAttribute('aria-busy');
-  $('guidance-results').hidden=true;$('guidance-result-list').replaceChildren();$('guidance-result-message').textContent='';$('guidance-result-notice').textContent='';$('guidance-error').textContent='';
+  $('guidance-results').hidden=true;$('guidance-result-list').replaceChildren();$('guidance-profile-summary').replaceChildren();$('guidance-unmatched').replaceChildren();$('guidance-unmatched').hidden=true;$('guidance-result-message').textContent='';$('guidance-result-notice').textContent='';$('guidance-error').textContent='';
   $('guidance-option-status').hidden=Boolean(guidanceAreas);$('guidance-option-status').replaceChildren();
   document.querySelectorAll('.guidance-extra').forEach(section=>{section.open=false;});
   renderGuidanceStep(1,false);
@@ -627,9 +627,19 @@ function clearGuidanceProfile(){
 function renderGuidanceCard(suggestion){
   const card=node('article','guidance-result-card');const heading=node('div','guidance-card-heading');
   const title=node('h4','',`${suggestion.code} · ${suggestion.name}`);const badge=node('span','guidance-fit-label',suggestion.badge);heading.append(title,badge);card.append(heading);
-  const matches=[['Thế mạnh',suggestion.matched_strengths||[]],['Quan tâm',suggestion.matched_interests||[]]].filter(([,values])=>values.length);
-  if(matches.length){const matchList=node('div','guidance-match-list');matches.forEach(([label,values])=>{const row=node('p','guidance-match-item');row.append(node('b','',label),node('span','',values.join(', ')));matchList.append(row);});card.append(matchList);}
-  if((suggestion.considerations||[]).length){const notes=node('ul','guidance-considerations');suggestion.considerations.forEach(value=>notes.append(node('li','',value)));card.append(notes);}
+  const criteriaMatches=suggestion.criteria_matches||[];
+  if(criteriaMatches.length){
+    card.append(node('p','guidance-evidence-heading','Vì sao xuất hiện'));
+    const matchList=node('div','guidance-match-list');criteriaMatches.forEach(match=>{
+      const row=node('p','guidance-match-item');const evidence=(match.program_name_terms||[]).map(value=>`“${value}”`).join(', ');
+      row.append(node('b','',match.group),node('span','',`${(match.criteria||[]).join(', ')} → nhóm ${match.topic}; tên chương trình có ${evidence||'từ khóa cùng nhóm'}.`));matchList.append(row);
+    });card.append(matchList);
+  }
+  const unverified=suggestion.unmatched_criteria||[];const limitations=suggestion.insufficient_data||[];
+  if(unverified.length||limitations.length){const notes=node('div','guidance-insufficient');notes.append(node('b','','Chưa đủ dữ liệu để đối chiếu'));
+    unverified.forEach(item=>{const value=`${item.group}: ${(item.criteria||[]).join(', ')}${item.topic?` (nhóm ${item.topic})`:''}. ${item.message||''}`;notes.append(node('p','',value));});
+    limitations.forEach(value=>notes.append(node('p','',value)));card.append(notes);
+  }
   const source=suggestion.source||{};const citation=node('div','guidance-citation');
   const page=Number.isInteger(source.page)&&source.page>0?source.page:null;const endPage=page&&Number.isInteger(source.end_page)&&source.end_page>=page?source.end_page:page;
   const label=`Nguồn · PDF trang ${page||'—'}${endPage&&endPage!==page?`–${endPage}`:''}`;
@@ -644,10 +654,22 @@ function renderGuidanceCard(suggestion){
   };
   actions.append(compare,ask);card.append(actions);return card;
 }
+function renderGuidanceProfileSummary(summary={},unmatched=[]){
+  const container=$('guidance-profile-summary');container.replaceChildren();container.append(node('h4','','Thông tin bạn đã cung cấp'));
+  const rows=[['Thế mạnh',summary.strengths],['Sở thích',summary.interests],['Định hướng',summary.direction],['Mục tiêu bồi dưỡng',summary.development_goals],['Tiêu chí ưu tiên',summary.priorities]];
+  const list=node('dl','guidance-profile-list');rows.forEach(([label,values])=>{
+    const group=node('div','guidance-profile-row');group.append(node('dt','',label),node('dd','',(values||[]).length?values.join(' · '):'Chưa cung cấp'));list.append(group);
+  });container.append(list);
+  const section=$('guidance-unmatched');section.replaceChildren();section.hidden=!unmatched.length;
+  if(unmatched.length){section.append(node('h4','','Chưa đủ dữ liệu để đối chiếu'));
+    unmatched.forEach(item=>{const row=node('p','guidance-unmatched-item');row.append(node('b','',`${item.group}: `),node('span','',(item.criteria||[]).join(' · ')),node('span','guidance-unmatched-message',` ${item.message||''}`));section.append(row);});
+  }
+}
 function renderGuidanceResults(data){
   const list=$('guidance-result-list');list.replaceChildren();const allowed=new Set(programs.map(program=>program.code));
   const suggestions=(data.suggestions||[]).filter(item=>typeof item.code==='string'&&(!allowed.size||allowed.has(item.code))).slice(0,3);
-  $('guidance-result-message').textContent=data.message||'Các gợi ý dựa trên thông tin bạn đã chọn. Hãy mở nguồn để tìm hiểu thêm.';
+  $('guidance-result-message').textContent=data.message||'Các gợi ý chỉ đối chiếu chủ đề với tên chương trình; hãy mở nguồn để xem thông tin tuyển sinh.';
+  renderGuidanceProfileSummary(data.profile_summary||{},data.unmatched_criteria||[]);
   suggestions.forEach(item=>list.append(renderGuidanceCard(item)));
   $('guidance-result-notice').textContent=data.notice||'Hãy kiểm tra tài liệu tuyển sinh trước khi cân nhắc lựa chọn.';
   $('program-guidance-form').hidden=true;$('guidance-results').hidden=false;$('guidance-option-status').hidden=true;$('guidance-results').focus({preventScroll:true});
