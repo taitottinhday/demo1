@@ -50,12 +50,36 @@ def assert_visible_controls_have_names(page, label):
     assert not missing_buttons, f"{label}: button chưa có accessible name {missing_buttons}"
 
 
+def assert_source_status_ready(page):
+    status = page.locator("#source-status")
+    expect(status).to_contain_text("PDF có thể tra cứu", timeout=20000)
+    expect(status).to_contain_text("chương trình", timeout=20000)
+
+
 def audit_applicant(page, base_url, width, height):
     page.set_viewport_size({"width": width, "height": height})
     page.goto(base_url, wait_until="domcontentloaded", timeout=30000)
-    expect(page.locator("#source-status")).to_contain_text("trang PDF", timeout=20000)
+    assert_source_status_ready(page)
     assert_no_horizontal_scroll(page, f"ứng viên {width}x{height}")
     assert_visible_controls_have_names(page, f"ứng viên {width}x{height}")
+
+    if width <= 900:
+        page.locator("#program-tools-open").click()
+        expect(page.locator("#program-tools.mobile-open")).to_be_visible()
+    page.fill("#program-search", "IT1")
+    page.keyboard.press("Enter")
+    expect(page.locator("#program")).to_have_value("IT1")
+    if width <= 900:
+        page.locator("#program-tools-close").click()
+        expect(page.locator("#program-tools")).not_to_be_visible()
+    suggestions = page.locator("#follow-up .small-action")
+    expect(suggestions).to_have_count(3)
+    for suggestion in suggestions.all():
+        expect(suggestion).to_be_visible()
+        assert suggestion.bounding_box()["height"] >= 28
+    page.get_by_role("button", name="Học phí IT1").click()
+    expect(page.locator("#question")).to_have_value("Học phí IT1 là bao nhiêu?")
+    assert_no_horizontal_scroll(page, f"gợi ý thí sinh {width}x{height}")
 
     history = page.locator("#messages")
     assert history.evaluate("el => ['auto', 'scroll'].includes(getComputedStyle(el).overflowY)")
@@ -84,7 +108,7 @@ def audit_auth_page(page, url, label, width, height):
 def audit_keyboard_and_compare(page, base_url):
     page.set_viewport_size({"width": 1440, "height": 900})
     page.goto(base_url, wait_until="domcontentloaded", timeout=30000)
-    expect(page.locator("#source-status")).to_contain_text("trang PDF", timeout=20000)
+    assert_source_status_ready(page)
     page.locator("#compare-open").click()
     page.locator("#compare-submit").click()
     expect(page.locator("#compare-error")).to_contain_text("ít nhất 2")
@@ -108,7 +132,7 @@ def audit_keyboard_and_compare(page, base_url):
 
     page.set_viewport_size({"width": 390, "height": 844})
     page.goto(base_url, wait_until="domcontentloaded", timeout=30000)
-    expect(page.locator("#source-status")).to_contain_text("trang PDF", timeout=20000)
+    assert_source_status_ready(page)
     page.locator("#program-tools-open").focus()
     page.keyboard.press("Enter")
     assert "mobile-open" in (page.locator("#program-tools").get_attribute("class") or "")

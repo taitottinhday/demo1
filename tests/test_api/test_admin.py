@@ -1,6 +1,5 @@
 import time
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -304,7 +303,10 @@ async def test_metrics_with_sample_data(client):
 
 @pytest.mark.asyncio
 async def test_unlinked_tickets_and_question_events_never_form_a_handover_rate(client):
-    hcm = ZoneInfo("Asia/Ho_Chi_Minh")
+    # Ho Chi Minh City uses UTC+07:00 without daylight-saving changes. Using a
+    # fixed offset keeps this test portable to Windows installations without
+    # an IANA timezone database (or the optional `tzdata` package).
+    hcm = timezone(timedelta(hours=7), name="Asia/Ho_Chi_Minh")
     in_range = datetime(2026, 10, 8, 12, tzinfo=hcm).timestamp()
     outside_range = datetime(2026, 10, 7, 12, tzinfo=hcm).timestamp()
     with store().connect() as db:

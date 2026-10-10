@@ -536,7 +536,11 @@ body.applicant-page{
 .applicant-page .message.assistant .small-action:hover{background:#f7f8fa;color:#a80e25}
 .applicant-page .message.assistant .small-action:last-child{color:#b51129}
 .applicant-page .composer-area{flex:0 0 auto;padding:11px 22px 10px;border-top:1px solid #e7eaee;background:#fff}
-.applicant-page .composer-area>#follow-up{display:none}
+.applicant-page .composer-area>#follow-up{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.applicant-page .composer-area>#follow-up:empty{display:none}
+.applicant-page .composer-area>#follow-up .small-action{display:inline-flex;align-items:center;min-height:30px;margin:0;padding:5px 10px;border:1px solid #e2e6ec;border-radius:999px;background:#f8f9fb;color:#3f4d63;font-size:10px;line-height:1.3;white-space:nowrap}
+.applicant-page .composer-area>#follow-up .small-action:hover{border-color:#e0b7be;background:#fff8f9;color:#a80e25}
+.applicant-page .composer-area>#follow-up .small-action:focus-visible{outline:3px solid #c47a86;outline-offset:2px}
 .applicant-page .question-status{margin:0 0 3px;color:#66748a;font-size:10px}
 .applicant-page #chat-error{margin:0;color:#ac1d32;font-size:11px}
 .applicant-page #chat-form{

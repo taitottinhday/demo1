@@ -5,10 +5,17 @@ python -m scripts.check_browser --browser "C:/Program Files/Google/Chrome/Applic
 
 import argparse
 from pathlib import Path
+from uuid import uuid4
 
 from playwright.sync_api import expect, sync_playwright
 
 from src.config import get_settings
+
+
+def assert_source_status_ready(page):
+    status = page.locator("#source-status")
+    expect(status).to_contain_text("PDF có thể tra cứu", timeout=20000)
+    expect(status).to_contain_text("chương trình", timeout=20000)
 
 
 def run(base_url, browser_path):
@@ -22,7 +29,7 @@ def run(base_url, browser_path):
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(base_url)
-        expect(page.locator("#source-status")).to_contain_text("51 trang", timeout=20000)
+        assert_source_status_ready(page)
         page.set_viewport_size({"width": 1366, "height": 768})
         page.evaluate(
             """() => {
@@ -136,7 +143,7 @@ def run(base_url, browser_path):
         earlier = page.locator(".message.assistant").first
         earlier.get_by_role("button", name="Chưa đúng", exact=True).click()
         expect(earlier.get_by_role("button", name="Chưa đúng", exact=True)).to_have_attribute("aria-pressed", "true")
-        earlier.get_by_role("button", name="Chuyển câu hỏi này cho cán bộ ↗", exact=True).click()
+        earlier.get_by_role("button", name="Chuyển câu hỏi cho cán bộ", exact=True).click()
         expect(page.locator("#handover-question-preview")).to_contain_text("IT1 có chỉ tiêu bao nhiêu?")
         expect(page.locator("#handover-answer-preview")).to_contain_text("300")
         expect(page.locator("#handover-sources-preview")).to_contain_text("PDF trang")
@@ -145,12 +152,17 @@ def run(base_url, browser_path):
         page.fill("#question", "Tôi có chắc chắn trúng tuyển không?")
         page.click("#send")
         expect(page.locator(".message.assistant").last).to_contain_text("không thể cam kết", timeout=20000)
-        page.click("#handover-open")
+        earlier.get_by_role("button", name="Chuyển câu hỏi cho cán bộ", exact=True).click()
+        expect(page.locator("#handover-question-preview")).to_contain_text("IT1 có chỉ tiêu bao nhiêu?")
         page.fill("#summary", "DEMO UI: Cần cán bộ kiểm tra trường hợp cá nhân, không yêu cầu cam kết.")
         page.check("#consent")
         page.click("#handover-send")
-        expect(page.locator("#tickets .ticket-card")).to_have_count(1)
-        ticket = page.locator("#tickets .ticket-head b").inner_text()
+        expect(page.locator("#ticket-success")).to_contain_text("ticket ", timeout=20000)
+        success = page.locator("#ticket-success").inner_text()
+        assert "ticket " in success, success
+        ticket = success.split("ticket ", 1)[1].split(" · ", 1)[0]
+        candidate_ticket = page.locator("#tickets .ticket-card").filter(has_text=ticket)
+        expect(candidate_ticket).to_have_count(1)
         page.locator('[data-close="track-dialog"]').click()
         staff = context.new_page()
         staff.goto(base_url + "/staff")
@@ -159,10 +171,11 @@ def run(base_url, browser_path):
         staff.get_by_role("button", name="Đăng nhập", exact=True).click()
         expect(staff.locator("#dashboard")).to_be_visible()
         staff.fill("#queue-search", ticket.lower())
-        expect(staff.locator(".queue-item")).to_have_count(1)
+        expect(staff.locator("#queue-search")).to_have_value(ticket.lower())
+        expect(staff.locator("#queue .queue-item")).to_have_count(1)
         # Claiming from the default waiting filter must switch to the new
         # status so the ticket remains selected and the reply form is shown.
-        staff.locator(".queue-item").filter(has_text=ticket).click()
+        staff.locator("#queue .queue-item").filter(has_text=ticket).click()
         staff.get_by_role("button", name="Nhận xử lý ticket →").click()
         expect(staff.locator("#status-filter")).to_have_value("in_progress")
         expect(staff.locator("#staff-reply")).to_be_visible()
@@ -174,9 +187,10 @@ def run(base_url, browser_path):
         expect(staff.locator("#status-filter")).to_have_value("")
         staff.locator("#clear-search").click()
         expect(staff.locator("#queue-search")).to_have_value("")
-        expect(staff.locator(".queue-item")).to_have_count(1)
+        queue_ticket = staff.locator("#queue .queue-item").filter(has_text=ticket)
+        expect(queue_ticket).to_have_count(1)
         staff.select_option("#queue-sort", "oldest")
-        staff.locator(".queue-item").filter(has_text=ticket).click()
+        queue_ticket.click()
         expect(staff.locator("#staff-reply")).to_be_visible()
         draft = "Bản nháp demo: Cán bộ sẽ kiểm tra hồ sơ theo quy định."
         staff.fill("#staff-reply", draft)
@@ -196,11 +210,12 @@ def run(base_url, browser_path):
         expect(mobile_staff.locator("#dashboard")).to_be_visible()
         mobile_staff.select_option("#status-filter", "")
         mobile_staff.fill("#queue-search", ticket.lower())
-        expect(mobile_staff.locator(".queue-item")).to_have_count(1)
-        expect(mobile_staff.locator(".queue-item .ticket-id")).to_be_visible()
-        expect(mobile_staff.locator(".queue-item .badge")).to_be_visible()
-        expect(mobile_staff.locator(".queue-item .ticket-owner")).to_be_visible()
-        expect(mobile_staff.locator(".queue-item-action")).to_be_visible()
+        mobile_ticket = mobile_staff.locator("#queue .queue-item").filter(has_text=ticket)
+        expect(mobile_ticket).to_have_count(1)
+        expect(mobile_ticket.locator(".ticket-id")).to_be_visible()
+        expect(mobile_ticket.locator(".badge")).to_be_visible()
+        expect(mobile_ticket.locator(".ticket-owner")).to_be_visible()
+        expect(mobile_ticket.locator(".queue-item-action")).to_be_visible()
         assert mobile_staff.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         mobile_staff_context.close()
         page.evaluate('checkReplies()')
@@ -228,7 +243,10 @@ def run(base_url, browser_path):
                 expect(card.locator(".badge")).to_have_text("Đã hủy")
             else:
                 staff.click("#refresh")
-                staff.locator(".queue-item").filter(has_text=created["id"]).click()
+                staff.select_option("#status-filter", "waiting")
+                rejection_ticket = staff.locator("#queue .queue-item").filter(has_text=created["id"])
+                expect(rejection_ticket).to_have_count(1)
+                rejection_ticket.click()
                 staff.fill("#reject-reason", "Nội dung không thuộc phạm vi tư vấn tuyển sinh HUST.")
                 staff.once("dialog", lambda dialog: dialog.accept())
                 staff.get_by_role("button", name="Từ chối yêu cầu").click()
@@ -262,10 +280,32 @@ def run(base_url, browser_path):
         admin.goto(base_url + "/admin")
         admin.fill("#username", cfg.admin_username)
         admin.fill("#password", cfg.admin_password)
-        admin.get_by_role("button", name="Đăng nhập →", exact=True).click()
+        admin.get_by_role("button", name="Đăng nhập", exact=True).click()
         expect(admin.locator("#dashboard")).to_be_visible()
-        expect(admin.locator("#metrics .kpi-card").first).to_contain_text("Công thức:")
-        expect(admin.locator("#metrics .kpi-card").first).to_contain_text("Tử số / mẫu số:")
+        metrics_data = admin.evaluate(
+            """async () => {
+            const response = await fetch('/api/v1/admin/metrics');
+            if (!response.ok) throw new Error('Không tải được KPI để đối chiếu giao diện.');
+            return response.json();
+            }"""
+        )
+        kpi_cards = admin.locator("#metrics .kpi-card")
+        expect(kpi_cards).to_have_count(len(metrics_data["kpis"]))
+        for index, metric in enumerate(metrics_data["kpis"]):
+            card = kpi_cards.nth(index)
+            expect(card.locator(".metric-label")).to_have_text(metric["label"])
+            expect(card.locator(".kpi-facts")).to_contain_text("Công thức:")
+            expect(card.locator(".kpi-facts")).to_contain_text("Khoảng:")
+            if metric.get("denominator") is None:
+                count_value = metric.get("value")
+                expect(card.locator(".kpi-facts")).to_contain_text(
+                    f"Số lượng: {count_value if count_value is not None else '—'}"
+                )
+            else:
+                numerator = metric.get("numerator")
+                expect(card.locator(".kpi-facts")).to_contain_text(
+                    f"Tử số / mẫu số: {numerator if numerator is not None else '—'} / {metric['denominator']}"
+                )
         expect(admin.locator("#data-note")).to_contain_text("Nguồn dữ liệu:")
         assert "chat_logs" not in admin.locator("body").inner_text()
         duration_values = admin.evaluate(
@@ -302,9 +342,11 @@ def run(base_url, browser_path):
             }"""
         )
         staff.fill("#queue-search", probe_ticket["id"].lower())
+        staff.select_option("#status-filter", "waiting")
         staff.click("#refresh")
-        expect(staff.locator(".queue-item")).to_have_count(1)
-        staff.locator(".queue-item").first.click()
+        regression_ticket = staff.locator("#queue .queue-item").filter(has_text=probe_ticket["id"])
+        expect(regression_ticket).to_have_count(1)
+        regression_ticket.click()
         staff.get_by_role("button", name="Nhận xử lý ticket →", exact=True).click()
         expect(staff.locator("#detail .badge")).to_have_text("Đang xử lý")
         admin.click("#refresh")
@@ -313,10 +355,25 @@ def run(base_url, browser_path):
         regression_id = admin.locator("#ticket-rows tr.clickable").first.locator("td").first.inner_text()
         admin.locator("#ticket-rows tr.clickable").first.click()
         expect(admin.locator("#detail")).to_contain_text(regression_id)
-        admin_officers = admin.evaluate(
-            """async () => (await (await fetch('/api/v1/admin/officers')).json()).filter(o => o.active)"""
+        empty_filter_username = f"qa_filter_{uuid4().hex[:12]}"
+        empty_filter_officer = admin.evaluate(
+            """async ({username, email, password}) => {
+            const response = await fetch('/api/v1/admin/officers', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, name: 'Cán bộ kiểm thử hàng chờ trống', email, password})
+            });
+            const body = await response.json();
+            if (!response.ok) throw new Error(body.detail || 'Không tạo được cán bộ fixture cho kiểm thử lọc rỗng.');
+            return body;
+            }""",
+            {
+                "username": empty_filter_username,
+                "email": f"{empty_filter_username}@hust.test",
+                "password": cfg.staff_password,
+            },
         )
-        empty_filter_officer = next(o for o in admin_officers if o["open_tickets"] == 0)
+        assert empty_filter_officer["open_tickets"] == 0
         admin.evaluate("window.__delayAdminOldFilter = true")
         admin.select_option("#status-filter", "in_progress")
         admin.select_option("#officer-filter", str(empty_filter_officer["id"]))
@@ -339,7 +396,7 @@ def run(base_url, browser_path):
         admin_mobile.goto(base_url + "/admin")
         admin_mobile.fill("#username", cfg.admin_username)
         admin_mobile.fill("#password", cfg.admin_password)
-        admin_mobile.get_by_role("button", name="Đăng nhập →", exact=True).click()
+        admin_mobile.get_by_role("button", name="Đăng nhập", exact=True).click()
         expect(admin_mobile.locator("#dashboard")).to_be_visible()
         admin_mobile.get_by_role("tab", name="Cán bộ", exact=True).click()
         expect(admin_mobile.locator("#officer-rows .officer-card").first).to_be_visible()
@@ -404,7 +461,7 @@ def run(base_url, browser_path):
         mobile = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
         m = mobile.new_page()
         m.goto(base_url)
-        expect(m.locator("#source-status")).to_contain_text("51 trang", timeout=20000)
+        assert_source_status_ready(m)
         assert m.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         m.screenshot(path=str(output / "applicant-mobile.png"), full_page=True)
         assert not errors, errors
