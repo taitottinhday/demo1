@@ -52,6 +52,39 @@ def test_store_data_survives_a_new_store_instance(tmp_path):
     assert persisted["owner"] == "canbo"
 
 
+def test_chat_request_replay_survives_restart_and_clear_removes_its_cache(tmp_path):
+    path = tmp_path / "chat-idempotency.db"
+    store = Store(path)
+    _, session = store.session("chat-session", 24)
+    request_id = "persisted-turn-001"
+    request_hash = "a" * 64
+    claim = store.claim_chat_request(session["id"], request_id, request_hash)
+    assert claim["status"] == "claimed"
+    answer = {
+        "response": "Fixture answer",
+        "kind": "answered",
+        "sources": [],
+        "mode": "extractive",
+        "tokens": 0,
+        "request_id": "feedback-001",
+    }
+
+    first = store.complete_chat_request(
+        session["id"], request_id, request_hash, claim["claim_token"], "Fixture question", answer
+    )
+    restarted = Store(path)
+    replay = restarted.claim_chat_request(session["id"], request_id, request_hash)
+
+    assert first["status"] == replay["status"] == "completed"
+    assert replay["response"] == first["response"]
+    assert len(restarted.messages(session["id"])) == 2
+    assert len({message["id"] for message in restarted.messages(session["id"])}) == 2
+
+    restarted.clear(session["id"])
+    assert restarted.messages(session["id"]) == []
+    assert restarted.claim_chat_request(session["id"], request_id, request_hash)["status"] == "claimed"
+
+
 def test_production_requires_a_persistent_data_dir(tmp_path):
     cfg = Settings(
         _env_file=None,

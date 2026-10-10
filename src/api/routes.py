@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import logging
 import re
@@ -27,6 +28,7 @@ logger = logging.getLogger(__name__)
 class ChatInput(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     program: str | None = Field(default=None, max_length=30)
+    request_id: str | None = Field(default=None, min_length=8, max_length=100, pattern=r"^[A-Za-z0-9_-]+$")
 
     @field_validator("message")
     @classmethod
@@ -684,42 +686,77 @@ def pdf(request: Request, source_id: str | None = None):
 @router.post("/chat")
 async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
     rt = runtime(request)
-    if not rt["store"].allowed("chat:" + row["id"]):
-        raise HTTPException(429, "Bạn đã gửi nhiều câu hỏi; vui lòng chờ một phút rồi thử lại.")
-    selected_program = body.program if body.program is not None else row["context"]
-    selected_program = selected_program or ""
-    if selected_program and selected_program not in {p["code"] for p in rt["knowledge"].programs}:
-        raise HTTPException(422, "Mã chương trình chưa có trong nguồn.")
-    classification = rt["admissions"].classify_scope(body.message, selected_program)
-    scope = classification["scope"]
-    answer_program = classification["program"] if scope == "program" else ""
-    # Keep an explicitly selected program as the next-turn context even when the
-    # current question is general; the answer itself must still use general scope.
-    stored_program = answer_program or selected_program
-    rt["store"].context(row["id"], stored_program)
-    started = time.perf_counter()
-    if rt.get("source_error"):
-        answer = {
-            "response": "Nguồn tuyển sinh chưa sẵn sàng. Bạn có thể chuyển cán bộ để được hỗ trợ.",
-            "kind": "error",
-            "sources": [],
-            "mode": "extractive",
-            "tokens": 0,
-            "reason": "source_unavailable",
-            "scope": scope,
-        }
-    else:
-        answer = await rt["admissions"].answer(body.message, answer_program, scope=scope)
-    elapsed = (time.perf_counter() - started) * 1000
-    answer["latency_ms"] = round(elapsed, 1)
-    answer["request_id"] = secrets.token_hex(8)
-    answer["program"] = stored_program or None
-    answer["scope"] = scope
-    answer["scope_program"] = answer_program or None
-    rt["store"].add_message(row["id"], "user", {"response": redact(body.message)})
-    rt["store"].add_message(row["id"], "assistant", answer)
-    rt["store"].record(answer["kind"], answer["mode"], elapsed, answer.get("tokens", 0))
-    return answer
+    request_id = body.request_id or secrets.token_urlsafe(24)
+    request_hash = hashlib.sha256(
+        json.dumps(
+            {"message": body.message, "program": body.program},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    claim = rt["store"].claim_chat_request(row["id"], request_id, request_hash)
+    if claim["status"] == "conflict":
+        raise HTTPException(409, "Mã lượt hỏi đã được dùng cho nội dung khác. Hãy gửi lại để tạo lượt mới.")
+    if claim["status"] == "completed":
+        return claim["response"]
+    if claim["status"] == "processing":
+        raise HTTPException(
+            409,
+            "Câu hỏi này vẫn đang được xử lý. Hãy chờ một chút rồi thử lại cùng lượt hỏi.",
+            headers={"Retry-After": "2"},
+        )
+    claim_token = claim["claim_token"]
+
+    try:
+        if not rt["store"].allowed("chat:" + row["id"]):
+            raise HTTPException(429, "Bạn đã gửi nhiều câu hỏi; vui lòng chờ một phút rồi thử lại.")
+        selected_program = body.program if body.program is not None else row["context"]
+        selected_program = selected_program or ""
+        if selected_program and selected_program not in {p["code"] for p in rt["knowledge"].programs}:
+            raise HTTPException(422, "Mã chương trình chưa có trong nguồn.")
+        classification = rt["admissions"].classify_scope(body.message, selected_program)
+        scope = classification["scope"]
+        answer_program = classification["program"] if scope == "program" else ""
+        # Keep an explicitly selected program as the next-turn context even when the
+        # current question is general; the answer itself must still use general scope.
+        stored_program = answer_program or selected_program
+        rt["store"].context(row["id"], stored_program)
+        started = time.perf_counter()
+        if rt.get("source_error"):
+            answer = {
+                "response": "Nguồn tuyển sinh chưa sẵn sàng. Bạn có thể chuyển cán bộ để được hỗ trợ.",
+                "kind": "error",
+                "sources": [],
+                "mode": "extractive",
+                "tokens": 0,
+                "reason": "source_unavailable",
+                "scope": scope,
+            }
+        else:
+            answer = await rt["admissions"].answer(body.message, answer_program, scope=scope)
+        elapsed = (time.perf_counter() - started) * 1000
+        answer["latency_ms"] = round(elapsed, 1)
+        answer["request_id"] = secrets.token_hex(8)
+        answer["turn_id"] = request_id
+        answer["program"] = stored_program or None
+        answer["scope"] = scope
+        answer["scope_program"] = answer_program or None
+        completed = rt["store"].complete_chat_request(
+            row["id"], request_id, request_hash, claim_token, redact(body.message), answer
+        )
+        if completed["status"] == "processing":
+            raise HTTPException(
+                409,
+                "Câu hỏi này vẫn đang được xử lý. Hãy chờ một chút rồi thử lại cùng lượt hỏi.",
+                headers={"Retry-After": "2"},
+            )
+        if completed["created"]:
+            rt["store"].record(answer["kind"], answer["mode"], elapsed, answer.get("tokens", 0))
+        return completed["response"]
+    except BaseException:
+        rt["store"].release_chat_request(row["id"], request_id, request_hash, claim_token)
+        raise
 
 
 @router.post("/handover")

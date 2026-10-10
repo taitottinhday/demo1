@@ -25,6 +25,13 @@ class Store:
                 CREATE TABLE IF NOT EXISTS messages (
                     id INTEGER PRIMARY KEY, session TEXT NOT NULL, role TEXT NOT NULL,
                     payload TEXT NOT NULL, created REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS chat_requests (
+                    session TEXT NOT NULL, request_id TEXT NOT NULL, request_hash TEXT NOT NULL,
+                    status TEXT NOT NULL CHECK(status IN ('processing','completed')),
+                    claim_token TEXT NOT NULL,
+                    response_json TEXT, user_message_id INTEGER, assistant_message_id INTEGER,
+                    created REAL NOT NULL, updated REAL NOT NULL,
+                    PRIMARY KEY(session, request_id));
                 CREATE TABLE IF NOT EXISTS tickets (
                     id TEXT PRIMARY KEY, session TEXT NOT NULL, request_key TEXT NOT NULL,
                     summary TEXT NOT NULL, reason TEXT NOT NULL, status TEXT NOT NULL,
@@ -423,21 +430,111 @@ class Store:
     def messages(self, sid):
         with self.connect() as db:
             rows = db.execute(
-                "SELECT role,payload,created FROM messages WHERE session=? ORDER BY id DESC LIMIT 40", (sid,)
+                "SELECT id,role,payload,created FROM messages WHERE session=? ORDER BY id DESC LIMIT 40", (sid,)
             ).fetchall()
-        return [{"role": r["role"], **json.loads(r["payload"]), "created": r["created"]} for r in reversed(rows)]
+        return [
+            {"role": r["role"], **json.loads(r["payload"]), "id": r["id"], "created": r["created"]}
+            for r in reversed(rows)
+        ]
 
     def student_messages(self, student_id, limit=120):
         with self.connect() as db:
             rows = db.execute(
                 """
-                SELECT m.role,m.payload,m.created
+                SELECT m.id,m.role,m.payload,m.created
                 FROM messages m JOIN sessions s ON s.id=m.session
                 WHERE s.student_id=? ORDER BY m.id DESC LIMIT ?
                 """,
                 (student_id, limit),
             ).fetchall()
-        return [{"role": r["role"], **json.loads(r["payload"]), "created": r["created"]} for r in reversed(rows)]
+        return [
+            {"role": r["role"], **json.loads(r["payload"]), "id": r["id"], "created": r["created"]}
+            for r in reversed(rows)
+        ]
+
+    def claim_chat_request(self, sid, request_id, request_hash, lease_seconds=180):
+        """Reserve one logical chat turn, or return its completed idempotent result."""
+        now = time.time()
+        claim_token = secrets.token_urlsafe(18)
+        with self.connect() as db:
+            inserted = db.execute(
+                "INSERT OR IGNORE INTO chat_requests"
+                "(session,request_id,request_hash,status,claim_token,created,updated) "
+                "VALUES(?,?,?,'processing',?,?,?)",
+                (sid, request_id, request_hash, claim_token, now, now),
+            ).rowcount == 1
+            row = db.execute(
+                "SELECT * FROM chat_requests WHERE session=? AND request_id=?", (sid, request_id)
+            ).fetchone()
+            if inserted:
+                return {"status": "claimed", "claim_token": claim_token}
+            if row["request_hash"] != request_hash:
+                return {"status": "conflict"}
+            if row["status"] == "completed":
+                return {"status": "completed", "response": json.loads(row["response_json"])}
+            reclaimed = db.execute(
+                "UPDATE chat_requests SET updated=?,claim_token=? WHERE session=? AND request_id=? "
+                "AND status='processing' AND updated<=?",
+                (now, claim_token, sid, request_id, now - lease_seconds),
+            ).rowcount
+            if reclaimed:
+                return {"status": "claimed", "claim_token": claim_token}
+            return {"status": "processing"}
+
+    def release_chat_request(self, sid, request_id, request_hash, claim_token):
+        """Release an unfinished reservation after validation, throttling, or an error."""
+        with self.connect() as db:
+            db.execute(
+                "DELETE FROM chat_requests WHERE session=? AND request_id=? "
+                "AND request_hash=? AND claim_token=? AND status='processing'",
+                (sid, request_id, request_hash, claim_token),
+            )
+
+    def complete_chat_request(self, sid, request_id, request_hash, claim_token, question, answer):
+        """Atomically persist the user/assistant pair and the replayable response."""
+        now = time.time()
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT * FROM chat_requests WHERE session=? AND request_id=?", (sid, request_id)
+            ).fetchone()
+            if not row or row["request_hash"] != request_hash:
+                raise RuntimeError("Chat request reservation was lost before completion.")
+            if row["status"] == "completed":
+                return {"status": "completed", "response": json.loads(row["response_json"]), "created": False}
+            if row["claim_token"] != claim_token:
+                return {"status": "processing"}
+
+            user_payload = {"response": question, "turn_id": request_id}
+            user_cursor = db.execute(
+                "INSERT INTO messages(session,role,payload,created) VALUES(?,?,?,?)",
+                (sid, "user", json.dumps(user_payload, ensure_ascii=False), now),
+            )
+            assistant_payload = {**answer, "turn_id": request_id}
+            assistant_cursor = db.execute(
+                "INSERT INTO messages(session,role,payload,created) VALUES(?,?,?,?)",
+                (sid, "assistant", json.dumps(assistant_payload, ensure_ascii=False), now),
+            )
+            result = {
+                **answer,
+                "turn_id": request_id,
+                "message_ids": {
+                    "user": user_cursor.lastrowid,
+                    "assistant": assistant_cursor.lastrowid,
+                },
+            }
+            db.execute(
+                "UPDATE chat_requests SET status='completed',response_json=?,user_message_id=?,"
+                "assistant_message_id=?,updated=? WHERE session=? AND request_id=?",
+                (
+                    json.dumps(result, ensure_ascii=False),
+                    user_cursor.lastrowid,
+                    assistant_cursor.lastrowid,
+                    now,
+                    sid,
+                    request_id,
+                ),
+            )
+            return {"status": "completed", "response": result, "created": True}
 
     def add_message(self, sid, role, payload):
         with self.connect() as db:
@@ -449,12 +546,17 @@ class Store:
     def clear(self, sid):
         with self.connect() as db:
             db.execute("DELETE FROM messages WHERE session=?", (sid,))
+            db.execute("DELETE FROM chat_requests WHERE session=?", (sid,))
             db.execute("UPDATE sessions SET context='' WHERE id=?", (sid,))
 
     def clear_student(self, student_id, sid):
         with self.connect() as db:
             db.execute(
                 "DELETE FROM messages WHERE session IN (SELECT id FROM sessions WHERE student_id=?)",
+                (student_id,),
+            )
+            db.execute(
+                "DELETE FROM chat_requests WHERE session IN (SELECT id FROM sessions WHERE student_id=?)",
                 (student_id,),
             )
             db.execute("UPDATE sessions SET context='' WHERE student_id=?", (student_id,))
@@ -466,12 +568,14 @@ class Store:
         with self.connect() as db:
             if student_id:
                 rows = db.execute(
-                    "SELECT m.id,m.payload FROM messages m JOIN sessions s ON s.id=m.session "
+                    "SELECT m.id,m.session,m.payload FROM messages m JOIN sessions s ON s.id=m.session "
                     "WHERE s.student_id=? AND m.role='assistant'",
                     (student_id,),
                 ).fetchall()
             else:
-                rows = db.execute("SELECT id,payload FROM messages WHERE session=? AND role='assistant'", (sid,)).fetchall()
+                rows = db.execute(
+                    "SELECT id,session,payload FROM messages WHERE session=? AND role='assistant'", (sid,)
+                ).fetchall()
             for row in rows:
                 payload = json.loads(row["payload"])
                 if payload.get("request_id") == request_id:
@@ -479,6 +583,19 @@ class Store:
                     db.execute(
                         "UPDATE messages SET payload=? WHERE id=?", (json.dumps(payload, ensure_ascii=False), row["id"])
                     )
+                    turn_id = payload.get("turn_id")
+                    if turn_id:
+                        cached = db.execute(
+                            "SELECT response_json FROM chat_requests WHERE session=? AND request_id=?",
+                            (row["session"], turn_id),
+                        ).fetchone()
+                        if cached and cached["response_json"]:
+                            response = json.loads(cached["response_json"])
+                            response["feedback"] = rating
+                            db.execute(
+                                "UPDATE chat_requests SET response_json=? WHERE session=? AND request_id=?",
+                                (json.dumps(response, ensure_ascii=False), row["session"], turn_id),
+                            )
                     return True
         return False
 
@@ -724,6 +841,10 @@ class Store:
     def purge(self, hours):
         with self.connect() as db:
             cutoff = time.time() - hours * 3600
+            db.execute(
+                "DELETE FROM chat_requests WHERE session IN (SELECT id FROM sessions WHERE updated<?)",
+                (cutoff,),
+            )
             db.execute("DELETE FROM messages WHERE session IN (SELECT id FROM sessions WHERE updated<?)", (cutoff,))
             db.execute("DELETE FROM sessions WHERE updated<?", (cutoff,))
             db.execute("DELETE FROM staff_sessions WHERE expires<?", (time.time(),))

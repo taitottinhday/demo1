@@ -3,9 +3,11 @@ const accountLink=document.createElement('a');accountLink.className='staff-link'
 const privacyNote=document.querySelector('.privacy');if(privacyNote)privacyNote.textContent='Bạn có thể dùng ẩn danh hoặc đăng nhập để lưu lịch sử và theo dõi yêu cầu.';
 const stateNames = {waiting:'Đang chờ', in_progress:'Đang xử lý', resolved:'Đã giải quyết',cancelled:'Đã hủy',rejected:'Đã từ chối'};
 let messages = [], programs = [], requestKey = '', busy = false, currentStudent = null, guideData = null, guideCompleted = new Set(), guideStorage = null, handoverPreview = {question:'', ai_answer:'', sources:[]};
+const pendingChatRequestKey = 'hust-pending-chat-request-v1';
+const questionDraftKey = 'hust-question-draft-v1';
+let renderedMessageById = new Map(), renderedMessageByTurn = new Map(), pendingChatRequest = readPendingChatRequest();
 let guidanceAreas = null, guidanceOptionsPromise = null, guidanceController = null, guidanceRequestId = 0, guidanceStep = 1;
 const guideStorageKey = 'hust-guide-checklist-v2';
-const questionDraftKey = 'hust-question-draft-v1';
 function updateAccountNav(student){
   if(!student){
     if(!accountLink.isConnected){const nav=document.querySelector('.topbar nav');nav?.insertBefore(accountLink,nav.querySelector('.staff-login-link'));}
@@ -111,7 +113,7 @@ async function api(path, options = {}) {
     if (!response.ok) { const error = new Error(typeof data.detail === 'string' ? data.detail : 'Nội dung chưa hợp lệ. Vui lòng kiểm tra rồi thử lại.'); error.status = response.status; throw error; }
     return data;
   } catch (error) {
-    if (error.name === 'AbortError') throw new Error('Yêu cầu chưa phản hồi kịp. Hãy thử lại; yêu cầu handover dùng cùng mã sẽ không bị tạo trùng.');
+    if (error.name === 'AbortError') throw new Error('Yêu cầu chưa phản hồi kịp. Hãy thử lại; cùng một lượt chat hoặc yêu cầu chuyển cán bộ sẽ không bị tạo trùng.');
     throw error;
   } finally { clearTimeout(timeout); }
 }
@@ -128,6 +130,17 @@ function appendStructuredAnswer(box,data){
   box.append(structured);
 }
 function addMessage(role, data, save=true) {
+  const messageId=data.id==null?'':String(data.id);
+  const turnId=data.turn_id==null?'':String(data.turn_id);
+  const turnKey=turnId?`${role}:${turnId}`:'';
+  const existing=messageId&&renderedMessageById.get(messageId);
+  if(existing)return existing;
+  const existingTurn=turnKey&&renderedMessageByTurn.get(turnKey);
+  if(existingTurn){
+    Object.assign(existingTurn.message,{...data,role});
+    if(messageId){existingTurn.element.dataset.messageId=messageId;renderedMessageById.set(messageId,existingTurn);}
+    return existingTurn;
+  }
   $('welcome')?.remove();
   const box=node('article','message '+role);
   box.append(node('div','speaker',role==='user'?'BẠN':'TRỢ LÝ X'));
@@ -166,7 +179,11 @@ function addMessage(role, data, save=true) {
   }
   $('messages').append(box);
   $('messages').scrollTop=$('messages').scrollHeight;
-  if(save)messages.push({role,...data});
+  const entry={element:box,message:{role,...data}};
+  if(messageId){box.dataset.messageId=messageId;renderedMessageById.set(messageId,entry);}
+  if(turnKey)renderedMessageByTurn.set(turnKey,entry);
+  if(save)messages.push(entry.message);
+  return entry;
 }
 function sourceLocation(source){
   const page=Number.isInteger(source.page)&&source.page>0?source.page:null;
@@ -185,7 +202,10 @@ async function init() {
     renderProgramOptions();
     setProgram(session.program || '');
     updateAccountNav(session.student);
-    session.messages.forEach(m=>addMessage(m.role,m));
+    session.messages.forEach(m=>{
+      if(pendingChatRequest&&m.role==='user'&&m.turn_id===pendingChatRequest.requestId){discardPendingChatRequest();clearQuestionDraft();$('question').value='';$('char-count').textContent='0 / 2000';}
+      addMessage(m.role,m);
+    });
     const source=status.source||{};
     if(source.pages)$('source-pages').textContent=`${source.pages} trang`;
     $('source-status').textContent=status.status==='ready'?`${source.document_count||1} nguồn · ${source.indexable_pdf_count||1} PDF có thể tra cứu · ${status.programs} chương trình · kỳ 2026 · bộ dữ liệu ${source.version||'chưa rõ'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
@@ -195,16 +215,35 @@ async function init() {
     restoreQuestionDraft();
   } catch(error) { $('chat-error').textContent='Không kết nối được ứng dụng: '+error.message; }
 }
-$('question').addEventListener('input',()=>{$('char-count').textContent=$('question').value.length+' / 2000';$('question-status').textContent='';saveQuestionDraft();});
+$('question').addEventListener('input',()=>{
+  const value=$('question').value.trim();
+  if(pendingChatRequest&&pendingChatRequest.message&&value!==pendingChatRequest.message)discardPendingChatRequest();
+  $('char-count').textContent=$('question').value.length+' / 2000';$('question-status').textContent='';saveQuestionDraft();
+});
 $('question').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('chat-form').requestSubmit();}});
 $('chat-form').addEventListener('submit',async e=>{
   e.preventDefault();const question=$('question').value.trim();if(!question||busy)return;
+  const program=$('program').value;
+  if(!pendingChatRequest||pendingChatRequest.message!==question||pendingChatRequest.program!==program){
+    pendingChatRequest={requestId:crypto.randomUUID(),program,message:question,entry:null};persistPendingChatRequest();
+  }
+  const pending=pendingChatRequest;
   busy=true;$('send').disabled=true;$('clear').disabled=true;$('chat-error').textContent='';
-  addMessage('user',{response:question});
+  if(!pending.entry)pending.entry=addMessage('user',{response:question,turn_id:pending.requestId});
   const loading=node('div','message assistant','Đang tra cứu tài liệu…');loading.id='loading';$('messages').append(loading);loading.scrollIntoView({block:'nearest'});
   try {
-    const data=await api('/chat',{method:'POST',body:JSON.stringify({message:question,program:$('program').value})});
-    loading.remove();addMessage('assistant',data);setProgram(data.program || '');renderScope(data);$('question').value='';$('char-count').textContent='0 / 2000';$('question-status').textContent='';clearQuestionDraft();
+    const data=await api('/chat',{method:'POST',body:JSON.stringify({message:question,program,request_id:pending.requestId})});
+    loading.remove();
+    const userMessageId=data.message_ids?.user;
+    if(pending.entry&&userMessageId!=null){
+      pending.entry.message.id=userMessageId;pending.entry.message.turn_id=data.turn_id||pending.requestId;
+      pending.entry.element.dataset.messageId=String(userMessageId);renderedMessageById.set(String(userMessageId),pending.entry);
+    }
+    addMessage('assistant',{...data,id:data.message_ids?.assistant});
+    setProgram(data.program || '');renderScope(data);
+    if($('question').value.trim()===question){$('question').value='';$('char-count').textContent='0 / 2000';$('question-status').textContent='';clearQuestionDraft();}
+    else saveQuestionDraft();
+    if(pendingChatRequest===pending)discardPendingChatRequest();
   } catch(error){loading.remove();$('chat-error').textContent=error.message+' Nội dung vẫn ở ô nhập để thử lại.';}
   finally{busy=false;$('send').disabled=false;$('clear').disabled=false;$('question').focus();}
 });
@@ -244,7 +283,7 @@ setProgramToolsOpen(false,false);
 $('comparison-result')?.setAttribute('aria-live','polite');
 $('clear').addEventListener('click',async()=>{
   if(!confirm('Xóa lịch sử và ngữ cảnh chat? Ticket đã gửi vẫn được giữ.'))return;
-  try {const data=await api('/session/messages',{method:'DELETE'});messages=[];$('messages').replaceChildren();setProgram('');$('question-status').textContent='';addMessage('assistant',{response:data.message,kind:'clarification'},false);}
+  try {const data=await api('/session/messages',{method:'DELETE'});messages=[];renderedMessageById.clear();renderedMessageByTurn.clear();discardPendingChatRequest();clearQuestionDraft();$('messages').replaceChildren();setProgram('');$('question-status').textContent='';addMessage('assistant',{response:data.message,kind:'clarification'},false);}
   catch(error){$('chat-error').textContent=error.message;}
 });
 function renderHandoverSources(sources){
@@ -397,10 +436,32 @@ $('guide-reset').onclick=async()=>{
   catch(error) { if(error.status===401||error.status===403){currentStudent=null;showGuideSessionNotice('Phiên đăng nhập đã hết hạn. Tiến độ local đã được đặt lại; hãy đăng nhập lại để đồng bộ.');renderGuideStorage(false);}else showGuideSessionNotice('Đã đặt lại trên thiết bị nhưng chưa đồng bộ được tài khoản.'); }
 };
 function restoreQuestionDraft() {
-  try { const draft=localStorage.getItem(questionDraftKey)||sessionStorage.getItem(questionDraftKey)||''; if(!$('question').value&&draft){$('question').value=draft;$('char-count').textContent=draft.length+' / 2000';} } catch {}
+  try {
+    const draft=localStorage.getItem(questionDraftKey)||sessionStorage.getItem(questionDraftKey)||'';
+    if(!$('question').value&&draft){$('question').value=draft;$('char-count').textContent=draft.length+' / 2000';}
+    if(pendingChatRequest&&draft)pendingChatRequest.message=draft.trim();
+    else if(pendingChatRequest)discardPendingChatRequest();
+  } catch {}
 }
 function saveQuestionDraft() { try { const value=$('question').value; if(value)localStorage.setItem(questionDraftKey,value); else localStorage.removeItem(questionDraftKey); } catch {} }
 function clearQuestionDraft() { try { localStorage.removeItem(questionDraftKey);sessionStorage.removeItem(questionDraftKey); } catch {} }
+function readPendingChatRequest() {
+  try {
+    const saved=JSON.parse(sessionStorage.getItem(pendingChatRequestKey)||'null');
+    if(saved&&typeof saved.request_id==='string'&&saved.request_id.length>=8){
+      const draft=localStorage.getItem(questionDraftKey)||sessionStorage.getItem(questionDraftKey)||'';
+      return {requestId:saved.request_id,program:typeof saved.program==='string'?saved.program:'',message:draft.trim(),entry:null};
+    }
+  } catch {}
+  return null;
+}
+function persistPendingChatRequest() {
+  try { if(pendingChatRequest)sessionStorage.setItem(pendingChatRequestKey,JSON.stringify({request_id:pendingChatRequest.requestId,program:pendingChatRequest.program})); } catch {}
+}
+function discardPendingChatRequest() {
+  pendingChatRequest=null;
+  try { sessionStorage.removeItem(pendingChatRequestKey); } catch {}
+}
 init();
 const comparisonFields=[
   ['quota','Chỉ tiêu'],
