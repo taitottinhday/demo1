@@ -379,7 +379,15 @@ class Admissions:
             chunks = chunks[:1]
         sources = [self.k.citation(c) for c in chunks]
         result = dict(base, kind="answered", reason="grounded", sources=sources)
-        if self.settings.answer_mode == "llm":
+        quota_question = chunks[0].get("kind") == "program" and any(term in q for term in ["chi tieu", "quota"])
+        if quota_question:
+            # Quotas are atomic facts in the official program table. Keep this deterministic so an
+            # LLM cannot turn a quota question into a nearby methods summary.
+            rendered = format_answer(question, chunks, answer_program)
+            if not rendered:
+                return dict(base, response=FALLBACK)
+            result.update(response=rendered, mode="extractive")
+        elif self.settings.answer_mode == "llm":
             if not self.settings.openai_api_key or "your-key" in self.settings.openai_api_key:
                 return dict(
                     base,

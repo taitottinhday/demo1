@@ -95,6 +95,25 @@ def format_answer(question, chunks, program=""):
     q = normalize(question)
     first = chunks[0]
 
+    if first.get("kind") == "program" and any(term in q for term in ["chi tieu", "quota"]):
+        requested_code = program or first.get("code", "")
+        row_index = next(
+            (
+                index
+                for index, chunk in enumerate(chunks, 1)
+                if chunk.get("kind") == "program" and chunk.get("code") == requested_code
+            ),
+            None,
+        )
+        if row_index is not None:
+            row = chunks[row_index - 1]
+            quota = re.search(r"Chỉ tiêu năm 2026:\s*([^.;]+)", row.get("text", ""), flags=re.I)
+            if quota:
+                return (
+                    f"{row['code']} — {row['title']}: chỉ tiêu tuyển sinh năm 2026 là "
+                    f"{quota.group(1).strip()}. [{row_index}]"
+                )
+
     def add_graduation_answer(response):
         if not any(term in q for term in ["dau ra", "tot nghiep"]):
             return response

@@ -41,6 +41,45 @@ async def test_source_and_grounded_program(client):
 
 
 @pytest.mark.asyncio
+async def test_long_program_quota_question_answers_quota_without_changing_method_answers(client):
+    quota = (
+        await client.post(
+            "/api/v1/chat",
+            json={"message": "Chỉ tiêu tuyển sinh chương trình IT2 năm 2026 là bao nhiêu?", "program": "IT2"},
+        )
+    ).json()
+
+    assert quota["kind"] == "answered"
+    assert "200" in quota["response"]
+    assert "chỉ tiêu" in quota["response"].lower()
+    assert "phương thức xét tuyển:" not in quota["response"].lower()
+    assert quota["sources"][0]["page"] == 10
+
+    methods = (
+        await client.post(
+            "/api/v1/chat",
+            json={"message": "Phương thức xét tuyển IT2 gồm những gì?", "program": "IT2"},
+        )
+    ).json()
+    assert "phương thức xét tuyển" in methods["response"].lower()
+    assert all(method in methods["response"] for method in ["XTTN", "ĐGTD", "THPT"])
+
+    llm_service = Admissions(
+        app.state.runtime["knowledge"],
+        app.state.runtime["store"],
+        Settings(_env_file=None, answer_mode="llm", openai_api_key="test-key"),
+    )
+    llm_service.generate = AsyncMock(
+        return_value={"response": "IT2 có các phương thức xét tuyển XTTN, ĐGTD và THPT.", "tokens": 20}
+    )
+    llm_quota = await llm_service.answer("Chỉ tiêu tuyển sinh chương trình IT2 năm 2026 là bao nhiêu?")
+    assert "200" in llm_quota["response"]
+    assert "phương thức xét tuyển" not in llm_quota["response"].lower()
+    assert llm_quota["mode"] == "extractive"
+    llm_service.generate.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_guide_action_labels_match_their_destinations(client):
     guide = (await client.get("/api/v1/guide")).json()
     steps = {step["id"]: step for step in guide["steps"]}
