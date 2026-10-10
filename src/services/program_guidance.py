@@ -337,9 +337,9 @@ def recommendation_options(knowledge):
 
 
 def recommend_programs(knowledge, profile):
-    """Rank at most three catalog programs by user-selected topic overlap.
+    """Select at most three catalog programs by topic coverage, without a fit score.
 
-    Development goals are summarized for the candidate but never affect a rank.
+    Development goals are summarized for the candidate but never affect selection.
     Free-text is processed in memory and is not saved to chat or ticket records.
     """
     allowed_areas = {area["id"] for area in AREAS}
@@ -367,7 +367,7 @@ def recommend_programs(knowledge, profile):
         for chunk in knowledge.chunks
         if chunk.get("kind") == "program" and chunk.get("code") in programs_by_code
     }
-    ranked = []
+    candidates = []
     for code, program in programs_by_code.items():
         name = _plain(program.get("name", ""))
         program_area_terms = {
@@ -378,9 +378,8 @@ def recommend_programs(knowledge, profile):
         program_areas = set(program_area_terms)
         matched_strengths = sorted(strengths & program_areas)
         matched_interests = sorted(interests & program_areas)
-        score = 2 * len(matched_strengths) + 3 * len(matched_interests)
         chunk = chunks_by_code.get(code)
-        if score <= 0 or chunk is None:
+        if not (matched_strengths or matched_interests) or chunk is None:
             continue
 
         criteria_matches = _criteria_matches_by_program(program_area_terms, profile_criteria)
@@ -389,9 +388,8 @@ def recommend_programs(knowledge, profile):
         considerations = ["Chưa đủ dữ liệu để xác nhận nội dung học hoặc mức độ thiên về phần mềm; căn cứ hiện tại chỉ là tên chương trình."]
 
         citation = knowledge.citation(chunk)
-        ranked.append(
+        candidates.append(
             {
-                "score": score,
                 "code": code,
                 "name": program["name"],
                 "badge": "Đối chiếu theo tên",
@@ -415,26 +413,27 @@ def recommend_programs(knowledge, profile):
             }
         )
 
-    ranked.sort(key=lambda item: (-item["score"], item["code"]))
-    # Keep the short list representative when the profile spans multiple areas;
-    # otherwise three similarly named programs can crowd out a distinct topic.
-    area_support = {}
+    # Pick one source-catalog candidate for each distinct topic in the order
+    # the candidate supplied it, then fill remaining places in catalog order.
+    area_order = []
     for label, criteria in profile_criteria.items():
         for criterion in criteria:
-            area_support.setdefault(criterion["area_id"], set()).add(label)
+            area_id = criterion["area_id"]
+            if area_id not in area_order:
+                area_order.append(area_id)
     chosen_codes = set()
-    for area_id in sorted(area_support, key=lambda key: (-len(area_support[key]), key)):
-        candidate = next((item for item in ranked if area_id in item["_program_areas"] and item["code"] not in chosen_codes), None)
+    for area_id in area_order:
+        candidate = next((item for item in candidates if area_id in item["_program_areas"] and item["code"] not in chosen_codes), None)
         if candidate:
             chosen_codes.add(candidate["code"])
         if len(chosen_codes) == 3:
             break
-    for item in ranked:
+    for item in candidates:
         if len(chosen_codes) == 3:
             break
         chosen_codes.add(item["code"])
-    shortlisted = [item for item in ranked if item["code"] in chosen_codes]
-    suggestions = [{key: value for key, value in item.items() if key not in {"score", "_program_areas"}} for item in shortlisted]
+    shortlisted = [item for item in candidates if item["code"] in chosen_codes]
+    suggestions = [{key: value for key, value in item.items() if key != "_program_areas"} for item in shortlisted]
     return {
         "suggestions": suggestions,
         "profile_summary": profile_summary,

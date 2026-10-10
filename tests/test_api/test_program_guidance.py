@@ -87,6 +87,9 @@ def test_example_profile_has_specific_title_linked_reasons_for_each_suggested_pr
         "development_goals": ["Giao tiếp và thuyết trình"],
         "priorities": ["Chương trình thiên về phần mềm"],
     }
+    encoded_response = json.dumps(data, ensure_ascii=False).lower()
+    assert '"score"' not in encoded_response
+    assert '"percent"' not in encoded_response
     programs = {item["code"]: item for item in knowledge.programs}
     for suggestion in data["suggestions"]:
         assert suggestion["name"] == programs[suggestion["code"]]["name"]
