@@ -1,6 +1,18 @@
 const $ = id => document.getElementById(id);
-const accountLink=document.createElement('a');accountLink.className='staff-link';accountLink.href='/account';accountLink.textContent='Đăng nhập';const accountNav=document.querySelector('.topbar nav');accountNav?.insertBefore(accountLink,accountNav.querySelector('.staff-login-link'));
+const accountLink=document.createElement('a');accountLink.className='account-cta';accountLink.href='/account';
+accountLink.innerHTML='<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.9-3.6 3.3-5.4 7-5.4s6.1 1.8 7 5.4"/></svg><span>Đăng nhập</span>';
+document.querySelector('.topbar nav')?.append(accountLink);
+// Small disclosure menus in the header (staff links, account).
+function bindNavMenu(toggle,panel){
+  const close=(focus)=>{if(panel.hidden)return;panel.hidden=true;toggle.setAttribute('aria-expanded','false');if(focus)toggle.focus();};
+  toggle.addEventListener('click',()=>{const open=panel.hidden;panel.hidden=!open;toggle.setAttribute('aria-expanded',String(open));if(open)panel.querySelector('a,button')?.focus();});
+  panel.addEventListener('keydown',event=>{if(event.key==='Escape')close(true);});
+  document.addEventListener('click',event=>{if(!panel.parentElement.contains(event.target))close(false);});
+}
+{const staffToggle=document.getElementById('staff-menu-toggle');if(staffToggle)bindNavMenu(staffToggle,document.getElementById('staff-menu'));}
+function setTicketCount(count){const badge=document.getElementById('ticket-count');badge.textContent=count;badge.hidden=!count;}
 const privacyNote=document.querySelector('.privacy');if(privacyNote)privacyNote.textContent='Bạn có thể dùng ẩn danh hoặc đăng nhập để lưu lịch sử và theo dõi yêu cầu.';
+const welcomeTemplate=document.getElementById('welcome')?.cloneNode(true);
 const stateNames = {waiting:'Đang chờ', in_progress:'Đang xử lý', resolved:'Đã giải quyết',cancelled:'Đã hủy',rejected:'Đã từ chối'};
 let messages = [], programs = [], requestKey = '', busy = false, currentStudent = null, guideData = null, guideCompleted = new Set(), guideStorage = null, handoverPreview = {question:'', ai_answer:'', sources:[]};
 const pendingChatRequestKey = 'hust-pending-chat-request-v1';
@@ -10,16 +22,23 @@ let guidanceAreas = null, guidanceOptionsPromise = null, guidanceController = nu
 const guideStorageKey = 'hust-guide-checklist-v2';
 function updateAccountNav(student){
   if(!student){
-    if(!accountLink.isConnected){const nav=document.querySelector('.topbar nav');nav?.insertBefore(accountLink,nav.querySelector('.staff-login-link'));}
+    if(!accountLink.isConnected)document.querySelector('.topbar nav')?.append(accountLink);
     return;
   }
   if(!accountLink.isConnected)return;
-  const name=node('span','account-name',student.name || student.email);
-  name.title=student.email;
-  const logout=node('button','nav-link account-logout','\u0110\u0103ng xu\u1ea5t');
+  const displayName=student.name || student.email;
+  const menu=node('div','nav-menu account-menu');
+  const trigger=node('button','account-trigger');trigger.type='button';trigger.id='account-menu-toggle';
+  trigger.setAttribute('aria-haspopup','true');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-controls','account-menu');
+  trigger.title=student.email;
+  trigger.append(node('span','account-avatar',(displayName.trim()[0]||'?').toUpperCase()),node('span','account-name',displayName));
+  const panel=node('div','nav-menu-panel');panel.id='account-menu';panel.hidden=true;
+  panel.append(node('p','nav-menu-caption',student.email));
+  const logout=node('button','nav-menu-item account-logout','Đăng xuất');
   logout.type='button';
   logout.onclick=async()=>{logout.disabled=true;try{await api('/auth/logout',{method:'POST'});location.href='/account';}catch(error){logout.disabled=false;$('chat-error').textContent=error.message;}};
-  accountLink.replaceWith(name,logout);
+  panel.append(logout);menu.append(trigger,panel);
+  accountLink.replaceWith(menu);bindNavMenu(trigger,panel);
 }
 function fold(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
 function displayProgramName(program){return String(program?.name||'').replace(/^CNTT:\s*/i,'').trim() || program?.code || '';}
@@ -85,13 +104,70 @@ function updateSuggestions(){
   const code=$('program').value;const box=$('follow-up');box.replaceChildren();
   const choices=code?[[`Phương thức ${code}`,`Phương thức xét tuyển ${code} là gì?`],[`Học phí ${code}`,`Học phí ${code} là bao nhiêu?`],[`Ngoại ngữ ${code}`,`Điều kiện ngoại ngữ ${code} là gì?`]]:[['Số ngành','HUST có bao nhiêu ngành?'],['Đăng ký ĐGTD','Cách đăng ký thi đánh giá tư duy?']];
   const seen=new Set();choices.forEach(([title,question])=>{if(seen.has(question))return;seen.add(question);const b=node('button','small-action',title);b.type='button';b.onclick=()=>fillQuestion(question);box.append(b);});
+  renderWelcome();
 }
+function renderWelcome(){
+  const code=$('program').value;
+  document.querySelectorAll('#welcome [data-welcome-question]').forEach(card=>{const template=card.dataset.programQuestion;card.querySelector('.welcome-q').textContent=template&&code?template.replace('{code}',code):card.dataset.welcomeQuestion;});
+  const count=$('welcome-program-count');if(count&&programs.length)count.textContent=programs.length;
+}
+function restoreWelcome(){if(welcomeTemplate&&!$('welcome')){$('messages').append(welcomeTemplate.cloneNode(true));renderWelcome();}}
+$('messages').addEventListener('click',event=>{
+  const card=event.target.closest('#welcome [data-welcome-question]');
+  if(card){if(busy)return;fillQuestion(card.querySelector('.welcome-q').textContent);$('chat-form').requestSubmit();return;}
+  const tool=event.target.closest('#welcome [data-welcome-open]');
+  if(tool)$(tool.dataset.welcomeOpen)?.click();
+});
 function scopeLabel(data={}){
   if(data.scope==='program'&&data.scope_program)return `Phạm vi trả lời: ${programLabel(data.scope_program)}.`;
   if(data.scope==='ambiguous')return 'Phạm vi chưa rõ: hãy chọn hoặc ghi rõ chương trình.';
   if(data.scope==='general')return 'Phạm vi trả lời: toàn trường HUST 2026.';
   const selected=$('program').value;
   return selected?`Ngữ cảnh câu tiếp theo: ${programLabel(selected)}. Câu hỏi toàn trường vẫn được trả lời theo phạm vi toàn trường.`:'Phạm vi trả lời: toàn trường HUST 2026.';
+}
+const FEEDBACK_REASONS=[['wrong_info','Sai thông tin'],['missing_info','Thiếu thông tin'],['off_topic','Không đúng câu hỏi'],['other','Khác']];
+function feedbackControls(data){
+  const actions=node('div','follow-up feedback-actions');const status=node('span','hint');status.setAttribute('role','status');
+  const buttons=[];
+  const lock=rating=>{buttons.forEach(x=>{x.disabled=true;x.setAttribute('aria-pressed',String(x.dataset.rating===rating));});};
+  const send=async(rating,reason,note)=>{
+    buttons.forEach(x=>x.disabled=true);
+    try{
+      await api('/answers/'+data.request_id+'/feedback',{method:'POST',body:JSON.stringify({rating,reason,note})});
+      data.feedback=rating;lock(rating);form.hidden=true;
+      status.textContent=rating==='incorrect'?'Cảm ơn bạn, góp ý đã được gửi tới quản trị viên. Bạn có thể chuyển câu hỏi cho cán bộ.':'Cảm ơn bạn đã đánh giá.';
+      return true;
+    }catch(e){status.textContent=e.message;if(!data.feedback)buttons.forEach(x=>x.disabled=false);return false;}
+  };
+  const form=node('form','feedback-form');form.hidden=true;
+  const legend=node('p','feedback-form-title','Câu trả lời chưa đúng ở đâu?');
+  const choices=node('div','feedback-reasons');
+  FEEDBACK_REASONS.forEach(([value,label],i)=>{
+    const item=node('label','feedback-reason');const radio=document.createElement('input');
+    radio.type='radio';radio.name='reason-'+data.request_id;radio.value=value;if(i===0)radio.checked=true;
+    item.append(radio,node('span','',label));choices.append(item);
+  });
+  const note=document.createElement('textarea');note.className='feedback-note';note.rows=2;note.maxLength=500;
+  note.placeholder='Ghi chú thêm (không bắt buộc), ví dụ: thông tin đúng là…';note.setAttribute('aria-label','Ghi chú thêm');
+  const formActions=node('div','feedback-form-actions');
+  const submit=node('button','small-action primary-action','Gửi đánh giá');submit.type='submit';
+  const cancel=node('button','small-action','Hủy');cancel.type='button';
+  cancel.onclick=()=>{form.hidden=true;buttons.forEach(x=>x.disabled=false);};
+  formActions.append(submit,cancel,node('span','hint','Đánh giá không thể thay đổi sau khi gửi.'));
+  form.append(legend,choices,note,formActions);
+  form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;const reason=form.querySelector('input[type=radio]:checked')?.value||'other';
+    const ok=await send('incorrect',reason,note.value.trim());if(!ok)submit.disabled=false;};
+  [['helpful','Hữu ích'],['incorrect','Chưa đúng']].forEach(([rating,title])=>{
+    const b=node('button','small-action',title);b.type='button';b.dataset.rating=rating;b.setAttribute('aria-pressed','false');buttons.push(b);
+    b.onclick=()=>{
+      if(rating==='helpful'){send('helpful');return;}
+      form.hidden=false;buttons.forEach(x=>x.disabled=true);form.querySelector('input[type=radio]:checked')?.focus();
+    };
+    actions.append(b);
+  });
+  actions.append(status);
+  if(data.feedback){lock(data.feedback);status.textContent='Bạn đã đánh giá câu trả lời này.';}
+  const wrap=node('div','feedback-block');wrap.append(actions,form);return wrap;
 }
 function renderScope(data){
   $('scope-status').textContent=scopeLabel(data);
@@ -166,15 +242,9 @@ function addMessage(role, data, save=true) {
   });
   if(role==='assistant') {
     const labels={answered:'Có nguồn',fallback:'Cần cán bộ kiểm tra',clarification:'Cần làm rõ',error:'Chưa xử lý được'};
-    box.append(node('div','meta',`${data.reason==='out_of_scope'?'Ngoài phạm vi tuyển sinh':(labels[data.kind] || 'Trợ lý X')}${data.mode ? ' · '+(data.mode==='llm'?'AI tổng hợp':'Tra cứu tài liệu') : ''}${data.cached?' · Đã lưu đệm':''}${data.scope ? ' · '+scopeLabel(data).replace(/^Phạm vi trả lời: /,'').replace(/\.$/,'') : ''}`));
+    box.append(node('div','meta',`${data.reason==='out_of_scope'?'Ngoài phạm vi tuyển sinh':(labels[data.kind] || 'Trợ lý tuyển sinh')}${data.mode ? ' · '+(data.mode==='llm'?'AI tổng hợp':'Tra cứu tài liệu') : ''}${data.cached?' · Đã lưu đệm':''}${data.scope ? ' · '+scopeLabel(data).replace(/^Phạm vi trả lời: /,'').replace(/\.$/,'') : ''}`));
     const originalQuestion=[...messages].reverse().find(m=>m.role==='user')?.response || '';
-    if(data.request_id){
-      const actions=node('div','follow-up');const status=node('span','hint');status.setAttribute('role','status');
-      const buttons=[];[['helpful','Hữu ích'],['incorrect','Chưa đúng']].forEach(([rating,title])=>{
-        const b=node('button','small-action',title);b.type='button';b.setAttribute('aria-pressed',String(data.feedback===rating));buttons.push(b);
-        b.onclick=async()=>{buttons.forEach(x=>x.disabled=true);try{await api('/answers/'+data.request_id+'/feedback',{method:'POST',body:JSON.stringify({rating})});data.feedback=rating;buttons.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));status.textContent=rating==='incorrect'?'Đã ghi nhận. Bạn có thể gửi câu hỏi cho cán bộ.':'Đã ghi nhận đánh giá.';}catch(e){status.textContent=e.message;}finally{buttons.forEach(x=>x.disabled=false);}};actions.append(b);
-      });actions.append(status);box.append(actions);
-    }
+    if(data.request_id)box.append(feedbackControls(data));
     if(data.request_id&&data.reason!=='out_of_scope') {const b=node('button','small-action','Chuyển câu hỏi cho cán bộ');b.type='button';b.onclick=()=>openHandover(originalQuestion,data.response,data.sources||[]);box.append(b);}
   }
   $('messages').append(box);
@@ -184,6 +254,43 @@ function addMessage(role, data, save=true) {
   if(turnKey)renderedMessageByTurn.set(turnKey,entry);
   if(save)messages.push(entry.message);
   return entry;
+}
+let finishReveal=null;
+// Types a freshly arrived answer out character by character, keeping its markup.
+// Screen readers get the full text at once through a hidden copy.
+function revealAnswer(box){
+  finishReveal?.();
+  const content=box.querySelector(':scope>.answer-structured,:scope>.body');
+  if(!content||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const walker=document.createTreeWalker(content,NodeFilter.SHOW_TEXT);const parts=[];
+  while(walker.nextNode())parts.push({node:walker.currentNode,text:walker.currentNode.nodeValue});
+  const total=parts.reduce((sum,part)=>sum+part.text.length,0);if(!total)return;
+  parts.forEach(part=>{part.node.nodeValue='';part.block=part.node.parentElement.closest('li,p,h3')||null;part.block?.classList.add('type-pending');});
+  const spoken=node('span','sr-only',content.textContent||parts.map(part=>part.text).join(' '));
+  content.setAttribute('aria-hidden','true');box.append(spoken);
+  const caret=node('span','type-caret');caret.setAttribute('aria-hidden','true');
+  box.classList.add('is-typing');
+  const scroller=$('messages');const duration=Math.min(2200,Math.max(450,total*14));const start=performance.now();let frame=0;
+  const render=shown=>{
+    let left=shown;
+    for(const part of parts){
+      const take=Math.min(part.text.length,Math.max(0,left));part.node.nodeValue=part.text.slice(0,take);left-=take;
+      if(take>0)part.block?.classList.remove('type-pending');
+      if(take<part.text.length||left<=0){part.node.after(caret);break;}
+    }
+  };
+  const done=()=>{
+    cancelAnimationFrame(frame);parts.forEach(part=>{part.node.nodeValue=part.text;part.block?.classList.remove('type-pending');});caret.remove();spoken.remove();
+    content.removeAttribute('aria-hidden');box.classList.remove('is-typing');box.classList.add('reveal-done');
+    box.removeEventListener('click',done);if(finishReveal===done)finishReveal=null;
+  };
+  const step=now=>{
+    const nearBottom=scroller.scrollHeight-scroller.scrollTop-scroller.clientHeight<80;
+    const progress=Math.min(1,(now-start)/duration);render(Math.ceil(total*(1-Math.pow(1-progress,1.6))));
+    if(nearBottom)scroller.scrollTop=scroller.scrollHeight;
+    if(progress<1)frame=requestAnimationFrame(step);else done();
+  };
+  box.addEventListener('click',done);finishReveal=done;frame=requestAnimationFrame(step);
 }
 function sourceLocation(source){
   const page=Number.isInteger(source.page)&&source.page>0?source.page:null;
@@ -211,7 +318,7 @@ async function init() {
     $('source-status').textContent=status.status==='ready'?`${source.document_count||1} nguồn · ${source.indexable_pdf_count||1} PDF có thể tra cứu · ${status.programs} chương trình · kỳ 2026 · bộ dữ liệu ${source.version||'chưa rõ'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
     const official=$('source-official');if(official&&source.url){official.href=source.url;official.hidden=false;}
     $('mode-label').textContent=status.mode==='llm'?'AI tổng hợp có kiểm tra trích dẫn.':'Đang dùng chế độ tra cứu tài liệu.';
-    $('ticket-count').textContent=session.tickets.length;
+    setTicketCount(session.tickets.length);
     restoreQuestionDraft();
   } catch(error) { $('chat-error').textContent='Không kết nối được ứng dụng: '+error.message; }
 }
@@ -228,9 +335,9 @@ $('chat-form').addEventListener('submit',async e=>{
     pendingChatRequest={requestId:crypto.randomUUID(),program,message:question,entry:null};persistPendingChatRequest();
   }
   const pending=pendingChatRequest;
-  busy=true;$('send').disabled=true;$('clear').disabled=true;$('chat-error').textContent='';
+  finishReveal?.();busy=true;$('send').disabled=true;$('clear').disabled=true;$('chat-error').textContent='';
   if(!pending.entry)pending.entry=addMessage('user',{response:question,turn_id:pending.requestId});
-  const loading=node('div','message assistant','Đang tra cứu tài liệu…');loading.id='loading';$('messages').append(loading);loading.scrollIntoView({block:'nearest'});
+  const loading=node('div','message assistant');loading.id='loading';const typing=node('div','typing');const dots=node('span','typing-dots');dots.setAttribute('aria-hidden','true');dots.append(node('i'),node('i'),node('i'));typing.append(dots,node('span','','Đang tra cứu tài liệu…'));loading.append(node('div','speaker','TRỢ LÝ X'),typing);$('messages').append(loading);loading.scrollIntoView({block:'nearest'});
   try {
     const data=await api('/chat',{method:'POST',body:JSON.stringify({message:question,program,request_id:pending.requestId})});
     loading.remove();
@@ -239,7 +346,9 @@ $('chat-form').addEventListener('submit',async e=>{
       pending.entry.message.id=userMessageId;pending.entry.message.turn_id=data.turn_id||pending.requestId;
       pending.entry.element.dataset.messageId=String(userMessageId);renderedMessageById.set(String(userMessageId),pending.entry);
     }
-    addMessage('assistant',{...data,id:data.message_ids?.assistant});
+    const lastBefore=$('messages').lastElementChild;
+    const answer=addMessage('assistant',{...data,id:data.message_ids?.assistant});
+    if(answer.element!==lastBefore&&answer.element===$('messages').lastElementChild)revealAnswer(answer.element);
     setProgram(data.program || '');renderScope(data);
     if($('question').value.trim()===question){$('question').value='';$('char-count').textContent='0 / 2000';$('question-status').textContent='';clearQuestionDraft();}
     else saveQuestionDraft();
@@ -283,7 +392,7 @@ setProgramToolsOpen(false,false);
 $('comparison-result')?.setAttribute('aria-live','polite');
 $('clear').addEventListener('click',async()=>{
   if(!confirm('Xóa lịch sử và ngữ cảnh chat? Ticket đã gửi vẫn được giữ.'))return;
-  try {const data=await api('/session/messages',{method:'DELETE'});messages=[];renderedMessageById.clear();renderedMessageByTurn.clear();discardPendingChatRequest();clearQuestionDraft();$('messages').replaceChildren();setProgram('');$('question-status').textContent='';addMessage('assistant',{response:data.message,kind:'clarification'},false);}
+  try {const data=await api('/session/messages',{method:'DELETE'});messages=[];renderedMessageById.clear();renderedMessageByTurn.clear();discardPendingChatRequest();clearQuestionDraft();$('messages').replaceChildren();setProgram('');restoreWelcome();$('question-status').textContent=data.message||'';}
   catch(error){$('chat-error').textContent=error.message;}
 });
 function renderHandoverSources(sources){
@@ -311,7 +420,7 @@ $('handover-form').addEventListener('submit',async e=>{
   }catch(error){$('handover-error').textContent=error.message;}finally{$('handover-send').disabled=false;}
 });
 async function loadTickets(){
-  try {const list=await api('/tickets');$('ticket-count').textContent=list.length;$('tickets').replaceChildren();
+  try {const list=await api('/tickets');setTicketCount(list.length);$('tickets').replaceChildren();
     const seen=readLocal(seenKey,{});const newReplies=list.filter(t=>t.reply&&seen[t.id]!==t.updated);const badge=$('reply-unread');badge.hidden=!newReplies.length;badge.textContent=newReplies.length+' phản hồi mới';const notice=$('ticket-notice');if(newReplies.length){notice.hidden=false;notice.textContent=`Cán bộ đã trả lời ${newReplies.length} ticket. Hãy xem phần “Phản hồi của cán bộ” bên dưới.`;if($('track-dialog').open)markRepliesSeen(list);}
     if(!list.length)$('tickets').append(node('p','empty-state','Chưa có yêu cầu. Bạn có thể chuyển câu hỏi từ màn hình chat.'));
     list.forEach(t=>{const card=node('article','ticket-card');const head=node('div','ticket-head');head.append(node('b','',t.id),node('span','badge '+t.status,stateNames[t.status]||'Không rõ'));card.append(head,node('p','',t.question||t.summary),node('small','hint',`Cập nhật gần nhất: ${new Date(Number(t.updated||t.created)*1000).toLocaleString('vi-VN')}`));if(t.ai_answer){const preview=node('details','ticket-preview');preview.append(node('summary','','Nội dung đã chuyển'),node('p','',t.ai_answer));if(Array.isArray(t.sources)&&t.sources.length)preview.append(node('small','hint',`${t.sources.length} nguồn liên quan`));card.append(preview);}if(['waiting','in_progress'].includes(t.status)){const cancel=node('button','secondary danger','Hủy yêu cầu');const error=node('p','error-text');error.setAttribute('role','alert');cancel.onclick=async()=>{if(!confirm('Hủy yêu cầu '+t.id+'? Cán bộ sẽ không tiếp tục xử lý yêu cầu này.'))return;cancel.disabled=true;try{await api('/tickets/'+t.id+'/cancel',{method:'POST'});await loadTickets();}catch(e){error.textContent=e.message;cancel.disabled=false;}};card.append(cancel,error);}if(t.reply)card.append(node('div','reply-box',`Phản hồi của cán bộ: ${t.reply}`));$('tickets').append(card);});
@@ -726,7 +835,7 @@ function readLocal(key,fallback){try{return JSON.parse(localStorage.getItem(key)
 try{localStorage.removeItem("hust-plan-2026-v1");}catch{}
 async function checkReplies(){
   if(document.hidden)return;
-  try{const tickets=await api('/tickets');$('ticket-count').textContent=tickets.length;const seen=readLocal(seenKey,{});let count=0;
+  try{const tickets=await api('/tickets');setTicketCount(tickets.length);const seen=readLocal(seenKey,{});let count=0;
     tickets.forEach(t=>{if(t.reply&&seen[t.id]!==t.updated)count++;});const badge=$('reply-unread');badge.hidden=count===0;badge.textContent=count+' phản hồi mới';
     const notice=$('ticket-notice');if(notice&&count){notice.hidden=false;notice.textContent=`Cán bộ đã trả lời ${count} ticket. Mở “Yêu cầu của tôi” để xem.`;}
   }catch{/* A temporary connection failure keeps the last successful notification. */}

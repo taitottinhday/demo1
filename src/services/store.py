@@ -78,6 +78,15 @@ class Store:
                     id INTEGER PRIMARY KEY, action TEXT NOT NULL, actor TEXT NOT NULL,
                     actor_id INTEGER REFERENCES users(id), target_type TEXT NOT NULL,
                     target_id TEXT, note TEXT, created REAL NOT NULL);
+                CREATE TABLE IF NOT EXISTS answer_feedback (
+                    id INTEGER PRIMARY KEY, request_id TEXT NOT NULL UNIQUE, session TEXT NOT NULL,
+                    student_id TEXT, rating TEXT NOT NULL, reason TEXT NOT NULL DEFAULT '',
+                    note TEXT NOT NULL DEFAULT '', question TEXT NOT NULL DEFAULT '',
+                    answer TEXT NOT NULL DEFAULT '', sources_json TEXT NOT NULL DEFAULT '[]',
+                    program TEXT NOT NULL DEFAULT '', kind TEXT NOT NULL DEFAULT '', mode TEXT NOT NULL DEFAULT '',
+                    status TEXT NOT NULL DEFAULT 'new', admin_note TEXT NOT NULL DEFAULT '',
+                    reviewed_by TEXT, reviewed_at REAL, created REAL NOT NULL);
+                CREATE INDEX IF NOT EXISTS idx_feedback_created ON answer_feedback(created);
                 CREATE INDEX IF NOT EXISTS idx_events_ticket ON ticket_events(ticket_id);
                 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
                 CREATE INDEX IF NOT EXISTS idx_tickets_owner ON tickets(owner);
@@ -99,6 +108,9 @@ class Store:
                     db.execute(f"ALTER TABLE tickets ADD COLUMN {column} {definition}")
             event_columns = {row[1] for row in db.execute("PRAGMA table_info(ticket_events)").fetchall()}
             for column, definition in {
+                # Older admin schemas created ticket_events without the text actor
+                # column that ticket_detail() reads; add it and backfill below.
+                "actor": "TEXT NOT NULL DEFAULT ''",
                 "actor_id": "INTEGER REFERENCES users(id)",
                 "from_officer_id": "INTEGER REFERENCES users(id)",
                 "to_officer_id": "INTEGER REFERENCES users(id)",
@@ -106,6 +118,27 @@ class Store:
             }.items():
                 if column not in event_columns:
                     db.execute(f"ALTER TABLE ticket_events ADD COLUMN {column} {definition}")
+            if "actor" not in event_columns:
+                db.execute(
+                    "UPDATE ticket_events SET actor=COALESCE("
+                    "(SELECT username FROM users WHERE users.id=ticket_events.actor_id),'') WHERE actor=''"
+                )
+            events_sql = db.execute("SELECT sql FROM sqlite_master WHERE name='ticket_events'").fetchone()[0]
+            if "CHECK" in events_sql.upper():
+                # Older admin schemas restricted action to a fixed list without 'reply',
+                # so resolving a ticket failed; SQLite cannot drop a CHECK, so rebuild.
+                cols = "id,ticket_id,actor,actor_id,action,from_officer_id,to_officer_id,note,created"
+                db.executescript(f"""
+                    CREATE TABLE ticket_events_new (
+                        id INTEGER PRIMARY KEY, ticket_id TEXT NOT NULL, actor TEXT NOT NULL DEFAULT '',
+                        actor_id INTEGER REFERENCES users(id), action TEXT NOT NULL,
+                        from_officer_id INTEGER REFERENCES users(id), to_officer_id INTEGER REFERENCES users(id),
+                        note TEXT, created REAL NOT NULL);
+                    INSERT INTO ticket_events_new({cols}) SELECT {cols} FROM ticket_events;
+                    DROP TABLE ticket_events;
+                    ALTER TABLE ticket_events_new RENAME TO ticket_events;
+                    CREATE INDEX IF NOT EXISTS idx_events_ticket ON ticket_events(ticket_id);
+                """)
             user_columns = {row[1] for row in db.execute("PRAGMA table_info(users)").fetchall()}
             if "password_set_at" not in user_columns:
                 db.execute("ALTER TABLE users ADD COLUMN password_set_at REAL")
@@ -564,7 +597,8 @@ class Store:
             # has no previous history.
             db.execute("UPDATE sessions SET context='' WHERE id=?", (sid,))
 
-    def feedback(self, sid, request_id, rating, student_id=None):
+    def feedback(self, sid, request_id, rating, student_id=None, reason="", note=""):
+        """Record a one-time rating; returns "ok", "exists" or None when the answer is not found."""
         with self.connect() as db:
             if student_id:
                 rows = db.execute(
@@ -578,26 +612,108 @@ class Store:
                 ).fetchall()
             for row in rows:
                 payload = json.loads(row["payload"])
-                if payload.get("request_id") == request_id:
-                    payload["feedback"] = rating
-                    db.execute(
-                        "UPDATE messages SET payload=? WHERE id=?", (json.dumps(payload, ensure_ascii=False), row["id"])
-                    )
-                    turn_id = payload.get("turn_id")
-                    if turn_id:
-                        cached = db.execute(
-                            "SELECT response_json FROM chat_requests WHERE session=? AND request_id=?",
-                            (row["session"], turn_id),
-                        ).fetchone()
-                        if cached and cached["response_json"]:
-                            response = json.loads(cached["response_json"])
-                            response["feedback"] = rating
-                            db.execute(
-                                "UPDATE chat_requests SET response_json=? WHERE session=? AND request_id=?",
-                                (json.dumps(response, ensure_ascii=False), row["session"], turn_id),
-                            )
-                    return True
-        return False
+                if payload.get("request_id") != request_id:
+                    continue
+                exists = db.execute("SELECT 1 FROM answer_feedback WHERE request_id=?", (request_id,)).fetchone()
+                if payload.get("feedback") or exists:
+                    return "exists"
+                payload["feedback"] = rating
+                db.execute(
+                    "UPDATE messages SET payload=? WHERE id=?", (json.dumps(payload, ensure_ascii=False), row["id"])
+                )
+                turn_id = payload.get("turn_id")
+                question = ""
+                if turn_id:
+                    cached = db.execute(
+                        "SELECT response_json FROM chat_requests WHERE session=? AND request_id=?",
+                        (row["session"], turn_id),
+                    ).fetchone()
+                    if cached and cached["response_json"]:
+                        response = json.loads(cached["response_json"])
+                        response["feedback"] = rating
+                        db.execute(
+                            "UPDATE chat_requests SET response_json=? WHERE session=? AND request_id=?",
+                            (json.dumps(response, ensure_ascii=False), row["session"], turn_id),
+                        )
+                    for (user_payload,) in db.execute(
+                        "SELECT payload FROM messages WHERE session=? AND role='user' ORDER BY id DESC",
+                        (row["session"],),
+                    ):
+                        user_message = json.loads(user_payload)
+                        if user_message.get("turn_id") == turn_id:
+                            question = user_message.get("response", "")
+                            break
+                # Copy the question/answer so the rating survives chat deletion and session cleanup.
+                db.execute(
+                    "INSERT INTO answer_feedback(request_id,session,student_id,rating,reason,note,question,answer,"
+                    "sources_json,program,kind,mode,created) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        request_id,
+                        row["session"],
+                        student_id,
+                        rating,
+                        reason if rating == "incorrect" else "",
+                        note if rating == "incorrect" else "",
+                        question,
+                        payload.get("response", ""),
+                        json.dumps(payload.get("sources") or [], ensure_ascii=False),
+                        payload.get("scope_program") or payload.get("program") or "",
+                        payload.get("kind", ""),
+                        payload.get("mode", ""),
+                        time.time(),
+                    ),
+                )
+                return "ok"
+        return None
+
+    def feedback_list(self, rating=None, status=None, page=1, page_size=20):
+        where, args = " WHERE 1=1", []
+        if rating:
+            where += " AND rating=?"
+            args.append(rating)
+        if status:
+            where += " AND status=?"
+            args.append(status)
+        with self.connect() as db:
+            total = db.execute("SELECT COUNT(*) FROM answer_feedback" + where, args).fetchone()[0]
+            items = [
+                {**dict(r), "sources": json.loads(r["sources_json"] or "[]")}
+                for r in db.execute(
+                    "SELECT * FROM answer_feedback" + where + " ORDER BY created DESC LIMIT ? OFFSET ?",
+                    (*args, page_size, (page - 1) * page_size),
+                )
+            ]
+            for item in items:
+                item.pop("sources_json", None)
+                item.pop("session", None)
+                item.pop("student_id", None)
+            summary = {"total": 0, "helpful": 0, "incorrect": 0, "reasons": {}, "statuses": {}}
+            for rating_value, count in db.execute("SELECT rating,COUNT(*) FROM answer_feedback GROUP BY rating"):
+                summary[rating_value] = count
+                summary["total"] += count
+            for reason_value, count in db.execute(
+                "SELECT reason,COUNT(*) FROM answer_feedback WHERE rating='incorrect' GROUP BY reason"
+            ):
+                summary["reasons"][reason_value or "unspecified"] = count
+            for status_value, count in db.execute(
+                "SELECT status,COUNT(*) FROM answer_feedback WHERE rating='incorrect' GROUP BY status"
+            ):
+                summary["statuses"][status_value] = count
+        return {"items": items, "total": total, "page": page, "page_size": page_size, "summary": summary}
+
+    def feedback_review(self, feedback_id, status, admin_note, reviewer):
+        with self.connect() as db:
+            result = db.execute(
+                "UPDATE answer_feedback SET status=?,admin_note=?,reviewed_by=?,reviewed_at=? WHERE id=?",
+                (status, admin_note, reviewer, time.time(), feedback_id),
+            )
+            if result.rowcount != 1:
+                return None
+            row = dict(db.execute("SELECT * FROM answer_feedback WHERE id=?", (feedback_id,)).fetchone())
+        row["sources"] = json.loads(row.pop("sources_json") or "[]")
+        row.pop("session", None)
+        row.pop("student_id", None)
+        return row
 
     def tickets(self, sid=None, status=None, owner=None, student_id=None):
         sql, args = "SELECT * FROM tickets WHERE 1=1", []

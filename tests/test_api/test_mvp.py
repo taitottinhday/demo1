@@ -553,14 +553,29 @@ async def test_feedback_ownership_validation_and_persistence(client):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as other:
         assert (await other.post(endpoint, json={"rating": "incorrect"})).status_code == 404
     assert (await client.post(endpoint, json={"rating": "other"})).status_code == 422
-    assert (await client.post(endpoint, json={"rating": "incorrect"})).status_code == 200
+    assert (await client.post(endpoint, json={"rating": "incorrect", "reason": "unknown"})).status_code == 422
+    body = {"rating": "incorrect", "reason": "missing_info", "note": "Thiếu chỉ tiêu năm 2026"}
+    assert (await client.post(endpoint, json=body)).status_code == 200
     session = (await client.get("/api/v1/session")).json()
     assert session["messages"][-1]["feedback"] == "incorrect"
     assert not session["tickets"]
-    await client.post(endpoint, json={"rating": "helpful"})
-    assert (await client.get("/api/v1/session")).json()["messages"][-1]["feedback"] == "helpful"
+    # A rating is final: a second rating is rejected and the first one is kept.
+    assert (await client.post(endpoint, json={"rating": "helpful"})).status_code == 409
+    assert (await client.get("/api/v1/session")).json()["messages"][-1]["feedback"] == "incorrect"
     await client.delete("/api/v1/session/messages")
     assert (await client.post(endpoint, json={"rating": "incorrect"})).status_code == 404
+    # The copy in answer_feedback survives chat deletion for admin review.
+    saved = app.state.runtime["store"].feedback_list()
+    assert saved["total"] == 1
+    item = saved["items"][0]
+    assert item["question"] == "IT1 có chỉ tiêu bao nhiêu?"
+    assert item["answer"] == answer["response"]
+    assert (item["rating"], item["reason"], item["note"], item["status"]) == (
+        "incorrect",
+        "missing_info",
+        "Thiếu chỉ tiêu năm 2026",
+        "new",
+    )
 
 
 @pytest.mark.asyncio

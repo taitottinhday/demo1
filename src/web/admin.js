@@ -33,7 +33,7 @@ async function api(path,options={}){
   if(!r.ok){const detail=data.detail;const error=new Error(typeof detail==='string'?detail:detail?.message||'Nội dung chưa hợp lệ.');error.fields=typeof detail==='object'?(detail.fields||{}):{};throw error;}
   return data;
 }
-function showDashboard(){$('dashboard').hidden=false;$('login-panel').hidden=true;$('logout').hidden=false;}
+function showDashboard(username){$('dashboard').hidden=false;$('login-panel').hidden=true;$('logout').hidden=false;const who=$('admin-identity');if(who&&username){who.textContent=username;who.dataset.initial=username.trim().charAt(0).toUpperCase();who.hidden=false;}}
 function fail(error){$('admin-error').textContent=error.message;}
 function stopAutoRefresh(){if(pollingTimer){window.clearInterval(pollingTimer);pollingTimer=null;}}
 function startAutoRefresh(){stopAutoRefresh();pollingTimer=window.setInterval(()=>{if(document.hidden||refreshInFlight||hasAdminDraft())return;refresh({silent:true}).catch(fail);},POLL_INTERVAL_MS);}
@@ -77,6 +77,7 @@ async function loadOverview(){
   (m.kpis||[]).forEach(k=>{
     const box=node('article','metric kpi-card');
     box.append(node('span','metric-label',k.label),node('b','metric-value',kpiValue(k)));
+    const more=node('details','kpi-more');more.append(node('summary','','Cách tính'));
     const facts=node('div','kpi-facts');
     facts.append(node('small','',`Công thức: ${k.formula||'Chưa xác định'}`));
     facts.append(node('small','',k.denominator===null||k.denominator===undefined?`Số lượng: ${k.value??'—'}`:`Tử số / mẫu số: ${k.numerator??'—'} / ${k.denominator}`));
@@ -84,7 +85,7 @@ async function loadOverview(){
     facts.append(node('small','',`Múi giờ: ${k.timezone||m.data_timezone||'—'}`));
     facts.append(node('small','',`Cập nhật: ${k.last_updated||m.data_last_updated||'—'}`));
     facts.append(node('small','',`Nguồn: ${k.source||m.data_source||'Chưa xác định'}`));
-    box.append(facts);$('metrics').append(box);
+    more.append(facts);box.append(more);$('metrics').append(box);
   });
   if(!m.kpis?.length){$('metrics').append(node('p','empty-state','Chưa đủ dữ liệu KPI.'));}
   bars($('status-chart'),Object.keys(names).map(k=>({label:names[k],value:s[k]||0,cls:k})));
@@ -151,24 +152,30 @@ async function openTicket(id){
   }catch(e){if(requestId===ticketDetailRequestId&&selected===id)fail(e);}
 }
 function renderDetail(t,history){
-  const box=$('detail');box.replaceChildren();
-  box.append(node('span','eyebrow','CHI TIẾT TICKET'),node('h2','',t.id),node('span','badge '+t.status,names[t.status]));
+  const detail=$('detail');detail.replaceChildren();
+  const header=node('header','detail-header');const titleGroup=node('div');
+  const meta=node('p','detail-meta');meta.append(node('span','',`Tạo ${when(t.created)}`),node('span','',t.officer_name?`Phụ trách: ${t.officer_name}`:'Chưa có người nhận'));
+  titleGroup.append(node('h2','',t.id),meta);header.append(titleGroup,node('span','badge '+t.status,names[t.status]));
+  const box=node('div','detail-scroll');detail.append(header,box);
   if(assignmentNotice?.ticketId===t.id){const notice=node('p','notice-text',assignmentNotice.text);notice.setAttribute('role','status');box.append(notice);}
   const facts=node('dl','facts');
   [['Lý do chuyển',reasons[t.handover_reason]||t.handover_reason],['Độ tự tin AI',t.confidence_score===null?'Chưa ghi nhận':t.confidence_score],['Cán bộ',t.officer_name||'—'],['Tạo lúc',when(t.created)],['Nhận lúc',when(t.claimed_at)],['Kết thúc lúc',when(t.resolved_at)]]
     .forEach(([k,v])=>facts.append(node('dt','',k),node('dd','',String(v))));
-  box.append(node('div','summary',t.summary),facts);
-  box.append(node('h3','','Hội thoại trước khi chuyển'));
+  const convo=node('div','convo');
+  const shared=node('article','convo-msg from-candidate');const sharedBody=node('div','convo-body');
+  sharedBody.append(node('span','convo-who','Nội dung chuyển cán bộ'),node('div','convo-bubble',t.summary));shared.append(node('span','convo-avatar','TS'),sharedBody);
+  convo.append(shared);box.append(convo,facts);
+  box.append(node('h3','detail-subtitle','Hội thoại trước khi chuyển'));
   if(!t.conversation.length)box.append(node('p','hint','Không còn lịch sử chat (ứng viên đã xóa hoặc phiên đã hết hạn).'));
   t.conversation.forEach(m=>{const item=node('div','message '+m.role);item.append(node('div','speaker',m.role==='user'?'Ứng viên':'Trợ lý AI'),node('div','body',m.text));
     m.sources.forEach(s=>{const card=node('details','source-card');const location=s.page?` · PDF trang ${s.page}${s.end_page&&s.end_page!==s.page?`–${s.end_page}`:''}`:s.source_type==='html'?' · Trang web':'';card.append(node('summary','',`Nguồn · ${s.title||'Tài liệu'}${location}`),node('div','quote',s.excerpt||''));if(s.local_url){const a=node('a','','Mở PDF');a.href=s.local_url;a.target='_blank';a.rel='noopener';card.append(a);}if(s.url){const a=node('a','','Nguồn chính thức');a.href=s.url;a.target='_blank';a.rel='noopener';card.append(a);}item.append(card);});
     box.append(item);});
-  if(t.reply)box.append(node('h3','',t.status==='rejected'?'Lý do từ chối':'Phản hồi của cán bộ'),node('div','reply-box',t.reply));
-  box.append(node('h3','','Lịch sử'));const list=node('ol','timeline');
+  if(t.reply)box.append(node('h3','detail-subtitle',t.status==='rejected'?'Lý do từ chối':'Phản hồi của cán bộ'),node('div','reply-box',t.reply));
+  const historyBox=node('details','event-history');historyBox.append(node('summary','',`Lịch sử xử lý (${history.length})`));const list=node('ol','timeline');
   history.forEach(e=>{const li=node('li');let text=actions[e.action]||e.action;
     if(e.action==='reassigned')text+=`: ${e.from_officer_name||'hàng chờ'} → ${e.to_officer_name||'hàng chờ'}`;
     li.append(node('b','',text),node('span','',' · '+(e.actor_name||'Ứng viên')+' · '+when(e.created)));if(e.note)li.append(node('div','hint',e.note));list.append(li);});
-  box.append(list);
+  historyBox.append(list);box.append(historyBox);
   if(t.status==='waiting'||t.status==='in_progress'){
     const err=node('p','error-text');err.setAttribute('role','alert');
     const label=node('label','','Phân công lại');label.htmlFor='reassign-to';const select=node('select');select.id='reassign-to';
@@ -190,7 +197,9 @@ function renderDetail(t,history){
         try{await loadOfficers();}catch(refreshError){fail(refreshError);}
         await openTicket(t.id);
       }catch(e){err.textContent=e.message;button.disabled=false;}};
-    box.append(label,select,noteLabel,note,button,err);
+    const footer=node('footer','detail-composer');const actions=node('div','ticket-actions reassign-actions');
+    const fields=node('div','reassign-fields');const pick=node('div');pick.append(label,select);const why=node('div');why.append(noteLabel,note);fields.append(pick,why);
+    const row=node('div','action-row');row.append(button);actions.append(fields,row,err);footer.append(actions);detail.append(footer);
   }
 }
 
@@ -266,6 +275,14 @@ $('officer-form').addEventListener('submit',async e=>{e.preventDefault();$('offi
   try{await api('/admin/officers',{method:'POST',body:JSON.stringify({name:$('o-name').value,username:$('o-username').value,email:$('o-email').value})});e.target.reset();await loadOfficers();}
   catch(error){$('officer-error').textContent=error.message;}finally{button.disabled=false;}});
 
+// Feedback -----------------------------------------------------------------
+const feedbackView=window.FeedbackView?.mount($('feedback-view'),{
+  api,editable:true,basePath:'/admin/feedback',onError:fail,
+  onChange:summary=>{const open=summary.statuses?.new||0;const badge=$('feedback-new-count');badge.hidden=!open;badge.textContent=String(open);},
+});
+const feedbackTabOpen=()=>!$('tab-feedback').hidden;
+document.querySelector('[data-tab="feedback"]')?.addEventListener('click',()=>feedbackView?.load().catch(fail));
+
 // Wiring -------------------------------------------------------------------
 async function refresh(options={}){
   const silent=options.silent===true;
@@ -275,7 +292,7 @@ async function refresh(options={}){
   try{
     const preserveDraft=silent&&hasAdminDraft();
     if(!preserveDraft)await loadOfficers();
-    await Promise.all([loadOverview(),loadTickets()]);
+    await Promise.all([loadOverview(),loadTickets(),feedbackView&&!(silent&&feedbackTabOpen()&&feedbackView.isEditing())?feedbackView.load():null]);
     if(selected&&!preserveDraft)await openTicketSilently(selected);
     markLiveUpdated();
   }catch(e){fail(e);}finally{refreshInFlight=false;}
@@ -293,7 +310,7 @@ $('status-filter').onchange=$('officer-filter').onchange=()=>{selected=null;assi
 $('prev').onclick=()=>{page--;loadTickets().catch(fail);};$('next').onclick=()=>{page++;loadTickets().catch(fail);};
 $('refresh').onclick=refresh;
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').textContent='';$('username-error').textContent='';$('password-error').textContent='';const username=$('username').value.trim(),password=$('password').value;$('username').removeAttribute('aria-invalid');$('password').removeAttribute('aria-invalid');const first=!username?'username':!password?'password':'';if(first){$(first).setAttribute('aria-invalid','true');$(`${first}-error`).textContent=first==='username'?'Tài khoản là bắt buộc.':'Mật khẩu là bắt buộc.';$(first).focus();return;}const button=e.submitter;button.disabled=true;
-  try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard();await refresh();startAutoRefresh();}
+  try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard(username);await refresh();startAutoRefresh();}
   catch(error){const firstField=error.fields?.username?'username':error.fields?.password?'password':'';if(firstField){$(firstField).setAttribute('aria-invalid','true');$(`${firstField}-error`).textContent=error.fields[firstField];$(firstField).focus();}else $('login-error').textContent=error.message;}finally{button.disabled=false;}});
 $('logout').onclick=async()=>{try{await api('/admin/logout',{method:'POST'});location.reload();}catch(e){fail(e);}};
-(async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard();await refresh();startAutoRefresh();}catch{/* Login form remains visible. */}})();
+(async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard(session.username||'');await refresh();startAutoRefresh();}catch{/* Login form remains visible. */}})();

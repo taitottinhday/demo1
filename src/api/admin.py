@@ -43,6 +43,11 @@ class OfficerPatch(BaseModel):
     active: bool | None = None
 
 
+class FeedbackReviewInput(BaseModel):
+    status: Literal["new", "reviewed", "resolved"]
+    admin_note: str = Field(default="", max_length=1000)
+
+
 class OfficerPasswordInput(BaseModel):
     password: str = Field(min_length=8, max_length=200)
 
@@ -202,6 +207,27 @@ async def request_officer_password_reset(officer_id: int, request: Request, user
         raise
     admins(request).record_audit("reset_password", user, "officer", officer["id"], "Gửi liên kết đặt lại mật khẩu")
     return {**officer, "invite_sent": True}
+
+
+@router.get("/feedback")
+def feedback(
+    request: Request,
+    rating: Literal["helpful", "incorrect"] | None = None,
+    status: Literal["new", "reviewed", "resolved"] | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    user=Depends(admin),
+):
+    return runtime(request)["store"].feedback_list(rating, status, page, page_size)
+
+
+@router.patch("/feedback/{feedback_id}")
+def review_feedback(feedback_id: int, body: FeedbackReviewInput, request: Request, user=Depends(admin)):
+    row = runtime(request)["store"].feedback_review(feedback_id, body.status, redact(body.admin_note.strip()), user)
+    if not row:
+        raise HTTPException(404, "Không tìm thấy đánh giá.")
+    admins(request).record_audit("feedback_review", user, "feedback", feedback_id, body.status)
+    return row
 
 
 @router.get("/metrics")

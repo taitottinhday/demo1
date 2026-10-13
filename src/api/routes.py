@@ -9,7 +9,7 @@ from typing import Literal
 from urllib.parse import quote, urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -62,8 +62,13 @@ class ReplyInput(BaseModel):
     reply: str = Field(min_length=1, max_length=4000)
 
 
+FEEDBACK_REASONS = Literal["wrong_info", "missing_info", "off_topic", "other"]
+
+
 class FeedbackInput(BaseModel):
     rating: Literal["helpful", "incorrect"]
+    reason: FEEDBACK_REASONS | None = None
+    note: str = Field(default="", max_length=500)
 
 
 class ComparisonInput(BaseModel):
@@ -549,8 +554,18 @@ def staff(request: Request):
 def answer_feedback(request_id: str, body: FeedbackInput, request: Request, row=Depends(candidate)):
     rt = runtime(request)
     student = rt["store"].student_user(request.cookies.get("student"))
-    if not rt["store"].feedback(row["id"], request_id, body.rating, student["id"] if student else None):
+    result = rt["store"].feedback(
+        row["id"],
+        request_id,
+        body.rating,
+        student["id"] if student else None,
+        body.reason or "",
+        redact(body.note.strip()),
+    )
+    if result is None:
         raise HTTPException(404, "Không tìm thấy câu trả lời trong phiên của bạn.")
+    if result == "exists":
+        raise HTTPException(409, "Bạn đã đánh giá câu trả lời này. Đánh giá không thể thay đổi.")
     return {"rating": body.rating}
 
 
@@ -960,6 +975,19 @@ def resolve(ticket_id: str, body: ReplyInput, request: Request, user=Depends(sta
     if not runtime(request)["store"].resolve(ticket_id, user, redact(body.reply.strip())):
         raise HTTPException(409, "Cần nhận xử lý yêu cầu trước; chỉ người nhận được đóng yêu cầu.")
     return {"ok": True}
+
+
+@router.get("/staff/feedback")
+def staff_feedback(
+    request: Request,
+    rating: Literal["helpful", "incorrect"] | None = None,
+    status: Literal["new", "reviewed", "resolved"] | None = None,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    user=Depends(staff),
+):
+    """Read-only view of candidate answer ratings for admissions officers."""
+    return runtime(request)["store"].feedback_list(rating, status, page, page_size)
 
 
 @router.get("/staff/metrics")

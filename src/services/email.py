@@ -136,17 +136,17 @@ class SmtpMailer:
         local_time = datetime.now(timezone(timedelta(hours=7))).strftime("%d/%m/%Y %H:%M:%S")
         greeting = f"Xin chào {name}," if name else "Xin chào bạn,"
         location = ip or "Không xác định"
-        subject = "Bạn vừa đăng nhập vào Trợ lý tuyển sinh X"
+        subject = "Bạn vừa đăng nhập vào Trợ lý tuyển sinh"
         text = (
             f"{greeting}\n\n"
-            "Tài khoản của bạn vừa đăng nhập thành công vào Trợ lý tuyển sinh X.\n\n"
+            "Tài khoản của bạn vừa đăng nhập thành công vào Trợ lý tuyển sinh.\n\n"
             f"Phương thức: {method}\nThời gian: {local_time} (GMT+7)\nĐịa chỉ IP: {location}\n\n"
             "Nếu đây không phải là bạn, hãy đổi mật khẩu và liên hệ quản trị viên ngay."
         )
         html = (
             '<!doctype html><html><body style="font-family:Arial,sans-serif;color:#123b3d">'
             f"<h2>{escape(subject)}</h2><p>{escape(greeting)}</p>"
-            "<p>Tài khoản của bạn vừa đăng nhập thành công vào Trợ lý tuyển sinh X.</p>"
+            "<p>Tài khoản của bạn vừa đăng nhập thành công vào Trợ lý tuyển sinh.</p>"
             f"<p><b>Phương thức:</b> {escape(method)}<br>"
             f"<b>Thời gian:</b> {escape(local_time)} (GMT+7)<br>"
             f"<b>Địa chỉ IP:</b> {escape(location)}</p>"

@@ -353,3 +353,31 @@ def test_staff_invitation_activation_lifecycle(tmp_path):
     assert authenticate(staff_store, "invitee", "InviteePass@123", "officer") == "invitee"
     assert admins.officer(officer["id"])["password_status"] == "ready"
     assert staff_store.activate_staff_invite(token, "AnotherPass@123") is None
+
+
+@pytest.mark.asyncio
+async def test_feedback_review_by_admin_and_read_only_for_staff(client):
+    answer = (await client.post("/api/v1/chat", json={"message": "IT1 có chỉ tiêu bao nhiêu?"})).json()
+    rating = {"rating": "incorrect", "reason": "wrong_info", "note": "Sai số liệu"}
+    assert (await client.post(f"/api/v1/answers/{answer['request_id']}/feedback", json=rating)).status_code == 200
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as staff_client:
+        assert (await staff_client.post("/api/v1/staff/login", json=STAFF)).status_code == 200
+        listed = (await staff_client.get("/api/v1/staff/feedback?rating=incorrect")).json()
+        assert listed["total"] == 1 and listed["summary"]["reasons"] == {"wrong_info": 1}
+        assert "session" not in listed["items"][0] and "student_id" not in listed["items"][0]
+        feedback_id = listed["items"][0]["id"]
+        # Officers can read but not review.
+        denied = await staff_client.patch(f"/api/v1/admin/feedback/{feedback_id}", json={"status": "resolved"})
+        assert denied.status_code == 403
+
+    assert (await client.get("/api/v1/admin/feedback")).status_code == 401
+    await login_admin(client)
+    update = {"status": "resolved", "admin_note": "Đã bổ sung trang 10"}
+    reviewed = await client.patch(f"/api/v1/admin/feedback/{feedback_id}", json=update)
+    assert reviewed.status_code == 200
+    assert reviewed.json()["status"] == "resolved" and reviewed.json()["reviewed_by"] == "admin"
+    data = (await client.get("/api/v1/admin/feedback?status=resolved")).json()
+    assert data["total"] == 1 and data["items"][0]["admin_note"] == "Đã bổ sung trang 10"
+    assert (await client.patch("/api/v1/admin/feedback/999999", json=update)).status_code == 404
+    assert (await client.patch(f"/api/v1/admin/feedback/{feedback_id}", json={"status": "bad"})).status_code == 422

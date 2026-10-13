@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh X · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261009-2"><script src="/assets/app.js?v=20261009-1" defer></script></head>
+<head><meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261009-2"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/enhance.css?v=20261013-3"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/enhance.dark.css?v=20261013-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/app.js?v=20261013-2" defer></script></head>
 <body class="applicant-page">
 <header class="topbar">
-  <a class="brand" href="/" aria-label="Về trang chủ Trợ lý tuyển sinh X, HUST 2026">
-    <span class="mark" aria-hidden="true">X</span>
-    <span class="brand-copy"><span>Trợ lý tuyển sinh X</span><small>HUST · 2026</small></span>
+  <a class="brand" href="/" aria-label="Về trang chủ Trợ lý tuyển sinh, HUST 2026">
+    <span class="mark" aria-hidden="true"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span>
+    <span class="brand-copy"><span>Trợ lý tuyển sinh</span><small>HUST · 2026</small></span>
   </a>
   <nav aria-label="Điều hướng">
     <a class="header-link" id="documents-link" href="/api/v1/source/pdf" target="_blank" rel="noopener">
@@ -15,16 +15,28 @@
     <button class="nav-link" id="track-open" type="button">
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.25h14a1.25 1.25 0 0 1 1.25 1.25v9.25A1.25 1.25 0 0 1 19 17H9l-4.25 3v-14A.75.75 0 0 1 5.5 5.25Z"/><path d="M8.5 9h7M8.5 12.5h5"/></svg>
       <span>Yêu cầu của tôi</span>
-      <span id="ticket-count" class="count">0</span><span id="reply-unread" class="unread" hidden></span>
+      <span id="ticket-count" class="count" hidden>0</span><span id="reply-unread" class="unread" hidden></span>
     </button>
-    <a class="staff-link staff-login-link" href="/staff" aria-label="Đăng nhập khu vực cán bộ" title="Đăng nhập khu vực cán bộ">
-      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-3.1 2.5-4.7 5.5-4.7 1.3 0 2.4.3 3.3.9M16.5 11.5v7m-3.5-3.5h7"/></svg>
-      <span>Đăng nhập cán bộ</span>
-    </a>
-    <a class="staff-link staff-login-link" href="/admin" aria-label="Đăng nhập khu vực quản trị" title="Đăng nhập khu vực quản trị">
-      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.1c0 4.4-2.8 7.7-7 9.4-4.2-1.7-7-5-7-9.4V6l7-2.5Z"/><path d="m9 11.8 2 2 4-4.2"/></svg>
-      <span>Đăng nhập admin</span>
-    </a>
+    <span class="nav-divider" aria-hidden="true"></span>
+    <span data-theme-slot hidden></span>
+    <div class="nav-menu staff-menu">
+      <button class="nav-menu-toggle" id="staff-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="staff-menu" aria-label="Khu vực cán bộ" title="Khu vực cán bộ">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20.5v-1.2c0-2.6 2.1-4.8 4.8-4.8h2.4c2.7 0 4.8 2.2 4.8 4.8v1.2"/><circle cx="10" cy="8" r="3.6"/><path d="M17.5 4.5 21 6v2.6c0 2.3-1.5 4-3.5 4.9-2-.9-3.5-2.6-3.5-4.9V6l3.5-1.5Z"/></svg>
+        <span>Cán bộ</span>
+        <svg class="nav-menu-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 9.5 5 5 5-5"/></svg>
+      </button>
+      <div class="nav-menu-panel" id="staff-menu" hidden>
+        <p class="nav-menu-caption">Dành cho cán bộ HUST</p>
+        <a class="nav-menu-item staff-login-link" href="/staff">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-3.1 2.5-4.7 5.5-4.7 1.3 0 2.4.3 3.3.9M16.5 11.5v7m-3.5-3.5h7"/></svg>
+          <span><b>Cán bộ tuyển sinh</b><small>Xử lý ticket hỗ trợ</small></span>
+        </a>
+        <a class="nav-menu-item staff-login-link" href="/admin">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.1c0 4.4-2.8 7.7-7 9.4-4.2-1.7-7-5-7-9.4V6l7-2.5Z"/><path d="m9 11.8 2 2 4-4.2"/></svg>
+          <span><b>Quản trị viên</b><small>Chỉ số và phân công</small></span>
+        </a>
+      </div>
+    </div>
   </nav>
 </header>
 <main class="workspace">
@@ -106,7 +118,7 @@
         <h2>Hỏi đáp tuyển sinh</h2>
         <button class="scope-pill" id="scope-open" type="button" aria-controls="program-tools" aria-label="Đổi phạm vi câu hỏi">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5.25h14a1.25 1.25 0 0 1 1.25 1.25v9.25A1.25 1.25 0 0 1 19 17H9l-4.25 3v-14A.75.75 0 0 1 5.5 5.25Z"/><path d="M8.5 9h7M8.5 12.5h5"/></svg>
-          <span class="scope-context">Phạm vi câu hỏi</span><span class="scope-divider">·</span><span id="scope-pill-label">Toàn trường</span><span class="scope-change">· Có thể đổi</span>
+          <span class="scope-context">Phạm vi câu hỏi</span><span class="scope-divider">·</span><span id="scope-pill-label">Toàn trường</span>
         </button>
       </div>
       <button class="mobile-sidebar-toggle" id="program-tools-open" type="button" aria-controls="program-tools" aria-expanded="false">
@@ -117,31 +129,43 @@
     </div>
     <div class="chat-scroll" id="messages" role="log" aria-live="polite" aria-relevant="additions">
       <div class="welcome" id="welcome">
-        <div class="demo-label"><span class="demo-dot" aria-hidden="true"></span>Ví dụ câu hỏi và câu trả lời</div>
-        <article class="demo-message demo-user">
-          <span class="demo-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-3.5 3.3-5.2 7-5.2s6 1.7 7 5.2"/></svg></span>
-          <div class="demo-message-content">
-            <span class="demo-speaker">Bạn</span>
-            <div class="demo-question">Học phí IT1 là bao nhiêu?</div>
-            <time>10:24</time>
-          </div>
-        </article>
-        <article class="demo-message demo-assistant">
-          <span class="assistant-avatar" aria-hidden="true">X</span>
-          <div class="demo-message-content">
-            <span class="demo-speaker">Trợ lý tuyển sinh X</span>
-            <div class="demo-answer">
-              Theo tài liệu tuyển sinh 2026, học phí dự kiến của IT1 (chương trình chuẩn) là <strong>28–40 triệu đồng/năm học.</strong> Mức thực tế có thể thay đổi theo quy định từng năm.
-            </div>
-            <a class="demo-source" href="/api/v1/source/pdf#page=20" target="_blank" rel="noopener">
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
-              Nguồn · PDF trang 20 <span aria-hidden="true">↗</span>
-            </a>
-            <div class="demo-actions" aria-label="Ví dụ thao tác trên câu trả lời">
-              <span>Hữu ích</span><span>Chưa đúng</span><span>Chuyển câu hỏi cho cán bộ</span>
-            </div>
-          </div>
-        </article>
+        <div class="welcome-hero">
+          <span class="welcome-mark" aria-hidden="true"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span>
+          <p class="welcome-hello">Xin chào! Mình là Trợ lý tuyển sinh</p>
+          <h3 class="welcome-title">Bạn muốn tìm hiểu gì về <span>tuyển sinh HUST 2026</span>?</h3>
+          <ul class="welcome-trust" aria-label="Đặc điểm của trợ lý">
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>Trích dẫn trang PDF gốc</li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19.5V6l8-3 8 3v13.5"/><path d="M9 20v-6h6v6M4 20h16"/></svg><span><span id="welcome-program-count">68</span> chương trình đào tạo</span></li>
+            <li><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.7-3.1 2.5-4.7 5.5-4.7s4.8 1.6 5.5 4.7M16 8.5h5M18.5 6v5"/></svg>Chuyển cán bộ khi cần</li>
+          </ul>
+        </div>
+        <p class="welcome-section-label" id="welcome-cards-label">Bấm một câu hỏi để bắt đầu</p>
+        <div class="welcome-cards" role="group" aria-labelledby="welcome-cards-label">
+        <button class="welcome-card" type="button" data-welcome-question="HUST 2026 có các phương thức tuyển sinh nào?" data-program-question="Phương thức xét tuyển {code} là gì?">
+          <span class="welcome-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg></span>
+          <span class="welcome-card-copy"><b>Phương thức xét tuyển</b><span class="welcome-q">HUST 2026 có các phương thức tuyển sinh nào?</span></span>
+          <span class="welcome-card-go" aria-hidden="true">→</span>
+        </button>
+        <button class="welcome-card" type="button" data-welcome-question="Học phí HUST 2026 là bao nhiêu?" data-program-question="Học phí {code} là bao nhiêu?">
+          <span class="welcome-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6M4.5 11.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6"/></svg></span>
+          <span class="welcome-card-copy"><b>Học phí</b><span class="welcome-q">Học phí HUST 2026 là bao nhiêu?</span></span>
+          <span class="welcome-card-go" aria-hidden="true">→</span>
+        </button>
+        <button class="welcome-card" type="button" data-welcome-question="Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?" data-program-question="Điều kiện ngoại ngữ {code} là gì?">
+          <span class="welcome-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.75"/><path d="M3.8 12h16.4M12 3.25c2.2 2.35 3.3 5.27 3.3 8.75s-1.1 6.4-3.3 8.75c-2.2-2.35-3.3-5.27-3.3-8.75S9.8 5.6 12 3.25Z"/></svg></span>
+          <span class="welcome-card-copy"><b>Điều kiện ngoại ngữ</b><span class="welcome-q">Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?</span></span>
+          <span class="welcome-card-go" aria-hidden="true">→</span>
+        </button>
+        <button class="welcome-card" type="button" data-welcome-question="Đăng ký xét tuyển đánh giá tư duy như thế nào?">
+          <span class="welcome-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m14.5 7.5 3 3"/></svg></span>
+          <span class="welcome-card-copy"><b>Thi đánh giá tư duy</b><span class="welcome-q">Đăng ký xét tuyển đánh giá tư duy như thế nào?</span></span>
+          <span class="welcome-card-go" aria-hidden="true">→</span>
+        </button>
+        </div>
+        <div class="welcome-tools">
+          <button type="button" class="welcome-tool" data-welcome-open="recommend-open"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 14.2 9l5.8 2.2-5.8 2.1-2.2 5.8-2.1-5.8L4 11.2 9.9 9 12 3.5Z"/></svg>Chưa biết chọn ngành? <b>Gợi ý ngành</b></button>
+          <button type="button" class="welcome-tool" data-welcome-open="compare-open"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg><b>So sánh chương trình</b></button>
+        </div>
       </div>
     </div>
     <div class="composer-area">

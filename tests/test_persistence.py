@@ -52,6 +52,32 @@ def test_store_data_survives_a_new_store_instance(tmp_path):
     assert persisted["owner"] == "canbo"
 
 
+def test_legacy_ticket_events_without_actor_column_are_migrated(tmp_path):
+    """An older schema had ticket_events.actor_id but no text actor column, which
+    made every staff ticket detail request fail with a 500."""
+    import sqlite3
+
+    db_path = tmp_path / "mvp.db"
+    store = Store(db_path)
+    session_token, session = store.session("legacy-session", 24)
+    ticket = store.create_ticket(session["id"], "handover-legacy", "Học phí IT1", "Thiếu căn cứ")
+    store.claim(ticket["id"], "canbo")
+    with sqlite3.connect(db_path) as db:
+        db.executescript(
+            """
+            CREATE TABLE ticket_events_old AS SELECT id, ticket_id, actor_id, action, created FROM ticket_events;
+            DROP TABLE ticket_events;
+            ALTER TABLE ticket_events_old RENAME TO ticket_events;
+            """
+        )
+
+    migrated = Store(db_path)
+    detail = migrated.ticket_detail(ticket["id"])
+
+    assert session_token
+    assert [event["action"] for event in detail["events"]] == ["created", "claimed"]
+
+
 def test_chat_request_replay_survives_restart_and_clear_removes_its_cache(tmp_path):
     path = tmp_path / "chat-idempotency.db"
     store = Store(path)

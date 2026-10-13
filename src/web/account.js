@@ -161,6 +161,17 @@ function show(view) {
   };
   $('auth-title').textContent = titles[view][0];
   $('auth-subtitle').textContent = titles[view][1];
+  document.querySelectorAll('.account-tabs button').forEach(button => {
+    const active = button.dataset.view === view;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    [$('auth-title'), $('auth-subtitle')].forEach((node, index) => node.animate?.(
+      [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+      { duration: 380, delay: index * 60, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }
+    ));
+  }
   feedback('');
 }
 

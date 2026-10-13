@@ -114,6 +114,7 @@ function showDashboard() {
   $('logout').hidden = false;
   $('staff-identity').hidden = false;
   $('staff-identity').textContent = state.username;
+  $('staff-identity').dataset.initial = (state.username || '?').trim().charAt(0).toUpperCase();
 }
 
 function stopAutoRefresh() {
@@ -151,33 +152,57 @@ function setDashboardLoading(loading) {
   $('refresh').disabled = loading;
 }
 
+const STATUS_TABS = [
+  ['waiting', 'Đang chờ'],
+  ['in_progress', 'Đang xử lý'],
+  ['resolved', 'Đã giải quyết'],
+  ['rejected', 'Từ chối'],
+  ['cancelled', 'Đã hủy'],
+  ['', 'Tất cả'],
+];
+
+function syncStatusTabs() {
+  const current = $('status-filter').value;
+  $('metrics').querySelectorAll('[data-status]').forEach((tab) => {
+    tab.setAttribute('aria-pressed', String(tab.dataset.status === current));
+  });
+}
+
 function renderMetrics(metrics = {}) {
   const counts = metrics.tickets || {};
-  const cards = [
-    ['waiting', 'Đang chờ', 'Ưu tiên xử lý'],
-    ['in_progress', 'Đang xử lý', 'Đang có cán bộ phụ trách'],
-    ['resolved', 'Đã giải quyết', 'Đã gửi phản hồi'],
-    ['rejected', 'Đã từ chối', 'Có lý do kèm theo'],
-    ['cancelled', 'Đã hủy', 'Đã đóng bởi ứng viên'],
-  ];
+  const total = Object.values(counts).reduce((sum, value) => sum + (Number(value) || 0), 0);
   const container = $('metrics');
   container.replaceChildren();
-  cards.forEach(([status, label, note]) => {
-    const card = node('div', `metric metric-${status}`);
-    card.append(node('span', 'metric-label', label), node('b', 'metric-value', counts[status] || 0), node('small', '', note));
-    container.append(card);
+  STATUS_TABS.forEach(([status, label]) => {
+    const tab = node('button', `status-tab status-${status || 'all'}`);
+    tab.type = 'button';
+    tab.dataset.status = status;
+    const count = status ? counts[status] || 0 : total;
+    tab.append(node('span', 'status-tab-dot'), node('span', '', label), node('span', 'status-tab-count', count));
+    tab.addEventListener('click', () => {
+      $('status-filter').value = status;
+      renderQueueAndSelectFirst();
+    });
+    container.append(tab);
   });
+  syncStatusTabs();
 
   const oldest = metrics.ticket_metrics && metrics.ticket_metrics.oldest_waiting;
   const oldestBox = $('oldest-waiting');
   oldestBox.replaceChildren();
   if (oldest) {
     oldestBox.hidden = false;
-    oldestBox.append(
-      node('span', 'oldest-dot', '●'),
-      node('span', '', `Ticket chờ lâu nhất: ${oldest.id}`),
-      node('b', '', `${formatAge(oldest.age_seconds)} chưa nhận xử lý`),
-    );
+    const open = node('button', 'desk-alert-button');
+    open.type = 'button';
+    const alertText = `${oldest.id} chờ ${formatAge(oldest.age_seconds)} chưa nhận`;
+    open.title = `Ticket chờ lâu nhất: ${alertText}`;
+    open.append(node('span', 'desk-alert-dot'), node('span', '', alertText));
+    open.addEventListener('click', () => {
+      $('status-filter').value = 'waiting';
+      renderQueue();
+      void selectTicket(oldest.id);
+    });
+    oldestBox.append(open);
   } else {
     oldestBox.hidden = true;
   }
@@ -245,7 +270,8 @@ function renderQueue() {
   const status = $('status-filter').value;
   const filtered = filteredTickets();
 
-  $('queue-count').textContent = `${filtered.length}/${state.tickets.length}`;
+  $('queue-count').textContent = `${filtered.length} ticket${query ? ' khớp tìm kiếm' : ''}`;
+  syncStatusTabs();
   container.replaceChildren();
   if (!filtered.length) {
     const empty = node('div', 'queue-empty');
@@ -294,19 +320,19 @@ function renderQueue() {
     renderEmptyDetail({ query, status });
   }
 
+  const now = Date.now() / 1000;
   filtered.forEach((ticket) => {
     const item = node('button', `queue-item${ticket.id === state.selectedId ? ' selected' : ''}`);
     item.type = 'button';
     item.setAttribute('aria-current', ticket.id === state.selectedId ? 'true' : 'false');
-    const header = node('div', 'ticket-head');
-    header.append(node('b', 'ticket-id', ticket.id), statusBadge(ticket.status));
-    item.append(header);
-    item.append(node('p', 'ticket-summary', ticket.summary || 'Không có nội dung tóm tắt.'));
-    const meta = node('div', 'ticket-meta');
-    meta.append(node('span', '', `Cập nhật ${formatDate(ticket.updated || ticket.created)}`));
-    meta.append(node('span', 'ticket-owner', `Phụ trách: ${ticket.owner || 'Chưa nhận'}`));
-    item.append(meta);
-    item.append(node('span', 'queue-item-action', queueActionLabel(ticket)));
+    const top = node('span', 'ticket-head');
+    const updated = Number(ticket.updated || ticket.created) || now;
+    const age = node('time', 'ticket-age', formatAge(now - updated));
+    age.title = formatDate(updated);
+    top.append(node('span', `ticket-dot ${ticket.status || ''}`), node('b', 'ticket-id', ticket.id), age);
+    const meta = node('span', 'ticket-meta');
+    meta.append(statusBadge(ticket.status), node('span', 'ticket-owner', ticket.owner ? `Phụ trách: ${ticket.owner}` : 'Chưa có người nhận'));
+    item.append(top, node('span', 'ticket-summary', ticket.summary || 'Không có nội dung tóm tắt.'), meta);
     item.addEventListener('click', () => selectTicket(ticket.id));
     container.append(item);
   });
@@ -325,18 +351,6 @@ function renderDetailLoading() {
   const loading = node('div', 'detail-loading');
   loading.append(node('span', 'loading-spinner'), node('p', '', 'Đang tải chi tiết ticket…'));
   detail.append(loading);
-}
-
-function appendField(container, label, value, className = '') {
-  const field = node('div', `detail-field ${className}`);
-  field.append(node('dt', '', label), node('dd', '', value || 'Chưa có dữ liệu'));
-  container.append(field);
-}
-
-function appendSection(container, title, value, className = '') {
-  const section = node('section', `detail-section ${className}`);
-  section.append(node('h3', '', title), node('div', 'detail-content', value || 'Chưa có dữ liệu.'));
-  container.append(section);
 }
 
 function optionalValue(ticket, detail, keys) {
@@ -360,49 +374,74 @@ function appendActions(container, ticket) {
   const actions = node('div', 'ticket-actions');
   const error = node('p', 'error-text action-error');
   error.setAttribute('role', 'alert');
+  const canReject = ticket.status === 'waiting' || (ticket.status === 'in_progress' && ticket.owner === state.username);
+  const row = node('div', 'action-row');
 
   if (ticket.status === 'waiting') {
     const claim = node('button', 'primary action-button', 'Nhận xử lý ticket →');
     claim.type = 'button';
     claim.addEventListener('click', () => performAction(ticket.id, claim, 'claim'));
-    actions.append(node('p', 'action-hint', 'Nhận ticket để trở thành cán bộ phụ trách.'), claim);
+    row.append(node('p', 'action-hint', 'Nhận ticket để trở thành cán bộ phụ trách và trả lời thí sinh.'), claim);
   } else if (ticket.status === 'in_progress' && ticket.owner === state.username) {
-    const replyLabel = node('label', 'action-label', 'Phản hồi cho ứng viên');
-    const reply = node('textarea', 'action-textarea');
+    const replyLabel = node('label', 'sr-only', 'Phản hồi cho thí sinh');
+    const reply = node('textarea', 'action-textarea reply-textarea');
     reply.id = 'staff-reply';
     replyLabel.htmlFor = reply.id;
     reply.maxLength = 4000;
-    reply.placeholder = 'Nhập phản hồi dựa trên thông tin đã kiểm tra…';
-    const resolve = node('button', 'primary action-button', 'Gửi phản hồi và đóng');
+    reply.rows = 1;
+    reply.placeholder = 'Viết phản hồi cho thí sinh dựa trên thông tin đã kiểm tra…';
+    const grow = () => {
+      reply.style.height = 'auto';
+      reply.style.height = `${Math.min(reply.scrollHeight + 2, 168)}px`;
+    };
+    reply.addEventListener('input', grow);
+    const resolve = node('button', 'primary action-button', 'Gửi phản hồi và đóng →');
     resolve.type = 'button';
     resolve.addEventListener('click', () => performAction(ticket.id, resolve, 'resolve', reply.value, error));
-    actions.append(replyLabel, reply, node('p', 'action-hint', 'Phản hồi sẽ được gửi vào phiên của ứng viên.'), resolve);
+    const replyRow = node('div', 'reply-row');
+    replyRow.append(replyLabel, reply, resolve);
+    actions.append(replyRow);
   } else if (ticket.status === 'in_progress') {
     actions.append(node('div', 'locked-notice', `Ticket đang được cán bộ ${ticket.owner || 'khác'} xử lý.`));
   }
 
-  if (ticket.status === 'waiting' || (ticket.status === 'in_progress' && ticket.owner === state.username)) {
-    const rejectLabel = node('label', 'action-label reject-label', 'Lý do từ chối');
+  if (canReject) {
+    const rejectPanel = node('div', 'reject-panel');
+    rejectPanel.hidden = true;
+    const rejectLabel = node('label', 'action-label reject-label', 'Lý do từ chối (gửi cho thí sinh)');
     const rejectReason = node('textarea', 'action-textarea reject-textarea');
     rejectReason.id = 'reject-reason';
     rejectLabel.htmlFor = rejectReason.id;
     rejectReason.maxLength = 4000;
-    rejectReason.placeholder = 'Nêu rõ lý do để ứng viên biết hướng xử lý tiếp theo…';
-    const reject = node('button', 'secondary danger action-button', 'Từ chối yêu cầu');
-    reject.type = 'button';
-    reject.addEventListener('click', () => {
+    rejectReason.rows = 2;
+    rejectReason.placeholder = 'Nêu rõ lý do để thí sinh biết hướng xử lý tiếp theo…';
+    const confirmReject = node('button', 'secondary danger action-button', 'Xác nhận từ chối');
+    confirmReject.type = 'button';
+    confirmReject.addEventListener('click', () => {
       if (!rejectReason.value.trim()) {
         error.textContent = 'Vui lòng nhập lý do từ chối.';
         rejectReason.focus();
         return;
       }
-      if (window.confirm('Từ chối ticket và gửi lý do cho ứng viên?')) {
-        performAction(ticket.id, reject, 'reject', rejectReason.value, error);
+      if (window.confirm('Từ chối ticket và gửi lý do cho thí sinh?')) {
+        performAction(ticket.id, confirmReject, 'reject', rejectReason.value, error);
       }
     });
-    actions.append(rejectLabel, rejectReason, reject);
+    rejectPanel.append(rejectLabel, rejectReason, confirmReject);
+    const toggle = node('button', 'text-action', 'Từ chối yêu cầu…');
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.addEventListener('click', () => {
+      rejectPanel.hidden = !rejectPanel.hidden;
+      toggle.setAttribute('aria-expanded', String(!rejectPanel.hidden));
+      toggle.textContent = rejectPanel.hidden ? 'Từ chối yêu cầu…' : 'Ẩn phần từ chối';
+      if (!rejectPanel.hidden) rejectReason.focus();
+    });
+    row.prepend(toggle);
+    actions.append(rejectPanel);
   }
 
+  if (row.children.length) actions.append(row);
   if (actions.children.length) {
     actions.append(error);
     container.append(actions);
@@ -446,38 +485,64 @@ async function performAction(ticketId, button, action, reply = '', errorNode = n
   }
 }
 
+function convoMessage(kind, who, avatar, text) {
+  const message = node('article', `convo-msg from-${kind}`);
+  const body = node('div', 'convo-body');
+  body.append(node('span', 'convo-who', who), node('div', 'convo-bubble', text));
+  const avatarNode = node('span', 'convo-avatar', kind === 'ai' ? '' : avatar);
+  if (kind === 'ai') {
+    const logo = document.createElement('img');
+    logo.className = 'brand-logo';
+    logo.src = '/assets/hust-logo.png';
+    logo.alt = '';
+    avatarNode.append(logo);
+  }
+  message.append(avatarNode, body);
+  return message;
+}
+
 function renderDetail(detail) {
   const ticket = detail.ticket || detail;
   const container = $('detail');
   container.replaceChildren();
 
-  const header = node('div', 'detail-header');
+  const header = node('header', 'detail-header');
   const titleGroup = node('div');
-  titleGroup.append(node('p', 'section-label', 'CHI TIẾT TICKET'), node('h2', '', ticket.id));
+  const meta = node('p', 'detail-meta');
+  meta.append(
+    node('span', '', `Tạo ${formatDate(ticket.created)}`),
+    node('span', '', `Cập nhật ${formatDate(ticket.updated)}`),
+    node('span', '', ticket.owner ? `Phụ trách: ${ticket.owner}` : 'Chưa có người nhận'),
+  );
+  titleGroup.append(node('h2', '', ticket.id), meta);
   header.append(titleGroup, statusBadge(ticket.status));
   container.append(header);
 
-  const fields = node('dl', 'detail-fields');
-  appendField(fields, 'Người phụ trách', ticket.owner || 'Chưa nhận xử lý');
-  appendField(fields, 'Thời gian tạo', formatDate(ticket.created));
-  appendField(fields, 'Cập nhật gần nhất', formatDate(ticket.updated));
-  container.append(fields);
-
-  appendSection(container, 'Nội dung ứng viên đồng ý chia sẻ', detail.shared_content || ticket.summary);
-  appendSection(container, 'Lý do chuyển cán bộ', ticket.reason, 'muted-section');
+  const scroll = node('div', 'detail-scroll');
+  const convo = node('div', 'convo');
+  convo.append(convoMessage('candidate', 'Thí sinh đồng ý chia sẻ', 'TS', detail.shared_content || ticket.summary || 'Chưa có dữ liệu.'));
+  if (ticket.reason) convo.append(node('p', 'convo-note', `Lý do chuyển cán bộ: ${ticket.reason}`));
 
   const original = valueText(optionalValue(ticket, detail, ['original_question', 'question', 'context', 'context_text']));
   const aiAnswer = valueText(optionalValue(ticket, detail, ['ai_answer', 'ai_response', 'answer', 'response']));
   const sources = valueText(optionalValue(ticket, detail, ['sources', 'related_sources', 'source']));
-  appendSection(container, 'Câu hỏi gốc / ngữ cảnh', original || 'Backend hiện chưa cung cấp ngữ cảnh bổ sung.');
-  appendSection(container, 'Câu trả lời AI và nguồn liên quan', [aiAnswer, sources ? `Nguồn:\n${sources}` : ''].filter(Boolean).join('\n\n') || 'Backend hiện chưa cung cấp câu trả lời AI hoặc nguồn liên quan.');
-
-  if (ticket.reply) appendSection(container, ticket.status === 'rejected' ? 'Lý do từ chối' : 'Phản hồi đã gửi', ticket.reply, 'reply-section');
-  appendActions(container, ticket);
+  if (original) convo.append(convoMessage('candidate', 'Câu hỏi gốc / ngữ cảnh', 'TS', original));
+  if (aiAnswer || sources) {
+    convo.append(convoMessage('ai', 'Trợ lý AI đã trả lời', '', [aiAnswer, sources ? `Nguồn:\n${sources}` : ''].filter(Boolean).join('\n\n')));
+  }
+  if (!original && !aiAnswer && !sources) {
+    convo.append(node('p', 'convo-note muted', 'Thí sinh chỉ đồng ý chia sẻ nội dung ở trên; câu hỏi gốc và câu trả lời AI không được chuyển kèm.'));
+  }
+  if (ticket.reply) {
+    const rejected = ticket.status === 'rejected';
+    const who = ticket.owner || 'cán bộ';
+    convo.append(convoMessage(rejected ? 'rejected' : 'staff', rejected ? `Lý do từ chối · ${who}` : `Phản hồi của ${who}`, who.slice(0, 2).toUpperCase(), ticket.reply));
+  }
+  scroll.append(convo);
 
   if (Array.isArray(detail.events) && detail.events.length) {
-    const history = node('section', 'detail-section event-history');
-    history.append(node('h3', '', 'Lịch sử xử lý'));
+    const history = node('details', 'event-history');
+    history.append(node('summary', '', `Lịch sử xử lý (${detail.events.length})`));
     const list = node('ol', 'event-list');
     detail.events.forEach((event) => {
       const item = node('li');
@@ -486,8 +551,13 @@ function renderDetail(detail) {
       list.append(item);
     });
     history.append(list);
-    container.append(history);
+    scroll.append(history);
   }
+  container.append(scroll);
+
+  const composer = node('footer', 'detail-composer');
+  appendActions(composer, ticket);
+  if (composer.children.length) container.append(composer);
 }
 
 async function selectTicket(ticketId, silent = false) {
@@ -617,3 +687,25 @@ if (loginError) $('login-error').textContent = decodeURIComponent(loginError.rep
     // The login panel is the expected state for an unauthenticated visitor.
   }
 })();
+
+// Read-only view of candidate ratings on AI answers.
+const feedbackView = window.FeedbackView?.mount($('feedback-view'), {
+  api,
+  editable: false,
+  basePath: '/staff/feedback',
+  onError: (error) => renderGlobalError(error.message),
+});
+function setFeedbackViewOpen(open) {
+  $('feedback-view').hidden = !open;
+  document.querySelector('#dashboard > .desk-body').hidden = open;
+  $('metrics').hidden = open;
+  $('feedback-toggle').setAttribute('aria-pressed', String(open));
+  $('feedback-toggle').textContent = open ? '← Về hàng chờ' : 'Đánh giá AI';
+  $('dashboard-title').textContent = open ? 'Đánh giá câu trả lời AI' : 'Hàng chờ hỗ trợ';
+  if (open) feedbackView?.load().catch((error) => renderGlobalError(error.message));
+}
+$('feedback-toggle')?.addEventListener('click', () => setFeedbackViewOpen($('feedback-view').hidden));
+window.setInterval(() => {
+  if (document.hidden || $('feedback-view').hidden || $('dashboard').hidden) return;
+  feedbackView?.load().catch((error) => renderGlobalError(error.message));
+}, POLL_INTERVAL_MS);

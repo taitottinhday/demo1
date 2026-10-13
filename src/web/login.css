@@ -1,0 +1,411 @@
+/* Login / account screens: split layout with an animated brand panel.
+   Loaded after style.css (and account.css); scoped to body.auth-page. */
+
+body.auth-page{
+  --brand:#c8102e;--brand-600:#a50d26;--brand-700:#86091e;--brand-50:#fdf1f3;--brand-100:#fbe1e5;
+  --ink:#14213d;--ink-2:#34425a;--muted:#6b778c;--line:#e8e6e1;--canvas:#fbfaf7;
+  --green:var(--brand);--red:var(--brand);
+  --ease-out:cubic-bezier(.22,1,.36,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow-sm:0 1px 2px #14213d0d,0 1px 1px #14213d08;
+  --shadow-md:0 6px 20px -6px #14213d1f,0 2px 6px -2px #14213d12;
+  --shadow-brand:0 10px 24px -10px #c8102e99;
+  min-height:100dvh;background:#fff;color:var(--ink);
+  font-family:"Be Vietnam Pro","Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased
+}
+body.auth-page button,body.auth-page input,body.auth-page textarea,body.auth-page select{font-family:inherit}
+
+@keyframes lg-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes lg-fade{from{opacity:0}to{opacity:1}}
+@keyframes lg-pop{from{opacity:0;transform:translateY(16px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes lg-pan{0%,100%{background-position:0% 40%}50%{background-position:100% 60%}}
+@keyframes lg-orb-a{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.15)}}
+@keyframes lg-orb-b{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,-60px) scale(.9)}}
+@keyframes lg-orb-c{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px)}}
+@keyframes lg-pop-ind{from{opacity:0;translate:0 16px;scale:.94}to{opacity:1;translate:0 0;scale:1}}
+@keyframes lg-bob{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@keyframes lg-underline{from{background-size:0% 4px}to{background-size:100% 4px}}
+@keyframes lg-shimmer{from{transform:translateX(-130%) skewX(-20deg)}to{transform:translateX(260%) skewX(-20deg)}}
+@keyframes lg-stripes{to{background-position:40px 0}}
+@keyframes lg-shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+@keyframes lg-dot{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-4px);opacity:1}}
+@keyframes lg-bar{0%{transform:scaleY(.15)}100%{transform:scaleY(1)}}
+@keyframes lg-ping{0%{box-shadow:0 0 0 0 #4ade80aa}100%{box-shadow:0 0 0 8px #4ade8000}}
+@keyframes lg-spin{to{transform:rotate(360deg)}}
+
+/* ---------- Top bar ---------- */
+body.auth-page .topbar{
+  position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:12px;
+  height:64px;min-height:64px;padding:0 28px;
+  background:#ffffffd9;border-bottom:1px solid var(--line);backdrop-filter:blur(10px);animation:lg-fade .4s both
+}
+body.auth-page .topbar .brand{display:flex;align-items:center;gap:11px;color:var(--ink);font-size:16px;font-weight:700;text-decoration:none}
+body.auth-page .topbar .brand-copy{display:flex;align-items:center;gap:12px;flex-shrink:0}
+body.auth-page .topbar nav{flex:0 0 auto;display:flex;align-items:center;gap:8px}
+body.auth-page .topbar .brand small{padding-left:12px;border-left:1px solid #dcd9d2;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px}
+body.auth-page .topbar .mark{
+  display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:11px;letter-spacing:0;
+  background:linear-gradient(140deg,#e2193a,var(--brand-700));color:#fff;font:800 20px/1 "Be Vietnam Pro",Arial,sans-serif;
+  box-shadow:var(--shadow-brand);transition:transform .45s var(--ease-spring)
+}
+body.auth-page .topbar .mark>span{display:none}
+body.auth-page .topbar .brand:hover .mark{transform:rotate(-8deg) scale(1.06)}
+body.auth-page .topbar .staff-link,body.auth-page .topbar .nav-link{
+  display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:12px;
+  background:#fff;color:var(--ink-2);font-size:13px;font-weight:500;text-decoration:none;
+  transition:transform .25s var(--ease-out),border-color .2s,color .2s,box-shadow .25s
+}
+body.auth-page .topbar .staff-link:hover,body.auth-page .topbar .nav-link:hover{
+  transform:translateY(-1px);border-color:#efc3ca;color:var(--brand-600);box-shadow:var(--shadow-md);background:#fff
+}
+
+/* ---------- Split layout (only while the login panel is showing) ---------- */
+body.auth-page .account-main,
+body.auth-page .staff-main:has(> .login-panel:not([hidden])){
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(400px,1fr);align-items:stretch;place-items:stretch;
+  width:100%;max-width:none;height:auto;min-height:calc(100dvh - 64px);margin:0;padding:0;overflow:visible;gap:0;
+  background:radial-gradient(#14213d0a 1px,transparent 1px) 0 0/22px 22px,#fff
+}
+body.staff-page.auth-page:has(.login-panel:not([hidden])),body.admin-page.auth-page:has(.login-panel:not([hidden])){height:auto;overflow:auto}
+/* Dashboard state keeps its own layout; only account for the 64px top bar. */
+body.staff-page.auth-page .staff-main,body.admin-page.auth-page .staff-main{height:calc(100dvh - 64px)}
+body.auth-page .staff-main:not(:has(> .login-panel:not([hidden]))) > .auth-hero{display:none}
+body.auth-page .page-footer{display:none}
+
+/* ---------- Brand panel ---------- */
+.auth-hero{
+  position:relative;overflow:hidden;margin:14px 0 14px 14px;border-radius:28px;color:#fff;isolation:isolate;
+  background:linear-gradient(135deg,#ea2445 0%,#c8102e 30%,#8d0a20 65%,#4d0512 100%);background-size:220% 220%;
+  animation:lg-pan 16s ease-in-out infinite,lg-fade .6s both;box-shadow:0 30px 60px -30px #86091e88
+}
+.auth-hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(#ffffff2e 1px,transparent 1.4px) 0 0/24px 24px;
+  -webkit-mask:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 70%);mask:radial-gradient(ellipse at 70% 30%,#000 10%,transparent 70%)
+}
+.auth-orbs{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.auth-orbs span{position:absolute;border-radius:50%;filter:blur(50px)}
+.auth-orbs span:nth-child(1){top:-80px;left:-60px;width:320px;height:320px;background:#ff7a8e;opacity:.55;animation:lg-orb-a 14s ease-in-out infinite}
+.auth-orbs span:nth-child(2){right:-90px;bottom:-60px;width:380px;height:380px;background:#ffb36b;opacity:.32;animation:lg-orb-b 17s ease-in-out infinite}
+.auth-orbs span:nth-child(3){top:38%;left:45%;width:220px;height:220px;background:#3b0410;opacity:.6;animation:lg-orb-c 12s ease-in-out infinite}
+.auth-hero-inner{display:flex;flex-direction:column;justify-content:space-between;gap:26px;height:100%;min-height:560px;padding:36px 44px 38px}
+.auth-hero-brand{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;animation:lg-rise .6s .1s var(--ease-out) both}
+.auth-hero-brand small{display:block;color:#ffffffb3;font-size:11px;font-weight:500;letter-spacing:.6px}
+.auth-hero-mark{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#fff;color:var(--brand);
+  font:800 22px/1 "Be Vietnam Pro",Arial,sans-serif;box-shadow:0 10px 24px -8px #0006
+}
+.auth-hero-kicker{
+  display:inline-block;margin:0 0 14px;padding:5px 12px;border:1px solid #ffffff40;border-radius:999px;background:#ffffff1f;
+  font-size:11px;font-weight:700;letter-spacing:1.4px;animation:lg-rise .6s .2s var(--ease-out) both
+}
+.auth-hero-title{
+  max-width:520px;margin:0;font-size:clamp(28px,3vw,40px);font-weight:800;line-height:1.18;letter-spacing:-1px;
+  animation:lg-rise .7s .28s var(--ease-out) both
+}
+.auth-hero-title em{
+  font-style:normal;color:#ffd3da;padding-bottom:2px;
+  background:linear-gradient(90deg,#ffd3da,#ffb36b) 0 100%/0% 4px no-repeat;
+  animation:lg-underline .9s 1s var(--ease-out) forwards
+}
+.auth-hero-lead{max-width:470px;margin:14px 0 0;color:#ffffffcc;font-size:15px;line-height:1.6;animation:lg-rise .7s .36s var(--ease-out) both}
+
+.auth-showcase{
+  position:relative;align-self:center;width:min(100%,430px);margin:6px 0;perspective:900px;
+  transition:transform .5s var(--ease-out);animation:lg-pop-ind .8s .5s var(--ease-out) both
+}
+.auth-glass{
+  border:1px solid #ffffff40;border-radius:20px;background:#ffffff1f;backdrop-filter:blur(16px) saturate(1.3);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 20px 40px -18px #0007,inset 0 1px 0 #ffffff40
+}
+.auth-chat,.auth-ticket,.auth-kpi{padding:18px;animation:lg-bob 6s 1.4s ease-in-out infinite}
+.auth-float-chip{
+  position:absolute;right:-18px;bottom:-22px;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;
+  background:#ffffffeb;color:var(--ink);font-size:12.5px;font-weight:600;
+  animation:lg-pop-ind .6s 1.1s var(--ease-spring) both,lg-bob 5s 2s ease-in-out infinite;transition:transform .5s var(--ease-out)
+}
+.auth-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:lg-ping 1.8s ease-out infinite}
+
+.auth-bubble{max-width:88%;padding:10px 14px;font-size:13.5px;line-height:1.5;transition:opacity .4s,filter .4s,transform .4s var(--ease-out)}
+.auth-bubble-user{margin-left:auto;width:fit-content;border-radius:16px 16px 5px 16px;background:#fff;color:var(--brand-700);font-weight:600;animation:lg-pop .5s .9s var(--ease-out) both}
+.auth-bubble-bot{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:0;animation:lg-pop .5s 1.25s var(--ease-out) both}
+.auth-bubble-bot>span:last-child{padding:10px 14px;border-radius:5px 16px 16px 16px;background:#ffffff2b}
+.auth-bot-avatar{
+  display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:10px;background:#fff;color:var(--brand);
+  font:800 14px/1 "Be Vietnam Pro",Arial,sans-serif
+}
+.auth-source{
+  display:inline-block;margin:10px 0 0 40px;padding:5px 11px;border-radius:999px;background:#ffffff2e;color:#fff;font-size:11.5px;
+  transition:opacity .4s,transform .4s var(--ease-out);animation:lg-pop .5s 1.5s var(--ease-out) both
+}
+.auth-chat.is-swapping .auth-bubble,.auth-chat.is-swapping .auth-source{opacity:0;filter:blur(4px);transform:translateY(6px)}
+
+.auth-ticket-head{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.auth-badge{padding:3px 10px;border-radius:999px;background:#fde68a;color:#7c4a03;font-size:11px;font-weight:700}
+.auth-ticket p{margin:10px 0 12px;font-size:13.5px;line-height:1.5;color:#fffffff0}
+.auth-ticket-reply{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#ffffff26;font-size:12.5px;color:#ffffffd9}
+.auth-typing{display:inline-flex;gap:4px}
+.auth-typing i{width:6px;height:6px;border-radius:50%;background:#fff;animation:lg-dot 1.1s infinite}
+.auth-typing i:nth-child(2){animation-delay:.15s}.auth-typing i:nth-child(3){animation-delay:.3s}
+
+.auth-kpi-head{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;color:#ffffffd9}
+.auth-kpi-head b{color:#fff;font-size:15px}
+.auth-bars{display:flex;align-items:flex-end;gap:9px;height:110px;margin:16px 0 12px}
+.auth-bars i{
+  flex:1;height:50%;border-radius:8px 8px 4px 4px;background:linear-gradient(#fff,#ffffff66);transform-origin:bottom;
+  animation:lg-bar 1s var(--ease-spring) both
+}
+.auth-bars i:nth-child(1){height:42%}.auth-bars i:nth-child(2){height:68%}.auth-bars i:nth-child(3){height:55%}.auth-bars i:nth-child(4){height:82%}
+.auth-bars i:nth-child(5){height:64%}.auth-bars i:nth-child(6){height:91%}.auth-bars i:nth-child(7){height:73%}
+.auth-bars i:nth-child(2){animation-delay:.08s}.auth-bars i:nth-child(3){animation-delay:.16s}.auth-bars i:nth-child(4){animation-delay:.24s}
+.auth-bars i:nth-child(5){animation-delay:.32s}.auth-bars i:nth-child(6){animation-delay:.4s}.auth-bars i:nth-child(7){animation-delay:.48s}
+.auth-kpi-foot{font-size:12px;color:#ffffffcc}
+.auth-up{color:#86efac;font-weight:700}
+
+.auth-hero-features{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.auth-hero-features li{
+  display:flex;align-items:center;gap:10px;color:#ffffffe6;font-size:14px;
+  animation:lg-rise .6s .7s var(--ease-out) both
+}
+.auth-hero-features li:nth-child(2){animation-delay:.8s}.auth-hero-features li:nth-child(3){animation-delay:.9s}
+.auth-hero-features svg{
+  box-sizing:content-box;flex:0 0 14px;width:14px;height:14px;padding:4px;border-radius:50%;background:#ffffff2e;
+  fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round
+}
+
+/* ---------- Form column ---------- */
+body.auth-page .account-card,body.auth-page .login-panel{
+  align-self:center;justify-self:center;width:min(100% - 48px,440px);max-width:440px;margin:40px auto;padding:0;
+  border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--ink)
+}
+body.auth-page .account-card>*,body.auth-page .login-panel>*{animation:lg-rise .6s var(--ease-out) both}
+body.auth-page .account-card>:nth-child(1),body.auth-page .login-panel>:nth-child(1){animation-delay:.15s}
+body.auth-page .account-card>:nth-child(2),body.auth-page .login-panel>:nth-child(2){animation-delay:.21s}
+body.auth-page .account-card>:nth-child(3),body.auth-page .login-panel>:nth-child(3){animation-delay:.27s}
+body.auth-page .account-card>:nth-child(4),body.auth-page .login-panel>:nth-child(4){animation-delay:.33s}
+body.auth-page .account-card>:nth-child(5),body.auth-page .login-panel>:nth-child(5){animation-delay:.39s}
+body.auth-page .account-card>:nth-child(6),body.auth-page .login-panel>:nth-child(6){animation-delay:.45s}
+body.auth-page .account-card>:nth-child(n+7),body.auth-page .login-panel>:nth-child(n+7){animation-delay:.51s}
+
+body.auth-page .account-card .eyebrow,body.auth-page .login-panel .eyebrow,body.auth-page .login-kicker{
+  display:inline-flex;align-items:center;gap:7px;width:fit-content;margin:0;padding:5px 12px;border-radius:999px;
+  background:var(--brand-50);color:var(--brand-600);font-size:11px;font-weight:700;letter-spacing:1.3px
+}
+body.auth-page .account-card .eyebrow::before,body.auth-page .login-panel .eyebrow::before,body.auth-page .login-kicker::before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--brand);animation:lg-ping 2s ease-out infinite;
+  box-shadow:0 0 0 0 #c8102e88
+}
+body.auth-page .account-card h1,body.auth-page .login-panel h1{
+  margin:16px 0 8px;color:var(--ink);font:800 clamp(28px,2.6vw,36px)/1.15 "Be Vietnam Pro",Arial,sans-serif;letter-spacing:-1px
+}
+body.auth-page .account-subtitle,body.auth-page .login-intro,body.auth-page #activate-intro{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6}
+
+body.auth-page .login-security-note,body.auth-page .security-note{
+  display:flex;align-items:flex-start;gap:12px;margin:22px 0 4px;padding:12px 14px;border:1px solid #d9eee3;border-radius:14px;
+  background:#f3fbf6;color:#1d6b45;font-size:12.5px;line-height:1.5
+}
+body.auth-page .login-security-note>span:first-child,body.auth-page .security-icon{
+  display:grid;place-items:center;flex:0 0 26px;width:26px;height:26px;border-radius:9px;background:#d3f2df;color:#15803d;font-size:0
+}
+body.auth-page .login-security-note>span:first-child::before,body.auth-page .security-icon::before{
+  content:"";width:15px;height:15px;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5 19 6v5.1c0 4.4-2.8 7.7-7 9.4-4.2-1.7-7-5-7-9.4V6l7-2.5Z'/%3E%3Cpath d='m9 11.8 2 2 4-4.2'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5 19 6v5.1c0 4.4-2.8 7.7-7 9.4-4.2-1.7-7-5-7-9.4V6l7-2.5Z'/%3E%3Cpath d='m9 11.8 2 2 4-4.2'/%3E%3C/svg%3E") center/contain no-repeat
+}
+body.auth-page .security-note strong{display:block;color:#14532d;font-size:13px}
+body.auth-page .security-note small{display:block;color:#3f7a5a;font-size:12px}
+
+/* Google + divider */
+body.auth-page .google-login{
+  position:relative;display:flex;align-items:center;gap:14px;min-height:54px;margin-top:26px;padding:0 18px;
+  border:1.5px solid var(--line);border-radius:16px;background:#fff;color:var(--ink);font-size:14.5px;text-decoration:none;box-shadow:var(--shadow-sm);
+  transition:transform .3s var(--ease-out),box-shadow .3s,border-color .2s
+}
+body.auth-page .google-login:hover{transform:translateY(-2px);border-color:#d6d2ca;box-shadow:var(--shadow-md);background:#fff}
+body.auth-page .google-mark{transition:transform .6s var(--ease-spring)}
+body.auth-page .google-login:hover .google-mark{transform:rotate(360deg)}
+body.auth-page .login-arrow{margin-left:auto;color:var(--muted);transition:transform .3s var(--ease-out)}
+body.auth-page .google-login:hover .login-arrow{transform:translateX(4px);color:var(--brand)}
+body.auth-page .login-divider{display:flex;align-items:center;gap:14px;margin:22px 0 4px;color:#9aa3b2;font-size:12px}
+body.auth-page .login-divider::before,body.auth-page .login-divider::after{content:"";flex:1;border-top:1px solid var(--line)}
+
+/* Segmented tabs with sliding indicator */
+body.auth-page .account-tabs{
+  position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;margin:18px 0 0;padding:4px;
+  border:0;border-radius:14px;background:#f2f0ec
+}
+body.auth-page .account-tabs::before{
+  content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:11px;background:#fff;
+  box-shadow:var(--shadow-md);transition:transform .45s var(--ease-spring)
+}
+body.auth-page .account-tabs:has(button[data-view="register"].active)::before{transform:translateX(100%)}
+body.auth-page .account-tabs button{
+  position:relative;z-index:1;min-height:40px;padding:0;border:0;border-radius:11px;background:transparent;
+  color:var(--muted);font-size:13.5px;font-weight:600;transition:color .25s
+}
+body.auth-page .account-tabs button.active{color:var(--ink)}
+body.auth-page #auth-switch{display:none}
+
+/* Forms */
+body.auth-page .account-form:not([hidden]),body.auth-page .login-panel form{display:flex;flex-direction:column;margin-top:10px}
+body.auth-page .account-form:not([hidden])>*{animation:lg-rise .5s var(--ease-out) both}
+body.auth-page .account-form>:nth-child(2),body.auth-page .account-form>:nth-child(3){animation-delay:.05s}
+body.auth-page .account-form>:nth-child(4),body.auth-page .account-form>:nth-child(5){animation-delay:.1s}
+body.auth-page .account-form>:nth-child(6),body.auth-page .account-form>:nth-child(7){animation-delay:.15s}
+body.auth-page .account-form>:nth-child(n+8){animation-delay:.2s}
+body.auth-page .account-form label,body.auth-page .login-panel label{
+  margin:16px 0 7px;color:var(--ink-2);font-size:13px;font-weight:600;transition:color .2s
+}
+body.auth-page label:has(+ input:focus),body.auth-page label:has(+ .password-field:focus-within){color:var(--brand-600)}
+body.auth-page .account-form input,body.auth-page .login-panel input:not([type="checkbox"]){
+  width:100%;min-height:50px;padding:0 16px;border:1.5px solid #e3e0da;border-radius:14px;background:#fbfaf8;color:var(--ink);font-size:15px;
+  transition:border-color .2s,background .2s,box-shadow .3s var(--ease-out),transform .2s
+}
+body.auth-page .account-form input::placeholder,body.auth-page .login-panel input::placeholder{color:#a3abb8}
+body.auth-page .account-form input:hover,body.auth-page .login-panel input:hover{border-color:#d3cfc6}
+body.auth-page .account-form input:focus,body.auth-page .login-panel input:focus{
+  border-color:var(--brand);background:#fff;outline:0;box-shadow:0 0 0 4px #c8102e1a
+}
+body.auth-page input[aria-invalid="true"]{border-color:#dc2626!important;background:#fff7f7!important;box-shadow:0 0 0 4px #dc26261a!important}
+body.auth-page #verify-code,body.auth-page #reset-code{text-align:center;font-size:22px;font-weight:700;letter-spacing:.5em;font-variant-numeric:tabular-nums}
+body.auth-page .password-field{position:relative}
+body.auth-page .password-field input{padding-right:72px}
+body.auth-page .password-field button{
+  position:absolute;top:50%;right:8px;transform:translateY(-50%);padding:6px 10px;border:0;border-radius:9px;background:transparent;
+  color:var(--brand-600);font-size:12.5px;font-weight:700;transition:background .2s
+}
+body.auth-page .password-field button:hover{background:var(--brand-50)}
+body.auth-page .field-note{color:#9aa3b2;font-weight:500}
+body.auth-page .field-error:not(:empty){margin:6px 0 0;color:#dc2626;font-size:12.5px;animation:lg-rise .3s var(--ease-out) both}
+body.auth-page .error-text:not(:empty){
+  margin:14px 0 0;padding:10px 12px;border:1px solid #fecaca;border-radius:12px;background:#fef2f2;color:#b91c1c;font-size:13px;
+  animation:lg-rise .3s var(--ease-out) both
+}
+body.auth-page .success-text:not([hidden]){padding:10px 12px;border-radius:12px;background:#f0fdf4;color:#15803d;animation:lg-pop .4s var(--ease-spring) both}
+body.auth-page form:has(.field-error:not(:empty)),
+body.auth-page .login-panel:has(.error-text:not(:empty)) form,
+body.auth-page .account-card:has(#auth-feedback:not(:empty)) .account-form:not([hidden]){animation:lg-shake .5s both}
+
+/* Primary button */
+body.auth-page .account-form .primary,body.auth-page .login-panel .primary{
+  position:relative;display:flex;align-items:center;justify-content:center;gap:10px;overflow:hidden;width:100%;min-height:54px;margin-top:22px;
+  border:0;border-radius:16px;background:linear-gradient(135deg,#e2193a,var(--brand-700));color:#fff;font-size:15.5px;font-weight:700;
+  box-shadow:var(--shadow-brand);transition:transform .25s var(--ease-out),box-shadow .25s,filter .2s
+}
+body.auth-page .account-form .primary::after,body.auth-page .login-panel .primary::after{
+  content:"";position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,transparent,#ffffff4d,transparent);
+  transform:translateX(-130%) skewX(-20deg);pointer-events:none
+}
+body.auth-page .account-form .primary:hover,body.auth-page .login-panel .primary:hover{
+  transform:translateY(-2px);box-shadow:0 16px 30px -12px #c8102eaa;background:linear-gradient(135deg,#ea2445,var(--brand-600))
+}
+body.auth-page .account-form .primary:hover::after,body.auth-page .login-panel .primary:hover::after{animation:lg-shimmer .9s ease}
+body.auth-page .account-form .primary:active,body.auth-page .login-panel .primary:active{transform:scale(.98)}
+body.auth-page .login-panel .login-submit span{font-size:15.5px;line-height:1.2}
+body.auth-page .login-panel .login-submit span:last-child{font-size:20px;line-height:1;transition:transform .3s var(--ease-out)}
+body.auth-page .login-submit:hover span:last-child{transform:translateX(4px)}
+body.auth-page .account-form .primary:disabled,body.auth-page .login-panel .primary:disabled{
+  cursor:wait;opacity:1;transform:none;
+  background:repeating-linear-gradient(-45deg,#c8102e 0 10px,#b30d28 10px 20px);background-size:40px 100%;animation:lg-stripes .6s linear infinite
+}
+body.auth-page .text-button{
+  align-self:center;margin-top:14px;padding:6px 10px;border:0;border-radius:9px;background:transparent;color:var(--brand-600);
+  font-size:13px;font-weight:600;transition:background .2s
+}
+body.auth-page .text-button:hover:not(:disabled){background:var(--brand-50)}
+body.auth-page .code-note,body.auth-page .otp-meta{color:var(--muted);font-size:13.5px}
+body.auth-page .code-note strong{color:var(--brand-600)}
+body.auth-page .login-help,body.auth-page .account-footnote{margin:22px 0 0;color:#8b95a6;font-size:12px;line-height:1.6;text-align:center}
+body.auth-page :focus-visible{outline:3px solid #c8102e55;outline-offset:2px}
+
+/* ---------- Desktop: whole page fits one screen, no scrolling ---------- */
+@media(min-width:961px){
+  body.account-page.auth-page,
+  body.staff-page.auth-page:has(.login-panel:not([hidden])),
+  body.admin-page.auth-page:has(.login-panel:not([hidden])),
+  body.staff-activate-page.auth-page{height:100dvh;min-height:0;overflow:hidden}
+  body.auth-page .account-main,
+  body.auth-page .staff-main:has(> .login-panel:not([hidden])){height:calc(100dvh - 64px);min-height:0;overflow:hidden}
+  .auth-hero{min-height:0}
+  .auth-hero-inner{min-height:0;height:100%;overflow:hidden}
+  .auth-showcase{flex:0 1 auto;min-height:0}
+  body.auth-page .account-card,body.auth-page .login-panel{margin:0 auto;max-height:100%}
+  /* Long helper texts are condensed so the form fits. */
+  body.auth-page .account-footnote{display:none}
+  body.auth-page .security-note{align-items:center;margin-top:16px;padding:9px 12px}
+  body.auth-page .security-note small{display:none}
+  body.auth-page .security-icon{flex-basis:24px;width:24px;height:24px}
+}
+/* Shorter laptop screens (e.g. 1366×768): tighten spacing. */
+@media(min-width:961px) and (max-height:860px){
+  .auth-hero{margin:10px 0 10px 10px}
+  .auth-hero-inner{gap:16px;padding:26px 36px 28px}
+  .auth-hero-brand{display:none}
+  .auth-hero-title{font-size:clamp(26px,2.6vw,34px)}
+  .auth-hero-lead{margin-top:10px;font-size:14px}
+  .auth-hero-features{gap:7px}
+  .auth-hero-features li{font-size:13px}
+  body.auth-page .account-card h1,body.auth-page .login-panel h1{margin:12px 0 6px;font-size:clamp(26px,2.3vw,32px)}
+  body.auth-page .account-subtitle,body.auth-page .login-intro,body.auth-page #activate-intro{font-size:13.5px;line-height:1.5}
+  body.auth-page .google-login{min-height:48px;margin-top:18px}
+  body.auth-page .login-divider{margin:14px 0 2px}
+  body.auth-page .account-tabs{margin-top:12px}
+  body.auth-page .account-tabs button{min-height:36px}
+  body.auth-page .account-form:not([hidden]),body.auth-page .login-panel form{margin-top:4px}
+  body.auth-page .account-form label,body.auth-page .login-panel label{margin:11px 0 5px}
+  body.auth-page .account-form input,body.auth-page .login-panel input:not([type="checkbox"]){min-height:46px}
+  body.auth-page .account-form .primary,body.auth-page .login-panel .primary{min-height:48px;margin-top:16px}
+  body.auth-page .text-button{margin-top:6px}
+  body.auth-page .login-security-note{margin-top:14px;padding:9px 12px}
+  body.auth-page .security-note{margin-top:10px}
+  body.auth-page .login-help{margin-top:14px}
+}
+/* Very short screens (e.g. 1280×720 or browser zoomed): drop secondary bits. */
+@media(min-width:961px) and (max-height:740px){
+  .auth-hero-lead,.auth-hero-features,.auth-float-chip{display:none}
+  .auth-chat,.auth-ticket,.auth-kpi{padding:14px}
+  .auth-bars{height:80px;margin:10px 0 8px}
+  body.auth-page .account-subtitle,body.auth-page .login-intro{display:none}
+  body.auth-page .account-card h1,body.auth-page .login-panel h1{margin:10px 0 4px;font-size:26px}
+  body.auth-page .google-login{margin-top:12px}
+  body.auth-page .security-note{display:none}
+  body.auth-page .login-security-note{margin-top:10px}
+  body.auth-page .account-form input,body.auth-page .login-panel input:not([type="checkbox"]){min-height:42px}
+}
+/* Last resort for extremely short windows: let only the form column scroll
+   rather than cut off fields. */
+@media(min-width:961px) and (max-height:600px){
+  body.auth-page .account-card,body.auth-page .login-panel{overflow-y:auto;padding:12px 4px}
+  .auth-showcase{display:none}
+}
+
+/* ---------- Responsive ---------- */
+@media(max-width:960px){
+  body.auth-page .account-main,
+  body.auth-page .staff-main:has(> .login-panel:not([hidden])){grid-template-columns:1fr;align-content:start}
+  .auth-hero{margin:12px 12px 0;border-radius:22px}
+  .auth-hero-inner{min-height:0;gap:14px;padding:22px 22px 24px}
+  .auth-hero-brand,.auth-showcase,.auth-hero-features{display:none}
+  .auth-hero-title{font-size:24px}
+  .auth-hero-lead{margin-top:8px;font-size:13.5px}
+  body.auth-page .account-card,body.auth-page .login-panel{margin:26px auto 40px;width:min(100% - 32px,440px)}
+}
+@media(max-width:600px){
+  body.auth-page .topbar{height:60px;min-height:60px;padding:0 14px;align-items:center}
+  body.auth-page .topbar .brand{min-width:0;font-size:14px}
+  body.auth-page .topbar .brand-copy>span{font-size:14px;white-space:nowrap}
+  body.auth-page .topbar .mark{flex:0 0 32px}
+  body.auth-page .topbar nav>*{flex-shrink:0}
+  body.auth-page .topbar .mark{width:32px;height:32px;font-size:17px}
+  body.auth-page .topbar nav{display:flex;flex-wrap:nowrap;gap:6px;min-width:0}
+  .auth-hero-kicker{display:none}
+  body.auth-page .topbar .brand small{display:none}
+  body.auth-page .topbar .staff-link,body.auth-page .topbar .nav-link{min-height:34px;padding:0 10px;font-size:12px}
+  .auth-hero-title{font-size:21px}
+  .auth-hero-lead{display:none}
+  body.auth-page .account-card h1,body.auth-page .login-panel h1{font-size:26px}
+}
+@media(prefers-reduced-motion:reduce){
+  body.auth-page *,body.auth-page *::before,body.auth-page *::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important
+  }
+}

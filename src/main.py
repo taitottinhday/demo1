@@ -121,7 +121,7 @@ def create_app(settings=None):
         except asyncio.CancelledError:
             pass
 
-    app = FastAPI(title="Trợ lý tuyển sinh X — HUST 2026", version="0.1.0", lifespan=lifespan)
+    app = FastAPI(title="Trợ lý tuyển sinh — HUST 2026", version="0.1.0", lifespan=lifespan)
 
     @app.exception_handler(RequestValidationError)
     async def structured_validation_error(request: Request, exc: RequestValidationError):
