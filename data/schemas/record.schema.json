@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "K71 source-backed normalized record v1",
+  "type": "object",
+  "required": ["record_id", "record_type", "title", "text", "source_id", "source_version", "page_start", "page_end", "topics", "cohort", "scope", "historical", "review_status", "evidence", "staff_reviewed"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "record_type": {"enum": ["section", "table", "table_row", "program", "cutoff"]},
+    "title": {"type": "string", "minLength": 1},
+    "text": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string"},
+    "source_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "page_start": {"type": "integer", "minimum": 1},
+    "page_end": {"type": "integer", "minimum": 1},
+    "topics": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "cohort": {"const": "K71"},
+    "admission_year": {"type": ["integer", "null"]},
+    "academic_year": {"type": ["string", "null"]},
+    "historical": {"type": "boolean"},
+    "scope": {"type": "string"},
+    "review_status": {"enum": ["machine_extracted", "table_reconstructed", "needs_table_review", "needs_ocr_review"]},
+    "staff_reviewed": {"type": "boolean"},
+    "answer_eligible": {"type": "boolean"},
+    "evidence": {
+      "type": "object",
+      "required": ["local_path", "page_start", "page_end", "quote"],
+      "properties": {
+        "url": {"type": ["string", "null"]},
+        "local_path": {"type": "string"},
+        "page_start": {"type": "integer", "minimum": 1},
+        "page_end": {"type": "integer", "minimum": 1},
+        "quote": {"type": "string"}
+      }
+    }
+  }
+}

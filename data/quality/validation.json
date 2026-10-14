@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "checks": [
+    "JSON Schema",
+    "unique IDs",
+    "source SHA256",
+    "page coverage",
+    "table provenance",
+    "parent references",
+    "view consistency",
+    "68 programs",
+    "historical score year/scale",
+    "TCHP units",
+    "20 OCR pages",
+    "release checksums"
+  ],
+  "records": 1132,
+  "chunks": 1065,
+  "cutoff_facts": 358,
+  "note": "Technical checks; not human accuracy certification."
+}

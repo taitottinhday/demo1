@@ -30,12 +30,43 @@ env/
 .DS_Store
 Thumbs.db
 
-# Data (never commit large data)
+# Data release: allow only public source documents and handoff artifacts.
+# Runtime databases, tools, test files and duplicate ZIP releases stay ignored.
 data/*
 !data/sources.md
+!data/README-data.md
 !data/raw/
 data/raw/*
-!data/raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
+!data/raw/*.pdf
+!data/manifests/
+data/manifests/*
+!data/manifests/*.json
+!data/schemas/
+data/schemas/*
+!data/schemas/*.json
+!data/normalized/
+data/normalized/*
+!data/normalized/*.jsonl
+!data/normalized/*.md
+!data/extracted/
+data/extracted/**
+!data/extracted/**/
+!data/extracted/**/*.json
+!data/extracted/**/*.jsonl
+!data/extracted/**/*.txt
+!data/processed/
+data/processed/*
+!data/processed/chunks.jsonl
+!data/processed/release.json
+!data/quality/
+data/quality/*
+!data/quality/report.md
+!data/quality/issues.jsonl
+!data/quality/page_inventory.jsonl
+!data/quality/validation.json
+!data/eval/
+data/eval/*
+!data/eval/retrieval-dev.jsonl
 *.db
 *.sqlite3
 *.db-wal

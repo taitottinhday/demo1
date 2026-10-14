@@ -1,0 +1,70 @@
+{
+  "release": "k71-2026-v1",
+  "parser_version": "admissions-normalizer-1.0",
+  "cohort": "K71",
+  "admission_year": 2026,
+  "sources": 6,
+  "pages": 131,
+  "tables": 79,
+  "records": 1132,
+  "chunks": 1065,
+  "programs": 68,
+  "ocr_pages": 20,
+  "topics": {
+    "language_rules": 207,
+    "scoring_rules": 101,
+    "student_support": 60,
+    "admission_rules": 350,
+    "programs": 196,
+    "application_steps": 93,
+    "training_models": 24,
+    "tuition_rules": 63,
+    "institutional_rules": 55,
+    "exam_rules": 155,
+    "contacts": 21,
+    "enrollment_rules": 13,
+    "cutoffs": 377,
+    "scholarships": 2
+  },
+  "status": "technical_release_requires_content_review",
+  "ready_for": [
+    "backend_import",
+    "retrieval_development",
+    "reranker_evaluation"
+  ],
+  "not_certified_for": [
+    "staff_approved_admissions_advice",
+    "accuracy_kpi"
+  ],
+  "files": {
+    "manifests/sources.json": "7d379cda0e19c997324a7c1f052f7921ecddf3ca4e6260fba2f007a0f9a6e64c",
+    "normalized/admission_rules.jsonl": "2f1b176c99fe066f7da60577f41eaebe1424aad6e5942c196d561fc87a34fd01",
+    "normalized/application_steps.jsonl": "b14b11fa4e92c92ae37d8746d1b079ea70d25ab3990fd7867457e2ca8dae00a0",
+    "normalized/contacts.jsonl": "5e8515ed43e4f3995d815d192ad3991d4148a90a6b309038c34699472a98e48e",
+    "normalized/cutoffs.jsonl": "0c78e6cff20af4769a556c0121a590e8a42943ae14314358b17bfd148476d648",
+    "normalized/enrollment_rules.jsonl": "e5d35d6833b6a77050024336dc1cfead7502a2a8fe020bcc37b368d0a908a25d",
+    "normalized/exam_rules.jsonl": "90cde7cd934cb637810d5b421799b70a44f0c539f0873c3d06f8a28953a645ce",
+    "normalized/institutional_rules.jsonl": "1c44d2a0c4852499eb4d3f62ea442523a94420e42256b0c07b419a181296c7b9",
+    "normalized/knowledge.md": "43825d20cc03b4c951f3f2512063a54c94565972b16134f7dbeba05545573b9b",
+    "normalized/language_rules.jsonl": "75b5635c7d1f0e61cbc9e40588f4433643d1186215f7b6645e58274d70af7d72",
+    "normalized/programs.jsonl": "2e4a2e1cdd0dbcab460c6ba6bee19c387d2136612e597c393c5afa545a22efb0",
+    "normalized/records.jsonl": "94e9b55fd0fe786aa449b6fad5115dc0f8974c01af9e3898830920145b28cb67",
+    "normalized/scholarships.jsonl": "3f0aaabe914e2ca7f820db134e6b47867c6eec68bd2246aa753e050d36126b6b",
+    "normalized/scoring_rules.jsonl": "c6059c38abe19c901dcd788c1a9a16597f343204f04f5cf3de89b881dfbe0732",
+    "normalized/student_support.jsonl": "b77efd4ba304dc9dd21b28c8af74834da83cc2ff2a39d32043100add2739ac1f",
+    "normalized/training_models.jsonl": "f5d87140b12fc4a86a89cb4e8bc3d1fcd0f6af6771a9aa07bea02d1ac93618e3",
+    "normalized/tuition_rules.jsonl": "45e0d3e68a5a4221d73b570c6eae966e63ec939291717a26bf2352fd2badd0b2",
+    "schemas/chunk.schema.json": "545e13254e8aca6ffd7664ae62df02ae50378310794253a43c0787ebc0f8d05c",
+    "schemas/record.schema.json": "9ee2cd35153cd8d693d6da51ab97f600e6f594a1810d7751b6a7b7f228631520",
+    "processed/chunks.jsonl": "bb0b5e7376e7ef71fbcc0dea61c617b5881c64ec8005e5d8309d2e78b9252548",
+    "README-data.md": "dd9b6bee716c4d1a0802d5fb7679d8e57592de93e940b72323fce94e85b52c2d",
+    "eval/retrieval-dev.jsonl": "ba76529a090eb34dbb147130cf492ab933fc364d549cbc3478a3c58a4d1216b3",
+    "quality/validation.json": "4a86476f4224cbde808a4e8f32e4995f439fc52d4ee7320cda1ad578e0d147f7"
+  },
+  "pipeline_files": {
+    "scripts/normalize_admissions_data.py": "42a8be642e301a1f777c362e2bb6d152cffc74b91daf56986f11f9b0bd0390e8",
+    "scripts/validate_admissions_data.py": "45b99c2b19263410629aecfa060cde5a729d18dc5dedbd0287250a16ffb1113c",
+    "scripts/setup_data_ocr.py": "805d9b74a31752250f3604b42461d41a92f642f7c27cb603fb71d9642abcf8d0",
+    "scripts/build_retrieval_dev.py": "d736b25cbe27eedd6a242ea0f37b74a636a9289456573f60b652c88d322a9936"
+  }
+}
