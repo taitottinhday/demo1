@@ -585,3 +585,22 @@ body.applicant-page{
 .applicant-page .message.assistant .feedback-form .primary-action{border-color:var(--brand);background:var(--brand);color:#fff}
 .applicant-page .message.assistant .feedback-form .primary-action:hover{background:var(--brand-600);color:#fff}
 .applicant-page .feedback-form-actions .hint{color:var(--muted);font-size:11px}
+
+/* Mobile overrides follow style.css because this stylesheet loads afterward. */
+@media(max-width:900px){
+  .applicant-page .topbar{box-sizing:border-box;display:flex;flex-wrap:wrap;align-content:center;height:auto;min-height:0;gap:7px;padding:8px 14px}
+  .applicant-page .brand{box-sizing:border-box;flex:0 0 100%;width:100%;min-width:0}
+  .applicant-page .topbar nav{box-sizing:border-box;display:flex;flex:1 1 100%;flex-wrap:wrap;justify-content:flex-start;gap:6px;min-width:0;width:100%;overflow:visible;padding:0}
+  .applicant-page .topbar nav>.header-link,.applicant-page .topbar nav>.nav-link,.applicant-page .topbar nav>.staff-link{box-sizing:border-box;flex:1 1 calc(50% - 6px);min-width:0;max-width:100%;height:auto;min-height:34px;justify-content:flex-start;padding:0 8px;white-space:normal;overflow-wrap:anywhere;text-align:left}
+  .applicant-page .workspace{box-sizing:border-box;flex:1 1 0;height:auto;min-height:0}
+  .applicant-page .chat-shell{height:100%;min-height:0}
+}
+@media(max-width:600px){
+  .applicant-page .topbar{padding-right:10px;padding-left:10px}
+  .applicant-page .topbar nav{gap:6px}
+  .applicant-page .program-search-control input{font-size:16px}
+  .applicant-page .program-guidance-dialog{box-sizing:border-box;left:0;right:0;width:100%;max-width:100%;min-width:0;height:min(88dvh,780px);max-height:90dvh;margin:auto 0 0;overflow:hidden}
+  .applicant-page .program-guidance-dialog input,.applicant-page .program-guidance-dialog select,.applicant-page .program-guidance-dialog textarea{font-size:16px}
+  .applicant-page .guidance-content,.applicant-page .guidance-form-scroll,.applicant-page .guidance-results{min-width:0;max-width:100%}
+  .applicant-page .guidance-options{grid-template-columns:minmax(0,1fr)}
+}

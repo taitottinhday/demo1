@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Cán bộ tuyển sinh · Trợ lý tuyển sinh</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="/assets/style.css?v=20261009-2"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/login.css?v=20261012-3"><link rel="stylesheet" href="/assets/dashboard.css?v=20261013-5"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/login.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/dashboard.dark.css?v=20261013-4"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/login-fx.js?v=20261012-1" defer></script>
-  <script src="/assets/feedback-view.js?v=20261013-1" defer></script><script src="/assets/staff.js?v=20261013-5" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261009-2"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/login.css?v=20261012-3"><link rel="stylesheet" href="/assets/dashboard.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/login.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/dashboard.dark.css?v=20261013-4"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/login-fx.js?v=20261012-1" defer></script>
+  <script src="/assets/feedback-view.js?v=20261013-1" defer></script><script src="/assets/staff.js?v=20261015-1" defer></script>
 </head>
 <body class="staff-page auth-page">
   <header class="topbar">
@@ -62,6 +62,7 @@
           <span class="button-label">Đăng nhập</span><span aria-hidden="true">→</span>
         </button>
       </form>
+      <button id="demo-login" class="secondary demo-login-button" type="button" data-demo-role="staff" hidden>Vào thử khu vực cán bộ</button>
       <p class="login-help">Chưa có quyền truy cập? Liên hệ quản trị viên để được cấp tài khoản.</p>
     </section>
 
@@ -69,7 +70,7 @@
       <div class="desk-toolbar">
         <div class="desk-title">
           <h1 id="dashboard-title">Hàng chờ hỗ trợ</h1>
-          <p id="live-status" class="desk-live" role="status" aria-live="polite">Tự động cập nhật mỗi 5 giây</p>
+          <p id="live-status" class="desk-live" role="status" aria-live="polite">Dữ liệu chỉ cập nhật khi bạn làm mới</p>
         </div>
         <div id="metrics" class="status-tabs" role="group" aria-label="Lọc theo trạng thái"></div>
         <div id="oldest-waiting" class="desk-alert" hidden></div>

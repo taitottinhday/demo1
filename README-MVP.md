@@ -40,6 +40,14 @@ Sau khi sửa Python hoặc cấu hình `.env`, dừng và chạy lại server �
 | `LLM_DAILY_LIMIT`, `LLM_TIMEOUT` | `100` lượt/ngày và `15` giây |
 | `APP_ENV` | `development`; production kiểm tra mật khẩu và cookie |
 
+Các trang cán bộ và admin có nút **Vào thử** trong môi trường `development`/`test`; nút tạo phiên demo để mentor thực hành. API demo trả 404 trong `production`, nơi vẫn yêu cầu đăng nhập tài khoản được cấp.
+
+### Email thông báo phản hồi
+
+Ứng dụng dùng chung nhà cung cấp email đang có: ưu tiên Resend HTTPS (`RESEND_API_KEY`, `RESEND_FROM`), sau đó dùng SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_SECURITY`). `PUBLIC_BASE_URL` phải là URL gốc người dùng có thể truy cập; production cần HTTPS. Không commit `.env` hoặc bí mật nhà cung cấp.
+
+Sau khi phản hồi được lưu, tác vụ nền gửi email ngắn đến email hợp lệ đã xác minh của tài khoản sinh viên liên kết với ticket. Email chỉ có mã ticket và đường dẫn đăng nhập; nội dung trao đổi không được đưa vào thư. Cán bộ xem trạng thái gửi tại chi tiết ticket và có thể gửi lại nếu thất bại. Khi không cấu hình provider ở local, phản hồi vẫn được lưu và trạng thái email báo thất bại; test dùng mailer giả, không gửi email thật. Tác vụ nền hiện dùng FastAPI `BackgroundTasks`, chưa có hàng đợi bền vững; nếu tiến trình dừng đột ngột trong lúc gửi, cần kiểm tra trạng thái vận hành trước khi thử lại.
+
 Mặc định `ANSWER_MODE=extractive`: tra cứu đoạn tài liệu thật, có trang nguồn, không gọi LLM và không cần API key. Để bật AI tổng hợp, bổ sung/chỉnh các dòng trong `.env`, rồi khởi động lại:
 
 ```dotenv
@@ -110,7 +118,7 @@ G1 vẫn là hồ sơ thiết kế; bản demo dùng SQLite/BM25 và giao diện
 
 Nguồn chưa được cán bộ HUST duyệt; app là demo của nhóm. Chỉ dùng phạm vi tuyển sinh chính quy từ THPT. Bảng quy đổi chứng chỉ trang 17 dạng ảnh chưa được xác minh; học bổng, hướng dẫn KTX và chuẩn ngoại ngữ đầu ra chưa đủ nguồn.
 
-Phiên ứng viên hết hạn sau 24 giờ không hoạt động; phiên cán bộ 8 giờ. Xóa chat không xóa ticket. Ticket được dọn sau 30 ngày không cập nhật, chỉ phù hợp demo. Dấu phản hồi đã xem lưu trên trình duyệt; thông báo mới chỉ hoạt động khi mở app, không gửi email hoặc push.
+Phiên ứng viên hết hạn sau 24 giờ không hoạt động; phiên cán bộ 8 giờ. Xóa chat không xóa ticket. Ticket được dọn sau 30 ngày không cập nhật, chỉ phù hợp demo. Trạng thái hàng chờ và phản hồi không tự tải lại định kỳ; dùng nút **Làm mới** ở trang cán bộ/admin hoặc trong cửa sổ yêu cầu của sinh viên.
 
 ## Cấu trúc và phân công
 

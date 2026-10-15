@@ -49,6 +49,11 @@ body.auth-page .desk:not([hidden]){display:flex;flex-direction:column;gap:10px;h
 .desk-icon-button:hover{border-color:#efc3ca;color:var(--brand);box-shadow:var(--shadow-md)}
 .desk-icon-button:hover svg{animation:dk-spin .6s cubic-bezier(.22,1,.36,1)}
 .desk-icon-button:disabled svg{animation:dk-spin .8s linear infinite}
+.demo-login-button:not([hidden]){display:block;width:100%;margin-top:12px}
+.email-notice-state{margin:10px 0;padding:9px 11px;border-radius:8px;background:#f4f6f9;color:#44536a;font-size:12px;line-height:1.5}
+.email-notice-state.sent{background:#eaf7ef;color:#14744c}
+.email-notice-state.failed{background:#fff1f0;color:#a1262c}
+.email-notice-state.skipped{background:#fff8e9;color:#795d19}
 
 /* ---------- Status tabs (staff) ---------- */
 .status-tabs{display:flex;flex-wrap:wrap;gap:6px}

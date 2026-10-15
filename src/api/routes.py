@@ -9,12 +9,13 @@ from typing import Literal
 from urllib.parse import quote, urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 
 from src.models.schemas import ProgramGuidanceInput, ProgramGuidanceResponse
 from src.services.accounts import authenticate
+from src.services.admin import AdminStore
 from src.services.admissions import redact
 from src.services.email import EmailDeliveryError
 from src.services.product_features import compare_programs
@@ -433,6 +434,7 @@ _SAFE_TICKET_FIELDS = {
     "question",
     "ai_answer",
     "sources",
+    "email_status",
 }
 _REDACTED_TICKET_FIELDS = {"summary", "reason", "reply", "question", "ai_answer"}
 
@@ -969,11 +971,85 @@ def claim(ticket_id: str, request: Request, user=Depends(staff)):
 
 
 @router.post("/staff/tickets/{ticket_id}/resolve")
-def resolve(ticket_id: str, body: ReplyInput, request: Request, user=Depends(staff)):
+def resolve(ticket_id: str, body: ReplyInput, request: Request, background_tasks: BackgroundTasks, user=Depends(staff)):
     if not body.reply.strip():
         raise HTTPException(422, "Cần nhập phản hồi trước khi đóng.")
-    if not runtime(request)["store"].resolve(ticket_id, user, redact(body.reply.strip())):
+    rt = runtime(request)
+    if not rt["store"].resolve(ticket_id, user, redact(body.reply.strip())):
         raise HTTPException(409, "Cần nhận xử lý yêu cầu trước; chỉ người nhận được đóng yêu cầu.")
+    queue_ticket_reply_notice(rt, ticket_id, background_tasks)
+    return {"ok": True, "email_status": rt["store"].ticket_notification_status(ticket_id)}
+
+
+@router.post("/staff/tickets/{ticket_id}/notification")
+def retry_ticket_notification(
+    ticket_id: str, request: Request, background_tasks: BackgroundTasks, user=Depends(staff)
+):
+    rt = runtime(request)
+    ticket = rt["store"].ticket_detail(ticket_id, owner=user)
+    if not ticket or ticket["ticket"]["owner"] != user or ticket["ticket"]["status"] != "resolved":
+        raise HTTPException(404, "Không tìm thấy yêu cầu.")
+    if not rt["store"].begin_ticket_notification(ticket_id, retry=True):
+        return {"ok": True, "email_status": rt["store"].ticket_notification_status(ticket_id)}
+    # A manually requested retry has already claimed the sending state.
+    background_tasks.add_task(deliver_ticket_reply_notice, rt, ticket_id, already_claimed=True)
+    return {"ok": True, "email_status": "sending"}
+
+
+def queue_ticket_reply_notice(rt, ticket_id, background_tasks):
+    """Run email delivery after the reply transaction has committed."""
+    background_tasks.add_task(deliver_ticket_reply_notice, rt, ticket_id)
+
+
+async def deliver_ticket_reply_notice(rt, ticket_id, already_claimed=False):
+    store = rt["store"]
+    if not already_claimed and not store.begin_ticket_notification(ticket_id):
+        return
+    recipient = store.ticket_notification_recipient(ticket_id)
+    if not recipient:
+        store.set_ticket_notification_status(ticket_id, "skipped")
+        logger.info("Ticket reply email skipped: no verified eligible student account; ticket=%s", ticket_id)
+        return
+    mailer = rt.get("mailer")
+    if not mailer or not mailer.configured:
+        store.set_ticket_notification_status(ticket_id, "failed")
+        logger.warning("Ticket reply email unavailable: provider not configured; ticket=%s", ticket_id)
+        return
+    public_url = rt["settings"].public_base_url.rstrip("/")
+    reply_url = f"{public_url}/?ticket={quote(ticket_id, safe='')}"
+    try:
+        await asyncio.to_thread(mailer.send_ticket_reply_notice, recipient, ticket_id, reply_url)
+    except Exception as exc:
+        store.set_ticket_notification_status(ticket_id, "failed")
+        logger.warning("Ticket reply email delivery failed: ticket=%s error=%s", ticket_id, type(exc).__name__)
+        return
+    store.set_ticket_notification_status(ticket_id, "sent")
+    logger.info("Ticket reply email accepted by provider: ticket=%s", ticket_id)
+
+
+@router.post("/demo/staff")
+def demo_staff_login(request: Request, response: Response):
+    rt = runtime(request)
+    if rt["settings"].app_env == "production":
+        raise HTTPException(404, "Không tìm thấy.")
+    staff_cookie(response, rt["store"].staff_login(rt["settings"].staff_username), rt["settings"])
+    return {"ok": True}
+
+
+@router.get("/demo/status")
+def demo_status(request: Request):
+    return {"enabled": runtime(request)["settings"].app_env != "production"}
+
+
+@router.post("/demo/admin")
+def demo_admin_login(request: Request, response: Response):
+    rt = runtime(request)
+    if rt["settings"].app_env == "production":
+        raise HTTPException(404, "Không tìm thấy.")
+    response.set_cookie(
+        "admin", AdminStore(rt["store"]).login(rt["settings"].admin_username),
+        httponly=True, samesite="strict", secure=rt["settings"].secure_cookies, max_age=8 * 3600,
+    )
     return {"ok": True}
 
 

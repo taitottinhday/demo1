@@ -38,6 +38,9 @@ class Store:
                     owner TEXT, reply TEXT NOT NULL DEFAULT '', question TEXT NOT NULL DEFAULT '',
                     ai_answer TEXT NOT NULL DEFAULT '', sources_json TEXT NOT NULL DEFAULT '[]', created REAL NOT NULL,
                     updated REAL NOT NULL, UNIQUE(session, request_key));
+                CREATE TABLE IF NOT EXISTS ticket_email_notifications (
+                    ticket_id TEXT PRIMARY KEY, status TEXT NOT NULL,
+                    updated REAL NOT NULL, FOREIGN KEY(ticket_id) REFERENCES tickets(id));
                 CREATE TABLE IF NOT EXISTS ticket_events (
                     id INTEGER PRIMARY KEY, ticket_id TEXT NOT NULL, actor TEXT NOT NULL,
                     action TEXT NOT NULL, created REAL NOT NULL);
@@ -730,7 +733,13 @@ class Store:
             sql += " AND (owner=? OR (status='waiting' AND owner IS NULL))"
             args.append(owner)
         with self.connect() as db:
-            return [dict(r) for r in db.execute(sql + " ORDER BY created DESC", args).fetchall()]
+            rows = [dict(r) for r in db.execute(sql + " ORDER BY created DESC", args).fetchall()]
+            for row in rows:
+                notification = db.execute(
+                    "SELECT status FROM ticket_email_notifications WHERE ticket_id=?", (row["id"],)
+                ).fetchone()
+                row["email_status"] = notification["status"] if notification else "not_applicable"
+            return rows
 
     def ticket(self, ticket_id):
         with self.connect() as db:
@@ -747,12 +756,15 @@ class Store:
             ticket = db.execute(sql, args).fetchone()
             if not ticket:
                 return None
+            notification = db.execute(
+                "SELECT status FROM ticket_email_notifications WHERE ticket_id=?", (ticket_id,)
+            ).fetchone()
             events = db.execute(
                 "SELECT actor,action,created FROM ticket_events WHERE ticket_id=? ORDER BY id",
                 (ticket_id,),
             ).fetchall()
         return {
-            "ticket": dict(ticket),
+            "ticket": {**dict(ticket), "email_status": notification["status"] if notification else "not_applicable"},
             "events": [dict(event) for event in events],
         }
 
@@ -792,6 +804,53 @@ class Store:
             if result.rowcount == 1:
                 ticket_event(db, ticket, "reply", actor=owner)
                 ticket_event(db, ticket, "resolved", actor=owner)
+                db.execute(
+                    "INSERT INTO ticket_email_notifications(ticket_id,status,updated) VALUES(?,?,?) "
+                    "ON CONFLICT(ticket_id) DO NOTHING",
+                    (ticket, "pending", now),
+                )
+            return result.rowcount == 1
+
+    def ticket_notification_recipient(self, ticket):
+        """Return a verified account address for a notification, never from client data."""
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT s.email,s.verified_at,s.disabled FROM tickets t "
+                "JOIN sessions x ON x.id=t.session JOIN students s ON s.id=x.student_id "
+                "WHERE t.id=?",
+                (ticket,),
+            ).fetchone()
+        if not row or not row["verified_at"] or row["disabled"]:
+            return None
+        email = row["email"]
+        if not email or len(email) > 254 or "@" not in email or "." not in email.rsplit("@", 1)[-1]:
+            return None
+        return email
+
+    def ticket_notification_status(self, ticket):
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT status FROM ticket_email_notifications WHERE ticket_id=?", (ticket,)
+            ).fetchone()
+        return row["status"] if row else "not_applicable"
+
+    def set_ticket_notification_status(self, ticket, status):
+        with self.connect() as db:
+            db.execute(
+                "INSERT INTO ticket_email_notifications(ticket_id,status,updated) VALUES(?,?,?) "
+                "ON CONFLICT(ticket_id) DO UPDATE SET status=excluded.status,updated=excluded.updated",
+                (ticket, status, time.time()),
+            )
+
+    def begin_ticket_notification(self, ticket, retry=False):
+        """Atomically claim one delivery attempt to prevent concurrent duplicate sends."""
+        with self.connect() as db:
+            allowed = "status='pending'" if not retry else "status='failed'"
+            result = db.execute(
+                "UPDATE ticket_email_notifications SET status='sending',updated=? "
+                f"WHERE ticket_id=? AND {allowed}",
+                (time.time(), ticket),
+            )
             return result.rowcount == 1
 
     def staff_login(self, username):

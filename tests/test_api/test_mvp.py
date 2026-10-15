@@ -11,6 +11,7 @@ from src.config import Settings
 from src.main import app, create_app
 from src.services.accounts import create_user
 from src.services.admissions import Admissions, redact
+from src.services.email import EmailDeliveryError, SmtpMailer
 from src.services.product_features import compare_programs
 from src.services.store import Store
 
@@ -314,6 +315,156 @@ async def test_handover_preview_is_stored_and_candidate_can_restore_after_sessio
         restored = await account.get("/api/v1/tickets")
         assert restored.status_code == 200
         assert any(item["id"] == ticket["id"] for item in restored.json())
+
+
+class FakeTicketMailer:
+    configured = True
+
+    def __init__(self, error=None):
+        self.error = error
+        self.sent = []
+
+    def send_ticket_reply_notice(self, recipient, ticket_id, reply_url):
+        if self.error:
+            raise self.error
+        self.sent.append((recipient, ticket_id, reply_url))
+
+
+async def _verified_student_ticket(client, email="student.notice@example.test"):
+    store = app.state.runtime["store"]
+    store.student_register(email, "Candidate@123", "Sinh viên")
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=? WHERE email=?", (time.time(), email))
+    token, _ = store.student_login(email, "Candidate@123", 24)
+    client.cookies.set("student", token)
+    await client.get("/api/v1/session")
+    created = await client.post(
+        "/api/v1/handover",
+        json={"summary": "Câu hỏi đã được chuyển.", "question": "Câu hỏi riêng.", "consent": True, "request_key": "email-notice-123"},
+    )
+    assert created.status_code == 200
+    return created.json()["id"], email, store
+
+
+async def _claim_ticket(client, ticket_id):
+    assert (await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})).status_code == 200
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/claim")).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_reply_is_saved_before_verified_account_notice_and_is_owner_only(client):
+    ticket_id, email, store = await _verified_student_ticket(client)
+    mailer = FakeTicketMailer()
+    app.state.runtime["mailer"] = mailer
+    await _claim_ticket(client, ticket_id)
+    result = await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã kiểm tra, nội dung riêng."})
+    assert result.status_code == 200
+    saved = (await client.get(f"/api/v1/tickets/{ticket_id}")).json()
+    assert saved["reply"] == "Đã kiểm tra, nội dung riêng."
+    assert saved["email_status"] == "sent"
+    assert mailer.sent == [(email, ticket_id, f"http://127.0.0.1:8000/?ticket={ticket_id}")]
+    assert (await client.get("/api/v1/staff/tickets/" + ticket_id)).json()["reply"] == saved["reply"]
+
+    other = store.student_register("another@example.test", "Candidate@123", "Sinh viên khác")
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=? WHERE id=?", (time.time(), other["id"]))
+    other_token, _ = store.student_login("another@example.test", "Candidate@123", 24)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", cookies={"student": other_token}) as stranger:
+        assert (await stranger.get(f"/api/v1/tickets/{ticket_id}")).status_code == 404
+        assert (await stranger.get("/api/v1/tickets")).json() == []
+
+
+@pytest.mark.asyncio
+async def test_no_notification_before_reply_commit_or_to_unverified_student(client):
+    ticket_id, _, store = await _verified_student_ticket(client)
+    mailer = FakeTicketMailer()
+    app.state.runtime["mailer"] = mailer
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Chưa nhận."})).status_code == 409
+    assert mailer.sent == []
+    await _claim_ticket(client, ticket_id)
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=NULL WHERE email='student.notice@example.test'")
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã lưu."})).status_code == 200
+    assert mailer.sent == []
+    assert (await client.get(f"/api/v1/tickets/{ticket_id}")).json()["email_status"] == "skipped"
+
+
+@pytest.mark.asyncio
+async def test_provider_failure_keeps_reply_and_retry_only_retries_email(client):
+    ticket_id, _, _ = await _verified_student_ticket(client)
+    mailer = FakeTicketMailer(EmailDeliveryError("provider unavailable"))
+    app.state.runtime["mailer"] = mailer
+    await _claim_ticket(client, ticket_id)
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Đã lưu dù email lỗi."})).status_code == 200
+    detail = (await client.get(f"/api/v1/tickets/{ticket_id}")).json()
+    assert detail["reply"] == "Đã lưu dù email lỗi." and detail["email_status"] == "failed"
+    mailer.error = None
+    retried = await client.post(f"/api/v1/staff/tickets/{ticket_id}/notification")
+    assert retried.status_code == 200 and retried.json()["email_status"] == "sent"
+    assert len(mailer.sent) == 1
+    again = await client.post(f"/api/v1/staff/tickets/{ticket_id}/notification")
+    assert again.json()["email_status"] == "sent"
+    assert len(mailer.sent) == 1
+    assert (await client.get(f"/api/v1/tickets/{ticket_id}")).json()["reply"] == "Đã lưu dù email lỗi."
+
+
+@pytest.mark.asyncio
+async def test_test_mode_does_not_send_real_email_when_provider_is_missing(client):
+    ticket_id, _, _ = await _verified_student_ticket(client)
+    app.state.runtime.pop("mailer", None)
+    await _claim_ticket(client, ticket_id)
+    assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Chế độ kiểm thử."})).status_code == 200
+    assert (await client.get(f"/api/v1/tickets/{ticket_id}")).json()["reply"] == "Chế độ kiểm thử."
+
+
+@pytest.mark.asyncio
+async def test_demo_entry_points_work_in_test_and_are_disabled_in_production(client):
+    assert (await client.get("/api/v1/demo/status")).json() == {"enabled": True}
+    assert (await client.post("/api/v1/demo/staff")).status_code == 200
+    assert (await client.get("/api/v1/staff/session")).json()["authenticated"] is True
+    await client.post("/api/v1/staff/logout")
+    assert (await client.post("/api/v1/demo/admin")).status_code == 200
+    assert (await client.get("/api/v1/admin/session")).json()["authenticated"] is True
+
+    runtime = app.state.runtime
+    previous = runtime["settings"]
+    runtime["settings"] = previous.model_copy(update={"app_env": "production"})
+    try:
+        assert (await client.get("/api/v1/demo/status")).json() == {"enabled": False}
+        assert (await client.post("/api/v1/demo/staff")).status_code == 404
+        assert (await client.post("/api/v1/demo/admin")).status_code == 404
+    finally:
+        runtime["settings"] = previous
+
+
+def test_ticket_notice_email_contains_only_ticket_reference_and_login_link():
+    mailer = SmtpMailer(Settings(_env_file=None, resend_api_key="test-key", resend_from="notice@example.test"))
+    delivered = []
+    mailer._deliver = delivered.append
+    mailer.send_ticket_reply_notice("student@example.test", "TS-1234ABCD", "https://admissions.example/?ticket=TS-1234ABCD")
+    message = delivered[0]
+    assert message["To"] == "student@example.test"
+    assert "TS-1234ABCD" in message["Subject"]
+    assert "https://admissions.example/?ticket=TS-1234ABCD" in message.get_body(preferencelist=("plain",)).get_content()
+    assert "nội dung trao đổi riêng" not in message.get_body(preferencelist=("plain",)).get_content()
+
+
+def test_notification_outbox_is_separate_and_allows_only_one_retry_claim(tmp_path):
+    store = Store(tmp_path / "notification.db")
+    student = store.student_register("outbox@example.test", "Candidate@123", "Sinh viên")
+    with store.connect() as db:
+        db.execute("UPDATE students SET verified_at=? WHERE id=?", (time.time(), student["id"]))
+    _, session = store.session(None, 24, student["id"])
+    ticket = store.create_ticket(session["id"], "outbox-request", "Ghi chú", "user_request")
+    assert store.claim(ticket["id"], "canbo")
+    assert store.resolve(ticket["id"], "canbo", "Đã lưu phản hồi.")
+    assert store.ticket_notification_recipient(ticket["id"]) == "outbox@example.test"
+    assert store.ticket_notification_status(ticket["id"]) == "pending"
+    assert store.begin_ticket_notification(ticket["id"])
+    assert not store.begin_ticket_notification(ticket["id"])
+    store.set_ticket_notification_status(ticket["id"], "failed")
+    assert store.begin_ticket_notification(ticket["id"], retry=True)
+    assert not store.begin_ticket_notification(ticket["id"], retry=True)
 
 
 @pytest.mark.asyncio

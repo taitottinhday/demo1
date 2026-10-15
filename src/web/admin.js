@@ -2,9 +2,8 @@ const $=id=>document.getElementById(id);
 const names={waiting:'Đang chờ',in_progress:'Đang xử lý',resolved:'Đã giải quyết',rejected:'Đã từ chối',cancelled:'Đã hủy'};
 const reasons={user_request:'Ứng viên yêu cầu',low_confidence:'AI không chắc chắn',sensitive:'Câu hỏi nhạy cảm'};
 const actions={created:'Tạo ticket',claimed:'Nhận xử lý',reply:'Gửi phản hồi',resolved:'Giải quyết',rejected:'Từ chối',reassigned:'Phân công lại',cancelled:'Ứng viên hủy'};
-let officers=[], page=1, total=0, selected=null, assignmentNotice=null, pollingTimer=null, refreshInFlight=false, ticketListRequestId=0, ticketDetailRequestId=0;
+let officers=[], page=1, total=0, selected=null, assignmentNotice=null, refreshInFlight=false, ticketListRequestId=0, ticketDetailRequestId=0;
 const PAGE_SIZE=15;
-const POLL_INTERVAL_MS=5000;
 document.body.classList.add('admin-page');
 function node(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined&&text!==null)n.textContent=text;return n;}
 function when(ts){return ts?new Date(ts*1000).toLocaleString('vi-VN'):'—';}
@@ -29,16 +28,14 @@ function kpiWindow(k){const w=k.time_window||{};return `${w.from||'Từ lúc b�
 async function api(path,options={}){
   const r=await fetch('/api/v1'+path,{...options,credentials:'include',headers:{'Content-Type':'application/json'}});
   const data=await r.json();
-  if(r.status===401||r.status===403){stopAutoRefresh();$('dashboard').hidden=true;$('login-panel').hidden=false;$('logout').hidden=true;if(r.status===401)$('login-error').textContent='Phiên quản trị đã hết hạn. Vui lòng đăng nhập lại.';}
+  if(r.status===401||r.status===403){$('dashboard').hidden=true;$('login-panel').hidden=false;$('logout').hidden=true;if(r.status===401)$('login-error').textContent='Phiên quản trị đã hết hạn. Vui lòng đăng nhập lại.';}
   if(!r.ok){const detail=data.detail;const error=new Error(typeof detail==='string'?detail:detail?.message||'Nội dung chưa hợp lệ.');error.fields=typeof detail==='object'?(detail.fields||{}):{};throw error;}
   return data;
 }
 function showDashboard(username){$('dashboard').hidden=false;$('login-panel').hidden=true;$('logout').hidden=false;const who=$('admin-identity');if(who&&username){who.textContent=username;who.dataset.initial=username.trim().charAt(0).toUpperCase();who.hidden=false;}}
 function fail(error){$('admin-error').textContent=error.message;}
-function stopAutoRefresh(){if(pollingTimer){window.clearInterval(pollingTimer);pollingTimer=null;}}
-function startAutoRefresh(){stopAutoRefresh();pollingTimer=window.setInterval(()=>{if(document.hidden||refreshInFlight||hasAdminDraft())return;refresh({silent:true}).catch(fail);},POLL_INTERVAL_MS);}
 function hasAdminDraft(){return ['o-name','o-username','o-email','reassign-to','reassign-note'].some(id=>{const field=$(id);return field&&((document.activeElement===field)||field.value.trim());});}
-function markLiveUpdated(){const status=$('live-status');if(status)status.textContent=`Đã cập nhật ${new Date().toLocaleTimeString('vi-VN')} · Tự động mỗi 5 giây`;}
+function markLiveUpdated(){const status=$('live-status');if(status)status.textContent=`Cập nhật lúc ${new Date().toLocaleTimeString('vi-VN')}`;}
 const FILTER_STORAGE_KEY='admin-dashboard-filters';
 function persistFilters(){
   try{sessionStorage.setItem(FILTER_STORAGE_KEY,JSON.stringify({from:$('from').value,to:$('to').value,status:$('status-filter').value,officer:$('officer-filter').value}));}catch{/* Ignore unavailable browser storage. */}
@@ -310,7 +307,11 @@ $('status-filter').onchange=$('officer-filter').onchange=()=>{selected=null;assi
 $('prev').onclick=()=>{page--;loadTickets().catch(fail);};$('next').onclick=()=>{page++;loadTickets().catch(fail);};
 $('refresh').onclick=refresh;
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-error').textContent='';$('username-error').textContent='';$('password-error').textContent='';const username=$('username').value.trim(),password=$('password').value;$('username').removeAttribute('aria-invalid');$('password').removeAttribute('aria-invalid');const first=!username?'username':!password?'password':'';if(first){$(first).setAttribute('aria-invalid','true');$(`${first}-error`).textContent=first==='username'?'Tài khoản là bắt buộc.':'Mật khẩu là bắt buộc.';$(first).focus();return;}const button=e.submitter;button.disabled=true;
-  try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard(username);await refresh();startAutoRefresh();}
+  try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard(username);await refresh();}
   catch(error){const firstField=error.fields?.username?'username':error.fields?.password?'password':'';if(firstField){$(firstField).setAttribute('aria-invalid','true');$(`${firstField}-error`).textContent=error.fields[firstField];$(firstField).focus();}else $('login-error').textContent=error.message;}finally{button.disabled=false;}});
 $('logout').onclick=async()=>{try{await api('/admin/logout',{method:'POST'});location.reload();}catch(e){fail(e);}};
-(async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard(session.username||'');await refresh();startAutoRefresh();}catch{/* Login form remains visible. */}})();
+const demoLoginButton=node('button','secondary demo-login-button','Vào thử khu vực admin');
+demoLoginButton.type='button';demoLoginButton.hidden=true;$('login-panel').append(demoLoginButton);
+fetch('/api/v1/demo/status').then(r=>r.json()).then(data=>{demoLoginButton.hidden=!data.enabled;}).catch(()=>{});
+demoLoginButton.onclick=async()=>{demoLoginButton.disabled=true;try{const response=await fetch('/api/v1/demo/admin',{method:'POST',credentials:'include'});if(!response.ok)throw new Error('Không thể mở phiên demo. Vui lòng thử lại.');location.reload();}catch(error){$('login-error').textContent=error.message;demoLoginButton.disabled=false;}};
+(async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard(session.username||'');await refresh();}catch{/* Login form remains visible. */}})();

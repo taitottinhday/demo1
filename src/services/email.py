@@ -161,6 +161,30 @@ class SmtpMailer:
         message.add_alternative(html, subtype="html")
         self._deliver(message)
 
+    def send_ticket_reply_notice(self, recipient: str, ticket_id: str, reply_url: str) -> None:
+        """Send a minimal notice; ticket content and student identity stay out of email."""
+        if not self.configured:
+            raise EmailDeliveryError("Email provider is not configured.")
+        subject = f"Đã có phản hồi cho yêu cầu {ticket_id}"
+        text = (
+            f"Cán bộ đã phản hồi yêu cầu {ticket_id} của bạn.\n\n"
+            "Đăng nhập để xem nội dung trao đổi an toàn:\n"
+            f"{reply_url}\n"
+        )
+        html = (
+            '<!doctype html><html lang="vi"><body style="font-family:Arial,sans-serif;color:#123b3d">'
+            f"<h2>Đã có phản hồi</h2><p>Cán bộ đã phản hồi yêu cầu <b>{escape(ticket_id)}</b>.</p>"
+            f'<p><a href="{escape(reply_url, quote=True)}">Đăng nhập để mở cuộc trao đổi</a></p>'
+            "<p>Đăng nhập vào tài khoản đã gửi yêu cầu để xem nội dung.</p></body></html>"
+        )
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = self._from_header
+        message["To"] = recipient
+        message.set_content(text)
+        message.add_alternative(html, subtype="html")
+        self._deliver(message)
+
     def _deliver(self, message: EmailMessage) -> None:
         if self.resend_configured:
             self._deliver_resend(message)

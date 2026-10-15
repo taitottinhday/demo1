@@ -32,10 +32,8 @@ const state = {
   loading: false,
   refreshing: false,
   actionInProgress: false,
-  pollTimer: null,
 };
 
-const POLL_INTERVAL_MS = 5000;
 
 function node(tag, className = '', text = '') {
   const element = document.createElement(tag);
@@ -100,7 +98,6 @@ async function api(path, options = {}) {
 }
 
 function showLogin(message = '') {
-  stopAutoRefresh();
   $('dashboard').hidden = true;
   $('login-panel').hidden = false;
   $('logout').hidden = true;
@@ -117,21 +114,6 @@ function showDashboard() {
   $('staff-identity').dataset.initial = (state.username || '?').trim().charAt(0).toUpperCase();
 }
 
-function stopAutoRefresh() {
-  if (state.pollTimer) {
-    window.clearInterval(state.pollTimer);
-    state.pollTimer = null;
-  }
-}
-
-function startAutoRefresh() {
-  stopAutoRefresh();
-  state.pollTimer = window.setInterval(() => {
-    if (document.hidden || state.refreshing || state.actionInProgress) return;
-    refreshDashboard(true, true).catch((error) => renderGlobalError(error.message));
-  }, POLL_INTERVAL_MS);
-}
-
 function hasStaffDraft() {
   return ['staff-reply', 'reject-reason'].some((id) => {
     const field = $(id);
@@ -142,7 +124,7 @@ function hasStaffDraft() {
 function markLiveUpdated() {
   const status = $('live-status');
   if (status) {
-    status.textContent = `Đã cập nhật ${new Date().toLocaleTimeString('vi-VN')} · Tự động mỗi 5 giây`;
+    status.textContent = `Cập nhật lúc ${new Date().toLocaleTimeString('vi-VN')}`;
   }
 }
 
@@ -376,6 +358,33 @@ function appendActions(container, ticket) {
   error.setAttribute('role', 'alert');
   const canReject = ticket.status === 'waiting' || (ticket.status === 'in_progress' && ticket.owner === state.username);
   const row = node('div', 'action-row');
+
+  if (ticket.status === 'resolved' && ticket.owner === state.username) {
+    const emailState = ticket.email_status || 'not_applicable';
+    const labels = {
+      sent: 'Đã lưu phản hồi · Email thông báo đã được nhà cung cấp chấp nhận.',
+      pending: 'Đã lưu phản hồi · Email thông báo đang chờ gửi.',
+      sending: 'Đã lưu phản hồi · Đang gửi email thông báo.',
+      failed: 'Đã lưu phản hồi · Gửi email thất bại; có thể gửi lại thông báo.',
+      skipped: 'Đã lưu phản hồi · Không gửi email vì tài khoản không có email hợp lệ đã xác minh.',
+    };
+    if (labels[emailState]) actions.append(node('p', `email-notice-state ${emailState}`, labels[emailState]));
+    if (emailState === 'failed') {
+      const retry = node('button', 'secondary action-button', 'Gửi lại email thông báo');
+      retry.type = 'button';
+      retry.addEventListener('click', async () => {
+        retry.disabled = true;
+        try {
+          await api(`/staff/tickets/${encodeURIComponent(ticket.id)}/notification`, { method: 'POST' });
+          await refreshDashboard(true);
+        } catch (error) {
+          if (errorNode) errorNode.textContent = error.message;
+          retry.disabled = false;
+        }
+      });
+      actions.append(retry);
+    }
+  }
 
   if (ticket.status === 'waiting') {
     const claim = node('button', 'primary action-button', 'Nhận xử lý ticket →');
@@ -633,7 +642,6 @@ async function login(event) {
     $('password').value = '';
     showDashboard();
     await refreshDashboard(false);
-    startAutoRefresh();
   } catch (error) {
     if (error.fields?.username || error.fields?.password) {
       const first = error.fields.username ? $('username') : $('password');
@@ -675,6 +683,22 @@ $('queue-search').addEventListener('input', renderQueueAndSelectFirst);
 const loginError = new URLSearchParams(window.location.search).get('login_error');
 if (loginError) $('login-error').textContent = decodeURIComponent(loginError.replaceAll('+', ' '));
 
+const demoLoginButton = $('demo-login');
+fetch('/api/v1/demo/status').then((response) => response.json()).then((result) => {
+  demoLoginButton.hidden = !result.enabled;
+}).catch(() => {});
+demoLoginButton.addEventListener('click', async () => {
+  demoLoginButton.disabled = true;
+  try {
+    const response = await fetch('/api/v1/demo/staff', { method: 'POST', credentials: 'include' });
+    if (!response.ok) throw new Error('Không thể mở phiên demo. Vui lòng thử lại.');
+    window.location.reload();
+  } catch (error) {
+    $('login-error').textContent = error.message;
+    demoLoginButton.disabled = false;
+  }
+});
+
 (async () => {
   try {
     const session = await api('/staff/session');
@@ -682,7 +706,6 @@ if (loginError) $('login-error').textContent = decodeURIComponent(loginError.rep
     state.username = session.username || '';
     showDashboard();
     await refreshDashboard(false);
-    startAutoRefresh();
   } catch {
     // The login panel is the expected state for an unauthenticated visitor.
   }
@@ -705,7 +728,3 @@ function setFeedbackViewOpen(open) {
   if (open) feedbackView?.load().catch((error) => renderGlobalError(error.message));
 }
 $('feedback-toggle')?.addEventListener('click', () => setFeedbackViewOpen($('feedback-view').hidden));
-window.setInterval(() => {
-  if (document.hidden || $('feedback-view').hidden || $('dashboard').hidden) return;
-  feedbackView?.load().catch((error) => renderGlobalError(error.message));
-}, POLL_INTERVAL_MS);

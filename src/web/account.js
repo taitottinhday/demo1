@@ -197,7 +197,10 @@ $('login-view').onsubmit = async event => {
   if (!validate(form, { email: emailRule, password: required('Mật khẩu') })) return;
   try {
     await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: field(form, 'email').value.trim().toLowerCase(), password: field(form, 'password').value }) });
-    location.href = '/';
+    const requestedTicket = new URLSearchParams(location.search).get('ticket');
+    location.href = requestedTicket && /^TS-[A-Z0-9]{8}$/i.test(requestedTicket)
+      ? `/?ticket=${encodeURIComponent(requestedTicket)}`
+      : '/';
   } catch (error) { applyApiError(form, error); }
 };
 
@@ -265,7 +268,12 @@ $('reset-view').onsubmit = async event => {
 (async () => {
   try {
     const session = await api('/auth/me');
-    if (session.authenticated) location.href = '/';
+    if (session.authenticated) {
+      const requestedTicket = new URLSearchParams(location.search).get('ticket');
+      location.href = requestedTicket && /^TS-[A-Z0-9]{8}$/i.test(requestedTicket)
+        ? `/?ticket=${encodeURIComponent(requestedTicket)}`
+        : '/';
+    }
   } catch { /* Logged out. */ }
 })();
 

@@ -320,6 +320,17 @@ async function init() {
     $('mode-label').textContent=status.mode==='llm'?'AI tổng hợp có kiểm tra trích dẫn.':'Đang dùng chế độ tra cứu tài liệu.';
     setTicketCount(session.tickets.length);
     restoreQuestionDraft();
+    const requestedTicket = new URLSearchParams(location.search).get('ticket');
+    if (requestedTicket && /^TS-[A-Z0-9]{8}$/i.test(requestedTicket)) {
+      if (!session.student) {
+        location.replace(`/account?ticket=${encodeURIComponent(requestedTicket)}`);
+        return;
+      }
+      $('track-dialog').showModal();
+      await loadTickets();
+      const ownTicket = [...$('tickets').querySelectorAll('.ticket-card')].find(card => card.textContent.includes(requestedTicket));
+      ownTicket?.scrollIntoView({ block: 'nearest' });
+    }
   } catch(error) { $('chat-error').textContent='Không kết nối được ứng dụng: '+error.message; }
 }
 $('question').addEventListener('input',()=>{
@@ -427,7 +438,6 @@ async function loadTickets(){
   }catch(error){$('tickets').replaceChildren(node('p','error-text',error.message));}
 }
 $('track-open').onclick=()=>{$('track-dialog').showModal();loadTickets();};$('refresh-tickets').onclick=loadTickets;
-setInterval(()=>{if($('track-dialog').open)loadTickets();},10000);
 function storageForGuide() {
   try {
     const storage = window.localStorage;
@@ -843,4 +853,4 @@ async function checkReplies(){
 function markRepliesSeen(tickets){
   const seen={};tickets.forEach(t=>{if(t.reply)seen[t.id]=t.updated;});try{localStorage.setItem(seenKey,JSON.stringify(seen));$('reply-unread').hidden=true;}catch{/* Do not mark read if storage is unavailable. */}
 }
-setTimeout(checkReplies,1500);setInterval(checkReplies,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReplies();});
+setTimeout(checkReplies,1500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReplies();});
