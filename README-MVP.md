@@ -154,7 +154,7 @@ Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwrig
 docker compose up --build
 ```
 
-Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. Ở local, Docker Compose lưu state tại `/app/state` và mount từ `data/state`. Trên Railway, tạo Volume mount tại `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`; giữ `MVP_DATA_DIR=data` để Volume không che các PDF nguồn. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo.
+Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. Ở local, Docker Compose lưu state tại `/app/state` và mount từ `data/state`. Trên Railway, tạo Volume mount tại `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`; giữ `MVP_DATA_DIR=data` để Volume không che các PDF nguồn. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo. Hai nút demo ở trang cán bộ/admin dùng database mẫu riêng tại `PERSISTENT_DATA_DIR/demo/mvp.db`, không truy cập ticket/tài khoản thật và không gửi email.
 
 Nếu nguồn chưa sẵn sàng: kiểm tra `/api/v1/status`, đường dẫn PDF và `sources.md`, rồi khởi động lại. PDF scan cần OCR/duyệt trước lập chỉ mục. Nếu AI lỗi: kiểm tra cấu hình/quota API, hoặc đổi `ANSWER_MODE=extractive`. Nếu đăng nhập lỗi sau deploy HTTPS: kiểm tra cookie Secure và origin.
 

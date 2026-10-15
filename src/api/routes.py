@@ -331,7 +331,10 @@ def program_guidance_options(request: Request):
 
 
 def runtime(request: Request):
-    return request.app.state.runtime
+    base = request.app.state.runtime
+    if request.cookies.get("demo_mode") == "1":
+        return base.get("demo_runtime", base)
+    return base
 
 
 def candidate(request: Request, response: Response):
@@ -945,6 +948,7 @@ def staff_session_status(request: Request):
 def logout(request: Request, response: Response):
     runtime(request)["store"].logout(request.cookies.get("staff"))
     response.delete_cookie("staff")
+    response.delete_cookie("demo_mode")
     return {"ok": True}
 
 
@@ -1029,28 +1033,38 @@ async def deliver_ticket_reply_notice(rt, ticket_id, already_claimed=False):
 
 @router.post("/demo/staff")
 def demo_staff_login(request: Request, response: Response):
-    rt = runtime(request)
-    if rt["settings"].app_env == "production":
+    base = request.app.state.runtime
+    rt = base.get("demo_runtime")
+    if not rt:
         raise HTTPException(404, "Không tìm thấy.")
+    response.set_cookie(
+        "demo_mode", "1", httponly=True, samesite="strict", secure=base["settings"].secure_cookies,
+        max_age=8 * 3600,
+    )
     staff_cookie(response, rt["store"].staff_login(rt["settings"].staff_username), rt["settings"])
-    return {"ok": True}
+    return {"ok": True, "demo": True}
 
 
 @router.get("/demo/status")
 def demo_status(request: Request):
-    return {"enabled": runtime(request)["settings"].app_env != "production"}
+    return {"enabled": bool(request.app.state.runtime.get("demo_runtime"))}
 
 
 @router.post("/demo/admin")
 def demo_admin_login(request: Request, response: Response):
-    rt = runtime(request)
-    if rt["settings"].app_env == "production":
+    base = request.app.state.runtime
+    rt = base.get("demo_runtime")
+    if not rt:
         raise HTTPException(404, "Không tìm thấy.")
+    response.set_cookie(
+        "demo_mode", "1", httponly=True, samesite="strict", secure=base["settings"].secure_cookies,
+        max_age=8 * 3600,
+    )
     response.set_cookie(
         "admin", AdminStore(rt["store"]).login(rt["settings"].admin_username),
         httponly=True, samesite="strict", secure=rt["settings"].secure_cookies, max_age=8 * 3600,
     )
-    return {"ok": True}
+    return {"ok": True, "demo": True}
 
 
 @router.get("/staff/feedback")

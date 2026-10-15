@@ -53,7 +53,10 @@ class OfficerPasswordInput(BaseModel):
 
 
 def runtime(request: Request):
-    return request.app.state.runtime
+    base = request.app.state.runtime
+    if request.cookies.get("demo_mode") == "1":
+        return base.get("demo_runtime", base)
+    return base
 
 
 def admins(request: Request):
@@ -88,6 +91,7 @@ def login(body: LoginInput, request: Request, response: Response):
 def logout(request: Request, response: Response):
     admins(request).logout(request.cookies.get("admin"))
     response.delete_cookie("admin")
+    response.delete_cookie("demo_mode")
     return {"ok": True}
 
 

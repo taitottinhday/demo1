@@ -310,8 +310,10 @@ $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-
   try{await api('/admin/login',{method:'POST',body:JSON.stringify({username,password})});$('password').value='';showDashboard(username);await refresh();}
   catch(error){const firstField=error.fields?.username?'username':error.fields?.password?'password':'';if(firstField){$(firstField).setAttribute('aria-invalid','true');$(`${firstField}-error`).textContent=error.fields[firstField];$(firstField).focus();}else $('login-error').textContent=error.message;}finally{button.disabled=false;}});
 $('logout').onclick=async()=>{try{await api('/admin/logout',{method:'POST'});location.reload();}catch(e){fail(e);}};
-const demoLoginButton=node('button','secondary demo-login-button','Vào thử khu vực admin');
+const demoLoginButton=node('button','secondary demo-login-button','Vào demo admin, không cần đăng nhập');
 demoLoginButton.type='button';demoLoginButton.hidden=true;$('login-panel').append(demoLoginButton);
-fetch('/api/v1/demo/status').then(r=>r.json()).then(data=>{demoLoginButton.hidden=!data.enabled;}).catch(()=>{});
+const demoLoginNote=node('p','login-help','Demo dùng ticket mẫu riêng, không gửi email và không tác động dữ liệu thật.');
+demoLoginNote.hidden=true;$('login-panel').append(demoLoginNote);
+fetch('/api/v1/demo/status').then(r=>r.json()).then(data=>{demoLoginButton.hidden=!data.enabled;demoLoginNote.hidden=!data.enabled;}).catch(()=>{});
 demoLoginButton.onclick=async()=>{demoLoginButton.disabled=true;try{const response=await fetch('/api/v1/demo/admin',{method:'POST',credentials:'include'});if(!response.ok)throw new Error('Không thể mở phiên demo. Vui lòng thử lại.');location.reload();}catch(error){$('login-error').textContent=error.message;demoLoginButton.disabled=false;}};
 (async()=>{try{const session=await api('/admin/session');if(!session.authenticated)return;showDashboard(session.username||'');await refresh();}catch{/* Login form remains visible. */}})();

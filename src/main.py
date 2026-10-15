@@ -98,6 +98,24 @@ def create_app(settings=None):
         except Exception as exc:
             source_error = str(exc)
             logging.warning("Nguồn chưa sẵn sàng: %s", type(exc).__name__)
+        demo_cfg = cfg.model_copy(update={
+            "staff_username": "demo-officer",
+            "staff_password": "demo-only-unused",
+            "admin_username": "demo-admin",
+            "admin_password": "demo-only-unused",
+        })
+        demo_store = Store(state_dir / "demo" / "mvp.db")
+        seed_accounts(demo_store, demo_cfg)
+        if not demo_store.tickets():
+            seed_demo_tickets(demo_store, demo_cfg)
+        demo_runtime = {
+            "settings": demo_cfg,
+            "store": demo_store,
+            "knowledge": knowledge,
+            "admissions": Admissions(knowledge, demo_store, demo_cfg),
+            "mailer": None,
+            "source_error": source_error,
+        }
         app.state.runtime = {
             "settings": cfg,
             "store": store,
@@ -105,8 +123,10 @@ def create_app(settings=None):
             "admissions": Admissions(knowledge, store, cfg),
             "mailer": SmtpMailer(cfg),
             "source_error": source_error,
+            "demo_runtime": demo_runtime,
         }
         store.purge(cfg.session_hours)
+        demo_store.purge(cfg.session_hours)
 
         async def cleanup():
             while True:
@@ -224,6 +244,25 @@ def create_app(settings=None):
         return {"status": "ok", "env": cfg.app_env, "source_ready": bool(app.state.runtime["knowledge"].chunks)}
 
     return app
+
+
+def seed_demo_tickets(store, cfg):
+    """Create synthetic, disposable tickets for public staff/admin demos."""
+    examples = [
+        ("Câu hỏi mẫu: học phí", "Ứng viên hỏi mức học phí dự kiến của chương trình IT1.", "waiting", ""),
+        ("Câu hỏi mẫu: phương thức xét tuyển", "Ứng viên cần hướng dẫn tìm hiểu các phương thức xét tuyển.", "in_progress", ""),
+        ("Câu hỏi mẫu: hồ sơ", "Ứng viên hỏi nơi xem danh sách giấy tờ cần chuẩn bị.", "resolved", "Bạn có thể xem hướng dẫn hồ sơ tại trang tuyển sinh chính thức."),
+    ]
+    for index, (summary, question, status, reply) in enumerate(examples):
+        _, session = store.session(None, cfg.session_hours)
+        ticket = store.create_ticket(
+            session["id"], f"demo-seed-{index}", summary, "user_request", question=question,
+            ai_answer="Đây là nội dung minh họa trong môi trường demo.",
+        )
+        if status in {"in_progress", "resolved"}:
+            store.claim(ticket["id"], cfg.staff_username)
+        if status == "resolved":
+            store.resolve(ticket["id"], cfg.staff_username, reply)
 
 
 app = create_app()
