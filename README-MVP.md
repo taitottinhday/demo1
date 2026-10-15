@@ -33,11 +33,20 @@ Sau khi sửa Python hoặc cấu hình `.env`, dừng và chạy lại server �
 | `ANSWER_MODE` | `extractive`; `llm` cần API key |
 | `OPENAI_API_KEY`, `MODEL_NAME` | Chỉ dùng khi bật LLM; không đưa key vào Git |
 | `STAFF_USERNAME`, `STAFF_PASSWORD` | Tài khoản demo; đổi mật khẩu trước khi public |
-| `MVP_DATA_DIR` | `data`; thư mục nguồn và SQLite |
+| `MVP_DATA_DIR` | `data`; thư mục nguồn tuyển sinh và dữ liệu xử lý knowledge |
+| `PERSISTENT_DATA_DIR` | Trống khi local; production phải trỏ tới Railway Volume, ví dụ `/app/state`, để giữ tài khoản, ticket, session và lịch sử |
 | `SESSION_HOURS` | `24`; thời gian phiên ứng viên không hoạt động |
 | `SECURE_COOKIES` | `false` cho local HTTP; `true` cho HTTPS production |
 | `LLM_DAILY_LIMIT`, `LLM_TIMEOUT` | `100` lượt/ngày và `15` giây |
 | `APP_ENV` | `development`; production kiểm tra mật khẩu và cookie |
+
+Các trang cán bộ và admin có nút **Vào thử** trong môi trường `development`/`test`; nút tạo phiên demo để mentor thực hành. API demo trả 404 trong `production`, nơi vẫn yêu cầu đăng nhập tài khoản được cấp.
+
+### Email thông báo phản hồi
+
+Ứng dụng dùng chung nhà cung cấp email đang có: ưu tiên Resend HTTPS (`RESEND_API_KEY`, `RESEND_FROM`), sau đó dùng SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `SMTP_SECURITY`). `PUBLIC_BASE_URL` phải là URL gốc người dùng có thể truy cập; production cần HTTPS. Không commit `.env` hoặc bí mật nhà cung cấp.
+
+Sau khi phản hồi được lưu, tác vụ nền gửi email ngắn đến email hợp lệ đã xác minh của tài khoản sinh viên liên kết với ticket. Email chỉ có mã ticket và đường dẫn đăng nhập; nội dung trao đổi không được đưa vào thư. Cán bộ xem trạng thái gửi tại chi tiết ticket và có thể gửi lại nếu thất bại. Khi không cấu hình provider ở local, phản hồi vẫn được lưu và trạng thái email báo thất bại; test dùng mailer giả, không gửi email thật. Tác vụ nền hiện dùng FastAPI `BackgroundTasks`, chưa có hàng đợi bền vững; nếu tiến trình dừng đột ngột trong lúc gửi, cần kiểm tra trạng thái vận hành trước khi thử lại.
 
 Mặc định `ANSWER_MODE=extractive`: tra cứu đoạn tài liệu thật, có trang nguồn, không gọi LLM và không cần API key. Để bật AI tổng hợp, bổ sung/chỉnh các dòng trong `.env`, rồi khởi động lại:
 
@@ -60,6 +69,41 @@ Không gửi key trong chat hoặc commit `.env`. Chế độ LLM dùng Response
 5. Chuyển cán bộ → sửa nội dung → đồng ý → gửi. Mở `/staff`, đăng nhập → nhận xử lý → phản hồi và đóng.
 6. Quay về ứng viên → **Yêu cầu của tôi → Làm mới** để xem phản hồi. Tải lại trang để kiểm tra dữ liệu còn được lưu.
 
+## Trang quản trị (Admin)
+
+Mở **http://127.0.0.1:8000/admin**, đăng nhập `admin` / `Admin@2026!` (đổi bằng `ADMIN_USERNAME`, `ADMIN_PASSWORD` trong `.env`). Đặc tả đầy đủ ở `ADMIN_SPEC.md`.
+
+- Tài khoản nằm trong bảng `users`. Khi server khởi động, `canbo` (role officer) và `admin` được tạo từ `.env` nếu chưa có. Đổi mật khẩu trong `.env` sau lần chạy đầu không cập nhật tài khoản đã có.
+- `/staff/login` chỉ nhận officer đang hoạt động. `/admin/login` chỉ nhận admin. Hai loại cookie tách riêng.
+- Chức năng: xem và lọc toàn bộ ticket, xem chi tiết kèm hội thoại, nguồn và lịch sử (`ticket_events`). Phân công lại hoặc trả về hàng chờ. Tạo, khóa hoặc mở cán bộ: khóa thì ticket họ đang giữ tự trả về hàng chờ. Có thêm metrics.
+- `ADMIN_STALE_HOURS` (mặc định `24`) là ngưỡng hiển thị "ticket chờ quá lâu".
+- Dữ liệu demo gồm 9 cán bộ demo (cùng tài khoản mặc định `canbo` là khoảng 10 cán bộ), mật khẩu demo `Demo@2026!`, và 50 ticket `TS-DEMO01` đến `TS-DEMO50` đủ trạng thái. Chạy được nhiều lần, không tạo trùng. Trong production chỉ chạy seed có chủ đích bằng `DEMO_SEED_ENABLED=true`:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\seed_admin_demo.py
+```
+
+Kịch bản demo admin, khoảng 2 phút:
+
+1. Tab **Ticket**, lọc "Đang chờ", mở `TS-DEMO01`: xem lý do chuyển, hội thoại và nguồn.
+2. Tab **Tổng quan**: thời gian chờ trung bình, tải từng cán bộ, ticket chờ quá lâu.
+3. Mở `TS-DEMO05`, phân công cho cán bộ khác, rồi xem sự kiện mới trong **Lịch sử**.
+4. Tab **Cán bộ**: khóa Nguyễn Thị Lan. Hộp xác nhận nêu số ticket sẽ về hàng chờ.
+
+Trên Railway, chạy seed sau khi đã gắn Volume `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`:
+
+```sh
+DEMO_SEED_ENABLED=true DEMO_SEED_FAST=true python scripts/seed_admin_demo.py
+```
+
+`DEMO_SEED_FAST=true` chỉ dùng cho dữ liệu kiểm thử, không gọi pipeline trả lời; các ticket được gắn câu trả lời demo rõ ràng và không phải nội dung tuyển sinh chính thức.
+
+Giới hạn hiện tại:
+
+- `confidence_score` luôn `null`.
+- `handover_rate` trả `null` cho đến khi bên AI ghi bảng `chat_logs`.
+- Ticket tạo trước khi có phần admin không có lịch sử và mốc thời gian nhận.
+
 G1 vẫn là hồ sơ thiết kế; bản demo dùng SQLite/BM25 và giao diện web trực tiếp thay cho Next.js/pgvector đề xuất. Code LangGraph mẫu không được gọi trong luồng chat.
 
 ## Hồ sơ Gate 2
@@ -74,7 +118,7 @@ G1 vẫn là hồ sơ thiết kế; bản demo dùng SQLite/BM25 và giao diện
 
 Nguồn chưa được cán bộ HUST duyệt; app là demo của nhóm. Chỉ dùng phạm vi tuyển sinh chính quy từ THPT. Bảng quy đổi chứng chỉ trang 17 dạng ảnh chưa được xác minh; học bổng, hướng dẫn KTX và chuẩn ngoại ngữ đầu ra chưa đủ nguồn.
 
-Phiên ứng viên hết hạn sau 24 giờ không hoạt động; phiên cán bộ 8 giờ. Xóa chat không xóa ticket. Ticket được dọn sau 30 ngày không cập nhật, chỉ phù hợp demo. Dấu phản hồi đã xem lưu trên trình duyệt; thông báo mới chỉ hoạt động khi mở app, không gửi email hoặc push.
+Phiên ứng viên hết hạn sau 24 giờ không hoạt động; phiên cán bộ 8 giờ. Xóa chat không xóa ticket. Ticket được dọn sau 30 ngày không cập nhật, chỉ phù hợp demo. Trạng thái hàng chờ và phản hồi không tự tải lại định kỳ; dùng nút **Làm mới** ở trang cán bộ/admin hoặc trong cửa sổ yêu cầu của sinh viên.
 
 ## Cấu trúc và phân công
 
@@ -110,7 +154,17 @@ Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwrig
 docker compose up --build
 ```
 
-Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. SQLite nằm tại `data/mvp.db`, không đưa dữ liệu ứng viên hoặc `.env` vào Git. Hiện chỉ xác minh chạy local; chưa deploy cloud. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo.
+Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. Ở local, Docker Compose lưu state tại `/app/state` và mount từ `data/state`. Trên Railway, tạo Volume mount tại `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`; giữ `MVP_DATA_DIR=data` để Volume không che các PDF nguồn. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo. Hai nút demo ở trang cán bộ/admin dùng database mẫu riêng tại `PERSISTENT_DATA_DIR/demo/mvp.db`, không truy cập ticket/tài khoản thật và không gửi email.
 
 Nếu nguồn chưa sẵn sàng: kiểm tra `/api/v1/status`, đường dẫn PDF và `sources.md`, rồi khởi động lại. PDF scan cần OCR/duyệt trước lập chỉ mục. Nếu AI lỗi: kiểm tra cấu hình/quota API, hoặc đổi `ANSWER_MODE=extractive`. Nếu đăng nhập lỗi sau deploy HTTPS: kiểm tra cookie Secure và origin.
 
+## Railway persistence
+
+The mutable SQLite state (staff accounts, candidate accounts, tickets, statuses, sessions and audit history) must live on a Railway Volume. Configure the service once:
+
+1. Add a Railway Volume and mount it at `/app/state`.
+2. Set `PERSISTENT_DATA_DIR=/app/state`.
+3. Keep `MVP_DATA_DIR=data`; do not mount the Volume over `/app/data`, because that directory contains the bundled source PDF and `sources.md`.
+4. With one replica, deploy and verify that a test ticket and its status still exist after a restart.
+
+Production now refuses to start without `PERSISTENT_DATA_DIR` or when it points to the knowledge directory. This prevents a deploy from appearing healthy while silently creating a blank database. SQLite on a shared Volume is intended for one replica; use PostgreSQL before scaling horizontally.

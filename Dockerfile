@@ -21,14 +21,21 @@ RUN useradd -m appuser
 # Copy application code
 COPY . .
 
-# Create data directory with correct ownership
-RUN mkdir -p /app/data && chown -R appuser:appuser /app
+# Create source and persistent-state directories with correct ownership. On
+# Railway, mount a Volume at /app/state; source PDFs remain in /app/data.
+RUN mkdir -p /app/data /app/state && chown -R appuser:appuser /app
 
-USER appuser
+# Railway mounts a Volume after the image is built, so its runtime ownership
+# cannot be fixed by the build-time chown above. The entrypoint repairs that
+# ownership before dropping privileges to appuser.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+
+USER root
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.getenv('PORT', '8000') + '/health')" || exit 1
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

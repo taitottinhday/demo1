@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tài khoản học viên · Trợ lý tuyển sinh</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/style.css?v=20261009-2">
+  <link rel="stylesheet" href="/assets/account.css?v=20261009-1"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/login.css?v=20261012-3"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/account.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/login.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/login-fx.js?v=20261012-1" defer></script>
+  <script src="/assets/account.js?v=20261012-1" defer></script>
+</head>
+<body class="account-page auth-page">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Trợ lý tuyển sinh, HUST 2026">
+      <span class="mark" aria-hidden="true"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span>
+      <span class="brand-copy"><span>Trợ lý tuyển sinh</span><small>HUST · 2026</small></span>
+    </a>
+    <nav aria-label="Điều hướng tài khoản"><a class="staff-link" href="/">← Về trang hỏi đáp</a></nav>
+  </header>
+  <main class="account-main">
+    <aside class="auth-hero" aria-hidden="true">
+      <div class="auth-orbs"><span></span><span></span><span></span></div>
+      <div class="auth-hero-inner">
+        <div class="auth-hero-brand"><span class="auth-hero-mark"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span><span>Trợ lý tuyển sinh<small>HUST · 2026</small></span></div>
+        <div class="auth-hero-copy">
+          <p class="auth-hero-kicker">TÀI KHOẢN HỌC VIÊN</p>
+          <h2 class="auth-hero-title">Hành trình vào HUST bắt đầu từ <em>một câu hỏi</em>.</h2>
+          <p class="auth-hero-lead">Đăng nhập để lưu lịch sử hỏi đáp, đồng bộ checklist và theo dõi phản hồi của cán bộ tuyển sinh.</p>
+        </div>
+        <div class="auth-showcase" data-depth="1"><div class="auth-glass auth-chat">
+            <div class="auth-bubble auth-bubble-user" data-rotate-q>Học phí IT1 là bao nhiêu?</div>
+            <div class="auth-bubble auth-bubble-bot"><span class="auth-bot-avatar"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span><span data-rotate-a>Khoảng <b>28–40 triệu đồng/năm</b> với chương trình chuẩn.</span></div>
+            <div class="auth-source" data-rotate-s>Nguồn · PDF trang 20 ↗</div>
+          </div>
+          <div class="auth-glass auth-float-chip" data-depth="2"><span class="auth-dot"></span>Đã đồng bộ lịch sử hỏi đáp</div></div>
+        <ul class="auth-hero-features"><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Câu trả lời kèm trích dẫn PDF gốc</span></li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Đồng bộ checklist giữa các thiết bị</span></li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Theo dõi ticket hỗ trợ mọi lúc</span></li></ul>
+      </div>
+    </aside>
+        <section class="account-card" aria-live="polite">
+      <div class="eyebrow">TÀI KHOẢN HỌC VIÊN</div>
+      <h1 id="auth-title">Chào mừng trở lại</h1>
+      <p id="auth-subtitle" class="account-subtitle">Đăng nhập để tiếp tục hành trình tìm hiểu và ứng tuyển vào HUST.</p>
+      <a id="google-login" class="google-login" href="/api/v1/auth/google/start"><span class="google-mark" aria-hidden="true">G</span><strong>Tiếp tục với Google</strong><span class="login-arrow" aria-hidden="true">›</span></a>
+      <div id="account-divider" class="login-divider"><span>hoặc tiếp tục bằng email</span></div>
+      <div class="account-tabs" id="auth-tabs"><button type="button" class="active" data-view="login">Đăng nhập</button><button type="button" data-view="register">Tạo tài khoản</button></div>
+
+      <form id="login-view" class="account-form auth-view" novalidate>
+        <label for="login-email">Email</label><input id="login-email" name="email" type="email" autocomplete="email" required aria-describedby="login-email-error"><p id="login-email-error" class="field-error" role="alert"></p>
+        <label for="login-password">Mật khẩu</label><input id="login-password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-password-error"><p id="login-password-error" class="field-error" role="alert"></p>
+        <button class="primary" type="submit">Đăng nhập →</button>
+        <button class="text-button" id="forgot-open" type="button">Quên mật khẩu?</button>
+      </form>
+
+      <form id="register-view" class="account-form auth-view" hidden novalidate>
+        <label for="register-name">Họ và tên</label><input id="register-name" name="name" autocomplete="name" maxlength="120" aria-describedby="register-name-error"><p id="register-name-error" class="field-error" role="alert"></p>
+        <label for="register-email">Email</label><input id="register-email" name="email" type="email" autocomplete="email" required aria-describedby="register-email-error"><p id="register-email-error" class="field-error" role="alert"></p>
+        <label for="register-password">Mật khẩu <span class="field-note">tối thiểu 10 ký tự</span></label><input id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" required aria-describedby="register-password-error"><p id="register-password-error" class="field-error" role="alert"></p>
+        <button class="primary" type="submit">Tạo tài khoản →</button>
+      </form>
+
+      <form id="verify-view" class="account-form auth-view" hidden novalidate>
+        <p class="code-note">Mã 6 số đã được gửi đến <strong id="verify-email-label"></strong>.</p><p id="verify-otp-meta" class="otp-meta" role="status"></p>
+        <label for="verify-code">Mã xác nhận</label><input id="verify-code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required aria-describedby="verify-code-error"><p id="verify-code-error" class="field-error" role="alert"></p>
+        <button class="primary" type="submit">Xác nhận email →</button>
+        <button class="text-button" id="resend-code" type="button" disabled>Gửi lại mã</button>
+      </form>
+
+      <form id="forgot-view" class="account-form auth-view" hidden novalidate>
+        <p class="code-note">Nhập email đã đăng ký để nhận mã đặt lại mật khẩu.</p>
+        <label for="forgot-email">Email</label><input id="forgot-email" name="email" type="email" autocomplete="email" required aria-describedby="forgot-email-error"><p id="forgot-email-error" class="field-error" role="alert"></p>
+        <button class="primary" type="submit">Gửi mã đặt lại →</button>
+      </form>
+
+      <form id="reset-view" class="account-form auth-view" hidden novalidate>
+        <p id="reset-otp-meta" class="otp-meta" role="status"></p>
+        <label for="reset-email">Email</label><input id="reset-email" name="email" type="email" autocomplete="email" required aria-describedby="reset-email-error"><p id="reset-email-error" class="field-error" role="alert"></p>
+        <label for="reset-code">Mã đặt lại</label><input id="reset-code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required aria-describedby="reset-code-error"><p id="reset-code-error" class="field-error" role="alert"></p>
+        <label for="reset-password">Mật khẩu mới <span class="field-note">tối thiểu 10 ký tự</span></label><input id="reset-password" name="password" type="password" autocomplete="new-password" minlength="10" required aria-describedby="reset-password-error"><p id="reset-password-error" class="field-error" role="alert"></p>
+        <button class="primary" type="submit">Đổi mật khẩu →</button>
+        <button class="text-button" id="resend-reset-code" type="button" disabled>Gửi lại mã</button>
+      </form>
+
+      <p id="auth-feedback" class="error-text" role="alert"></p>
+      <p id="auth-switch" class="auth-switch">Chưa có tài khoản? <button id="register-link" type="button">Tạo tài khoản miễn phí</button></p>
+      <div class="security-note"><span class="security-icon" aria-hidden="true">♧</span><div><strong>Dữ liệu đăng nhập được bảo vệ</strong><small>Mật khẩu được mã hóa và mã OTP không được lưu dưới dạng nguyên văn.</small></div></div>
+      <p class="account-footnote">Bạn chỉ cần email đã xác nhận để sử dụng tài khoản. Tiến độ checklist sẽ được đồng bộ sau khi đăng nhập; không gửi CCCD hoặc thông tin nhạy cảm vào khung hỏi đáp.</p>
+    </section>
+  </main>
+</body>
+</html>

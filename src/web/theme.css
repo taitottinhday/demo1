@@ -1,0 +1,113 @@
+/* Theme switch UI + dark-mode refinements shared by all pages.
+   Generated colour overrides live in *.dark.css (scripts/build_dark_theme.py). */
+
+html[data-theme="dark"]{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
+
+/* ---------- Theme switch (light/dark toggle) ---------- */
+.theme-switch{
+  flex:0 0 auto;display:inline-flex;align-items:center;padding:0;border:0;border-radius:999px;background:transparent;cursor:pointer;
+  -webkit-tap-highlight-color:transparent
+}
+.theme-track{
+  position:relative;display:block;width:58px;height:30px;border:1px solid #e3e0da;border-radius:999px;
+  background:linear-gradient(180deg,#fff7e8,#ffe9c7);box-shadow:inset 0 1px 2px #14213d14;
+  transition:background .45s ease,border-color .45s ease,box-shadow .3s
+}
+.theme-switch:hover .theme-track{box-shadow:inset 0 1px 2px #14213d14,0 0 0 4px #c8102e14}
+.theme-switch svg{
+  position:absolute;top:50%;width:15px;height:15px;margin-top:-7.5px;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+  transition:opacity .35s,transform .5s cubic-bezier(.34,1.56,.64,1)
+}
+.theme-sun{left:8px;stroke:#d97706}
+.theme-moon{right:8px;stroke:#94a3b8;opacity:.55}
+.theme-knob{
+  position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#fde68a 60%,#f59e0b);box-shadow:0 2px 6px #b4530966,0 0 0 1px #f59e0b33;
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .45s ease,box-shadow .45s ease
+}
+.theme-switch:active .theme-knob{width:28px}
+/* Dark state: knob slides right and turns into a moon. */
+.theme-switch[aria-checked="true"] .theme-track{
+  border-color:#3b4152;background:linear-gradient(180deg,#1e2433,#2b3247);box-shadow:inset 0 1px 3px #0008
+}
+.theme-switch[aria-checked="true"] .theme-knob{
+  transform:translateX(28px);background:radial-gradient(circle at 65% 35%,#f8fafc,#cbd5e1 70%,#94a3b8);
+  box-shadow:0 2px 8px #0009,0 0 12px #c7d2fe55
+}
+.theme-switch[aria-checked="true"]:active .theme-knob{transform:translateX(24px)}
+.theme-switch[aria-checked="true"] .theme-sun{opacity:.45;transform:rotate(-90deg) scale(.8);stroke:#94a3b8}
+.theme-switch[aria-checked="true"] .theme-moon{opacity:0;transform:rotate(40deg) scale(.6)}
+.theme-switch:not([aria-checked="true"]) .theme-moon{transform:none}
+.theme-switch:focus-visible{outline:3px solid #c8102e55;outline-offset:3px}
+
+/* Applicant phone header: slightly smaller switch. */
+@media(max-width:600px){
+  .applicant-page .theme-track{width:50px;height:26px}
+  .applicant-page .theme-knob{width:20px;height:20px}
+  .applicant-page .theme-switch[aria-checked="true"] .theme-knob{transform:translateX(24px)}
+  .applicant-page .theme-switch svg{width:13px;height:13px;margin-top:-6.5px}
+  .applicant-page .theme-sun{left:6px}.applicant-page .theme-moon{right:6px}
+}
+
+/* ---------- Switch animation ---------- */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){z-index:2}
+html.theme-animating *,html.theme-animating *::before,html.theme-animating *::after{
+  transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease!important
+}
+
+/* ---------- Dark refinements ---------- */
+html[data-theme="dark"] body{
+  --shadow-sm:0 1px 2px #0006;
+  --shadow-md:0 8px 24px -8px #000a,0 2px 6px -2px #0006;
+  --shadow-brand:0 10px 26px -10px #c8102eaa
+}
+html[data-theme="dark"] body.applicant-page,html[data-theme="dark"] body.auth-page{background-color:#17191e}
+/* Browser autofill keeps a light-blue fill otherwise. */
+html[data-theme="dark"] input:-webkit-autofill,
+html[data-theme="dark"] input:-webkit-autofill:hover,
+html[data-theme="dark"] input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#e6e8ed;caret-color:#e6e8ed;
+  -webkit-box-shadow:0 0 0 1000px #23262e inset;transition:background-color 9999s
+}
+html[data-theme="dark"] ::placeholder{color:#7d8496}
+html[data-theme="dark"] ::selection{background:#c8102e66;color:#fff}
+
+/* Applicant: chat canvas dots and bubbles */
+html[data-theme="dark"] .applicant-page .chat-shell{
+  background:
+    radial-gradient(900px 420px at 100% 0,#c8102e1f,transparent 60%),
+    radial-gradient(#ffffff10 1px,transparent 1px) 0 0/22px 22px,
+    #17191e
+}
+html[data-theme="dark"] .applicant-page .demo-answer strong,
+html[data-theme="dark"] .applicant-page .welcome-title span{color:#f3687f}
+html[data-theme="dark"] .applicant-page .welcome-title span{
+  background:linear-gradient(90deg,#ff5a75,#ff9aa9,#f3687f,#ff5a75);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+
+/* Login: right column backdrop + hero tuned for dark surroundings */
+html[data-theme="dark"] body.auth-page .account-main,
+html[data-theme="dark"] body.auth-page .staff-main:has(> .login-panel:not([hidden])){
+  background:radial-gradient(#ffffff0d 1px,transparent 1px) 0 0/22px 22px,#17191e
+}
+html[data-theme="dark"] .auth-hero{
+  background:linear-gradient(135deg,#b3132f 0%,#8f0c22 35%,#5a0716 70%,#2a030a 100%);background-size:220% 220%;
+  box-shadow:0 30px 60px -30px #000
+}
+html[data-theme="dark"] .auth-bubble-user,html[data-theme="dark"] .auth-float-chip{background:#fff;color:#86091e}
+html[data-theme="dark"] .auth-float-chip{color:#14213d}
+html[data-theme="dark"] .auth-hero-mark,html[data-theme="dark"] .auth-bot-avatar{background:#fff;color:#c8102e}
+/* HUST logo replaces the "X" text mark on every page */
+.mark:has(.brand-logo),.welcome-mark:has(.brand-logo){width:auto!important;height:auto!important;background:none!important;box-shadow:none!important;border:0!important;border-radius:0!important;letter-spacing:0!important}
+.welcome-mark:has(.brand-logo)::before,.welcome-mark:has(.brand-logo)::after{display:none}
+.auth-hero-mark:has(.brand-logo){width:auto!important;height:auto!important;padding:5px 7px;background:#fff!important}
+.brand-logo{display:block;width:auto;max-width:none}
+.mark .brand-logo{height:40px}
+.welcome-mark .brand-logo{height:84px}
+.auth-hero-mark .brand-logo{height:38px}
+@media (max-width:720px){.mark .brand-logo{height:32px}.welcome-mark .brand-logo{height:64px}}
+.from-ai .convo-avatar:has(.brand-logo),.auth-bot-avatar:has(.brand-logo),html[data-theme="dark"] .from-ai .convo-avatar:has(.brand-logo),html[data-theme="dark"] .auth-bot-avatar:has(.brand-logo){background:#fff!important;padding:3px;box-sizing:border-box}
+.convo-avatar .brand-logo,.auth-bot-avatar .brand-logo{height:100%;width:auto;max-height:28px}

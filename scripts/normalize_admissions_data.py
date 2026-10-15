@@ -86,6 +86,15 @@ def issue(kind, source_id, page, detail):
 
 
 def source_kind(filename):
+    aliases = {
+        "english_k71_2026.pdf": "language",
+        "tuition_2026_2027.pdf": "tuition",
+        "admission_regulation_2026.pdf": "regulations",
+        "talent_admission_2026.pdf": "talent",
+        "tsa_regulation_2026.pdf": "tsa",
+    }
+    if filename in aliases:
+        return aliases[filename]
     if filename.startswith("00_"):
         return "language"
     if filename.startswith("12006"):
@@ -102,7 +111,14 @@ def source_kind(filename):
 def sources():
     content = (DATA / "sources.md").read_text(encoding="utf-8-sig")
     result = []
+    seen_checksums = set()
     for path in sorted((DATA / "raw").glob("*.pdf")):
+        checksum = hashlib.sha256(path.read_bytes()).hexdigest()
+        # The merged branches keep legacy and runtime names for the same PDFs.
+        # Preserve existing snapshot paths while extracting each document once.
+        if checksum in seen_checksums:
+            continue
+        seen_checksums.add(checksum)
         kind = source_kind(path.name)
         entries = re.split(r"(?=Tên tài liệu:)", content)
         matched = next((part for part in entries if "raw/" + path.name in part), "")
@@ -117,7 +133,7 @@ def sources():
                 "local_path": path.relative_to(DATA).as_posix(),
                 "url_original": url,
                 "url": canonical,
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "sha256": checksum,
                 "cohort": "K71",
                 "admission_year": 2026,
                 "applicability_status": "confirmed_by_project_owner",
@@ -148,7 +164,7 @@ def sources():
     # Web URLs are registered as gaps, not silently represented as downloaded evidence.
     web = []
     for part in re.split(r"(?=Tên tài liệu:)", content):
-        if "Tên tài liệu:" not in part or "File tương ứng:" in part:
+        if "Tên tài liệu:" not in part or re.search(r"File tương ứng:\s*raw/", part):
             continue
         match = re.search(r"URL chính thức:\s*(https://\S+)", part)
         if match and not any(row["url"] == match.group(1) for row in web):

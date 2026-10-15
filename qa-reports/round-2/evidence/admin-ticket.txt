@@ -1,0 +1,11 @@
+Production page: /admin -> Ticket -> status “Đã giải quyết” -> QA_TEST record
+Observed at: 2026-10-10 13:12:18 Asia/Ho_Chi_Minh
+Ticket: TS-AC57CE06
+Status: Đã giải quyết
+Question: IT2 có chỉ tiêu bao nhiêu?
+Existing AI answer: mã IT2 = CNTT: Kỹ thuật Máy tính; chỉ tiêu 2026 = 200.
+Citation: Thông tin tuyển sinh Đại học năm 2026, PDF trang 10.
+Staff response: Theo tài liệu Thông tin tuyển sinh Đại học năm 2026, chỉ tiêu của mã IT2 (CNTT: Kỹ thuật Máy tính) là 200. Thí sinh vui lòng đối chiếu tài liệu tuyển sinh chính thức nếu có cập nhật mới.
+History: created -> claimed -> replied -> resolved. One reply and one resolution observed.
+
+Applicant-owned session is not available in the open browser tabs; applicant visibility remains unverified.

@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/staff", "destination": "/staff.html" },
+    { "source": "/staff/activate", "destination": "/staff-activate.html" },
+    { "source": "/staff/reset", "destination": "/staff-activate.html" },
+    { "source": "/account", "destination": "/account.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/assets/:path*", "destination": "/:path*" },
+    {
+      "source": "/api/:path*",
+      "destination": "https://demo1-production-f54e.up.railway.app/api/:path*"
+    }
+  ]
+}

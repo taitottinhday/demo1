@@ -27,3 +27,19 @@
 ---
 
 <!-- Format: copy block trên cho mỗi ngày làm việc -->
+
+## [2026-10-10]
+
+| Member | Task | Status | Output | Time |
+|--------|------|--------|--------|------|
+| Codex | QA vòng 2 production cho Trợ lý tuyển sinh X; xử lý ticket QA_TEST sau khi người dùng xác nhận; lập ma trận AI, test case, báo cáo UI/data/security/E2E | ✅ Hoàn thành audit; không sửa mã sản phẩm. Kết luận NO-GO do thiếu độ phủ và full suite còn 1 test đỏ | `qa-reports/round-2/ROUND2_EXECUTIVE_SUMMARY.md`; E2E cán bộ/admin đã xác nhận phản hồi và trạng thái; chưa xác minh được phiên thí sinh sở hữu ticket | — |
+
+**Tổng kết ngày:** Đã ghi nhận 52 ca chức năng (26 PASS, 3 PARTIAL, 1 BLOCKED, 2 FAIL, 20 NOT_TESTED) và 150 câu AI, trong đó 145 câu chưa chạy. Báo cáo cùng bằng chứng đã được push lên hai remote; push hook không tìm thấy Phoenix/Antigravity log để gửi.
+
+## [2026-10-15]
+
+| Member | Task | Status | Output | Time |
+|--------|------|--------|--------|------|
+| Codex | Gỡ tự làm mới định kỳ; sửa responsive mobile; bổ sung thông báo email an toàn sau phản hồi ticket; mở lối vào demo cán bộ/admin cho môi trường dev/test; thêm kiểm thử và tài liệu | ✅ Hoàn tất mã; kiểm tra tĩnh và 3 test đơn vị PASS. Test HTTP dừng ở fixture `AsyncClient`; chưa commit/push/deploy | `src/web/app.js`, `src/web/staff.js`, `src/web/admin.js`, `src/api/routes.py`, `src/services/store.py`, `src/services/email.py`, `tests/test_api/test_mvp.py`, `README-MVP.md` | — |
+
+**Tổng kết ngày:** Thay đổi chưa được push. Email dùng chung Resend/SMTP hiện có; kiểm thử chỉ dùng mailer giả hoặc không cấu hình provider, không gửi thư thật. Lệnh pytest cho test API chờ trước thân test khi fixture mở `httpx.AsyncClient`; test mẫu email, outbox/retry và production guard đã PASS; Ruff và compileall sạch.

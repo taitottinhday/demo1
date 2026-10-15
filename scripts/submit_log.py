@@ -14,20 +14,22 @@ import os
 import shutil
 import sys
 import time
-import urllib.request
 import urllib.error
-from datetime import datetime, timezone
+import urllib.request
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
 except ImportError:
     pass
 
+ROOT = Path(__file__).resolve().parent.parent
 SERVER_URL = os.environ.get("AI_LOG_SERVER", "")
 API_KEY = os.environ.get("AI_LOG_API_KEY", "")
-LOG_DIR = Path(os.environ.get("AI_LOG_DIR", ".ai-log"))
+_configured_log_dir = Path(os.environ.get("AI_LOG_DIR", ".ai-log"))
+LOG_DIR = _configured_log_dir if _configured_log_dir.is_absolute() else ROOT / _configured_log_dir
 LOG_FILE = LOG_DIR / "session.jsonl"
 ARCHIVE_DIR = LOG_DIR / "archive"
 
@@ -35,6 +37,38 @@ ARCHIVE_DIR = LOG_DIR / "archive"
 # If the local file has more than this, we submit the oldest BATCH_LIMIT
 # and leave the rest for the next push.
 BATCH_LIMIT = 500
+STALE_PENDING_SECONDS = 30
+
+
+def _recover_stale_pending() -> None:
+    """Recover abandoned batches left by a crashed/offline submit process."""
+    if not LOG_DIR.exists():
+        return
+    now = time.time()
+    stale = []
+    for pending in sorted(LOG_DIR.glob("session.pending.*.jsonl")):
+        try:
+            if now - pending.stat().st_mtime >= STALE_PENDING_SECONDS:
+                stale.append(pending)
+        except FileNotFoundError:
+            continue
+    if not stale:
+        return
+
+    recovered = LOG_FILE.with_name("session.recovered.jsonl")
+    with open(recovered, "wb") as out:
+        for pending in stale:
+            with open(pending, "rb") as src:
+                shutil.copyfileobj(src, out)
+        if LOG_FILE.exists():
+            with open(LOG_FILE, "rb") as src:
+                shutil.copyfileobj(src, out)
+    os.replace(recovered, LOG_FILE)
+    for pending in stale:
+        try:
+            pending.unlink()
+        except FileNotFoundError:
+            pass
 
 
 def _archive(pending: Path) -> None:
@@ -42,7 +76,7 @@ def _archive(pending: Path) -> None:
     if not pending.exists() or pending.stat().st_size == 0:
         return
     ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(UTC).strftime("%Y-%m-%d")
     archive_file = ARCHIVE_DIR / f"{today}.jsonl"
     with open(pending, "rb") as src, open(archive_file, "ab") as dst:
         shutil.copyfileobj(src, dst)
@@ -68,6 +102,8 @@ def _restore_pending(pending: Path) -> None:
 
 
 def main():
+    _recover_stale_pending()
+
     if not SERVER_URL:
         print("[ai-log] AI_LOG_SERVER not set — skipping submission.", file=sys.stderr)
         sys.exit(0)

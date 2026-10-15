@@ -1,53 +1,70 @@
 Trường: Đại học Bách khoa Hà Nội
 Kỳ tuyển sinh: 2026
-Phạm vi: Đại học chính quy/sau đại học
+Phạm vi: Tuyển sinh đại học chính quy năm 2026. Tài liệu bổ trợ về XTTN, học phí năm học 2026–2027 và quy định ngoại ngữ dành cho sinh viên K71 trở đi được ghi phạm vi riêng bên dưới.
 
+# Nguồn chính và nguồn bổ trợ được ứng dụng hiện tại nạp
 Tên tài liệu: Thông tin tuyển sinh Đại học năm 2026
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2023_06/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
 File tương ứng: raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
 Kỳ áp dụng: 2026
+Trạng thái: PDF 51 trang; nguồn chính của bộ nạp hiện tại.
 
-
-Tên tài liệu: Điểm chuẩn Đại học Bách khoa năm 2026
-URL chính thức: https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026
-Kỳ áp dụng: 2026
-Ghi chú: Dữ liệu có trong trang web và ảnh trên web, điểm chuẩn của năm 2024 và 2025 đã có ở file raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf
-
-
-Tên tài liệu: Quy định chuẩn ngoại ngữ 2026 (PDF)
-URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf
-File tương ứng: raw/00_ Quy định ngoại ngữ K71_final_đã ký.pdf
-Ngày ban hành: Ngày 07/09/2026
-Hiệu lực: Từ năm học 2025-2026
-Đối tượng áp dụng: Sinh viên đại học hệ chính quy từ K71
-
-
+# Nguồn dữ liệu bổ trợ đã tải và kiểm tra
 Tên tài liệu: Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf
-File tương ứng: raw/4740_qd-dhbk-qcts.pdf
+File tương ứng: raw/admission_regulation_2026.pdf
+Bản sao tương thích pipeline data (cùng SHA256): raw/4740_qd-dhbk-qcts.pdf
 Kỳ áp dụng: 2026
+Phạm vi: Quy chế tuyển sinh; có các điều khoản cho từng hình thức đào tạo và đối tượng.
 
-Tên tài liệu: Quy định về Phương thức XTTN năm 2026
+Tên tài liệu: Quy định về Phương thức xét tuyển tài năng (XTTN) năm 2026
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf
-File tương ứng: raw/qui-dinh-ve-xttn-nam-2026-ky.pdf
+File tương ứng: raw/talent_admission_2026.pdf
+Bản sao tương thích pipeline data (cùng SHA256): raw/qui-dinh-ve-xttn-nam-2026-ky.pdf
 Kỳ áp dụng: 2026
+Phạm vi: Thí sinh đăng ký chương trình đại học chính quy bằng phương thức XTTN.
 
-Tên tài liệu: Quy chế thi ĐGTD của ĐHBK Hà Nội
+Tên tài liệu: Quy định chuẩn ngoại ngữ cho sinh viên đại học chính quy
+URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf
+File tương ứng: raw/english_k71_2026.pdf
+Bản sao tương thích pipeline data (cùng SHA256): raw/00_ Quy định ngoại ngữ K71_final_đã ký.pdf
+Ngày trên tài liệu: 2026; ngày 07/09/2026 trong manifest nhóm cung cấp chưa được xác minh độc lập từ phần trích xuất.
+Hiệu lực: Học kỳ 1 năm học 2026–2027 với sinh viên từ khóa K71; điều khoản quy đổi chứng chỉ có ngoại lệ cho khóa trước.
+Phạm vi: Chính sách học ngoại ngữ và chuẩn đầu ra cho sinh viên đang học; không dùng làm quy định tuyển sinh chung cho thí sinh.
+
+Tên tài liệu: Quy chế thi Đánh giá tư duy (TSA) của Đại học Bách khoa Hà Nội
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2025_06/quy-che-tsa-10461qd.pdf
-File tương ứng: raw/quy-che-tsa-10461qd.pdf
-Kỳ áp dụng: 2026
+File tương ứng: raw/tsa_regulation_2026.pdf
+Bản sao tương thích pipeline data (cùng SHA256): raw/quy-che-tsa-10461qd.pdf
+Kỳ tham khảo: 2026
+Trạng thái: 19 trang; tệp là bản scan không có lớp văn bản trích xuất được. Chưa dùng làm nguồn trả lời trước khi OCR và đối chiếu thủ công.
 
+Tên tài liệu: Mức học phí năm học 2026–2027
+URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf
+File tương ứng: raw/tuition_2026_2027.pdf
+Bản sao tương thích pipeline data (cùng SHA256): raw/12006_QĐ-ĐHBK.pdf
+Kỳ áp dụng: Năm học 2026–2027
+Phạm vi: Có mức học phí theo tín chỉ học phí, một số mức khác cho học kỳ hè, vừa làm vừa học và sau đại học. Không suy ra tổng năm học nếu chưa biết số tín chỉ học phí đăng ký.
 
-Tên tài liệu: Học phí Đại học năm 2026
-URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf?fbclid=IwY2xjawU1QRtleHRuA2FlbQIxMABwZG9mAWJyaWQRMUYzeVplQnZDT1hreWhvQVhzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEebOKfoZXNiTGGBA0pJfSWAk5V5Qyib1RwPXCg5H6iRbnYzp6_l4Nv8HPF0ow_aem_fQL0dktj9swYfzuqA0jvnA
-File tương ứng: raw/12006_QĐ-ĐHBK.pdf
-Kỳ áp dụng: 2026
+# Nguồn trực tuyến chưa lưu bản nội dung cục bộ đầy đủ
+Tên tài liệu: Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026
+URL chính thức: https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026
+File tương ứng: Không có PDF cục bộ; chỉ lưu một số dữ kiện tóm tắt đã đối chiếu với trang chính thức.
+Phạm vi: Điểm thi tốt nghiệp THPT năm 2026; bảng đầy đủ có phần trình bày dạng ảnh nên tập dữ liệu chuẩn hóa chỉ ghi những điểm được nêu rõ trong nội dung trang.
 
-
-Tên tài liệu: Học bổng năm 2026
+Tên tài liệu: Trang thông tin học bổng sinh viên
 URL chính thức: https://ctsv.hust.edu.vn/so-tay-sv/61/hoc-bong
-Kỳ áp dụng: 2026
-Ghi chú: Dữ liệu có trên web, chi tiết quy định từng học bổng ở link trong web.
+File tương ứng: Không có bản tải cục bộ; trang có liên kết tới quy định từng học bổng.
+Phạm vi: Chưa đủ dữ liệu ngoại tuyến để kết luận điều kiện hoặc mức của một học bổng cụ thể.
 
+Ghi chú vận hành: Runtime đọc toàn bộ PDF cục bộ có lớp văn bản đã kiểm tra và nạp các dữ kiện đã chuẩn hóa trong `normalized/admissions_facts_2026.json`. Khi trả lời, mỗi trích dẫn giữ đúng nguồn và số trang; dữ kiện web không có trang PDF thì dẫn về URL chính thức. Nguồn chỉ có bản tóm tắt chỉ hỗ trợ đúng các dữ kiện đã chuẩn hóa, không được suy rộng thành bảng đầy đủ.
 
+Giới hạn cần giữ để tránh trả lời sai:
+- PDF quy chế TSA là bản scan chưa có lớp văn bản OCR đã kiểm chứng, vì vậy chưa dùng để trả lời nội dung chi tiết.
+- Bài điểm chuẩn 2026 có phần bảng dạng ảnh; chỉ trả lời chương trình/phương thức đã được ghi chính xác trong dữ liệu chuẩn hóa. Mã chưa có dữ kiện phải được báo chưa đủ nguồn.
+- Trang học bổng trực tuyến hiện chỉ được catalog hóa; chưa có nội dung điều kiện/mức học bổng cụ thể được xác minh trong bộ dữ liệu này.
 
+# Tích hợp nhánh data và ứng dụng
+Các tên PDF cũ được giữ để bảo toàn đường dẫn bằng chứng của snapshot `k71-2026-v1`; ứng dụng dùng tên trong `source_catalog.json`. Pipeline data loại bản trùng theo SHA256. Không cộng các bản sao thành nguồn mới.
+
+Dữ liệu OCR của nhánh data nằm trong `extracted/`, có trạng thái cần đối chiếu; runtime trên main chưa dùng dữ liệu OCR này. Các file `normalized/records.jsonl` và `processed/chunks.jsonl` thuộc snapshot data, còn runtime hiện đọc `normalized/admissions_facts_2026.json`. Hai bộ chưa được nối bằng adapter.

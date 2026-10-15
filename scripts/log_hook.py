@@ -5,17 +5,67 @@ Reads JSON from stdin, normalizes to common format, appends to .ai-log/session.j
 """
 import json
 import os
-import sys
+import re
 import subprocess
-from datetime import datetime, timezone, timedelta
+import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from auto_submit import submit_if_enabled
+
+ROOT = Path(__file__).resolve().parent.parent
 VN_TZ = timezone(timedelta(hours=7))
+
+_SENSITIVE_KEY = re.compile(
+    r"(?i)(api[_-]?key|access[_-]?token|auth(?:orization)?|cookie|password|secret|session|request[_-]?key|refresh[_-]?token|private[_-]?key)"
+)
+_SECRET_TEXT = re.compile(
+    r"(?i)(bearer\s+|sk-[a-z0-9_-]{12,}|(?:api[_-]?key|access[_-]?token|password|secret|token)\s*[:=]\s*)([^\s,;]+)"
+)
+_EMAIL_TEXT = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
+_PHONE_TEXT = re.compile(r"(?<!\d)(?:\+?\d[\d .()\-]{7,}\d)(?!\d)")
+
+
+def _redact_text(value: object, limit: int = 1000) -> str:
+    """Return a short, safe summary without credentials or direct identifiers."""
+    text = str(value or "")
+    text = _SECRET_TEXT.sub(lambda match: f"{match.group(1)}[REDACTED]", text)
+    text = _EMAIL_TEXT.sub("[REDACTED_EMAIL]", text)
+    text = _PHONE_TEXT.sub("[REDACTED_PHONE]", text)
+    return text[:limit]
+
+
+def _sanitize(value: object, depth: int = 0) -> object:
+    """Recursively remove sensitive fields before a tool payload is logged."""
+    if depth > 4:
+        return "[TRUNCATED]"
+    if isinstance(value, dict):
+        return {
+            str(key): "[REDACTED]" if _SENSITIVE_KEY.search(str(key)) else _sanitize(item, depth + 1)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_sanitize(item, depth + 1) for item in value[:30]]
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return _redact_text(value) if isinstance(value, str) else value
+    return _redact_text(value)
+
+
+def _safe_summary(value: object, limit: int = 1000) -> str:
+    sanitized = _sanitize(value)
+    if isinstance(sanitized, str):
+        return sanitized[:limit]
+    try:
+        return json.dumps(sanitized, ensure_ascii=False, separators=(",", ":"))[:limit]
+    except (TypeError, ValueError):
+        return _redact_text(sanitized, limit)
 
 
 def git(cmd):
     try:
-        return subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            cmd, shell=True, cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except Exception:
         return ""
 
@@ -70,16 +120,14 @@ def normalize(data: dict, tool: str) -> dict | None:
         "ts": ts,
         "tool": tool,
         "event": event,
-        "session_id": (
-            data.get("session_id") or
-            data.get("conversation_id") or
-            data.get("generation_id") or ""
-        ),
+        # Session/conversation identifiers are deliberately not persisted.
+        "session_id": "",
         "model": data.get("model", ""),
         "repo": repo,
         "branch": git("git rev-parse --abbrev-ref HEAD"),
         "commit": git("git rev-parse --short HEAD"),
-        "student": git("git config user.email"),
+        # Keep the required field shape without storing a user's email.
+        "student": "configured" if git("git config user.email") else "",
     }
 
     if tool == "claude":
@@ -91,16 +139,16 @@ def normalize(data: dict, tool: str) -> dict | None:
         elif isinstance(data.get("tool_input"), dict):
             prompt = data["tool_input"].get("prompt") or data["tool_input"].get("content") or ""
         base.update({
-            "prompt": prompt,
+            "prompt": _redact_text(prompt),
             "tool_name": data.get("tool_name", ""),
-            "tool_input": data.get("tool_input") if event != "UserPromptSubmit" else None,
-            "tool_response": str(data.get("tool_response", ""))[:500],
+            "tool_input_summary": _safe_summary(data.get("tool_input")) if event != "UserPromptSubmit" else "",
+            "tool_response_summary": _safe_summary(data.get("tool_response"), 500),
         })
 
     elif tool == "gemini":
         if event == "BeforeAgent":
             prompt = data.get("prompt", "")[:1000]
-            base.update({"prompt": prompt})
+            base.update({"prompt": _redact_text(prompt)})
         else:
             req = data.get("request", {})
             contents = req.get("contents", [])
@@ -118,26 +166,27 @@ def normalize(data: dict, tool: str) -> dict | None:
                 answer = resp["candidates"][0]["content"]["parts"][0]["text"][:500]
             except Exception:
                 pass
-            base.update({"prompt": prompt, "response_summary": answer})
+            base.update({"prompt": _redact_text(prompt), "response_summary": _redact_text(answer, 500)})
 
     elif tool == "codex":
         base.update({
-            "prompt": data.get("prompt", "")[:1000],
-            "turn_id": data.get("turn_id", ""),
-            "transcript_path": data.get("transcript_path", ""),
+            "prompt": _redact_text(data.get("prompt", "")),
+            "tool_name": data.get("tool_name", data.get("toolName", "")),
+            "tool_input_summary": _safe_summary(data.get("tool_input", data.get("tool_input_summary", ""))),
+            "tool_output_summary": _safe_summary(data.get("tool_output", data.get("tool_response", "")), 500),
         })
 
     elif tool == "cursor":
         base.update({
-            "prompt": data.get("prompt", "")[:1000],
-            "files_context": data.get("attachments", []),
+            "prompt": _redact_text(data.get("prompt", "")),
+            "files_context": _safe_summary(data.get("attachments", [])),
         })
 
     elif tool == "copilot":
         base.update({
-            "prompt": data.get("prompt", "")[:1000],
+            "prompt": _redact_text(data.get("prompt", "")),
             "tool_name": data.get("toolName", ""),
-            "tool_args": data.get("toolArgs"),
+            "tool_args_summary": _safe_summary(data.get("toolArgs")),
         })
 
     # Skip only true noise: no prompt AND no tool-specific payload (tool_input,
@@ -145,11 +194,11 @@ def normalize(data: dict, tool: str) -> dict | None:
     # this only checked `prompt`, which dropped Claude Bash/Edit events (their
     # tool_input has `command` / `file_path`, not `prompt` or `content`) and
     # any Gemini/Cursor/Copilot turn that carried context but no plain prompt.
-    _PAYLOAD_KEYS = ("prompt", "tool_input", "response_summary",
-                     "tool_response", "tool_args", "files_context")
-    _LIFECYCLE_EVENTS = ("Stop", "stop", "SessionEnd", "sessionEnd", "AfterModel")
-    has_payload = any(base.get(k) for k in _PAYLOAD_KEYS)
-    if not has_payload and event not in _LIFECYCLE_EVENTS:
+    payload_keys = ("prompt", "tool_input_summary", "tool_output_summary",
+                    "tool_response_summary", "response_summary", "tool_args_summary", "files_context")
+    lifecycle_events = ("Stop", "stop", "SessionEnd", "sessionEnd", "AfterModel")
+    has_payload = any(base.get(k) for k in payload_keys)
+    if not has_payload and event not in lifecycle_events:
         return None
 
     return base
@@ -173,12 +222,19 @@ def main():
     if not entry:
         sys.exit(0)
 
-    log_dir = Path(os.environ.get("AI_LOG_DIR", ".ai-log"))
+    configured_log_dir = Path(os.environ.get("AI_LOG_DIR", ".ai-log"))
+    log_dir = configured_log_dir if configured_log_dir.is_absolute() else ROOT / configured_log_dir
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / "session.jsonl"
 
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    # Tool events can be frequent. They are flushed in batches at Stop/
+    # SessionEnd; prompt/manual events still trigger the existing best-effort
+    # background submit immediately.
+    if entry.get("event") not in {"PostToolUse", "postToolUse"}:
+        submit_if_enabled()
 
     # Codex requires a response matching its hook schema.
     print(json.dumps({} if tool == "codex" else {"status": "logged"}))

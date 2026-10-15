@@ -1,4 +1,130 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cán bộ tuyển sinh · Trợ lý X</title><link rel="stylesheet" href="/assets/style.css"><script src="/assets/staff.js" defer></script></head><body>
-<header class="topbar"><a class="brand" href="/"><span class="mark">X<span>✦</span></span><span>Trợ lý tuyển sinh <b>X</b><small>KHÔNG GIAN CÁN BỘ</small></span></a><nav><a class="staff-link" href="/">← Về trang ứng viên</a><button class="nav-link" id="logout" hidden>Đăng xuất</button></nav></header>
-<main class="staff-main"><section id="login-panel" class="login-panel"><div class="eyebrow">CỔNG CÁN BỘ TUYỂN SINH</div><h1>Đăng nhập cán bộ</h1><p>Đăng nhập để xem hàng chờ và phản hồi yêu cầu của ứng viên.</p><form id="login-form"><label for="username">Tài khoản</label><input id="username" autocomplete="username" required><label for="password">Mật khẩu</label><input type="password" id="password" autocomplete="current-password" required><div id="login-error" role="alert" class="error-text"></div><button type="submit" class="primary">Đăng nhập →</button></form><p class="hint">Tài khoản được nhóm vận hành cấp. Hàng chờ và nội dung ứng viên chỉ hiển thị sau đăng nhập.</p></section>
-<section id="dashboard" hidden><div class="dashboard-heading"><div><div class="eyebrow">TUYỂN SINH HUST 2026</div><h1>Quản lý yêu cầu tư vấn</h1></div><button id="refresh" class="secondary">Làm mới dữ liệu ↻</button></div><div id="metrics" class="metrics"></div><p class="hint">Tỷ lệ trả lời ở đây tính trên tất cả lượt chat demo, không phải KPI trên bộ test. Accuracy và giảm tải cần đánh giá riêng.</p><div id="staff-error" class="error-text" role="alert"></div><div class="queue-layout"><section class="queue-panel"><div class="queue-heading"><h2>Hàng chờ hỗ trợ</h2><label class="sr-only" for="status-filter">Lọc trạng thái</label><select id="status-filter"><option value="">Tất cả trạng thái</option><option value="waiting">Đang chờ</option><option value="in_progress">Đang xử lý</option><option value="resolved">Đã giải quyết</option><option value="cancelled">Đã hủy</option><option value="rejected">Đã từ chối</option></select></div><div class="queue-tools"><label class="sr-only" for="queue-search">Tìm mã hoặc nội dung yêu cầu</label><input id="queue-search" type="search" placeholder="Tìm mã hoặc nội dung…"><label class="sr-only" for="queue-sort">Sắp xếp yêu cầu</label><select id="queue-sort"><option value="newest">Mới nhất trước</option><option value="oldest">Chờ lâu nhất trước</option></select></div><p id="queue-count" class="hint" aria-live="polite"></p><div id="queue"></div></section><section class="ticket-detail" id="detail"><p class="empty-state">Chọn một yêu cầu để xem nội dung<br>và bắt đầu hỗ trợ ứng viên.</p></section></div></section></main><footer class="page-footer"><span>EDU-12 · Handover có sự đồng ý</span><span>HUST 2026 · Yêu cầu tư vấn</span></footer></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cán bộ tuyển sinh · Trợ lý tuyển sinh</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/style.css?v=20261009-2"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/login.css?v=20261012-3"><link rel="stylesheet" href="/assets/dashboard.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/login.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/dashboard.dark.css?v=20261013-4"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/login-fx.js?v=20261012-1" defer></script>
+  <script src="/assets/feedback-view.js?v=20261013-1" defer></script><script src="/assets/staff.js?v=20261015-2" defer></script>
+</head>
+<body class="staff-page auth-page">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Về trang chủ Trợ lý tuyển sinh">
+      <span class="mark" aria-hidden="true"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span>
+      <span class="brand-copy"><span>Trợ lý tuyển sinh</span><small>HUST · 2026</small></span>
+    </a>
+    <nav class="staff-nav" aria-label="Điều hướng cán bộ">
+      <span id="staff-identity" class="staff-identity" hidden></span>
+      <a class="staff-link staff-login-link" href="/admin">Đăng nhập admin</a>
+      <button class="nav-link" id="logout" type="button" hidden>Đăng xuất</button>
+    </nav>
+  </header>
+
+  <main class="staff-main">
+    <aside class="auth-hero" aria-hidden="true">
+      <div class="auth-orbs"><span></span><span></span><span></span></div>
+      <div class="auth-hero-inner">
+        <div class="auth-hero-brand"><span class="auth-hero-mark"><img class="brand-logo" src="/assets/hust-logo.png" alt=""></span><span>Trợ lý tuyển sinh<small>HUST · 2026</small></span></div>
+        <div class="auth-hero-copy">
+          <p class="auth-hero-kicker">KHU VỰC CÁN BỘ</p>
+          <h2 class="auth-hero-title">Mỗi ticket là một thí sinh <em>đang chờ</em> câu trả lời.</h2>
+          <p class="auth-hero-lead">Tiếp nhận, xử lý và phản hồi các câu hỏi tuyển sinh được chuyển từ trợ lý AI.</p>
+        </div>
+        <div class="auth-showcase" data-depth="1"><div class="auth-glass auth-ticket">
+            <div class="auth-ticket-head"><b>#T-1024</b><span class="auth-badge">Đang chờ</span></div>
+            <p>Em muốn hỏi điều kiện IELTS cho chương trình tiên tiến ạ?</p>
+            <div class="auth-ticket-reply"><span class="auth-typing"><i></i><i></i><i></i></span>Cán bộ đang soạn phản hồi…</div>
+          </div>
+          <div class="auth-glass auth-float-chip" data-depth="2"><span class="auth-dot"></span>Làm mới để xem ticket mới</div></div>
+        <ul class="auth-hero-features"><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Bấm Làm mới để cập nhật hàng chờ</span></li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Xem trước câu trả lời AI và nguồn trích dẫn</span></li><li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg><span>Lịch sử xử lý minh bạch</span></li></ul>
+      </div>
+    </aside>
+        <section id="login-panel" class="login-panel" aria-labelledby="login-title">
+      <p class="login-kicker">KHU VỰC CÁN BỘ</p>
+      <h1 id="login-title">Đăng nhập để xử lý ticket</h1>
+      <p class="login-intro">Theo dõi hàng chờ, nhận yêu cầu và gửi phản hồi tuyển sinh có kiểm tra.</p>
+      <div class="login-security-note">
+        <span aria-hidden="true">✓</span>
+        <span>Chỉ tài khoản cán bộ được quản trị cấp mới có quyền truy cập.</span>
+      </div>
+      <form id="login-form" novalidate>
+        <label for="username">Tài khoản cán bộ</label>
+        <input id="username" name="username" autocomplete="username" placeholder="Nhập tài khoản" required aria-describedby="username-error"><p id="username-error" class="field-error" role="alert"></p>
+        <label for="password">Mật khẩu</label>
+        <div class="password-field">
+          <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required aria-describedby="password-error">
+          <button type="button" id="toggle-password" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
+        </div>
+        <p id="password-error" class="field-error" role="alert"></p>
+        <p id="login-error" role="alert" class="error-text"></p>
+        <button type="submit" class="primary login-submit" id="login-submit">
+          <span class="button-label">Đăng nhập</span><span aria-hidden="true">→</span>
+        </button>
+      </form>
+      <button id="demo-login" class="secondary demo-login-button" type="button" data-demo-role="staff" hidden>Vào demo cán bộ, không cần đăng nhập</button>
+      <p class="login-help">Demo dùng ticket mẫu riêng, không gửi email và không tác động dữ liệu thật. Chưa có quyền truy cập? Liên hệ quản trị viên để được cấp tài khoản.</p>
+    </section>
+
+    <section id="dashboard" class="desk" hidden aria-labelledby="dashboard-title">
+      <div class="desk-toolbar">
+        <div class="desk-title">
+          <h1 id="dashboard-title">Hàng chờ hỗ trợ</h1>
+          <p id="live-status" class="desk-live" role="status" aria-live="polite">Dữ liệu chỉ cập nhật khi bạn làm mới</p>
+        </div>
+        <div id="metrics" class="status-tabs" role="group" aria-label="Lọc theo trạng thái"></div>
+        <div id="oldest-waiting" class="desk-alert" hidden></div>
+        <button id="feedback-toggle" class="desk-view-toggle" type="button" aria-pressed="false" aria-controls="feedback-view">Đánh giá AI</button>
+        <button id="refresh" class="desk-icon-button" type="button" aria-label="Làm mới" title="Làm mới">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+        </button>
+      </div>
+      <div id="staff-error" class="error-text staff-error" role="alert"></div>
+      <div id="dashboard-loading" class="loading-bar" role="status" aria-live="polite" hidden>
+        <span class="loading-spinner" aria-hidden="true"></span><span>Đang tải dữ liệu…</span>
+      </div>
+
+      <section id="feedback-view" class="feedback-view" aria-label="Đánh giá câu trả lời AI (chỉ xem)" hidden></section>
+      <div class="desk-body">
+        <section class="desk-list" aria-labelledby="queue-title">
+          <div class="desk-list-head">
+            <h2 id="queue-title" class="sr-only">Danh sách ticket</h2>
+            <label class="search-field" for="queue-search">
+              <span class="sr-only">Tìm ticket theo mã hoặc nội dung</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.2 4.2"/></svg>
+              <input id="queue-search" type="search" autocomplete="off" aria-controls="queue" aria-describedby="queue-search-help" placeholder="Tìm ticket…">
+            </label>
+            <label class="sr-only" for="queue-sort">Sắp xếp</label>
+            <select id="queue-sort" class="desk-select">
+              <option value="newest">Mới nhất</option>
+              <option value="oldest">Cũ nhất</option>
+            </select>
+            <label class="sr-only" for="status-filter">Lọc theo trạng thái</label>
+            <select id="status-filter" hidden>
+              <option value="waiting" selected>Đang chờ</option>
+              <option value="">Tất cả</option>
+              <option value="in_progress">Đang xử lý</option>
+              <option value="resolved">Đã giải quyết</option>
+              <option value="rejected">Đã từ chối</option>
+              <option value="cancelled">Đã hủy</option>
+            </select>
+          </div>
+          <p id="queue-search-help" class="sr-only">Bấm Làm mới để tải lại kết quả; từ khóa tìm kiếm hiện tại sẽ được giữ lại.</p>
+          <p id="queue-count" class="desk-list-count" aria-live="polite"></p>
+          <div id="queue" class="queue" aria-live="polite"></div>
+        </section>
+
+        <section class="ticket-detail" id="detail" aria-labelledby="detail-title">
+          <div class="empty-detail">
+            <span class="empty-detail-icon" aria-hidden="true">⌁</span>
+            <h2 id="detail-title">Chọn một ticket</h2>
+            <p>Chọn yêu cầu ở danh sách bên trái để xem nội dung và bắt đầu xử lý.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer"><span>Không gian xử lý yêu cầu tuyển sinh</span><span>HUST 2026 · Yêu cầu tư vấn</span></footer>
+</body>
+</html>

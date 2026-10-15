@@ -20,7 +20,13 @@ def build_graph() -> StateGraph:
 
     # Add edges
     graph.set_entry_point("analyze")
-    graph.add_conditional_edges("analyze", should_continue)
+    # Keep every routing value explicit so graph behavior remains stable as
+    # more analysis branches are added.
+    graph.add_conditional_edges(
+        "analyze",
+        should_continue,
+        {"respond": "respond", END: END},
+    )
     graph.add_edge("respond", END)
 
     return graph.compile()
