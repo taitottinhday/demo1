@@ -13,21 +13,18 @@ Trạng thái: PDF 51 trang; nguồn chính của bộ nạp hiện tại.
 Tên tài liệu: Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf
 File tương ứng: raw/admission_regulation_2026.pdf
-Bản sao tương thích pipeline data (cùng SHA256): raw/4740_qd-dhbk-qcts.pdf
 Kỳ áp dụng: 2026
 Phạm vi: Quy chế tuyển sinh; có các điều khoản cho từng hình thức đào tạo và đối tượng.
 
 Tên tài liệu: Quy định về Phương thức xét tuyển tài năng (XTTN) năm 2026
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf
 File tương ứng: raw/talent_admission_2026.pdf
-Bản sao tương thích pipeline data (cùng SHA256): raw/qui-dinh-ve-xttn-nam-2026-ky.pdf
 Kỳ áp dụng: 2026
 Phạm vi: Thí sinh đăng ký chương trình đại học chính quy bằng phương thức XTTN.
 
 Tên tài liệu: Quy định chuẩn ngoại ngữ cho sinh viên đại học chính quy
 URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf
 File tương ứng: raw/english_k71_2026.pdf
-Bản sao tương thích pipeline data (cùng SHA256): raw/00_ Quy định ngoại ngữ K71_final_đã ký.pdf
 Ngày trên tài liệu: 2026; ngày 07/09/2026 trong manifest nhóm cung cấp chưa được xác minh độc lập từ phần trích xuất.
 Hiệu lực: Học kỳ 1 năm học 2026–2027 với sinh viên từ khóa K71; điều khoản quy đổi chứng chỉ có ngoại lệ cho khóa trước.
 Phạm vi: Chính sách học ngoại ngữ và chuẩn đầu ra cho sinh viên đang học; không dùng làm quy định tuyển sinh chung cho thí sinh.
@@ -35,14 +32,12 @@ Phạm vi: Chính sách học ngoại ngữ và chuẩn đầu ra cho sinh viên
 Tên tài liệu: Quy chế thi Đánh giá tư duy (TSA) của Đại học Bách khoa Hà Nội
 URL chính thức: https://hust.edu.vn/uploads/sys/tuyen-sinh/2025_06/quy-che-tsa-10461qd.pdf
 File tương ứng: raw/tsa_regulation_2026.pdf
-Bản sao tương thích pipeline data (cùng SHA256): raw/quy-che-tsa-10461qd.pdf
 Kỳ tham khảo: 2026
 Trạng thái: 19 trang; tệp là bản scan không có lớp văn bản trích xuất được. Chưa dùng làm nguồn trả lời trước khi OCR và đối chiếu thủ công.
 
 Tên tài liệu: Mức học phí năm học 2026–2027
 URL chính thức: https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf
 File tương ứng: raw/tuition_2026_2027.pdf
-Bản sao tương thích pipeline data (cùng SHA256): raw/12006_QĐ-ĐHBK.pdf
 Kỳ áp dụng: Năm học 2026–2027
 Phạm vi: Có mức học phí theo tín chỉ học phí, một số mức khác cho học kỳ hè, vừa làm vừa học và sau đại học. Không suy ra tổng năm học nếu chưa biết số tín chỉ học phí đăng ký.
 
@@ -65,6 +60,6 @@ Giới hạn cần giữ để tránh trả lời sai:
 - Trang học bổng trực tuyến hiện chỉ được catalog hóa; chưa có nội dung điều kiện/mức học bổng cụ thể được xác minh trong bộ dữ liệu này.
 
 # Tích hợp nhánh data và ứng dụng
-Các tên PDF cũ được giữ để bảo toàn đường dẫn bằng chứng của snapshot `k71-2026-v1`; ứng dụng dùng tên trong `source_catalog.json`. Pipeline data loại bản trùng theo SHA256. Không cộng các bản sao thành nguồn mới.
+Snapshot `k71-2026-v2` dùng cùng sáu đường dẫn PDF chuẩn trong `source_catalog.json` cho pipeline và ứng dụng. Năm bản sao trùng SHA256 từ nhánh cũ đã được loại bỏ; bản `v1` và tên cũ có thể truy nguyên trong lịch sử Git. Manifest nối `source_id` của corpus với `runtime_source_id` của catalog.
 
 Dữ liệu OCR của nhánh data nằm trong `extracted/`, có trạng thái cần đối chiếu; runtime trên main chưa dùng dữ liệu OCR này. Các file `normalized/records.jsonl` và `processed/chunks.jsonl` thuộc snapshot data, còn runtime hiện đọc `normalized/admissions_facts_2026.json`. Hai bộ chưa được nối bằng adapter.

@@ -1,0 +1,37 @@
+                                                            7
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+                                                            Tài chính - Ngân               2. Phương thức ĐGTD20  EM5      Tài chính - Ngân hàng           7340201                      100
+                                                       hàng                            3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+              Phân tích kinh doanh (CT tiên                                                     2. Phương thức ĐGTD                Chương trình học21  EME13                                7340101   Quản trị kinh doanh   140
+                    tiến)                                                                                3. Phương thức THPT (D01(Gốc); A01;    bằng tiếng Anh
+                                                                             D07;K01)
+                                                                                                        1. Phương thức XTTN
+                  Logistics và Quản lý chuỗi                      Logistics và quản lý            2. Phương thức ĐGTD                Chương trình học22  EME14                                7510605                      140
+               cung ứng (CT tiên tiến)                       chuỗi cung ứng                 3. Phương thức THPT (D01(Gốc); A01;    bằng tiếng Anh
+                                                                             D07;K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD                Chương trình học23  EME17   Kế toán                       7340301   Kế toán             80
+                                                                                                        3. Phương thức THPT (D01(Gốc); A00 ;   bằng tiếng Anh
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+                                            Kỹ thuật điện tử -              2. Phương thức ĐGTD24  ET1     Kỹ thuật Điện tử - Viễn thông     7520207                      480
+                                                              viễn thông                      3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD25  ET2     Kỹ thuật Y sinh                7520212   Kỹ thuật y sinh       100
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                              B00;K01)
+               Truyền thông số và Kỹ thuật đa           Kỹ thuật điện tử -              1. Phương thức XTTN                Chương trình học
+26  ETE16                                 7520207                       60
+              phương tiện (CT tiên tiến)                     viễn thông                      2. Phương thức ĐGTD                  bằng tiếng Anh

@@ -1,0 +1,54 @@
+{
+  "page_id": "hust-admissions-k71-p42",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 42,
+  "printed_page": null,
+  "native_text": "                                      41\n\n              Tên chương   Mã      Tên          Phương\n    Mã xét    trình, ngành,   ngành,    ngành,    Chỉ    thức\nTT                                                         Ghi chú\n      tuyển   nhóm ngành   nhóm    nhóm      tiêu    tuyển\n                   xét tuyển    ngành1    ngành             sinh\n                  học); Kỹ thuật\n               cơ   điện   tử\n            (ĐTTX  Văn\n               bằng thứ hai)\n            Kỹ  thuật  vật\n                   liệu   (ĐTTX\n                Liên    thông\n    MS1LT;   Cao đẳng Đại        Kỹ   thuật          Xét\n 8                          7520309            70\n   MS1VB2   học); Kỹ thuật           Vật liệu             tuyển\n                  vật         liệu\n            (ĐTTX  Văn\n               bằng thứ hai)\n             Quản  trị kinh\n               doanh (ĐTTX\n                Liên    thông\n    EM3LT;   Cao đẳng Đại          Quản     trị          Xét\n 9                          7340101            70\n   EM3VB2   học); Quản trị            kinh doanh           tuyển\n                kinh    doanh\n            (ĐTTX  Văn\n               bằng thứ hai)\n             Công    nghệ\n                thông        tin\n            (ĐTTX   Liên\n                thông    Cao\n    IT1LT,                         Công nghệ          Xét\n10            đẳng     Đại  7480201            150\n    IT1VB2                         Thông tin            tuyển\n                  học);   Công\n               nghệ thông tin\n            (ĐTTX  Văn\n               bằng thứ hai)\n            Kỹ thuật Hóa\n               học   (ĐTTX\n                Liên    thông\n    CH1LT,   Cao đẳng Đại        Kỹ   thuật          Xét\n11                          7520301            40\n   CH1VB2   học); Kỹ thuật         Hóa học             tuyển\n               hóa      học\n            (ĐTTX  Văn\n               bằng thứ hai)\n\n     5. Các thông tin cần thiết khác để thí sinh dự tuyển vào các ngành của trường.",
+  "text": "                                      41\n\n              Tên chương   Mã      Tên          Phương\n    Mã xét    trình, ngành,   ngành,    ngành,    Chỉ    thức\nTT                                                         Ghi chú\n      tuyển   nhóm ngành   nhóm    nhóm      tiêu    tuyển\n                   xét tuyển    ngành1    ngành             sinh\n                  học); Kỹ thuật\n               cơ   điện   tử\n            (ĐTTX  Văn\n               bằng thứ hai)\n            Kỹ  thuật  vật\n                   liệu   (ĐTTX\n                Liên    thông\n    MS1LT;   Cao đẳng Đại        Kỹ   thuật          Xét\n 8                          7520309            70\n   MS1VB2   học); Kỹ thuật           Vật liệu             tuyển\n                  vật         liệu\n            (ĐTTX  Văn\n               bằng thứ hai)\n             Quản  trị kinh\n               doanh (ĐTTX\n                Liên    thông\n    EM3LT;   Cao đẳng Đại          Quản     trị          Xét\n 9                          7340101            70\n   EM3VB2   học); Quản trị            kinh doanh           tuyển\n                kinh    doanh\n            (ĐTTX  Văn\n               bằng thứ hai)\n             Công    nghệ\n                thông        tin\n            (ĐTTX   Liên\n                thông    Cao\n    IT1LT,                         Công nghệ          Xét\n10            đẳng     Đại  7480201            150\n    IT1VB2                         Thông tin            tuyển\n                  học);   Công\n               nghệ thông tin\n            (ĐTTX  Văn\n               bằng thứ hai)\n            Kỹ thuật Hóa\n               học   (ĐTTX\n                Liên    thông\n    CH1LT,   Cao đẳng Đại        Kỹ   thuật          Xét\n11                          7520301            40\n   CH1VB2   học); Kỹ thuật         Hóa học             tuyển\n               hóa      học\n            (ĐTTX  Văn\n               bằng thứ hai)\n\n     5. Các thông tin cần thiết khác để thí sinh dự tuyển vào các ngành của trường.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        304.510009765625,
+        42.46797180175781,
+        319.510009765625,
+        55.75197219848633
+      ],
+      "text": "41 \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        746.2526245117188,
+        74.18399810791016,
+        760.599365234375
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        99.26399993896484,
+        762.692626953125,
+        535.7799682617188,
+        777.0393676757812
+      ],
+      "text": "5. Các thông tin cần thiết khác để thí sinh dự tuyển vào các ngành của trường. \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        790.6503295898438,
+        74.4540023803711,
+        806.192626953125
+      ],
+      "text": " \n"
+    }
+  ],
+  "table_ids": [
+    "hust-admissions-k71-9aea5b7b9afb-p42-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1966
+}

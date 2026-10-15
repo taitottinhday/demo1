@@ -1,0 +1,38 @@
+                                                           29
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+                      - Tự động
+               hoá (CT                           THPT                  28.12/30                       27.54/30
+                    tiên tiến)
+                Tin học                         XTTN                 65.26/100                     74.67/110
+               công                                       DGTD                 68.73/100                     62.48/100
+                nghiệp và
+             Tự động
+                             Kỹ thuật điều khiển
+14  EEEP     hóa        7520216                            40    41                40      47                                      và tự động hoá
+              (Chương                                            THPT                  27.27/30                       26.22/30
+                   trình Việt -
+               Pháp
+              PFIEV)
+                                         XTTN                 59.11/100                     75.35/110
+              Quản lý
+15  EM1                 7510604  Kinh tế công nghiệp  DGTD   85    87    63.32/100    50      52     52.68/100               năng lượng
+                                            THPT                   23.7/30                        25.4/30
+                                         XTTN                 60.05/100                      79.7/110              Quản lý
+                                 Quản lý công
+16  EM2      công       7510601                DGTD   105   108    64.15/100    130     137     52.68/100                                       nghiệp
+                nghiệp                                            THPT                   23.9/30                        25.6/30
+                                         XTTN                 61.94/100                     80.18/110
+              Quản trị
+17  EM3                 7340101  Quản trị kinh doanh  DGTD   120   114    65.81/100    130     131     55.65/100                kinh doanh
+                                            THPT                   24.3/30                       25.77/30
+                 Tài chính -              Tài chính - Ngân    XTTN                 61.94/100                     82.57/110
+18  EM5                 7340201                            80    97                75      78
+              Ngân hàng            hàng           DGTD                 65.81/100                     56.17/100

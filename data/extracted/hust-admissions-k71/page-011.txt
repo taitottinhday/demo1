@@ -1,0 +1,39 @@
+                                                            10
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        2. Phương thức ĐGTD
+            An toàn không gian số - Cyber                                                                      Chương trình học
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;                 Security (CT Tiên tiến)                                                                                   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+             Công nghệ thông tin (Việt -                                                        2. Phương thức ĐGTD                 Tăng cường tiếng42  ITE6                                  7480201   Công nghệ thông tin   240
+                Nhật)                                                                               3. Phương thức THPT (A00 (Gốc); A01;   Nhật
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+             Công nghệ thông tin (Global                                                       2. Phương thức ĐGTD                Chương trình học43  ITE7                                  7480201   Công nghệ thông tin   120
+               ICT)                                                                                3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+             Công nghệ thông tin (Việt -                                                        2. Phương thức ĐGTD                 Tăng cường tiếng44  ITEP                                  7480201   Công nghệ thông tin   40
+               Pháp)                                                                               3. Phương thức THPT (A00 (Gốc); A01;   Pháp
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD45  ME1     Kỹ thuật Cơ điện tử             7520114   Kỹ thuật cơ điện tử    300
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD46  ME2     Kỹ thuật Cơ khí                7520103   Kỹ thuật cơ khí       560
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Cơ điện tử (CT tiên                                                      2. Phương thức ĐGTD                Chương trình học47  MEE1                                 7520114   Kỹ thuật cơ điện tử    180
+                    tiến)                                                                                3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+            Cơ khí - Chế tạo máy - hợp tác                                                    1. Phương thức XTTN                 Chuẩn ngoại ngữ tiếng
+48 MEGU                                 7520103   Kỹ thuật cơ khí       40
+                 với ĐH Griffith (Úc)                                                               2. Phương thức ĐGTD               Anh

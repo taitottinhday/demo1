@@ -1,0 +1,48 @@
+                                         2
+
+STT Môn đạt giải     Mã xét tuyển/Chương trình đào tạo
+
+ 3   Vật lý               Tất cả các chương trình đào tạo trừ 4 chương trình Ngôn ngữ
+                         có mã xét tuyển FL1, FL2, FL3 và FL4 (gồm 64 chương trình)
+ 4   Hóa học         Nhóm ngành Hoá-Sinh-Thực phẩm-Môi trường, Y sinh, Vật
+                             liệu-Dệt may, gồm 18 chương trình sau:
+                     CH1-Kỹ thuật Hóa học
+                     CH2-Hóa học
+                      CH-E11-Kỹ thuật Hóa dược
+                      CH-E20-Hoá học Mỹ phẩm
+                      BF1-Kỹ thuật Sinh học
+                      BF2-Kỹ thuật Thực phẩm
+                       BF-E12-Kỹ thuật Thực phẩm
+                       BF-E19-Kỹ thuật sinh học
+                      ET2-Kỹ thuật y sinh
+                      ET-E5-Kỹ thuật y sinh
+                     EV1-Kỹ thuật Môi trường
+                      EV2-Quản lý Tài nguyên và Môi trường
+                    MS1-Kỹ thuật Vật liệu
+                    MS2-Kỹ thuật Vi điện tử và Công nghệ nano
+                     MS3-Công nghệ Vật liệu Polyme và Compozit
+                    MS5-Kỹ thuật In
+                    MS-E3-KHKT Vật liệu
+                      TX1-Công nghệ Dệt May
+ 5    Sinh học         Nhóm ngành Hoá-Sinh-Thực phẩm-Môi trường-Y sinh, gồm
+                        12 chương trình sau:
+                     CH1-Kỹ thuật Hóa học
+                     CH2-Hóa học
+                      CH-E11-Kỹ thuật Hóa dược
+                      CH-E20-Hoá học Mỹ phẩm
+                      BF1-Kỹ thuật Sinh học
+                      BF2-Kỹ thuật Thực phẩm
+                       BF-E12-Kỹ thuật Thực phẩm
+                       BF-E19-Kỹ thuật sinh học
+                     EV1-Kỹ thuật Môi trường
+                      EV2-Quản lý Tài nguyên và Môi trường
+                      ET-E5-Kỹ thuật Y sinh
+                      ET2-Kỹ thuật Y sinh
+ 6   Ngoại ngữ       Nhóm ngành Ngôn ngữ, Kinh tế quản lý, Khoa học giáo dục
+                    gồm 14 chương trình sau:
+                         FL1-Tiếng Anh KHKT và Công nghệ
+                         FL2-Tiếng Anh chuyên nghiệp quốc tế
+                         FL3-Tiếng Trung Khoa học và Công nghệ
+                        FL4- Tiếng Hàn Khoa học và Công nghệ
+                     EM1-Quản lý năng lượng
+                     EM2-Quản lý Công nghiệp

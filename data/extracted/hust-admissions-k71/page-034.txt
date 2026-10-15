@@ -1,0 +1,34 @@
+                                                           33
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+            An toàn                         XTTN                 87.95/100                     102.6/110
+               không gian                                       DGTD                 78.49/100                     74.88/100
+                số - Cyber
+36  ITE15                7480202  An toàn thông tin             40    42                60      64                  Security
+                                            THPT                  28.69/30                        27.9/30              (CT Tiên
+                    tiến)
+              Công nghệ                       XTTN                 75.17/100                     88.07/110
+                thông tin37  ITE6                 7480201  Công nghệ thông tin  DGTD   240   255    72.81/100    240     250     71.05/100                  (Việt -
+                                            THPT                  27.97/30                       27.35/30                Nhật)
+              Công nghệ                                         XTTN                 87.59/100
+                thông tin                                                                                     102.67/110
+38  ITE7                 7480201  Công nghệ thông tin           120   121               125     125                 (Global                        DGTD                 78.19/100                     74.88/100
+               ICT)                             THPT                  28.66/30                       28.01/30
+              Công nghệ                       XTTN                  72.3/100                      82.15/110
+                thông tin39  ITEP                 7480201  Công nghệ thông tin  DGTD   40    41    71.83/100    45      46     70.66/100                  (Việt -
+                                            THPT                  27.83/30                       27.35/30                Pháp)
+                                         XTTN                 73.74/100                     78.01/110
+            Kỹ thuật
+40  ME1                 7520114  Kỹ thuật cơ điện tử   DGTD   340   340    72.32/100    330     338     68.02/100            Cơ điện tử
+                                            THPT                   27.9/30                       27.49/30
+                                         XTTN                 62.21/100                     73.48/110
+            Kỹ thuật
+41  ME2                 7520103  Kỹ thuật cơ khí     DGTD   600   616    66.05/100    730     752     61.36/100            Cơ khí
+                                            THPT                  26.62/30                        25.8/30

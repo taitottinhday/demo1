@@ -1,7 +1,6 @@
 # Data pipeline only; intentionally separate from backend requirements.
-PyMuPDF==1.28.2
+-r requirements-data-validation.txt
 Pillow==12.3.0
-jsonschema==4.26.0
 requests>=2.32,<3
 # Windows: use a matching prebuilt wheel from
 # https://github.com/simonflueckiger/tesserocr-windows_build/releases

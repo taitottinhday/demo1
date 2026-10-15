@@ -1,0 +1,50 @@
+                                          3
+
+ STT Môn đạt giải     Mã xét tuyển/Chương trình đào tạo
+                      EM3-Quản trị Kinh doanh
+                       EM5-Tài chính Ngân hàng
+                       EM-E13-Phân tích Kinh doanh
+                          EM-E14-Logistics và Quản lý chuỗi cung ứng
+                      EM-E17-Kế toán
+                       ED2-Công nghệ giáo dục
+                       ED3-Quản lý giáo dục
+                      ED5-Tâm lý học công nghiệp và tổ chức
+
+     b) Thí sinh tham dự kỳ thi KHKT cấp quốc tế (ISEF được tổ chức tại Hoa Kỳ hàng
+năm) hoặc đạt giải Ba trở lên trong kỳ thi KHKT cấp quốc gia (ViSEF) do Bộ Giáo dục và
+Đào tạo chủ trì tổ chức được đăng ký xét tuyển thẳng vào các chương trình đào tạo phù
+hợp với lĩnh vực đề tài dự thi theo quy định trong Bảng 2.
+
+Bảng 2. Quy định chọn chương trình xét tuyển thẳng theo lĩnh vực đề tài dự thi KHKT
+
+ STT  Lĩnh vực đạt giải            Mã xét tuyển/Chương trình đào tạo
+  1     - Khoa học động vật           Gồm 16 chương trình sau:
+          - Hóa sinh                    CH1-Kỹ thuật Hóa học
+          - Sinh học tế bào và phân tử        CH2-Hóa học
+          - Hóa học                      CH-E11-Kỹ thuật Hóa dược
+          - Sinh học trên máy tính và Sinh-Tin  CH-E20-Hoá học Mỹ phẩm
+          - Khoa học Trái đất và Môi trường    BF1-Kỹ thuật Sinh học
+          - Kỹ thuật môi trường             BF2-Kỹ thuật Thực phẩm
+          - Khoa học vật liệu                BF-E12-Kỹ thuật Thực phẩm
+          - Vi sinh                        BF-E19-Kỹ thuật sinh học
+          - Khoa học Thực vật             EV1-Kỹ thuật Môi trường
+          - Y học chuyển dịch              EV2-Quản lý Tài nguyên và Môi trường
+                                 MS1-Kỹ thuật Vật liệu
+                                 MS2-Kỹ thuật Vi điện tử và Công nghệ nano
+                                      MS3-Công nghệ Vật liệu Polyme và Compozit
+                                 MS5-Kỹ thuật In
+                                MS-E3-KHKT Vật liệu
+                                    TX1-Công nghệ Dệt May
+  2     - Toán học                 Gồm tất cả chương trình, trừ các chương trình
+          - Vật lý và Thiên văn                  sau: IT1, IT2, IT-E6, IT-E7, IT-E10, IT-E15,
+          - Hệ thống nhúng                    IT-EP, FL1, FL2, FL3, FL4
+          - Rô bốt và máy thông minh
+          - Phần mềm hệ thống
+          - Năng lượng hóa học
+          - Năng lượng vật lý
+  3     - Y sinh và Khoa học sức khỏe     Gồm 5 chương trình sau:
+          - Kỹ thuật Y sinh                 ET-E5-Kỹ thuật Y sinh
+                                   ET2-Kỹ thuật Y sinh
+                                      PH3-Vật lý Y khoa
+                                    CH-E11-Kỹ thuật Hóa dược
+                                    CH-E20-Hoá học Mỹ phẩm

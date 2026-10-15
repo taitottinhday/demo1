@@ -1,0 +1,38 @@
+                                     21
+
+
+             Bảng 4. Mức học phí các chương trình Elitech
+                                Đơn vị: triệu đồng/năm
+TT  Tên chương trình            Mức học phí trung bình  Ghi chú
+I.   Chương  trình giảng dạy bằng
+      tiếng Anh
+1    Công nghệ thông tin Global ICT
+2   An toàn không gian số
+3    Khoa học và Kỹ thuật Vật liệu
+4   Kỹ thuật thực phẩm
+5   Kỹ thuật sinh học
+6   Kỹ thuật hóa dược
+7   Hệ thống điện và năng lượng tái tạo
+                                   35 - 508   Kỹ thuật Điều khiển và Tự động hóa
+9    Phân tích kinh doanh
+10  Kỹ thuật Cơ điện tử
+11  Kỹ thuật Điện tử Viễn thông
+12  Kỹ thuật Y sinh
+     Truyền thông số và KT đa phương
+13      tiện
+14  Kỹ thuật Ô tô
+    Khoa học tính toán cho các hệ thống
+15     thông minh                                                      Chương
+                                       35-4516  Hóa học mỹ phẩm                                                                            trình mới
+17  Kế toán
+18   Khoa học Dữ liệu và Trí tuệ nhân tạo  ~68
+19   Logistics và Quản lý chuỗi cung ứng  ~65
+    Chương trình có tăng cường ngoại
+II.    ngữ
+20  Hệ thống nhúng thông minh và IoT
+21   Công nghệ thông tin Việt Nhật      40 - 50
+22   Công nghệ thông tin Việt Pháp
+III.  Chương trình PFIEV
+23   Tin học công nghiệp và TĐH
+                                    40 - 45
+24  Cơ khí hàng không

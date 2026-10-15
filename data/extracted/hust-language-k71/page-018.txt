@@ -1,0 +1,18 @@
+                                                       2
+
+(*) Học phần QT1524 Tiếng Đức 5: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương trình Kỹ thuật Điện tử -
+  Viễn thông và chương trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.
+(*) Học phần QT1528 Tiếng Đức 6, QT1529 Tiếng Đức 7: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương
+   trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.
+
+                     Bảng 6.2 Bảng quy đổi tương đương các chứng chỉ tiếng Đức
+
+               Goethe-Zertifikat          TestDaF        DSD    TELC/ ÖSD/ HUSTGC
+                A1                                           A1
+                A2                                           A2
+                                              DSD1
+                 B1              TDN3                          B1
+                 B2              TDN4                          B2
+                                              DSD2
+                 C1              TDN5                          C1
+                 C2                                              C2

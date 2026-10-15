@@ -1,0 +1,61 @@
+{
+  "page_id": "hust-admissions-k71-p15",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 15,
+  "printed_page": null,
+  "native_text": "                                                             14\n\n\n\nGhi chú:\n\n   •  Tổ hợp A00, A01,B00, D07, D01 in đậm thì môn Toán hệ số 2, các môn còn lại trong tổ hợp hệ số 1. Các tổ hợp không in đậm thì các\n     môn trong tổ hợp đều hệ số 1.\n     • Tổ hợp K01 (Toán, Văn, Lý/Hóa/Sinh/Tin) thì môn Toán hệ số 3, môn Văn hệ số 1 và môn còn lại trong số 4 môn Lý/Hóa/Sinh/Tin có\n hệ số 2.",
+  "text": "                                                             14\n\n\n\nGhi chú:\n\n   •  Tổ hợp A00, A01,B00, D07, D01 in đậm thì môn Toán hệ số 2, các môn còn lại trong tổ hợp hệ số 1. Các tổ hợp không in đậm thì các\n     môn trong tổ hợp đều hệ số 1.\n     • Tổ hợp K01 (Toán, Văn, Lý/Hóa/Sinh/Tin) thì môn Toán hệ số 3, môn Văn hệ số 1 và môn còn lại trong số 4 môn Lý/Hóa/Sinh/Tin có\n hệ số 2.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        408.07000732421875,
+        42.46803283691406,
+        423.07000732421875,
+        55.75203323364258
+      ],
+      "text": "14 \n"
+    },
+    {
+      "bbox": [
+        42.599998474121094,
+        62.390384674072266,
+        46.1099967956543,
+        77.93266296386719
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        428.2300109863281,
+        78.47265625,
+        431.4700012207031,
+        92.81938171386719
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        42.599998474121094,
+        101.87265014648438,
+        94.58399963378906,
+        116.21937561035156
+      ],
+      "text": "Ghi chú: \n"
+    },
+    {
+      "bbox": [
+        49.68000030517578,
+        125.4751968383789,
+        788.6828002929688,
+        195.6893768310547
+      ],
+      "text": "• Tổ hợp A00, A01,B00, D07, D01 in đậm thì môn Toán hệ số 2, các môn còn lại trong tổ hợp hệ số 1. Các tổ hợp không in đậm thì các \nmôn trong tổ hợp đều hệ số 1. \n• Tổ hợp K01 (Toán, Văn, Lý/Hóa/Sinh/Tin) thì môn Toán hệ số 3, môn Văn hệ số 1 và môn còn lại trong số 4 môn Lý/Hóa/Sinh/Tin có \nhệ số 2. \n"
+    }
+  ],
+  "table_ids": [],
+  "image_count": 0,
+  "text_characters": 390
+}

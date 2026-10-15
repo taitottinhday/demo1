@@ -1,0 +1,70 @@
+{
+  "page_id": "hust-admissions-k71-p45",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 45,
+  "printed_page": null,
+  "native_text": "                                       44\n\n      7. Chính sách ưu tiên: theo quy định của Bộ giáo dục và Đào tạo.\n\n      8. Lệ phí xét tuyển/thi tuyển: 150.000 đồng/thí sinh, được hướng dẫn đóng tại thời\nđiểm nộp hồ sơ xét tuyển và sẽ không hoàn lại.\n\n      9. Việc cơ sở đào tạo thực hiện các cam kết đối với thí sinh (Giải quyết khiếu nại,\nbảo vệ quyền lợi chính đáng của thí sinh trong những trường hợp rủi ro, trách nhiệm giải\nquyết việc thí sinh được chuyển đến hoặc chuyển đi do sai sót trong tuyển sinh): thực hiện\ntheo quy chế tuyển sinh.",
+  "text": "                                       44\n\n      7. Chính sách ưu tiên: theo quy định của Bộ giáo dục và Đào tạo.\n\n      8. Lệ phí xét tuyển/thi tuyển: 150.000 đồng/thí sinh, được hướng dẫn đóng tại thời\nđiểm nộp hồ sơ xét tuyển và sẽ không hoàn lại.\n\n      9. Việc cơ sở đào tạo thực hiện các cam kết đối với thí sinh (Giải quyết khiếu nại,\nbảo vệ quyền lợi chính đáng của thí sinh trong những trường hợp rủi ro, trách nhiệm giải\nquyết việc thí sinh được chuyển đến hoặc chuyển đi do sai sót trong tuyển sinh): thực hiện\ntheo quy chế tuyển sinh.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        304.510009765625,
+        42.46797180175781,
+        319.510009765625,
+        55.75197219848633
+      ],
+      "text": "44 \n"
+    },
+    {
+      "bbox": [
+        99.26399993896484,
+        68.51263427734375,
+        449.8599853515625,
+        82.85935974121094
+      ],
+      "text": "7. Chính sách ưu tiên: theo quy định của Bộ giáo dục và Đào tạo. \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        92.99261474609375,
+        553.4398803710938,
+        123.77934265136719
+      ],
+      "text": "8. Lệ phí xét tuyển/thi tuyển: 150.000 đồng/thí sinh, được hướng dẫn đóng tại thời \nđiểm nộp hồ sơ xét tuyển và sẽ không hoàn lại. \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        133.7926025390625,
+        553.43994140625,
+        197.57933044433594
+      ],
+      "text": "9. Việc cơ sở đào tạo thực hiện các cam kết đối với thí sinh (Giải quyết khiếu nại, \nbảo vệ quyền lợi chính đáng của thí sinh trong những trường hợp rủi ro, trách nhiệm giải \nquyết việc thí sinh được chuyển đến hoặc chuyển đi do sai sót trong tuyển sinh): thực hiện \ntheo quy chế tuyển sinh. \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        207.59259033203125,
+        74.18399810791016,
+        221.93931579589844
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        790.6503295898438,
+        74.4540023803711,
+        806.192626953125
+      ],
+      "text": " \n"
+    }
+  ],
+  "table_ids": [],
+  "image_count": 0,
+  "text_characters": 546
+}

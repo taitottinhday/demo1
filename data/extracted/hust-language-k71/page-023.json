@@ -1,0 +1,36 @@
+{
+  "page_id": "hust-language-k71-p23",
+  "source_id": "hust-language-k71",
+  "source_version": "168b5c897fe8157d711c53a37d70ee95cd1a72ed2f1c5303548cf7df8163391a",
+  "page": 23,
+  "printed_page": null,
+  "native_text": "                                            2\n\n      6. Xếp bậc chứng chỉ tiếng Hàn Quốc theo Khung năng lực ngoại ngữ 6 bậc dùng\ncho Việt Nam\n\n    TOPIK      TOPIK 1   TOPIK 2   TOPIK 3   TOPIK 4   TOPIK 5   TOPIK 6\n\nBậc trình độ theo\n                   Bậc 1      Bậc 2      Bậc 3      Bậc 4      Bậc 5      Bậc 6\n  KNLNNVN",
+  "text": "                                            2\n\n      6. Xếp bậc chứng chỉ tiếng Hàn Quốc theo Khung năng lực ngoại ngữ 6 bậc dùng\ncho Việt Nam\n\n    TOPIK      TOPIK 1   TOPIK 2   TOPIK 3   TOPIK 4   TOPIK 5   TOPIK 6\n\nBậc trình độ theo\n                   Bậc 1      Bậc 2      Bậc 3      Bậc 4      Bậc 5      Bậc 6\n  KNLNNVN",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        298.45001220703125,
+        28.81900405883789,
+        303.95001220703125,
+        40.996002197265625
+      ],
+      "text": "2\n"
+    },
+    {
+      "bbox": [
+        56.70000457763672,
+        57.253997802734375,
+        548.9419555664062,
+        88.08799743652344
+      ],
+      "text": "6. Xếp bậc chứng chỉ tiếng Hàn Quốc theo Khung năng lực ngoại ngữ 6 bậc dùng \ncho Việt Nam\n"
+    }
+  ],
+  "table_ids": [
+    "hust-language-k71-168b5c897fe8-p23-t1"
+  ],
+  "image_count": 1,
+  "text_characters": 325
+}

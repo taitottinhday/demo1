@@ -1,0 +1,54 @@
+{
+  "page_id": "hust-admissions-k71-p46",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 46,
+  "printed_page": null,
+  "native_text": "                                                            45\n\n    10. Thông tin về tuyển sinh của 2 năm gần nhất\n\n\n                                                 Năm 2024            Năm 2025        Ghi\n                Tên chương    Mã     Tên    Phương                                                   chú\n    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ\n                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu\n                                                                   học     điểm xét         học    điểm xét\n I  Hình thức VLVH đối với đối tượng tốt nghiệp từ cao đẳng trở lên (liên thông, VB2 VLVH)\n 1   EE1.P-LT;  Kỹ   thuật  Điện                              80     87                130   77\n    EE1.P-B2  (VLVH     Liên\n                 thông Cao đẳng –\n                                 Kỹ thuật\n                Đại học); Kỹ thuật  7520201\n                                               điện\n                Điện (VLVH Liên\n                 thông Đại học –\n                Đại học)\n 2   BF2.P-LT;  Kỹ   thuật  Thực                              30                              0\n    BF2.P-B2  phẩm   (VLVH\n                Liên  thông  Cao\n                                 Kỹ thuật\n                đẳng – Đại học);\n                                7540102  thực\n            Kỹ   thuật  Thực\n                                    phẩm\n              phẩm   (VLVH\n                Liên  thông  Đại\n                học – Đại học)\n 3  MS1.P-    Kỹ thuật vật liệu  7520309 Kỹ thuật            120     47                 70    0",
+  "text": "                                                            45\n\n    10. Thông tin về tuyển sinh của 2 năm gần nhất\n\n\n                                                 Năm 2024            Năm 2025        Ghi\n                Tên chương    Mã     Tên    Phương                                                   chú\n    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ\n                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu\n                                                                   học     điểm xét         học    điểm xét\n I  Hình thức VLVH đối với đối tượng tốt nghiệp từ cao đẳng trở lên (liên thông, VB2 VLVH)\n 1   EE1.P-LT;  Kỹ   thuật  Điện                              80     87                130   77\n    EE1.P-B2  (VLVH     Liên\n                 thông Cao đẳng –\n                                 Kỹ thuật\n                Đại học); Kỹ thuật  7520201\n                                               điện\n                Điện (VLVH Liên\n                 thông Đại học –\n                Đại học)\n 2   BF2.P-LT;  Kỹ   thuật  Thực                              30                              0\n    BF2.P-B2  phẩm   (VLVH\n                Liên  thông  Cao\n                                 Kỹ thuật\n                đẳng – Đại học);\n                                7540102  thực\n            Kỹ   thuật  Thực\n                                    phẩm\n              phẩm   (VLVH\n                Liên  thông  Đại\n                học – Đại học)\n 3  MS1.P-    Kỹ thuật vật liệu  7520309 Kỹ thuật            120     47                 70    0",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        422.1099853515625,
+        42.46803283691406,
+        437.1099853515625,
+        55.75203323364258
+      ],
+      "text": "45 \n"
+    },
+    {
+      "bbox": [
+        84.98400115966797,
+        74.63262939453125,
+        346.0099792480469,
+        88.97935485839844
+      ],
+      "text": "10. Thông tin về tuyển sinh của 2 năm gần nhất \n"
+    },
+    {
+      "bbox": [
+        84.98400115966797,
+        96.5926513671875,
+        88.2239990234375,
+        110.93937683105469
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        56.63999938964844,
+        543.9303588867188,
+        60.14999771118164,
+        559.47265625
+      ],
+      "text": " \n"
+    }
+  ],
+  "table_ids": [
+    "hust-admissions-k71-9aea5b7b9afb-p46-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1944
+}

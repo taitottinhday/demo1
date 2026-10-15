@@ -1,0 +1,54 @@
+{
+  "page_id": "hust-admissions-k71-p51",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 51,
+  "printed_page": null,
+  "native_text": "                                                            50\n\n                                                 Năm 2024            Năm 2025        Ghi\n                Tên chương    Mã     Tên    Phương                                                   chú\n    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ\n                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu\n                                                                   học     điểm xét         học    điểm xét\n                 (Liên  thông  Đại          ngữ Anh\n                học  –  Đại  học\n               Chính quy)\n 4            Công nghệ thông                              95     82                100   79\n                                     Công\n                     tin  (Liên  thông\n    IT1.B2CQ                   7480201  nghệ\n                Đại học – Đại học\n                                            thông tin\n               Chính quy)",
+  "text": "                                                            50\n\n                                                 Năm 2024            Năm 2025        Ghi\n                Tên chương    Mã     Tên    Phương                                                   chú\n    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ\n                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu\n                                                                   học     điểm xét         học    điểm xét\n                 (Liên  thông  Đại          ngữ Anh\n                học  –  Đại  học\n               Chính quy)\n 4            Công nghệ thông                              95     82                100   79\n                                     Công\n                     tin  (Liên  thông\n    IT1.B2CQ                   7480201  nghệ\n                Đại học – Đại học\n                                            thông tin\n               Chính quy)",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        422.1099853515625,
+        42.46803283691406,
+        437.1099853515625,
+        55.75203323364258
+      ],
+      "text": "50 \n"
+    },
+    {
+      "bbox": [
+        56.63999938964844,
+        293.9226379394531,
+        59.880001068115234,
+        308.26934814453125
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        84.98400115966797,
+        318.0403747558594,
+        88.49400329589844,
+        333.5826721191406
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        56.63999938964844,
+        543.9303588867188,
+        60.14999771118164,
+        559.47265625
+      ],
+      "text": " \n"
+    }
+  ],
+  "table_ids": [
+    "hust-admissions-k71-9aea5b7b9afb-p51-t1"
+  ],
+  "image_count": 1,
+  "text_characters": 1323
+}

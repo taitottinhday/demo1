@@ -1,0 +1,37 @@
+                                                           28
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+            Kỹ thuật                        DGTD                 50.88/100                     54.02/100
+             Hóa dược
+              (CT tiên                           THPT                  21.38/30                       24.34/30
+                    tiến)
+                                         XTTN                 57.22/100                     71.05/110
+              Công nghệ
+ 8  ED2                 7140103  Công nghệ giáo dục  DGTD   120   123    61.66/100    115     119     52.07/100                 giáo dục
+                                            THPT                   23.3/30                        25.3/30
+                                         XTTN                 56.75/100                     71.05/110
+              Quản lý
+ 9  ED3                 7140114  Quản lý giáo dục    DGTD   65    64    61.25/100    60      59     50.29/100                 giáo dục
+                                            THPT                   23.2/30                       24.78/30
+                                         XTTN                 66.57/100                     80.03/110
+            Kỹ thuật
+10  EE1                 7520201  Kỹ thuật điện      DGTD   300   300    69.88/100    245     244     65.25/100               Điện
+                                            THPT                  27.55/30                       26.81/30
+            Kỹ thuật                         XTTN                 85.44/100                      86.7/110
+               Điều khiển          Kỹ thuật điều khiển11  EE2                 7520216                DGTD   550   547    76.43/100    500     519     73.77/100                      - Tự động              và tự động hoá
+                                            THPT                  28.48/30                       28.16/30               hoá
+             Hệ thống                        XTTN                 61.93/100                     85.14/110
+                 điện và                                       DGTD                  65.8/100                      58.18/100
+12  EEE18    năng lượng  7520201  Kỹ thuật điện                60    60                75      70
+                      tái tạo (CT                                            THPT                  26.56/30                        25.8/30
+                    tiên tiến)
+            Kỹ thuật           Kỹ thuật điều khiển   XTTN                 78.24/100                     86.15/110
+13  EEE8                7520216                            140   147               120     130
+               Điều khiển             và tự động hoá     DGTD                 73.86/100                     69.13/100

@@ -1,4 +1,3 @@
-{"issue_id": "9efed9b3b7493f1a", "kind": "metadata_discrepancy", "source_id": "hust-language-k71", "page": 5, "detail": "sources.md ghi 2025-2026; Điều 7 PDF ghi 2026-2027. Manifest dùng nội dung PDF; không sửa sources.md đang được người dùng chỉnh."}
 {"issue_id": "77c4f4a8bd63abe1", "kind": "toc_excluded", "source_id": "hust-regulations-k71", "page": 3, "detail": "Mục lục lưu trong extracted, không làm bằng chứng trả lời."}
 {"issue_id": "f442f11946c2020b", "kind": "ocr_requires_visual_review", "source_id": "hust-tsa-k71", "page": 1, "detail": "OCR confidence=93; kiểm tra chữ, số, công thức và bố cục bảng trước dùng làm kết luận."}
 {"issue_id": "1f09169bf36a957c", "kind": "ocr_requires_visual_review", "source_id": "hust-tsa-k71", "page": 2, "detail": "OCR confidence=94; kiểm tra chữ, số, công thức và bố cục bảng trước dùng làm kết luận."}

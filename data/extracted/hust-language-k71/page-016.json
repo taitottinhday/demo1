@@ -1,0 +1,45 @@
+{
+  "page_id": "hust-language-k71-p16",
+  "source_id": "hust-language-k71",
+  "source_version": "168b5c897fe8157d711c53a37d70ee95cd1a72ed2f1c5303548cf7df8163391a",
+  "page": 16,
+  "printed_page": null,
+  "native_text": "                                                           3\n\n                 Bảng 5.3 Bảng quy đổi tương đương các văn bằng, chứng chỉ tiếng Pháp\n\n                                                 Chứng chỉ TCF 4 kỹ năng\n                     Chứng chỉ\n         DELF                      Điểm bài thi trắc nghiệm        Điểm bài thi Diễn đạt Nói & Viết                     TCF\n                                      (Nghe - Đọc & Kiến thức ngôn ngữ)\n                                                                         Diễn đạt nói: 1/20\n         DELF A1       101 ÷ 199               101 ÷ 199\n                                                                         Diễn đạt viết: 1/20\n                                                                         Diễn đạt nói:  2 ÷ 5/20\n         DELF A2       200 ÷ 299               200 ÷ 299\n                                                                         Diễn đạt viết: 2 ÷ 5/20\n                                                                         Diễn đạt nói:  6 ÷ 9/20\n         DELF B1       300 ÷ 399               300 ÷ 399\n                                                                         Diễn đạt viết: 6 ÷ 9/20\n                                                                         Diễn đạt nói:  10 ÷ 13/20\n         DELF B2       400 ÷ 499               400 ÷ 499\n                                                                         Diễn đạt viết: 10 ÷ 13/20\n                                                                         Diễn đạt nói:  14 ÷ 17/20\n         DELF C1       500 ÷ 599               500 ÷ 599\n                                                                         Diễn đạt viết: 14 ÷ 17/20\n                                                                         Diễn đạt nói:  18 ÷ 20/20\n         DELF C2       600 ÷ 699               600 ÷ 699\n                                                                         Diễn đạt viết: 18 ÷ 20/20\n\nGhi chú: Văn bằng DELF được công nhận vô thời hạn; Chứng chỉ TCF có giá trị công nhận trong vòng 2 năm kể từ ngày cấp.",
+  "text": "                                                           3\n\n                 Bảng 5.3 Bảng quy đổi tương đương các văn bằng, chứng chỉ tiếng Pháp\n\n                                                 Chứng chỉ TCF 4 kỹ năng\n                     Chứng chỉ\n         DELF                      Điểm bài thi trắc nghiệm        Điểm bài thi Diễn đạt Nói & Viết                     TCF\n                                      (Nghe - Đọc & Kiến thức ngôn ngữ)\n                                                                         Diễn đạt nói: 1/20\n         DELF A1       101 ÷ 199               101 ÷ 199\n                                                                         Diễn đạt viết: 1/20\n                                                                         Diễn đạt nói:  2 ÷ 5/20\n         DELF A2       200 ÷ 299               200 ÷ 299\n                                                                         Diễn đạt viết: 2 ÷ 5/20\n                                                                         Diễn đạt nói:  6 ÷ 9/20\n         DELF B1       300 ÷ 399               300 ÷ 399\n                                                                         Diễn đạt viết: 6 ÷ 9/20\n                                                                         Diễn đạt nói:  10 ÷ 13/20\n         DELF B2       400 ÷ 499               400 ÷ 499\n                                                                         Diễn đạt viết: 10 ÷ 13/20\n                                                                         Diễn đạt nói:  14 ÷ 17/20\n         DELF C1       500 ÷ 599               500 ÷ 599\n                                                                         Diễn đạt viết: 14 ÷ 17/20\n                                                                         Diễn đạt nói:  18 ÷ 20/20\n         DELF C2       600 ÷ 699               600 ÷ 699\n                                                                         Diễn đạt viết: 18 ÷ 20/20\n\nGhi chú: Văn bằng DELF được công nhận vô thời hạn; Chứng chỉ TCF có giá trị công nhận trong vòng 2 năm kể từ ngày cấp.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        421.32501220703125,
+        28.81900405883789,
+        426.82501220703125,
+        40.996002197265625
+      ],
+      "text": "3\n"
+    },
+    {
+      "bbox": [
+        224.03099060058594,
+        57.253997802734375,
+        624.1190795898438,
+        71.6449966430664
+      ],
+      "text": "Bảng 5.3 Bảng quy đổi tương đương các văn bằng, chứng chỉ tiếng Pháp\n"
+    },
+    {
+      "bbox": [
+        98.94999694824219,
+        328.68798828125,
+        758.10205078125,
+        343.0790100097656
+      ],
+      "text": "Ghi chú: Văn bằng DELF được công nhận vô thời hạn; Chứng chỉ TCF có giá trị công nhận trong vòng 2 năm kể từ ngày cấp.\n"
+    }
+  ],
+  "table_ids": [
+    "hust-language-k71-168b5c897fe8-p16-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 2077
+}

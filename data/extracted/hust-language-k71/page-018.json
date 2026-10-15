@@ -1,0 +1,63 @@
+{
+  "page_id": "hust-language-k71-p18",
+  "source_id": "hust-language-k71",
+  "source_version": "168b5c897fe8157d711c53a37d70ee95cd1a72ed2f1c5303548cf7df8163391a",
+  "page": 18,
+  "printed_page": null,
+  "native_text": "                                                       2\n\n(*) Học phần QT1524 Tiếng Đức 5: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương trình Kỹ thuật Điện tử -\n  Viễn thông và chương trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n(*) Học phần QT1528 Tiếng Đức 6, QT1529 Tiếng Đức 7: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương\n   trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n\n                     Bảng 6.2 Bảng quy đổi tương đương các chứng chỉ tiếng Đức\n\n               Goethe-Zertifikat          TestDaF        DSD    TELC/ ÖSD/ HUSTGC\n                A1                                           A1\n                A2                                           A2\n                                              DSD1\n                 B1              TDN3                          B1\n                 B2              TDN4                          B2\n                                              DSD2\n                 C1              TDN5                          C1\n                 C2                                              C2",
+  "text": "                                                       2\n\n(*) Học phần QT1524 Tiếng Đức 5: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương trình Kỹ thuật Điện tử -\n  Viễn thông và chương trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n(*) Học phần QT1528 Tiếng Đức 6, QT1529 Tiếng Đức 7: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương\n   trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n\n                     Bảng 6.2 Bảng quy đổi tương đương các chứng chỉ tiếng Đức\n\n               Goethe-Zertifikat          TestDaF        DSD    TELC/ ÖSD/ HUSTGC\n                A1                                           A1\n                A2                                           A2\n                                              DSD1\n                 B1              TDN3                          B1\n                 B2              TDN4                          B2\n                                              DSD2\n                 C1              TDN5                          C1\n                 C2                                              C2",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        421.32501220703125,
+        28.81900405883789,
+        426.82501220703125,
+        40.996002197265625
+      ],
+      "text": "2\n"
+    },
+    {
+      "bbox": [
+        120.19999694824219,
+        57.253997802734375,
+        788.4392700195312,
+        71.6449966430664
+      ],
+      "text": "(*) Học phần QT1524 Tiếng Đức 5: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương trình Kỹ thuật Điện tử - \n"
+    },
+    {
+      "bbox": [
+        120.25,
+        72.2030029296875,
+        788.4500732421875,
+        103.54299926757812
+      ],
+      "text": "Viễn thông và chương trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n(*) Học phần QT1528 Tiếng Đức 6, QT1529 Tiếng Đức 7: chỉ dành cho các sinh viên học chuyển tiếp sang Đức theo chương \n"
+    },
+    {
+      "bbox": [
+        134.4499969482422,
+        104.10099792480469,
+        453.47003173828125,
+        118.49199676513672
+      ],
+      "text": "trình Kỹ thuật Cơ điện tử, hợp tác với ĐH Leibniz Hannover.\n"
+    },
+    {
+      "bbox": [
+        273.72198486328125,
+        131.0500030517578,
+        610.4349365234375,
+        145.4409942626953
+      ],
+      "text": "Bảng 6.2 Bảng quy đổi tương đương các chứng chỉ tiếng Đức\n"
+    }
+  ],
+  "table_ids": [
+    "hust-language-k71-168b5c897fe8-p18-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1101
+}

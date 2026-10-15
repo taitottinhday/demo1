@@ -1,0 +1,35 @@
+                                                           35
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+                                         XTTN                 70.05/100                      78.4/110             Hệ thống
+                              Hệ thống thông tin
+47  MI2       thông tin    7340405                DGTD   80    84    71.07/100    100     101     68.45/100                                     quản lý
+               quản lý                                            THPT                  27.72/30                       27.34/30
+                                         XTTN                 56.45/100                     76.65/110
+            Kỹ thuật
+48  MS1                 7520309  Kỹ thuật vật liệu    DGTD   300   307    60.99/100    325     332     56.55/100               Vật liệu
+                                            THPT                  25.39/30                        24.9/30
+            Kỹ thuật Vi                       XTTN                  80.9/100                      92.77/110
+                 điện tử và49  MS2                 7440122  Khoa học vật liệu    DGTD   240   241    74.76/100    185     195     71.68/100              Công nghệ
+                                            THPT                  28.25/30                       27.64/30               nano
+              Công nghệ                       XTTN                 55.37/100                     76.65/110
+                  vật liệu50  MS3                 7510402  Công nghệ vật liệu   DGTD   80    89    60.04/100    120     120     56.55/100              Polyme và
+                                            THPT                  25.16/30                       25/30               Compozit
+                                         XTTN                  55/100                       70.89/110
+51  MS5     Kỹ thuật in  7520137  Kỹ thuật In       DGTD   60    65    56.88/100    120     128     53.42/100
+                                            THPT                  24.06/30                       24/30
+              Khoa học                        XTTN                  55/100                       76.65/110
+                và kỹ thuật                                       DGTD                 55.89/100                     52.53/100
+52  MSE3     vật liệu     7520309  Kỹ thuật vật liệu              60    64                45      49
+              (CT tiên                                            THPT                   23.7/30                        24/30
+                    tiến)
+               Vật lý kỹ                        XTTN                 61.23/100                     75.82/110
+53  PH1                 7520401   Vật lý kỹ thuật               200   212               370     397
+                  thuật                          DGTD                 65.19/100                     56.66/100

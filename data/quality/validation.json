@@ -1,21 +1,23 @@
 {
   "status": "passed",
+  "records": 1132,
+  "chunks": 1065,
+  "cutoff_facts": 358,
   "checks": [
     "JSON Schema",
     "unique IDs",
-    "source SHA256",
+    "catalog/source SHA256 and paths",
     "page coverage",
     "table provenance",
-    "parent references",
+    "parent/context references",
     "view consistency",
     "68 programs",
     "historical score year/scale",
     "TCHP units",
     "20 OCR pages",
-    "release checksums"
+    "development anchors",
+    "release counts",
+    "complete snapshot and pipeline checksums"
   ],
-  "records": 1132,
-  "chunks": 1065,
-  "cutoff_facts": 358,
   "note": "Technical checks; not human accuracy certification."
 }

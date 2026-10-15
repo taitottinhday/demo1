@@ -1,0 +1,35 @@
+                                                            13
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                            Kỹ thuật cơ khí                 2. Phương thức ĐGTD63  TE2     Kỹ thuật Cơ khí động lực         7520116                      120
+                                                      động lực                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                            Kỹ thuật hàng                  2. Phương thức ĐGTD64  TE3     Kỹ thuật Hàng không            7520120                       80
+                                                      không                          3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD                Chương trình học65  TEE2    Kỹ thuật Ô tô (CT tiên tiến)       7520130   Kỹ thuật ô tô         100
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Cơ khí hàng không (Chương             Kỹ thuật hàng                  2. Phương thức ĐGTD66  TEEP                                  7520120                       40                                    Chương trình PFIEV
+                   trình Việt - Pháp PFIEV)                   không                          3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+             Khoa học máy tính - hợp tác                                                       2. Phương thức ĐGTD                Chương trình liên kết67  TROYIT                               7480101   Khoa học máy tính    120
+                 với ĐH Troy (Hoa Kỳ)                                                             3. Phương thức THPT (D01(Gốc); A00 ;   đào tạo
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD
+68  TX1      Công nghệ Dệt - May            7540204   Công nghệ dệt, may   240
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                              D07; K01)

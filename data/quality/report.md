@@ -25,16 +25,15 @@ Hiệu lực K71 được chủ dự án xác nhận. Không gán năm 2026 cho 
 
 ## Các giới hạn cần xử lý
 
-- PDF gốc không đổi. sources.md đang được người dùng chỉnh nên không ghi đè.
+- Catalog là nguồn metadata chung; PDF gốc không đổi. Không ghi đè sources.md.
 - OCR và bảng gộp/tiếp nối giữ trạng thái cần đối chiếu; raw grids không đưa vào chunks trả lời.
 - Native sections và chương trình đủ cấu trúc để phát triển; chưa thay thế duyệt nội dung của cán bộ.
 - normalized/*.jsonl là bản ghi có nguồn theo chủ đề, không phải toàn bộ bảng đã chuyển thành giá trị tính toán.
-- Các URL web trong sources.md chưa được đóng gói bản lưu. Học bổng tổng quan đã trích từ PDF trang 25–26; điểm chuẩn có trong PDF là lịch sử.
+- Dữ kiện web tóm tắt từ main được giữ riêng trong admissions_facts_2026.json; chưa có bản lưu web đầy đủ. Điểm chuẩn trong records.jsonl là lịch sử 2024/2025.
 - Không suy ra tổng học phí năm từ đơn giá TCHP, không tính điểm từ công thức OCR chưa duyệt.
 
 ## Vấn đề phát hiện
 
-- `metadata_discrepancy` / hust-language-k71 / trang 5: sources.md ghi 2025-2026; Điều 7 PDF ghi 2026-2027. Manifest dùng nội dung PDF; không sửa sources.md đang được người dùng chỉnh.
 - `toc_excluded` / hust-regulations-k71 / trang 3: Mục lục lưu trong extracted, không làm bằng chứng trả lời.
 - `ocr_requires_visual_review` / hust-tsa-k71 / trang 1: OCR confidence=93; kiểm tra chữ, số, công thức và bố cục bảng trước dùng làm kết luận.
 - `ocr_requires_visual_review` / hust-tsa-k71 / trang 2: OCR confidence=94; kiểm tra chữ, số, công thức và bố cục bảng trước dùng làm kết luận.

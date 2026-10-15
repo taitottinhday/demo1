@@ -1,0 +1,32 @@
+                                                            46
+
+                                                 Năm 2024            Năm 2025        Ghi
+                Tên chương    Mã     Tên    Phương                                                   chú
+    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ
+                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu
+                                                                   học     điểm xét         học    điểm xét
+    LT;      (VLVH     Liên             vật liệu
+    MS1.P-B2  thông Cao đẳng –
+                Đại học); Kỹ thuật
+                   vật  liệu (VLVH
+                Liên  thông  Đại
+                học – Đại học)
+ 4   IT1.P-B2   Công nghệ thông                              15     16                200   96
+                                     Công
+                     tin (VLVH  Liên
+                                7480201  nghệ
+                 thông Đại học –
+                                            thông tin
+                Đại học)
+ 5   ETE5.P-   Kỹ  thuật Y sinh                              140    122                120   90
+    LT;      (VLVH     Liên
+    ETE5.P-    thông Cao đẳng –
+                                 Kỹ thuật
+    B2         Đại học); Kỹ thuật  7520212
+                            Y sinh
+          Y  sinh  (VLVH
+                Liên  thông  Đại
+                học – Đại học)
+ 6   EE2.P-LT;  KT Điều khiển và         Kỹ thuật             50     39                100   63
+                                7520216
+    EE2.P-B2   tự   động   hóa           Điều

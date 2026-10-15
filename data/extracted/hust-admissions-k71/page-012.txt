@@ -1,0 +1,27 @@
+                                                            11
+
+
+    Mã xét                     Mã ngành                     ChỉTT             Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú      tuyển                                chuẩn                            tiêu
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+            Cơ điện tử - hợp tác với ĐH                                                       2. Phương thức ĐGTD                 Chuẩn ngoại ngữ tiếng49  MELUH                               7520114   Kỹ thuật cơ điện tử    50                 Leibniz Hannover (Đức)                                                           3. Phương thức THPT (A00 (Gốc); A01;   Đức
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+            Cơ điện tử - hợp tác với ĐH                                                       2. Phương thức ĐGTD                 Chuẩn ngoại ngữ tiếng50  MENUT                               7520114   Kỹ thuật cơ điện tử    100             Công nghệ Nagaoka (Nhật Bản)                                                   3. Phương thức THPT (A00 (Gốc); A01;   Nhật
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD51  MI1      Toán - Tin                    7460117   Toán tin            160
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                              Hệ thống thông tin             2. Phương thức ĐGTD52  MI2     Hệ thống thông tin quản lý        7340405                       80                                                       quản lý                         3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                          Chương trình mới -                                                                                                        2. Phương thức ĐGTD53  MIE22                                 7460107   Khoa học tính toán    40                                    Chương trình học            Khoa học tính toán cho các                                                      3. Phương thức THPT (A00 (Gốc); A01;                                                                                                                     bằng tiếng Anh
+              hệ thống thông minh                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD54  MS1     Kỹ thuật Vật liệu               7520309   Kỹ thuật vật liệu      280
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                               D07; K01)
+            Kỹ thuật Vi điện tử và Công                                                       1. Phương thức XTTN55  MS2                                   7440122   Khoa học vật liệu     180               nghệ nano                                                                          2. Phương thức ĐGTD

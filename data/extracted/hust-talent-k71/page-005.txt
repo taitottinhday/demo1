@@ -1,0 +1,51 @@
+                                          4
+
+ STT  Lĩnh vực đạt giải            Mã xét tuyển/Chương trình đào tạo
+  4     - Kỹ thuật cơ khí              Gồm 11 chương trình sau:
+                                 ME1-Kỹ thuật Cơ điện tử
+                                 ME2-Kỹ thuật Cơ khí
+                                   TE1-Kỹ thuật Ô tô
+                                   TE2-Kỹ thuật Cơ khí động lực
+                                   TE3-Kỹ thuật Hàng không
+                                  ME-E1-Kỹ thuật Cơ điện tử
+                                ME-GU-Cơ khí Chế tạo máy-Griffith (Úc)
+                                   ME-LUH-Cơ điện tử-Leibniz Hannover (Đức)
+                                ME-NUT-Cơ điện tử-Nagaoka (Nhật Bản)
+                                     TE-E2-Kỹ thuật Ô tô
+                                    TE-EP-Cơ khí Hàng không Việt-Pháp
+  5     - Khoa học xã hội và hành vi      Gồm 10 chương trình sau:
+                                    ED2-Công nghệ Giáo dục
+                                    ED3-Quản lý giáo dục
+                                  ED5-Tâm lý học công nghiệp và tổ chức
+                                  EM1-Quản lý năng lượng
+                                  EM2-Quản lý Công nghiệp
+                                  EM3-Quản trị Kinh doanh
+                                     EM5-Tài chính Ngân hàng
+                                     EM-E13-Phân tích Kinh doanh
+                                             EM-E14-Logistics và Quản lý chuỗi cung ứng
+                                   EM-E17-Kế toán
+
+    Điều 3. Xét tuyển theo chứng chỉ quốc tế (diện 1.2)
+
+      1. Đối tượng và điều kiện đăng ký xét tuyển: Thí sinh tốt nghiệp THPT, có điểm trung
+bình chung (TBC) các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo
+thang điểm 10. Điểm TBC năm học = (điểm TBC học kỳ I + điểm TBC học kỳ II)/2. Thí
+sinh có ít nhất 1 trong các chứng chỉ quốc tế sau còn giá trị tính tới thời điểm đăng ký:
+SAT, ACT, A-Level, AP và IB. Đối với chứng chỉ A-Level và AP, chỉ xét đối với chứng
+chỉ có điểm thi môn Toán và 2 trong số các môn học sau: Lý/Hóa/Sinh/Tin/Khoa học/tiếng
+Anh. Điểm chứng chỉ áp dụng để xét tuyển là tổng điểm của môn Toán và 2 môn thi có
+điểm số cao nhất còn lại. Đối với chứng chỉ ACT, thí sinh phải có điểm phần thi Khoa học.
+
+      2. Quy định về quy đổi điểm số cho các chứng chỉ quốc tế có điểm thành phần môn
+học đánh giá theo hệ chữ trong Bảng 3.
+  Bảng 3. Quy đổi điểm số cho các chứng chỉ quốc tế có điểm thành phần môn học
+                         đánh giá theo hệ chữ
+        TT    Điểm theo hệ chữ    Điểm quy đổi theo hệ số thang 10
+
+            1         A*                        10
+
+            2        A                         9
+
+            3         B                         8
+
+            4         C                         7

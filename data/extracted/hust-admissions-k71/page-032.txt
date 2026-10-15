@@ -1,0 +1,37 @@
+                                                           31
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+               Viễn thông
+              (CT tiên                           THPT                  27.55/30                       27.03/30
+                    tiến)
+                                         XTTN                 57.34/100                     91.19/110            Kỹ thuật Y
+25  ETE5      sinh (CT    7520212  Kỹ thuật y sinh     DGTD   40    42    61.77/100    55      58     53.67/100
+                    tiên tiến)                                            THPT                  25.58/30                       25.08/30
+             Hệ thống                        XTTN                 72.71/100                     84.11/110
+               nhúng                             Kỹ thuật điện tử -    DGTD                 71.97/100                     69.07/100
+26  ETE9     thông minh  7520207                            80    80                80      83                                         viễn thông
+                và IoT (CT                                            THPT                  27.85/30                       27.21/30
+                    tiên tiến)
+               Điện tử -                         XTTN                 61.89/100                     74.67/110
+               Viễn thông                                       DGTD                 65.76/100                     56.68/100
+                      - hợp tác
+                             Kỹ thuật điện tử -
+27  ETLUH   với ĐH     7520207                            40    44                90      93                                         viễn thông
+                 Leibniz                                            THPT                  26.55/30                       25.65/30
+               Hannover
+                (Đức)
+                                         XTTN                  55/100                       71.05/110
+            Kỹ thuật
+28  EV1                 7520320  Kỹ thuật môi trường  DGTD   200   198    52.63/100    180     179     50.72/100             Môi trường
+                                            THPT                  22.22/30                        22.1/30
+                                         XTTN                  55/100                       71.05/110              Quản lý Tài
+                                 Quản lý tài nguyên
+29  EV2      nguyên và   7850101                DGTD   155   154    51.19/100    130     132     50.33/100                                      và môi trường
+             Môi trường                                            THPT                  21.53/30                       21.78/30

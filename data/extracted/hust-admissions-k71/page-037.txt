@@ -1,0 +1,37 @@
+                                                           36
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+                                            THPT                  26.41/30                       25.87/30
+                                         XTTN                  55/100                       70.89/110
+            Kỹ thuật
+54  PH2                 7520402  Kỹ thuật hạt nhân   DGTD   40    58    59.68/100    40      30     53.28/100                  hạt nhân
+                                            THPT                  25.07/30                       24.64/30
+                                         XTTN                 55.56/100                     75.82/110
+               Vật lý Y
+55  PH3                 7520402  Kỹ thuật hạt nhân   DGTD   60    60     60.2/100     50      52     55.28/100               khoa
+                                            THPT                   25.2/30                       25.31/30
+                                         XTTN                 64.13/100                     76.19/110
+            Kỹ thuật Ô
+56  TE1                 7520130  Kỹ thuật ô tô      DGTD   220   219    67.74/100    260     262     64.36/100                   tô
+                                            THPT                  27.03/30                       26.99/30
+                                         XTTN                 60.48/100                     75.38/110            Kỹ thuật
+                             Kỹ thuật cơ khí
+57  TE2     Cơ khí      7520116                DGTD   120   132    64.53/100    140     146     59.89/100                                   động lực
+               động lực                                            THPT                  26.25/30                       26.12/30
+                                         XTTN                 62.12/100                     81.01/110            Kỹ thuật
+                             Kỹ thuật hàng
+58  TE3      Hàng       7520120                DGTD   80    78    65.97/100    100     108     62.36/100                                   không
+               không                                            THPT                   26.6/30                       26.22/30
+                                         XTTN                 55.47/100                     77.44/110            Kỹ thuật Ô
+59  TEE2      tô (CT tiên   7520130  Kỹ thuật ô tô      DGTD   100   106    60.12/100    85      80     60.68/100
+                    tiến)                                            THPT                  25.18/30                        25.9/30
+            Cơ khí             Kỹ thuật hàng      XTTN                 58.56/100                     81.01/110
+60  TEEP                7520120                            40    40                40      45
+               hàng không           không          DGTD                 62.84/100                     54.68/100

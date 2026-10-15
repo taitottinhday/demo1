@@ -1,0 +1,62 @@
+10
+
+3. Ngân hàng câu hỏi TSA chuẩn hóa được bố sung liên tục hàng năm theo kết quả
+xây dựng của Ban xây dựng ngân hang câu hỏi TSA hoặc mua từ các đơn vị có chức năng
+chuyên môn cung cấp.
+
+4. Việc xây dựng, thử nghiệm, chuẩn hóa câu hỏi TSA được thực hiện theo quy trình
+do Giám đốc DHBK Hà Nội phê duyệt.
+
+Chương V
+TỎ CHỨC THỊ
+
+Điều 20. Chuẩn bị cơ sở vật chất phục vụ cho mỗi dot thi
+
+1. Yêu cầu cơ sở vật chất, thiết bị phục vụ cho kỳ thi tại địa điểm tổ chức cụm thi:
+
+a) Có đủ phòng thi, máy vi tinh để tổ chức thi; phòng thi đảm bảo có đủ ánh sáng,
+bàn ghế;
+
+b) Có hệ thống máy tính được kết nối internet;
+
+c) Khu vực thi bảo đảm các yêu cầu an toàn, bảo mật và phòng chống cháy nỗ; có
+thiết bị kiểm tra an ninh dé kiểm soát, ngăn chặn được việc mang tài liệu, đồ dùng trái phép
+vào phòng thi; có phòng làm việc cho Hội đồng thi; có nơi bảo quản đồ đạc của thí sinh;
+
+d) Trước cửa mỗi phòng thi phải niêm yết danh sách của thí sinh từng buổi thi, kíp
+thi, quy định trách nhiệm của thí sinh trong phòng thi;
+
+đ) Đáp ứng đầy đủ các yêu cầu khác về cơ sở vật chất của Hội đồng thi (nếu có).
+
+2. Yêu cầu đối với máy vi tính trong phòng thi:
+
+a) Có cầu hình tương đương với nhau, đảm bao hoạt động 6n định;
+
+b) Trong thời gian làm bài thi, trừ kết nối với máy chủ thông qua internet, không kết
+nối với bat kỳ thiết bị, phương tiện nào khác trong và ngoài phòng thi; được đặt ngày, giờ
+chính xác trong hệ thống:
+
+c) Được cài đặt phần mềm thi trước ngày thi, không có bat kỳ phần mềm và tai liệu
+nào khác liên quan đến nội dung thi.
+
+Điều 21. Bố trí phòng thi, khu vực thi
+
+1. Mỗi thí sinh được sử dụng một máy vi tính riêng biệt. Mỗi phòng thi có số lượng
+máy vi tính dự phòng ít nhất bằng 5% tổng số thí sinh trong phòng thi.
+
+2. Các máy vi tính trong phòng thi được bố trí đảm bảo khoảng cách hoặc vách ngăn
+để thí sinh không thể nhìn rõ bài thi của thí các sinh khác.
+
+3. Trong mỗi phòng thi bố trí 01 CBCT và 01 CBKT hỗ trợ kỹ thuật quá trình thi.
+
+4. Bố trí số cán bộ giám sát dam bảo việc giám sát các phòng thi trên cùng một tang
+và không quá 04 phòng thi/cán bộ.
+
+5. Bế trí lực lượng công an, bảo vệ, y tế, phục vụ tại khu vực thi, số lượng phù hợp
+với quy mô của cụm điểm thi.
+
+Điều 22. Ban Coi thi
+
+1. Thành phần Ban Coi thi gồm:
+
+a) Trưởng ban: lãnh đạo Hội đồng thi kiêm nhiệm;

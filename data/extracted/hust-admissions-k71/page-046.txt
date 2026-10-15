@@ -1,0 +1,32 @@
+                                                            45
+
+    10. Thông tin về tuyển sinh của 2 năm gần nhất
+
+
+                                                 Năm 2024            Năm 2025        Ghi
+                Tên chương    Mã     Tên    Phương                                                   chú
+    Mã xét      trình, ngành,    ngành,   ngành,     thứcTT                                                             Số    Điểm trúng        Số   Điểm trúng       tuyển    nhóm ngành xét   nhóm   nhóm     tuyển    Chỉ                      Chỉ
+                                                             nhập   tuyển/Thang      nhập  tuyển/Thang                     tuyển       ngành   ngành     sinh                                                                          tiêu                            tiêu
+                                                                   học     điểm xét         học    điểm xét
+ I  Hình thức VLVH đối với đối tượng tốt nghiệp từ cao đẳng trở lên (liên thông, VB2 VLVH)
+ 1   EE1.P-LT;  Kỹ   thuật  Điện                              80     87                130   77
+    EE1.P-B2  (VLVH     Liên
+                 thông Cao đẳng –
+                                 Kỹ thuật
+                Đại học); Kỹ thuật  7520201
+                                               điện
+                Điện (VLVH Liên
+                 thông Đại học –
+                Đại học)
+ 2   BF2.P-LT;  Kỹ   thuật  Thực                              30                              0
+    BF2.P-B2  phẩm   (VLVH
+                Liên  thông  Cao
+                                 Kỹ thuật
+                đẳng – Đại học);
+                                7540102  thực
+            Kỹ   thuật  Thực
+                                    phẩm
+              phẩm   (VLVH
+                Liên  thông  Đại
+                học – Đại học)
+ 3  MS1.P-    Kỹ thuật vật liệu  7520309 Kỹ thuật            120     47                 70    0

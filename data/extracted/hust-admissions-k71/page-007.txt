@@ -1,0 +1,39 @@
+                                                            6
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        2. Phương thức ĐGTD
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Điều khiển - Tự động            Kỹ thuật điều khiển            2. Phương thức ĐGTD13  EE2                                   7520216                      500
+               hoá                                      và tự động hoá                 3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Hệ thống điện và năng lượng tái                                                   2. Phương thức ĐGTD                Chương trình học14  EEE18                                 7520201   Kỹ thuật điện         60
+                  tạo (CT tiên tiến)                                                                   3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Điều khiển - Tự động            Kỹ thuật điều khiển            2. Phương thức ĐGTD                Chương trình học15  EEE8                                  7520216                      140
+               hoá (CT tiên tiến)                          và tự động hoá                 3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                Tin học công nghiệp và Tự
+                                            Kỹ thuật điều khiển            2. Phương thức ĐGTD16  EEEP     động hóa (Chương trình Việt -     7520216                       40                                    Chương trình PFIEV
+                                                         và tự động hoá                 3. Phương thức THPT (A00 (Gốc); A01;              Pháp PFIEV)
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD17  EM1     Quản lý năng lượng             7510604   Kinh tế công nghiệp   80
+                                                                                                        3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+                                                  Quản lý công                   2. Phương thức ĐGTD18  EM2     Quản lý công nghiệp            7510601                       80
+                                                           nghiệp                          3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+19  EM3     Quản trị kinh doanh             7340101   Quản trị kinh doanh   140
+                                                                                                        2. Phương thức ĐGTD

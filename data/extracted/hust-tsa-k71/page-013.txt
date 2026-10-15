@@ -1,0 +1,49 @@
+12
+
+Điều 24. Công tác coi thi, trách nhiệm của các thành viên Ban Coi thi
+
+1. Công tác chuẩn bị
+
+Trước ngày thi ít nhất 01 ngày, Lãnh đạo và thư ký điểm thi, kỹ thuật viên có mặt tại
+địa điểm thi để thực hiện kiểm tra, rà soát cơ sở vật chất được quy định tại Điều 20 và 21
+Quy chế này. Lưu ý kiểm tra việc cài đặt phần mềm của các máy vi tính, kiểm tra hệ thống
+mạng và việc kết nối máy tính với mạng internet, kiểm tra hệ thống điện, thiết bị điện; tiếp
+nhận sơ đồ mạng và phòng đặt các switch trung gian (nếu có), vị trí cầu dao điện tổng và
+cầu dao của tòa nha/tang nhà tại khu vực tô chức thi. Tiến hành niêm phong các phòng thi,
+phòng hội đồng thi.
+
+2. Quy trình coi thi
+
+a) Trước giờ thi ít nhất là 60 phút, CBCT nhận túi tài liệu phòng thi từ Trưởng Điểm
+thi; CBCT và CBKT kiểm tra niêm phong trước khi mở phòng thi; khởi động máy vi tính
+và chương trình phần mềm thi; gọi thí sinh vào phòng thi, kiểm tra căn cước công dân để
+nhận dạng thí sinh; kiểm tra vật đụng của thí sinh; hướng dẫn thí sinh ngồi đúng vị trí theo
+số báo danh; phát phiếu tài khoản dự thi cho thí sinh; ký tên vào các tờ giấy nháp và phát
+cho thí sinh; phổ biến quy định trách nhiệm của thí sinh và xử lý thí sinh vi phạm quy chế
+thi, hướng dẫn thí sinh các điểm cần lưu ý trong thời gian thi; hướng dẫn thí sinh đăng nhập
+vào tài khoản dự thi và kiểm tra bàn phím, chuột điều khiển máy tính. Nếu cán bộ tham gia
+công tác coi thi đem thiết bị liên lạc, thiết bị có khả năng thu phát sóng khác vào khu vực
+thi thì phải để các thiết bị tại nơi quản lý tập trung trong phòng hội đồng thi trong suốt quá
+trình thi.
+
+b) Sau khi Chủ tịch Hội đồng thi hoặc cán bộ được Chủ tịch Hội đồng thi ủy quyền
+kích hoạt kỳ thi trên phần mềm, CBCT cho thí sinh bắt đầu làm bài.
+
+c) Trong thời gian làm bài thi: Thí sinh thực hiện theo quy định tại Điều 15 của Quy
+chế này. CBCT và CBKT theo dõi trạng thái hoạt động tài khoản thi của thí sinh và xử lý
+các sự cố nảy sinh trong quá trình thi:
+
+- Nếu thấy tài khoản thi không tương tác với hệ thống thi trong thời gian quá 05 phút,
+tài khoản thi đã kết thúc khi chưa hết thời gian làm bài thì phải kiểm tra việc kết nối giữa
+máy vi tính của thí sinh đó với internet hoặc máy chủ;
+
+- Khi thí sinh bị gián đoạn thời gian làm bài thi do sự có tài khoản, phần mềm hoặc
+máy vi tính, CBCT thực hiện theo quy định tại Điều 25 của Quy chế nay.
+
+đ) Nộp bai thi:
+
+- Khi hết thời gian làm bài thi theo đồng hồ chung của hệ thống, hệ thống tự động thu
+bài thi của thí sinh. Trường hợp thí sinh nộp bài trước khi hết thời gian làm bài thi, sau khi
+nộp bài thí sinh chỉ được rời khỏi phòng thi cho đến khi CBCT cho phép;
+
+- CBCT, CBKT yêu cầu từng thí sinh xem lại việc nộp bài của mình và ký xác nhận;

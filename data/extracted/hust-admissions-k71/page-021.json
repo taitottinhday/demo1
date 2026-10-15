@@ -1,0 +1,36 @@
+{
+  "page_id": "hust-admissions-k71-p21",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 21,
+  "printed_page": null,
+  "native_text": "                                     20\n\n\nTT  Tên chương trình              Mức học phí trung bình  Ghi chú\n16  Kỹ thuật thực phẩm\n17   Tài chính-Ngân hàng\n18  Quản lý công nghiệp\n19  Quản lý năng lượng\n20  Quản trị kinh doanh\n21   Tiếng Anh KHKT và Công nghệ\n22   Tiếng Trung KH&KT\n                                                       Chương\n23   Tiếng Hàn Khoa học và Công nghệ\n                                                                              trình mới\n24  Kỹ thuật hóa học\n25  Hóa học\n26  Kỹ thuật in\n27  Kỹ thuật vật liệu\n28  Công nghệ vật liệu Polyme và Compozit\n29  Kỹ thuật vi điện tử và CN Nano\n30   Vật lý kỹ thuật\n31  Kỹ thuật hạt nhân\n32   Vật lý Y khoa\n33  Công nghệ Dệt May\n34  Kỹ thuật môi trường\n35  Quản lý Tài nguyên và Môi trường\n36  Công nghệ giáo dục\n37  Quản lý giáo dục\n                                                       Chương\n38  Tâm lý học công nghiệp và tổ chức                                                                              trình mới",
+  "text": "                                     20\n\n\nTT  Tên chương trình              Mức học phí trung bình  Ghi chú\n16  Kỹ thuật thực phẩm\n17   Tài chính-Ngân hàng\n18  Quản lý công nghiệp\n19  Quản lý năng lượng\n20  Quản trị kinh doanh\n21   Tiếng Anh KHKT và Công nghệ\n22   Tiếng Trung KH&KT\n                                                       Chương\n23   Tiếng Hàn Khoa học và Công nghệ\n                                                                              trình mới\n24  Kỹ thuật hóa học\n25  Hóa học\n26  Kỹ thuật in\n27  Kỹ thuật vật liệu\n28  Công nghệ vật liệu Polyme và Compozit\n29  Kỹ thuật vi điện tử và CN Nano\n30   Vật lý kỹ thuật\n31  Kỹ thuật hạt nhân\n32   Vật lý Y khoa\n33  Công nghệ Dệt May\n34  Kỹ thuật môi trường\n35  Quản lý Tài nguyên và Môi trường\n36  Công nghệ giáo dục\n37  Quản lý giáo dục\n                                                       Chương\n38  Tâm lý học công nghiệp và tổ chức                                                                              trình mới",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        298.8699951171875,
+        42.46797180175781,
+        313.8699951171875,
+        55.75197219848633
+      ],
+      "text": "20 \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        62.390323638916016,
+        74.4540023803711,
+        77.93260192871094
+      ],
+      "text": " \n"
+    }
+  ],
+  "table_ids": [
+    "hust-admissions-k71-9aea5b7b9afb-p21-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 993
+}

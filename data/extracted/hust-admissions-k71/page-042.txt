@@ -1,0 +1,51 @@
+                                      41
+
+              Tên chương   Mã      Tên          Phương
+    Mã xét    trình, ngành,   ngành,    ngành,    Chỉ    thức
+TT                                                         Ghi chú
+      tuyển   nhóm ngành   nhóm    nhóm      tiêu    tuyển
+                   xét tuyển    ngành1    ngành             sinh
+                  học); Kỹ thuật
+               cơ   điện   tử
+            (ĐTTX  Văn
+               bằng thứ hai)
+            Kỹ  thuật  vật
+                   liệu   (ĐTTX
+                Liên    thông
+    MS1LT;   Cao đẳng Đại        Kỹ   thuật          Xét
+ 8                          7520309            70
+   MS1VB2   học); Kỹ thuật           Vật liệu             tuyển
+                  vật         liệu
+            (ĐTTX  Văn
+               bằng thứ hai)
+             Quản  trị kinh
+               doanh (ĐTTX
+                Liên    thông
+    EM3LT;   Cao đẳng Đại          Quản     trị          Xét
+ 9                          7340101            70
+   EM3VB2   học); Quản trị            kinh doanh           tuyển
+                kinh    doanh
+            (ĐTTX  Văn
+               bằng thứ hai)
+             Công    nghệ
+                thông        tin
+            (ĐTTX   Liên
+                thông    Cao
+    IT1LT,                         Công nghệ          Xét
+10            đẳng     Đại  7480201            150
+    IT1VB2                         Thông tin            tuyển
+                  học);   Công
+               nghệ thông tin
+            (ĐTTX  Văn
+               bằng thứ hai)
+            Kỹ thuật Hóa
+               học   (ĐTTX
+                Liên    thông
+    CH1LT,   Cao đẳng Đại        Kỹ   thuật          Xét
+11                          7520301            40
+   CH1VB2   học); Kỹ thuật         Hóa học             tuyển
+               hóa      học
+            (ĐTTX  Văn
+               bằng thứ hai)
+
+     5. Các thông tin cần thiết khác để thí sinh dự tuyển vào các ngành của trường.

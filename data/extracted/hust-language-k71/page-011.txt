@@ -1,0 +1,25 @@
+                                                      2
+
+        Bảng 3.2 Yêu cầu trình độ tiếng Anh theo học kỳ và chuẩn ngoại ngữ đầu ra khi xét tốt nghiệp
+
+               Hạng mục                                  Yêu cầu
+Đăng ký học tập cho học kỳ 1
+                                        Được xếp lớp học theo quy định tại Bảng 3.1
+Đăng ký học tập cho học kỳ 2
+                                                 Sinh viên phải đăng ký học song hành học phần FL1133
+Đăng ký học tập cho học kỳ 3
+                                                Tiếng Anh cơ sở 3 nếu chưa học hoặc chưa được miễn.
+                                                 Sinh viên phải đăng ký học song hành học phần FL1134
+Đăng ký học tập cho học kỳ 4
+                                                Tiếng Anh cơ sở 4 nếu chưa học hoặc chưa được miễn.
+                                                 Sinh viên phải đăng ký học song hành học phần FL1135
+Đăng ký học tập cho học kỳ 5
+                                                Tiếng Anh cơ sở 5 nếu chưa học hoặc chưa được miễn.
+Chuẩn đầu ra khi xét tốt nghiệp với CTĐT chuẩn  Có chứng chỉ tiếng Anh được quy đổi tương đương từ Bậc
+(trừ các CTĐT nhóm ngành ngôn ngữ)              3 trở lên theo Bảng 2.1, Phụ lục II
+                                        Đáp ứng đồng thời hai điều kiện sau:
+                                                          a) Có chứng chỉ tiếng Anh được quy đổi tương đương từ
+Chuẩn đầu ra khi xét tốt nghiệp với CTĐT tài     Bậc 4 trở lên theo Bảng 2.1 - Phụ lục II
+năng tích hợp Cử nhân – Thạc sĩ                    b) Đáp ứng yêu cầu chuẩn đầu ra ngoại ngữ theo Chuẩn
+                                  CTĐT kỹ sư, thạc sĩ tài năng thuộc các lĩnh vực STEM do
+                                      Bộ Giáo dục và Đào tạo ban hành.

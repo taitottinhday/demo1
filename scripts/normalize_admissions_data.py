@@ -13,14 +13,13 @@ import re
 import unicodedata
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
 
 import pymupdf
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
-VERSION = "k71-2026-v1"
-PARSER = "admissions-normalizer-1.0"
+VERSION = "k71-2026-v2"
+PARSER = "admissions-normalizer-1.1"
 TITLES = {
     "admissions": "Thông tin tuyển sinh đại học năm 2026",
     "language": "Quy định ngoại ngữ từ K71",
@@ -105,34 +104,41 @@ def source_kind(filename):
         return "talent"
     if filename.startswith("quy-che"):
         return "tsa"
-    return "admissions"
+    if filename == "thong-tin-tuyen-sinh-dai-hoc-2026f.pdf":
+        return "admissions"
+    raise ValueError(f"Unknown PDF kind: {filename}")
 
 
 def sources():
-    content = (DATA / "sources.md").read_text(encoding="utf-8-sig")
+    catalog = json.loads((DATA / "source_catalog.json").read_text(encoding="utf-8"))
     result = []
     seen_checksums = set()
-    for path in sorted((DATA / "raw").glob("*.pdf")):
+    documents = [item for item in catalog["documents"] if item["type"] == "pdf"]
+    # Stable ordering preserves the order of the original six-source snapshot.
+    order = ["language", "tuition", "regulations", "talent", "tsa", "admissions"]
+    documents.sort(key=lambda item: order.index(source_kind(Path(item["local_path"]).name)))
+    for document in documents:
+        relative = Path(document["local_path"].removeprefix("data/"))
+        path = (DATA / relative).resolve()
+        if not path.is_relative_to(DATA.resolve()) or relative.is_absolute():
+            raise ValueError(f"Source path escapes data/: {document['id']}")
         checksum = hashlib.sha256(path.read_bytes()).hexdigest()
-        # The merged branches keep legacy and runtime names for the same PDFs.
-        # Preserve existing snapshot paths while extracting each document once.
+        if checksum != document["sha256"]:
+            raise ValueError(f"Source checksum mismatch: {document['id']}")
         if checksum in seen_checksums:
-            continue
+            raise ValueError(f"Duplicate PDF in source catalog: {document['id']}")
         seen_checksums.add(checksum)
         kind = source_kind(path.name)
-        entries = re.split(r"(?=Tên tài liệu:)", content)
-        matched = next((part for part in entries if "raw/" + path.name in part), "")
-        url = re.search(r"URL chính thức:\s*(https://\S+)", matched)
-        url = url.group(1) if url else None
-        canonical = urlunsplit((*urlsplit(url)[:3], "", "")) if url else None
+        url = document["official_url"]
         result.append(
             {
                 "source_id": f"hust-{kind}-k71",
+                "runtime_source_id": document["id"],
                 "kind": kind,
                 "title": TITLES[kind],
                 "local_path": path.relative_to(DATA).as_posix(),
                 "url_original": url,
-                "url": canonical,
+                "url": url,
                 "sha256": checksum,
                 "cohort": "K71",
                 "admission_year": 2026,
@@ -148,33 +154,19 @@ def sources():
     # Dates grounded in readable text; remain distinct from the cohort confirmation.
     for item in result:
         if item["kind"] == "language":
-            item["publication_date"] = "2026-09-07"
             item["effective_note"] = (
                 "Điều 7, trang PDF 5: từ học kỳ 1 năm học 2026–2027; ngoại lệ quy đổi chứng chỉ cho khóa khác."
             )
-            issue(
-                "metadata_discrepancy",
-                item["source_id"],
-                5,
-                "sources.md ghi 2025-2026; Điều 7 PDF ghi 2026-2027. Manifest dùng nội dung PDF; không sửa sources.md đang được người dùng chỉnh.",
-            )
+            item["publication_note"] = "Ngày 07/09/2026 do nhóm cung cấp; chưa xác minh độc lập, publication_date giữ null."
         if item["kind"] == "talent":
             item["publication_date"] = "2026-03-17"
             item["effective_date"] = "2026-03-17"
     # Web URLs are registered as gaps, not silently represented as downloaded evidence.
-    web = []
-    for part in re.split(r"(?=Tên tài liệu:)", content):
-        if "Tên tài liệu:" not in part or re.search(r"File tương ứng:\s*raw/", part):
-            continue
-        match = re.search(r"URL chính thức:\s*(https://\S+)", part)
-        if match and not any(row["url"] == match.group(1) for row in web):
-            web.append(
-                {
-                    "url": match.group(1),
-                    "status": "not_in_local_raw",
-                    "title": compact(part.splitlines()[0].split(":", 1)[1]),
-                }
-            )
+    web = [
+        {"runtime_source_id": item["id"], "url": item["official_url"],
+         "title": item["title"], "status": item["status"], "full_snapshot_available": False}
+        for item in catalog["documents"] if item["type"] == "html"
+    ]
     return result, web
 
 
@@ -201,6 +193,8 @@ def extract(source, api):
         path = DATA / "extracted" / source["source_id"]
         path.mkdir(parents=True, exist_ok=True)
         needs_ocr = len(native.strip()) < 100 and bool(page.get_images())
+        if needs_ocr and api is None:
+            raise RuntimeError(f"Missing OCR engine for {source['source_id']} page {number}; no complete release produced.")
         method, confidence, text, words = "native", None, native, []
         if needs_ocr:
             cache = path / f"page-{number:03d}.ocr.json"
@@ -370,6 +364,8 @@ def base_record(source, page_start, page_end, text, title, kind="section", locat
         },
         "applicability_status": "confirmed_by_project_owner",
         "staff_reviewed": False,
+        "answer_eligible": False,
+        "extraction_method": "native",
     }
 
 
@@ -693,6 +689,7 @@ def chunks_for(record):
 
 
 def build(skip_ocr=False):
+    ISSUES.clear()
     manifests, web = sources()
     api = get_ocr_api(skip_ocr)
     records, pages, tables = [], [], []
@@ -798,6 +795,8 @@ def build(skip_ocr=False):
         "ready_for": ["backend_import", "retrieval_development", "reranker_evaluation"],
         "not_certified_for": ["staff_approved_admissions_advice", "accuracy_kpi"],
         "files": {},
+        "schema_version": 2,
+        "runtime_integration": "pending_adapter",
     }
     for folder in ["manifests", "normalized", "schemas"]:
         for path in sorted((DATA / folder).glob("*")):
@@ -824,11 +823,11 @@ def build(skip_ocr=False):
         "",
         "## Các giới hạn cần xử lý",
         "",
-        "- PDF gốc không đổi. sources.md đang được người dùng chỉnh nên không ghi đè.",
+        "- Catalog là nguồn metadata chung; PDF gốc không đổi. Không ghi đè sources.md.",
         "- OCR và bảng gộp/tiếp nối giữ trạng thái cần đối chiếu; raw grids không đưa vào chunks trả lời.",
         "- Native sections và chương trình đủ cấu trúc để phát triển; chưa thay thế duyệt nội dung của cán bộ.",
         "- normalized/*.jsonl là bản ghi có nguồn theo chủ đề, không phải toàn bộ bảng đã chuyển thành giá trị tính toán.",
-        "- Các URL web trong sources.md chưa được đóng gói bản lưu. Học bổng tổng quan đã trích từ PDF trang 25–26; điểm chuẩn có trong PDF là lịch sử.",
+        "- Dữ kiện web tóm tắt từ main được giữ riêng trong admissions_facts_2026.json; chưa có bản lưu web đầy đủ. Điểm chuẩn trong records.jsonl là lịch sử 2024/2025.",
         "- Không suy ra tổng học phí năm từ đơn giá TCHP, không tính điểm từ công thức OCR chưa duyệt.",
         "",
         "## Vấn đề phát hiện",

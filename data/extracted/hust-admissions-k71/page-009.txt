@@ -1,0 +1,40 @@
+                                                            8
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Điện tử - Viễn thông            Kỹ thuật điện tử -              2. Phương thức ĐGTD                Chương trình học27  ETE4                                  7520207                      120
+             (CT tiên tiến)                                 viễn thông                      3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD                Chương trình học28  ETE5    Kỹ thuật Y sinh (CT tiên tiến)     7520212   Kỹ thuật y sinh       40
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+            Hệ thống nhúng thông minh và            Kỹ thuật điện tử -              2. Phương thức ĐGTD                 Tăng cường tiếng29  ETE9                                  7520207                       80
+               IoT (CT tiên tiến)                             viễn thông                      3. Phương thức THPT (A00 (Gốc); A01;   Nhật
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+               Điện tử - Viễn thông - hợp tác
+                                            Kỹ thuật điện tử -              2. Phương thức ĐGTD                 Chuẩn ngoại ngữ tiếng30  ETLUH   với ĐH Leibniz Hannover        7520207                       40
+                                                              viễn thông                      3. Phương thức THPT (A00 (Gốc); A01;   Đức               (Đức)
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD31  EV1     Kỹ thuật Môi trường            7520320   Kỹ thuật môi trường   160
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+             Quản lý Tài nguyên và Môi                Quản lý tài nguyên             2. Phương thức ĐGTD32  EV2                                   7850101                      120
+                trường                                    và môi trường                  3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+               Tiếng Anh KHKT và Công
+33  FL1                                   7220201   Ngôn ngữ Anh       210   2. Phương thức ĐGTD
+               nghệ
+                                                                                                        3. Phương thức THPT (D01 (Gốc); K01)

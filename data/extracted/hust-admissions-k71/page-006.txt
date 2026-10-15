@@ -1,0 +1,38 @@
+                                                            5
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD 5  CH1     Kỹ thuật Hoá học               7520301   Kỹ thuật hóa học      680
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD 6  CH2     Hoá học                      7440112   Hoá học            160
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Hóa dược (CT tiên                                                       2. Phương thức ĐGTD                Chương trình học 7  CHE11                                7520301   Kỹ thuật hóa học      100
+                    tiến)                                                                                3. Phương thức THPT (A00 (Gốc); B00;   bằng tiếng Anh
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                          Chương trình mới -
+                                                                                                        2. Phương thức ĐGTD 8  CHE20   Hóa học mỹ phẩm              7440112   Hoá học             40                                    Chương trình học
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;                                                                                                                     bằng tiếng Anh
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD 9  ED2      Công nghệ giáo dục             7140103   Công nghệ giáo dục   120
+                                                                                                        3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD10  ED3      Quản lý giáo dục               7140114   Quản lý giáo dục      60
+                                                                                                        3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+                                                                                                        1. Phương thức XTTN
+           Tâm lý học công nghiệp và                                                      2. Phương thức ĐGTD11  ED5                                   7310401   Tâm lý học           40                                    Chương trình mới
+                 tổ chức                                                                             3. Phương thức THPT (D01(Gốc); A00 ;
+                                                                    A01 ; K01)
+12  EE1     Kỹ thuật Điện                  7520201   Kỹ thuật điện        240   1. Phương thức XTTN

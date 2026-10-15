@@ -1,0 +1,10 @@
+                                                             14
+
+
+
+Ghi chú:
+
+   •  Tổ hợp A00, A01,B00, D07, D01 in đậm thì môn Toán hệ số 2, các môn còn lại trong tổ hợp hệ số 1. Các tổ hợp không in đậm thì các
+     môn trong tổ hợp đều hệ số 1.
+     • Tổ hợp K01 (Toán, Văn, Lý/Hóa/Sinh/Tin) thì môn Toán hệ số 3, môn Văn hệ số 1 và môn còn lại trong số 4 môn Lý/Hóa/Sinh/Tin có
+ hệ số 2.

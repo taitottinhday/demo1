@@ -1,0 +1,34 @@
+                                                           3
+
+     Bảng 7.3 Danh mục các học phần tiếng Nhật thuộc khối ngoại ngữ cơ bản, điều kiện miễn học và chuẩn đầu ra
+                                 với chương trình Công nghệ thông tin Việt - Nhật
+
+       Mã học                                    Học phần được miễn và học kỳ xếp lớp học
+   TT             Tên học phần    Thời lượng
+          phần                                        Nhóm 1                 Nhóm 2
+     1    JP1110      Tiếng Nhật 1     5(0-10-0-10)                   Kỳ 1              M
+     2    JP1120      Tiếng Nhật 2     5(0-10-0-10)                   Kỳ 2              M
+                                              ĐK (Kỳ 3)
+     3    JP1132      Tiếng Nhật 3     3(0-6-0-6)                               M
+                                                (Được miễn học nếu có chứng chỉ JLPT từ N3 trở lên)
+                                              ĐK (Kỳ 4)
+     4    JP2111      Tiếng Nhật 4     3(0-6-0-6)                               M
+                                                (Được miễn học nếu có chứng chỉ JLPT từ N3 trở lên)
+                                 Đáp ứng một trong các điều kiện sau:
+   Chuẩn đầu ra khi xét tốt nghiệp   a) Có chứng chỉ JLPT từ N3 trở lên; hoặc
+                                           b) Đạt toàn bộ các học phần tiếng Nhật gồm: {JP1110, JP1120, JP1132, JP2111}
+
+Ghi chú:   Nhóm 1: Chưa có chứng chỉ JLPT tới mức N3      Nhóm 2: Có chứng chỉ JLPT từ N3 trở lên
+
+         M: Được miễn học (ghi điểm R)
+         Kỳ 1: Được xếp học ở kỳ 1                  Kỳ 2: Được xếp học ở kỳ 2
+         ĐK: Sinh viên tự đăng ký học song hành với các học phần của CTĐT tại kỳ tương ứng (trong bảng 7.3) nếu chưa
+            học hoặc chưa được miễn.
+
+   Bảng 7.4 Bảng xếp bậc chứng chỉ tiếng Nhật (JLPT) theo Khung năng lực ngoại ngữ 6 bậc dùng cho Việt Nam
+
+                     JLPT          N5       N4       N3       N2       N1
+
+                   Bậc trình độ theo
+                                        Bậc 2      Bậc 3      Bậc 4      Bậc 5      Bậc 6
+                KNLNNVN

@@ -39,6 +39,7 @@ CASES = [
 ]
 
 records = [json.loads(line) for line in (DATA / "normalized/records.jsonl").read_text(encoding="utf-8").splitlines()]
+release = json.loads((DATA / "processed/release.json").read_text(encoding="utf-8"))["release"]
 cases = []
 for i, (question, kind, pages, topic, behavior) in enumerate(CASES, 1):
     source_id = f"hust-{kind}-k71" if kind else None
@@ -60,6 +61,8 @@ for i, (question, kind, pages, topic, behavior) in enumerate(CASES, 1):
             "expected_behavior": behavior,
             "label_status": "draft_page_anchors_need_relevance_review",
             "split": "development",
+            "dataset_release": release,
+            "corpus": "normalized_pdf_records_only",
         }
     )
 (DATA / "eval").mkdir(exist_ok=True)

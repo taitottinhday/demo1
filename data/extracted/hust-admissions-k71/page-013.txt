@@ -1,0 +1,37 @@
+                                                            12
+
+
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+             Công nghệ vật liệu Polyme và                                                     2. Phương thức ĐGTD56  MS3                                   7510402   Công nghệ vật liệu     80
+               Compozit                                                                           3. Phương thức THPT (A00 (Gốc); A01;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD57  MS5     Kỹ thuật in                    7520137   Kỹ thuật In           60
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+             Khoa học và kỹ thuật vật liệu                                                      2. Phương thức ĐGTD                Chương trình học58  MSE3                                 7520309   Kỹ thuật vật liệu      60
+             (CT tiên tiến)                                                                       3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD59  PH1      Vật lý kỹ thuật                 7520401   Vật lý kỹ thuật       200
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD60  PH2     Kỹ thuật hạt nhân               7520402   Kỹ thuật hạt nhân     40
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD61  PH3      Vật lý Y khoa                  7520402   Kỹ thuật hạt nhân     60
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                            K01)
+                                                                                                        1. Phương thức XTTN
+62  TE1     Kỹ thuật Ô tô                  7520130   Kỹ thuật ô tô         200
+                                                                                                        2. Phương thức ĐGTD

@@ -20,7 +20,10 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt -r requirements-data-validation.txt
+
+      - name: Validate committed data snapshot without rebuilding
+        run: python -X utf8 scripts/validate_admissions_data.py
 
       - name: Lint with ruff
         run: ruff check src/ tests/ scripts/ingest_sources.py scripts/evaluate_mvp.py scripts/check_browser.py

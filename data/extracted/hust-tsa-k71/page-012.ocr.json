@@ -1,0 +1,5789 @@
+{
+  "source_version": "a9e3724b1f933594b838bf99d641ff14dbfb77cf7b19ee882d79f2f79288cb45",
+  "text": "11\n\nb) Phó trưởng ban: lãnh dao các ban Tuyền sinh — Hướng nghiệp, Đào tạo hoặc Quan\nlý chất lượng của ĐHBK Hà Nội; lãnh đạo các đơn vị phối hợp (nếu có);\n\nc) Các uy viên và thư ký: Lãnh dao đơn vị, chuyên viên, giảng viên các đơn vị thuộc\nĐHBK Hà Nội;\n\nd) Cán bộ coi thi và cán bộ kỹ thuật: CBCT và CBKT là cán bộ của DHBK Hà Nội\nhoặc của đơn vị phối hợp;\n\nđ) Cán bộ giám sát, bảo vệ, nhân viên y tế, nhân viên phục vụ. công an;\n\ne) Tại các điểm thi có Trưởng Điểm thi, các Phó Trưởng Điểm thi và Thư ký do Chủ\ntịch Hội đồng thi quyết định để điều hành toàn bộ công tác coi thi tại Điểm thi, trong đó có\nmột Phó Trưởng Điểm thi là cán bộ của đơn vị phối hợp.\n\n2. Nhiệm vụ và quyền hạn của Ban Coi thi\n\nĐiều hành toàn bộ công tác coi thi từ việc bế trí lực lượng coi thi, bảo vệ phòng thi,\ntô chức coi thi, bao đảm an toàn khu vực thi.\n\n3. Nhiệm vụ và quyền hạn của Trưởng Ban Coi thi\n\na) Chịu trách nhiệm điều hành toàn bộ công tác coi thi, quyết định danh sách thành\nviên Ban Coi thi, danh sách cán bộ coi thi, cán bộ kỹ thuật, cán bộ giám sát, cán bộ y tế,\nbảo vệ, công an, nhân viên phục vụ tại các điểm thi;\n\nb) Quyết định xử lý các tình huống xảy ra trong các buổi thi.\n\n4. Nhiệm vụ và quyền hạn của Trưởng Điểm thi:\n\na) Thay mặt Trưởng Ban Coi thi điều hành toàn bộ công tác coi thi tại điểm thi được\ngiao;\n\nb) Xử lý các tình huống xảy ra trong các buổi thi; trường hợp tình huống phức tạp\nphải báo cáo ngay cho Trưởng Ban Coi thi giải quyết.\n\nĐiều 23. Làm thủ tục cho thí sinh dự thi\n\n1. Căn cứ đữ liệu thí sinh đăng ký dự thi, Ban Thư ký Hội đồng thi hoàn thành danh\nsách thí sinh, danh sách ảnh thí sinh của từng phòng thi; các thông tin liên quan đến kỳ thi\nphải được gửi đầy đủ đến từng tài khoản của thí sinh trên hệ thống đăng ký và công bố trên\ntrang thông tin của ĐHBK Hà Nội.\n\n2. Thí sinh phải xuất trình 1 trong 3 loại giấy tờ tùy thân sau để làm thủ tục dự thi tại\nĐiểm thi: (1) Căn cước/Căn cước công dân gắn chip; (2) Chứng minh nhân dan; (3) Hộ\nchiếu. Trong trường hợp thí sinh không mang theo 1 trong 3 loại giấy tờ tùy thân trên, thí\nsinh sẽ phải làm các thủ tục cam đoan và hậu kiểm xác thực thông tin sau khi thi thì mới\nđược công nhận kết quả thi.\n\n3. Trong thời gian làm thủ tục dự thi, Trưởng Điểm thi phân công CBCT và CBKT\nhướng dẫn thí sinh làm thủ tục dự thi, phổ biến quy chế thi, hướng dẫn thí sinh sử dụng\nphần mềm thi; ghi xác nhận những sai sót về họ, tên, đối tượng, nơi thường trú, khu vực\ncủa thí sinh và chuyển những thông tin này cho Ban Thư ký Hội đồng thi xem xét, cập nhật\nvào dữ liệu đăng ký của thí sinh.\n\nSU\n\nYou =-\n",
+  "confidence": 94,
+  "words": [
+    {
+      "text": "11",
+      "bbox": [
+        298.67,
+        31.0,
+        306.67,
+        38.33
+      ],
+      "confidence": 96.52
+    },
+    {
+      "text": "b)",
+      "bbox": [
+        97.0,
+        63.0,
+        107.33,
+        74.67
+      ],
+      "confidence": 93.2
+    },
+    {
+      "text": "Phó",
+      "bbox": [
+        110.67,
+        63.0,
+        131.0,
+        72.33
+      ],
+      "confidence": 96.74
+    },
+    {
+      "text": "trưởng",
+      "bbox": [
+        134.0,
+        63.0,
+        169.0,
+        74.67
+      ],
+      "confidence": 96.63
+    },
+    {
+      "text": "ban:",
+      "bbox": [
+        172.33,
+        63.0,
+        193.33,
+        72.33
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "lãnh",
+      "bbox": [
+        197.33,
+        63.0,
+        219.33,
+        72.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "dao",
+      "bbox": [
+        222.67,
+        63.0,
+        240.67,
+        74.33
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "các",
+      "bbox": [
+        244.33,
+        63.0,
+        261.0,
+        72.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "ban",
+      "bbox": [
+        264.33,
+        63.0,
+        283.0,
+        72.33
+      ],
+      "confidence": 96.36
+    },
+    {
+      "text": "Tuyền",
+      "bbox": [
+        286.67,
+        60.33,
+        319.33,
+        75.0
+      ],
+      "confidence": 85.74
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        323.0,
+        62.67,
+        344.33,
+        72.33
+      ],
+      "confidence": 60.78
+    },
+    {
+      "text": "—",
+      "bbox": [
+        346.67,
+        68.33,
+        354.0,
+        69.0
+      ],
+      "confidence": 60.78
+    },
+    {
+      "text": "Hướng",
+      "bbox": [
+        356.67,
+        63.0,
+        392.33,
+        75.0
+      ],
+      "confidence": 96.64
+    },
+    {
+      "text": "nghiệp,",
+      "bbox": [
+        395.67,
+        62.67,
+        433.33,
+        75.0
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "Đào",
+      "bbox": [
+        437.0,
+        63.0,
+        458.67,
+        72.33
+      ],
+      "confidence": 95.96
+    },
+    {
+      "text": "tạo",
+      "bbox": [
+        462.0,
+        64.0,
+        478.33,
+        74.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "hoặc",
+      "bbox": [
+        482.0,
+        63.0,
+        505.33,
+        74.33
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "Quan",
+      "bbox": [
+        509.0,
+        63.0,
+        536.67,
+        74.67
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "lý",
+      "bbox": [
+        68.67,
+        81.67,
+        78.67,
+        94.0
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "chất",
+      "bbox": [
+        82.0,
+        79.33,
+        103.33,
+        91.33
+      ],
+      "confidence": 96.64
+    },
+    {
+      "text": "lượng",
+      "bbox": [
+        107.0,
+        82.0,
+        137.33,
+        94.0
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "của",
+      "bbox": [
+        141.33,
+        82.0,
+        159.0,
+        91.33
+      ],
+      "confidence": 93.27
+    },
+    {
+      "text": "ĐHBK",
+      "bbox": [
+        162.33,
+        82.0,
+        199.0,
+        91.33
+      ],
+      "confidence": 91.54
+    },
+    {
+      "text": "Hà",
+      "bbox": [
+        202.0,
+        82.0,
+        217.0,
+        91.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "Nội;",
+      "bbox": [
+        220.33,
+        82.0,
+        242.67,
+        93.0
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "lãnh",
+      "bbox": [
+        247.0,
+        82.0,
+        269.33,
+        91.33
+      ],
+      "confidence": 94.65
+    },
+    {
+      "text": "đạo",
+      "bbox": [
+        273.0,
+        82.0,
+        291.33,
+        93.0
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "các",
+      "bbox": [
+        295.33,
+        82.0,
+        311.67,
+        91.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "đơn",
+      "bbox": [
+        316.0,
+        82.0,
+        335.33,
+        91.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "vị",
+      "bbox": [
+        338.67,
+        82.0,
+        348.33,
+        93.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "phối",
+      "bbox": [
+        351.67,
+        79.33,
+        374.33,
+        94.0
+      ],
+      "confidence": 96.8
+    },
+    {
+      "text": "hợp",
+      "bbox": [
+        377.67,
+        82.0,
+        397.0,
+        94.0
+      ],
+      "confidence": 96.78
+    },
+    {
+      "text": "(nếu",
+      "bbox": [
+        401.33,
+        79.33,
+        424.0,
+        93.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "có);",
+      "bbox": [
+        427.67,
+        82.0,
+        446.67,
+        93.67
+      ],
+      "confidence": 95.79
+    },
+    {
+      "text": "c)",
+      "bbox": [
+        97.33,
+        100.67,
+        106.33,
+        112.67
+      ],
+      "confidence": 91.27
+    },
+    {
+      "text": "Các",
+      "bbox": [
+        110.67,
+        100.67,
+        130.33,
+        110.33
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "uy",
+      "bbox": [
+        134.0,
+        101.0,
+        147.0,
+        112.67
+      ],
+      "confidence": 93.29
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        150.67,
+        100.67,
+        172.67,
+        110.33
+      ],
+      "confidence": 96.74
+    },
+    {
+      "text": "và",
+      "bbox": [
+        175.67,
+        101.33,
+        188.0,
+        110.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thư",
+      "bbox": [
+        191.33,
+        100.67,
+        208.0,
+        110.33
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "ký:",
+      "bbox": [
+        211.33,
+        100.67,
+        227.33,
+        112.67
+      ],
+      "confidence": 96.77
+    },
+    {
+      "text": "Lãnh",
+      "bbox": [
+        231.33,
+        100.67,
+        258.0,
+        110.33
+      ],
+      "confidence": 96.15
+    },
+    {
+      "text": "dao",
+      "bbox": [
+        261.67,
+        100.67,
+        280.0,
+        112.0
+      ],
+      "confidence": 96.56
+    },
+    {
+      "text": "đơn",
+      "bbox": [
+        284.0,
+        100.67,
+        303.33,
+        110.33
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "vị,",
+      "bbox": [
+        306.67,
+        100.67,
+        319.33,
+        112.0
+      ],
+      "confidence": 95.18
+    },
+    {
+      "text": "chuyên",
+      "bbox": [
+        323.67,
+        100.67,
+        360.67,
+        112.67
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "viên,",
+      "bbox": [
+        364.0,
+        100.67,
+        388.67,
+        112.33
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "giảng",
+      "bbox": [
+        392.67,
+        100.67,
+        421.33,
+        113.0
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        424.67,
+        100.67,
+        447.0,
+        110.33
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "các",
+      "bbox": [
+        451.0,
+        101.33,
+        468.33,
+        110.33
+      ],
+      "confidence": 96.56
+    },
+    {
+      "text": "đơn",
+      "bbox": [
+        472.33,
+        100.67,
+        491.67,
+        110.33
+      ],
+      "confidence": 96.86
+    },
+    {
+      "text": "vị",
+      "bbox": [
+        494.67,
+        100.67,
+        504.67,
+        112.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thuộc",
+      "bbox": [
+        508.0,
+        100.67,
+        536.33,
+        112.0
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "ĐHBK",
+      "bbox": [
+        68.67,
+        120.0,
+        105.33,
+        129.0
+      ],
+      "confidence": 90.9
+    },
+    {
+      "text": "Hà",
+      "bbox": [
+        108.67,
+        120.33,
+        124.33,
+        129.0
+      ],
+      "confidence": 96.49
+    },
+    {
+      "text": "Nội;",
+      "bbox": [
+        127.33,
+        119.67,
+        150.0,
+        131.0
+      ],
+      "confidence": 96.39
+    },
+    {
+      "text": "d)",
+      "bbox": [
+        97.33,
+        138.67,
+        107.33,
+        150.67
+      ],
+      "confidence": 93.22
+    },
+    {
+      "text": "Cán",
+      "bbox": [
+        112.0,
+        139.0,
+        132.67,
+        148.33
+      ],
+      "confidence": 96.22
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        136.33,
+        139.0,
+        149.33,
+        150.0
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        153.33,
+        139.0,
+        168.67,
+        148.0
+      ],
+      "confidence": 94.53
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        172.33,
+        139.0,
+        185.67,
+        148.0
+      ],
+      "confidence": 95.95
+    },
+    {
+      "text": "và",
+      "bbox": [
+        189.33,
+        139.0,
+        201.67,
+        148.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        205.33,
+        139.0,
+        223.67,
+        148.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        226.67,
+        139.0,
+        239.33,
+        150.0
+      ],
+      "confidence": 96.61
+    },
+    {
+      "text": "kỹ",
+      "bbox": [
+        243.33,
+        139.0,
+        255.67,
+        150.67
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "thuật:",
+      "bbox": [
+        259.67,
+        139.0,
+        289.33,
+        150.0
+      ],
+      "confidence": 93.09
+    },
+    {
+      "text": "CBCT",
+      "bbox": [
+        294.0,
+        139.0,
+        327.33,
+        148.0
+      ],
+      "confidence": 92.64
+    },
+    {
+      "text": "và",
+      "bbox": [
+        331.0,
+        139.0,
+        343.67,
+        148.33
+      ],
+      "confidence": 93.31
+    },
+    {
+      "text": "CBKT",
+      "bbox": [
+        347.33,
+        139.0,
+        380.67,
+        148.33
+      ],
+      "confidence": 92.73
+    },
+    {
+      "text": "là",
+      "bbox": [
+        385.0,
+        139.0,
+        394.33,
+        148.33
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        398.0,
+        139.0,
+        416.0,
+        148.33
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        419.33,
+        139.0,
+        432.0,
+        150.0
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "của",
+      "bbox": [
+        436.33,
+        139.0,
+        454.0,
+        148.0
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "DHBK",
+      "bbox": [
+        458.0,
+        139.0,
+        495.33,
+        148.0
+      ],
+      "confidence": 92.24
+    },
+    {
+      "text": "Hà",
+      "bbox": [
+        499.0,
+        139.0,
+        513.67,
+        148.33
+      ],
+      "confidence": 95.9
+    },
+    {
+      "text": "Nội",
+      "bbox": [
+        517.0,
+        139.0,
+        536.33,
+        150.0
+      ],
+      "confidence": 96.57
+    },
+    {
+      "text": "hoặc",
+      "bbox": [
+        68.67,
+        157.67,
+        93.0,
+        169.0
+      ],
+      "confidence": 96.25
+    },
+    {
+      "text": "của",
+      "bbox": [
+        97.0,
+        158.0,
+        114.67,
+        167.0
+      ],
+      "confidence": 96.78
+    },
+    {
+      "text": "đơn",
+      "bbox": [
+        118.0,
+        157.67,
+        138.0,
+        167.0
+      ],
+      "confidence": 96.48
+    },
+    {
+      "text": "vị",
+      "bbox": [
+        141.33,
+        157.67,
+        151.33,
+        169.0
+      ],
+      "confidence": 96.48
+    },
+    {
+      "text": "phối",
+      "bbox": [
+        154.67,
+        155.33,
+        177.33,
+        169.67
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "hợp;",
+      "bbox": [
+        181.0,
+        157.67,
+        203.33,
+        169.67
+      ],
+      "confidence": 96.43
+    },
+    {
+      "text": "đ)",
+      "bbox": [
+        97.67,
+        176.67,
+        107.67,
+        188.33
+      ],
+      "confidence": 92.85
+    },
+    {
+      "text": "Cán",
+      "bbox": [
+        111.67,
+        177.0,
+        132.33,
+        186.0
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        135.67,
+        176.67,
+        148.67,
+        188.33
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "giám",
+      "bbox": [
+        152.67,
+        176.67,
+        177.67,
+        188.67
+      ],
+      "confidence": 96.8
+    },
+    {
+      "text": "sát,",
+      "bbox": [
+        181.67,
+        177.0,
+        198.33,
+        188.0
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "bảo",
+      "bbox": [
+        201.67,
+        176.67,
+        220.67,
+        186.0
+      ],
+      "confidence": 96.36
+    },
+    {
+      "text": "vệ,",
+      "bbox": [
+        224.0,
+        177.0,
+        238.67,
+        188.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "nhân",
+      "bbox": [
+        242.67,
+        176.67,
+        267.67,
+        186.0
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        271.33,
+        176.67,
+        294.0,
+        186.0
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "y",
+      "bbox": [
+        297.33,
+        180.0,
+        303.67,
+        188.67
+      ],
+      "confidence": 92.83
+    },
+    {
+      "text": "tế,",
+      "bbox": [
+        307.0,
+        174.33,
+        319.0,
+        188.0
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "nhân",
+      "bbox": [
+        322.67,
+        176.67,
+        347.67,
+        186.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        351.33,
+        176.67,
+        373.33,
+        186.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "phục",
+      "bbox": [
+        376.0,
+        176.67,
+        401.33,
+        188.67
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "vụ.",
+      "bbox": [
+        405.0,
+        179.67,
+        420.67,
+        188.0
+      ],
+      "confidence": 91.84
+    },
+    {
+      "text": "công",
+      "bbox": [
+        425.0,
+        177.0,
+        449.67,
+        188.67
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "an;",
+      "bbox": [
+        453.33,
+        179.67,
+        469.0,
+        188.0
+      ],
+      "confidence": 96.04
+    },
+    {
+      "text": "e)",
+      "bbox": [
+        97.67,
+        196.0,
+        107.0,
+        207.67
+      ],
+      "confidence": 92.0
+    },
+    {
+      "text": "Tại",
+      "bbox": [
+        110.67,
+        196.0,
+        127.67,
+        207.0
+      ],
+      "confidence": 96.66
+    },
+    {
+      "text": "các",
+      "bbox": [
+        131.67,
+        196.0,
+        148.67,
+        205.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "điểm",
+      "bbox": [
+        152.33,
+        193.33,
+        177.33,
+        205.0
+      ],
+      "confidence": 96.79
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        181.0,
+        196.0,
+        194.0,
+        205.0
+      ],
+      "confidence": 96.61
+    },
+    {
+      "text": "có",
+      "bbox": [
+        198.0,
+        196.0,
+        209.33,
+        205.0
+      ],
+      "confidence": 96.49
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        213.33,
+        196.0,
+        251.67,
+        207.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        255.0,
+        193.33,
+        284.33,
+        205.0
+      ],
+      "confidence": 96.12
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        287.67,
+        196.0,
+        304.0,
+        207.0
+      ],
+      "confidence": 96.0
+    },
+    {
+      "text": "các",
+      "bbox": [
+        308.0,
+        196.0,
+        324.67,
+        205.0
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "Phó",
+      "bbox": [
+        328.33,
+        196.0,
+        348.33,
+        205.0
+      ],
+      "confidence": 96.55
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        351.67,
+        196.0,
+        390.0,
+        207.67
+      ],
+      "confidence": 96.38
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        393.67,
+        193.33,
+        422.0,
+        205.0
+      ],
+      "confidence": 95.97
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        425.67,
+        196.0,
+        438.67,
+        205.0
+      ],
+      "confidence": 93.87
+    },
+    {
+      "text": "và",
+      "bbox": [
+        442.33,
+        196.0,
+        455.0,
+        205.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "Thư",
+      "bbox": [
+        458.33,
+        196.0,
+        480.33,
+        205.0
+      ],
+      "confidence": 96.72
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        483.67,
+        196.0,
+        496.33,
+        207.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "do",
+      "bbox": [
+        500.0,
+        196.0,
+        512.0,
+        205.33
+      ],
+      "confidence": 93.69
+    },
+    {
+      "text": "Chủ",
+      "bbox": [
+        516.0,
+        196.0,
+        537.0,
+        205.33
+      ],
+      "confidence": 88.79
+    },
+    {
+      "text": "tịch",
+      "bbox": [
+        69.0,
+        214.67,
+        88.33,
+        226.0
+      ],
+      "confidence": 96.62
+    },
+    {
+      "text": "Hội",
+      "bbox": [
+        91.33,
+        214.67,
+        110.67,
+        226.0
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "đồng",
+      "bbox": [
+        114.67,
+        212.33,
+        140.33,
+        226.67
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        142.33,
+        213.33,
+        156.67,
+        227.67
+      ],
+      "confidence": 93.91
+    },
+    {
+      "text": "quyết",
+      "bbox": [
+        160.33,
+        212.33,
+        188.67,
+        226.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "định",
+      "bbox": [
+        192.33,
+        214.67,
+        214.67,
+        226.0
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "để",
+      "bbox": [
+        218.33,
+        212.33,
+        229.33,
+        224.0
+      ],
+      "confidence": 92.64
+    },
+    {
+      "text": "điều",
+      "bbox": [
+        233.33,
+        212.33,
+        255.0,
+        224.0
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "hành",
+      "bbox": [
+        258.33,
+        214.67,
+        284.0,
+        224.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "toàn",
+      "bbox": [
+        287.33,
+        214.67,
+        309.67,
+        224.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        312.67,
+        214.67,
+        325.33,
+        226.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "công",
+      "bbox": [
+        328.67,
+        214.67,
+        353.33,
+        226.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "tác",
+      "bbox": [
+        356.33,
+        215.0,
+        371.0,
+        224.0
+      ],
+      "confidence": 96.52
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        374.67,
+        214.67,
+        390.0,
+        224.0
+      ],
+      "confidence": 96.01
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        393.33,
+        214.67,
+        406.67,
+        224.0
+      ],
+      "confidence": 94.81
+    },
+    {
+      "text": "tại",
+      "bbox": [
+        410.0,
+        214.67,
+        422.67,
+        226.0
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        426.33,
+        212.33,
+        455.0,
+        224.0
+      ],
+      "confidence": 96.2
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        458.0,
+        214.67,
+        475.0,
+        226.0
+      ],
+      "confidence": 96.11
+    },
+    {
+      "text": "trong",
+      "bbox": [
+        479.0,
+        216.0,
+        506.0,
+        226.67
+      ],
+      "confidence": 96.83
+    },
+    {
+      "text": "đó",
+      "bbox": [
+        509.33,
+        214.67,
+        521.67,
+        224.0
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "có",
+      "bbox": [
+        525.33,
+        215.0,
+        537.0,
+        224.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "một",
+      "bbox": [
+        69.0,
+        233.67,
+        89.0,
+        245.0
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "Phó",
+      "bbox": [
+        92.67,
+        233.67,
+        112.67,
+        243.0
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        116.33,
+        233.67,
+        155.67,
+        245.67
+      ],
+      "confidence": 96.07
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        159.0,
+        231.0,
+        187.67,
+        243.0
+      ],
+      "confidence": 95.16
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        191.0,
+        233.67,
+        204.0,
+        243.0
+      ],
+      "confidence": 92.42
+    },
+    {
+      "text": "là",
+      "bbox": [
+        207.67,
+        233.67,
+        217.0,
+        243.0
+      ],
+      "confidence": 95.41
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        220.67,
+        233.67,
+        238.33,
+        243.0
+      ],
+      "confidence": 96.29
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        241.33,
+        233.67,
+        254.0,
+        245.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "của",
+      "bbox": [
+        258.0,
+        233.67,
+        276.0,
+        243.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "đơn",
+      "bbox": [
+        279.67,
+        233.67,
+        299.33,
+        243.0
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "vị",
+      "bbox": [
+        302.67,
+        233.67,
+        312.33,
+        245.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "phối",
+      "bbox": [
+        316.0,
+        231.0,
+        339.0,
+        245.67
+      ],
+      "confidence": 96.4
+    },
+    {
+      "text": "hợp.",
+      "bbox": [
+        342.33,
+        233.67,
+        364.33,
+        245.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "2.",
+      "bbox": [
+        97.67,
+        252.67,
+        106.67,
+        262.0
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "Nhiệm",
+      "bbox": [
+        110.33,
+        252.67,
+        146.33,
+        263.67
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "vụ",
+      "bbox": [
+        149.67,
+        255.67,
+        162.33,
+        263.67
+      ],
+      "confidence": 96.79
+    },
+    {
+      "text": "và",
+      "bbox": [
+        165.67,
+        252.67,
+        178.0,
+        262.0
+      ],
+      "confidence": 96.62
+    },
+    {
+      "text": "quyền",
+      "bbox": [
+        181.67,
+        250.0,
+        212.33,
+        264.67
+      ],
+      "confidence": 92.53
+    },
+    {
+      "text": "hạn",
+      "bbox": [
+        216.0,
+        252.67,
+        234.33,
+        263.67
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "của",
+      "bbox": [
+        238.33,
+        252.67,
+        255.67,
+        262.0
+      ],
+      "confidence": 96.33
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        259.0,
+        253.0,
+        280.67,
+        262.0
+      ],
+      "confidence": 93.31
+    },
+    {
+      "text": "Coi",
+      "bbox": [
+        284.0,
+        252.67,
+        302.0,
+        262.0
+      ],
+      "confidence": 92.77
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        305.67,
+        252.67,
+        319.33,
+        262.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "Điều",
+      "bbox": [
+        97.67,
+        269.0,
+        123.33,
+        281.0
+      ],
+      "confidence": 94.73
+    },
+    {
+      "text": "hành",
+      "bbox": [
+        126.67,
+        271.33,
+        152.33,
+        281.0
+      ],
+      "confidence": 96.43
+    },
+    {
+      "text": "toàn",
+      "bbox": [
+        155.67,
+        271.33,
+        178.0,
+        281.0
+      ],
+      "confidence": 96.62
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        181.0,
+        271.67,
+        194.0,
+        283.0
+      ],
+      "confidence": 96.62
+    },
+    {
+      "text": "công",
+      "bbox": [
+        198.0,
+        272.0,
+        222.67,
+        283.67
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "tác",
+      "bbox": [
+        226.33,
+        272.0,
+        241.0,
+        281.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        245.0,
+        271.67,
+        260.33,
+        281.0
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        264.0,
+        271.33,
+        277.67,
+        281.0
+      ],
+      "confidence": 96.83
+    },
+    {
+      "text": "từ",
+      "bbox": [
+        281.67,
+        272.0,
+        292.67,
+        281.0
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "việc",
+      "bbox": [
+        296.0,
+        271.33,
+        317.33,
+        283.0
+      ],
+      "confidence": 67.68
+    },
+    {
+      "text": "bế",
+      "bbox": [
+        321.0,
+        269.0,
+        334.0,
+        281.0
+      ],
+      "confidence": 91.08
+    },
+    {
+      "text": "trí",
+      "bbox": [
+        337.67,
+        272.0,
+        348.67,
+        281.0
+      ],
+      "confidence": 95.04
+    },
+    {
+      "text": "lực",
+      "bbox": [
+        353.0,
+        271.33,
+        368.33,
+        283.0
+      ],
+      "confidence": 95.04
+    },
+    {
+      "text": "lượng",
+      "bbox": [
+        372.67,
+        271.67,
+        402.33,
+        283.67
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        406.33,
+        271.33,
+        421.67,
+        281.0
+      ],
+      "confidence": 96.04
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        425.33,
+        271.33,
+        441.67,
+        282.67
+      ],
+      "confidence": 96.5
+    },
+    {
+      "text": "bảo",
+      "bbox": [
+        445.67,
+        271.33,
+        465.0,
+        281.0
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "vệ",
+      "bbox": [
+        469.0,
+        272.0,
+        481.0,
+        283.0
+      ],
+      "confidence": 96.37
+    },
+    {
+      "text": "phòng",
+      "bbox": [
+        485.0,
+        271.33,
+        517.0,
+        283.67
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        520.67,
+        271.33,
+        537.0,
+        283.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "tô",
+      "bbox": [
+        69.33,
+        288.0,
+        79.33,
+        300.0
+      ],
+      "confidence": 78.9
+    },
+    {
+      "text": "chức",
+      "bbox": [
+        83.0,
+        290.33,
+        107.67,
+        300.0
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        111.33,
+        290.33,
+        127.0,
+        300.0
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        130.67,
+        290.33,
+        147.33,
+        301.67
+      ],
+      "confidence": 96.73
+    },
+    {
+      "text": "bao",
+      "bbox": [
+        151.0,
+        290.67,
+        169.33,
+        300.0
+      ],
+      "confidence": 95.89
+    },
+    {
+      "text": "đảm",
+      "bbox": [
+        173.0,
+        290.33,
+        194.67,
+        300.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "an",
+      "bbox": [
+        198.67,
+        293.67,
+        210.0,
+        300.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "toàn",
+      "bbox": [
+        213.33,
+        290.67,
+        236.0,
+        300.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "khu",
+      "bbox": [
+        239.0,
+        290.33,
+        258.33,
+        300.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "vực",
+      "bbox": [
+        262.0,
+        293.33,
+        281.0,
+        302.0
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "thi.",
+      "bbox": [
+        284.67,
+        290.33,
+        301.0,
+        300.0
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "3.",
+      "bbox": [
+        98.33,
+        309.67,
+        107.0,
+        319.0
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "Nhiệm",
+      "bbox": [
+        110.67,
+        309.67,
+        146.67,
+        321.0
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "vụ",
+      "bbox": [
+        150.0,
+        312.67,
+        162.67,
+        320.67
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "và",
+      "bbox": [
+        166.0,
+        309.67,
+        178.33,
+        319.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "quyền",
+      "bbox": [
+        181.67,
+        307.0,
+        212.67,
+        321.33
+      ],
+      "confidence": 94.36
+    },
+    {
+      "text": "hạn",
+      "bbox": [
+        216.33,
+        309.67,
+        234.67,
+        320.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "của",
+      "bbox": [
+        238.33,
+        309.67,
+        256.0,
+        318.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        259.33,
+        309.67,
+        299.0,
+        321.33
+      ],
+      "confidence": 96.18
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        302.33,
+        310.0,
+        323.33,
+        319.0
+      ],
+      "confidence": 93.31
+    },
+    {
+      "text": "Coi",
+      "bbox": [
+        327.0,
+        309.67,
+        345.33,
+        319.0
+      ],
+      "confidence": 91.72
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        348.67,
+        309.67,
+        362.0,
+        319.0
+      ],
+      "confidence": 92.86
+    },
+    {
+      "text": "a)",
+      "bbox": [
+        98.33,
+        328.33,
+        107.67,
+        340.0
+      ],
+      "confidence": 93.29
+    },
+    {
+      "text": "Chịu",
+      "bbox": [
+        112.0,
+        328.33,
+        137.0,
+        340.0
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "trách",
+      "bbox": [
+        141.33,
+        328.33,
+        167.33,
+        337.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "nhiệm",
+      "bbox": [
+        171.0,
+        328.33,
+        202.67,
+        340.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "điều",
+      "bbox": [
+        206.67,
+        326.0,
+        229.0,
+        338.0
+      ],
+      "confidence": 96.66
+    },
+    {
+      "text": "hành",
+      "bbox": [
+        232.67,
+        328.33,
+        258.0,
+        338.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "toàn",
+      "bbox": [
+        261.67,
+        328.67,
+        284.67,
+        338.0
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        288.33,
+        328.67,
+        300.67,
+        340.0
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "công",
+      "bbox": [
+        305.67,
+        328.67,
+        330.33,
+        340.33
+      ],
+      "confidence": 96.4
+    },
+    {
+      "text": "tác",
+      "bbox": [
+        334.0,
+        329.0,
+        349.0,
+        338.0
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        353.0,
+        328.33,
+        368.33,
+        338.0
+      ],
+      "confidence": 96.36
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        372.0,
+        328.33,
+        388.33,
+        339.67
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "quyết",
+      "bbox": [
+        393.33,
+        326.0,
+        421.67,
+        340.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "định",
+      "bbox": [
+        426.0,
+        328.33,
+        448.33,
+        339.67
+      ],
+      "confidence": 96.67
+    },
+    {
+      "text": "danh",
+      "bbox": [
+        452.67,
+        328.33,
+        478.67,
+        338.0
+      ],
+      "confidence": 96.79
+    },
+    {
+      "text": "sách",
+      "bbox": [
+        483.0,
+        328.67,
+        505.33,
+        338.0
+      ],
+      "confidence": 96.71
+    },
+    {
+      "text": "thành",
+      "bbox": [
+        508.67,
+        328.33,
+        538.0,
+        338.0
+      ],
+      "confidence": 96.14
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        70.0,
+        347.33,
+        92.0,
+        356.67
+      ],
+      "confidence": 96.33
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        96.0,
+        347.67,
+        117.0,
+        356.67
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "Coi",
+      "bbox": [
+        121.0,
+        347.33,
+        139.33,
+        356.67
+      ],
+      "confidence": 91.61
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        143.33,
+        347.33,
+        159.67,
+        359.0
+      ],
+      "confidence": 86.9
+    },
+    {
+      "text": "danh",
+      "bbox": [
+        164.33,
+        347.33,
+        189.33,
+        356.67
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "sách",
+      "bbox": [
+        193.67,
+        347.67,
+        216.0,
+        357.0
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        219.67,
+        347.67,
+        237.33,
+        356.67
+      ],
+      "confidence": 96.57
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        241.33,
+        347.33,
+        253.67,
+        359.0
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        258.0,
+        347.33,
+        273.33,
+        356.67
+      ],
+      "confidence": 93.72
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        277.33,
+        347.33,
+        294.33,
+        358.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        299.0,
+        347.67,
+        316.67,
+        356.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        320.33,
+        347.33,
+        333.33,
+        359.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "kỹ",
+      "bbox": [
+        337.33,
+        347.67,
+        349.33,
+        359.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thuật,",
+      "bbox": [
+        353.67,
+        347.67,
+        381.67,
+        359.0
+      ],
+      "confidence": 96.28
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        386.67,
+        347.67,
+        404.33,
+        356.67
+      ],
+      "confidence": 96.73
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        408.0,
+        347.67,
+        421.0,
+        359.0
+      ],
+      "confidence": 96.73
+    },
+    {
+      "text": "giám",
+      "bbox": [
+        425.0,
+        347.33,
+        450.67,
+        359.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "sát,",
+      "bbox": [
+        455.33,
+        347.67,
+        472.67,
+        358.67
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "cán",
+      "bbox": [
+        477.33,
+        347.67,
+        495.0,
+        356.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        498.67,
+        347.67,
+        511.33,
+        359.0
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "y",
+      "bbox": [
+        513.33,
+        343.67,
+        518.0,
+        360.67
+      ],
+      "confidence": 93.27
+    },
+    {
+      "text": "tế,",
+      "bbox": [
+        525.33,
+        345.0,
+        537.0,
+        358.67
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "bảo",
+      "bbox": [
+        69.67,
+        366.67,
+        88.0,
+        376.0
+      ],
+      "confidence": 95.31
+    },
+    {
+      "text": "vệ,",
+      "bbox": [
+        91.67,
+        366.67,
+        106.67,
+        377.67
+      ],
+      "confidence": 96.8
+    },
+    {
+      "text": "công",
+      "bbox": [
+        111.0,
+        366.67,
+        136.0,
+        378.33
+      ],
+      "confidence": 96.57
+    },
+    {
+      "text": "an,",
+      "bbox": [
+        139.67,
+        369.33,
+        154.33,
+        377.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "nhân",
+      "bbox": [
+        158.33,
+        366.67,
+        183.33,
+        376.0
+      ],
+      "confidence": 96.53
+    },
+    {
+      "text": "viên",
+      "bbox": [
+        186.67,
+        366.67,
+        208.67,
+        376.0
+      ],
+      "confidence": 96.53
+    },
+    {
+      "text": "phục",
+      "bbox": [
+        212.0,
+        366.67,
+        236.67,
+        378.33
+      ],
+      "confidence": 96.65
+    },
+    {
+      "text": "vụ",
+      "bbox": [
+        240.33,
+        369.33,
+        253.0,
+        378.0
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "tại",
+      "bbox": [
+        256.67,
+        366.67,
+        269.33,
+        378.0
+      ],
+      "confidence": 96.6
+    },
+    {
+      "text": "các",
+      "bbox": [
+        273.33,
+        366.67,
+        290.33,
+        376.0
+      ],
+      "confidence": 96.63
+    },
+    {
+      "text": "điểm",
+      "bbox": [
+        294.33,
+        364.0,
+        319.67,
+        376.0
+      ],
+      "confidence": 96.7
+    },
+    {
+      "text": "thi;",
+      "bbox": [
+        323.0,
+        366.67,
+        340.0,
+        377.67
+      ],
+      "confidence": 90.58
+    },
+    {
+      "text": "b)",
+      "bbox": [
+        98.0,
+        385.33,
+        108.67,
+        397.33
+      ],
+      "confidence": 92.99
+    },
+    {
+      "text": "Quyết",
+      "bbox": [
+        113.0,
+        383.0,
+        144.67,
+        397.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "định",
+      "bbox": [
+        148.33,
+        385.33,
+        170.67,
+        396.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "xử",
+      "bbox": [
+        174.0,
+        385.67,
+        187.33,
+        395.0
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "lý",
+      "bbox": [
+        191.33,
+        385.33,
+        200.0,
+        397.67
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "các",
+      "bbox": [
+        204.0,
+        385.67,
+        221.0,
+        395.0
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "tình",
+      "bbox": [
+        224.0,
+        385.33,
+        244.67,
+        395.0
+      ],
+      "confidence": 96.12
+    },
+    {
+      "text": "huống",
+      "bbox": [
+        247.67,
+        383.0,
+        280.33,
+        397.33
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "xảy",
+      "bbox": [
+        283.67,
+        385.67,
+        302.33,
+        397.33
+      ],
+      "confidence": 96.07
+    },
+    {
+      "text": "ra",
+      "bbox": [
+        305.67,
+        388.33,
+        316.0,
+        395.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "trong",
+      "bbox": [
+        319.33,
+        386.67,
+        346.67,
+        397.33
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "các",
+      "bbox": [
+        350.33,
+        385.67,
+        366.67,
+        395.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "buổi",
+      "bbox": [
+        370.0,
+        383.0,
+        392.67,
+        395.0
+      ],
+      "confidence": 80.9
+    },
+    {
+      "text": "thi.",
+      "bbox": [
+        396.33,
+        385.33,
+        412.67,
+        395.0
+      ],
+      "confidence": 95.09
+    },
+    {
+      "text": "4.",
+      "bbox": [
+        98.33,
+        404.33,
+        107.33,
+        413.67
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "Nhiệm",
+      "bbox": [
+        111.33,
+        404.33,
+        147.33,
+        415.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "vụ",
+      "bbox": [
+        150.33,
+        407.67,
+        163.0,
+        415.67
+      ],
+      "confidence": 96.65
+    },
+    {
+      "text": "và",
+      "bbox": [
+        166.67,
+        404.33,
+        178.67,
+        414.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "quyền",
+      "bbox": [
+        182.33,
+        401.67,
+        213.33,
+        416.67
+      ],
+      "confidence": 96.57
+    },
+    {
+      "text": "hạn",
+      "bbox": [
+        217.0,
+        404.33,
+        235.0,
+        415.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "của",
+      "bbox": [
+        239.0,
+        404.67,
+        256.67,
+        413.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        260.0,
+        404.67,
+        299.33,
+        416.67
+      ],
+      "confidence": 96.4
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        303.0,
+        401.67,
+        331.33,
+        413.67
+      ],
+      "confidence": 96.3
+    },
+    {
+      "text": "thi:",
+      "bbox": [
+        335.0,
+        404.33,
+        351.33,
+        413.67
+      ],
+      "confidence": 91.75
+    },
+    {
+      "text": "a)",
+      "bbox": [
+        98.67,
+        423.33,
+        108.0,
+        435.33
+      ],
+      "confidence": 93.22
+    },
+    {
+      "text": "Thay",
+      "bbox": [
+        112.0,
+        423.33,
+        138.67,
+        435.33
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "mặt",
+      "bbox": [
+        142.33,
+        424.0,
+        161.33,
+        434.67
+      ],
+      "confidence": 96.79
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        165.0,
+        423.67,
+        203.33,
+        435.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        206.67,
+        423.67,
+        228.0,
+        432.67
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "Coi",
+      "bbox": [
+        231.33,
+        423.33,
+        249.33,
+        432.67
+      ],
+      "confidence": 92.99
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        253.0,
+        423.33,
+        266.33,
+        432.67
+      ],
+      "confidence": 95.35
+    },
+    {
+      "text": "điều",
+      "bbox": [
+        270.33,
+        420.67,
+        292.67,
+        432.67
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "hành",
+      "bbox": [
+        296.0,
+        423.33,
+        321.33,
+        432.67
+      ],
+      "confidence": 96.8
+    },
+    {
+      "text": "toàn",
+      "bbox": [
+        324.67,
+        423.33,
+        347.0,
+        432.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "bộ",
+      "bbox": [
+        350.0,
+        423.33,
+        362.67,
+        434.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "công",
+      "bbox": [
+        366.33,
+        423.67,
+        390.67,
+        435.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "tác",
+      "bbox": [
+        394.33,
+        423.67,
+        409.67,
+        432.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "coi",
+      "bbox": [
+        413.33,
+        423.33,
+        428.33,
+        432.67
+      ],
+      "confidence": 95.36
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        432.0,
+        423.33,
+        445.67,
+        432.67
+      ],
+      "confidence": 92.26
+    },
+    {
+      "text": "tại",
+      "bbox": [
+        449.0,
+        423.33,
+        462.0,
+        434.67
+      ],
+      "confidence": 92.26
+    },
+    {
+      "text": "điểm",
+      "bbox": [
+        466.33,
+        421.0,
+        492.0,
+        432.67
+      ],
+      "confidence": 96.41
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        495.33,
+        423.33,
+        508.33,
+        432.67
+      ],
+      "confidence": 93.81
+    },
+    {
+      "text": "được",
+      "bbox": [
+        512.33,
+        423.33,
+        538.0,
+        434.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "giao;",
+      "bbox": [
+        70.67,
+        442.0,
+        95.67,
+        454.33
+      ],
+      "confidence": 96.54
+    },
+    {
+      "text": "b)",
+      "bbox": [
+        98.67,
+        461.0,
+        109.0,
+        473.0
+      ],
+      "confidence": 93.27
+    },
+    {
+      "text": "Xử",
+      "bbox": [
+        113.67,
+        461.67,
+        130.33,
+        470.67
+      ],
+      "confidence": 94.63
+    },
+    {
+      "text": "lý",
+      "bbox": [
+        134.67,
+        461.33,
+        144.33,
+        473.33
+      ],
+      "confidence": 96.15
+    },
+    {
+      "text": "các",
+      "bbox": [
+        149.0,
+        461.67,
+        165.67,
+        470.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "tình",
+      "bbox": [
+        170.0,
+        461.33,
+        190.0,
+        470.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "huống",
+      "bbox": [
+        194.33,
+        458.67,
+        226.0,
+        473.33
+      ],
+      "confidence": 96.71
+    },
+    {
+      "text": "xảy",
+      "bbox": [
+        230.33,
+        461.67,
+        248.33,
+        473.33
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "ra",
+      "bbox": [
+        253.0,
+        464.33,
+        263.33,
+        470.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "trong",
+      "bbox": [
+        267.33,
+        462.67,
+        295.0,
+        473.33
+      ],
+      "confidence": 96.69
+    },
+    {
+      "text": "các",
+      "bbox": [
+        299.67,
+        461.67,
+        316.0,
+        470.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "buổi",
+      "bbox": [
+        320.67,
+        458.67,
+        343.33,
+        470.67
+      ],
+      "confidence": 94.74
+    },
+    {
+      "text": "thi;",
+      "bbox": [
+        347.67,
+        461.33,
+        364.0,
+        472.67
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "trường",
+      "bbox": [
+        368.67,
+        461.67,
+        403.33,
+        473.33
+      ],
+      "confidence": 96.24
+    },
+    {
+      "text": "hợp",
+      "bbox": [
+        407.67,
+        461.33,
+        427.0,
+        473.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "tình",
+      "bbox": [
+        431.67,
+        461.33,
+        452.0,
+        470.67
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "huống",
+      "bbox": [
+        456.0,
+        458.67,
+        489.0,
+        473.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "phức",
+      "bbox": [
+        493.0,
+        461.33,
+        518.33,
+        473.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "tạp",
+      "bbox": [
+        522.67,
+        462.67,
+        538.0,
+        473.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "phải",
+      "bbox": [
+        70.33,
+        480.33,
+        92.33,
+        492.0
+      ],
+      "confidence": 95.53
+    },
+    {
+      "text": "báo",
+      "bbox": [
+        96.0,
+        480.33,
+        114.67,
+        489.67
+      ],
+      "confidence": 96.18
+    },
+    {
+      "text": "cáo",
+      "bbox": [
+        118.67,
+        480.67,
+        136.0,
+        489.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "ngay",
+      "bbox": [
+        139.67,
+        483.33,
+        164.67,
+        492.0
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "cho",
+      "bbox": [
+        168.67,
+        480.33,
+        186.67,
+        489.67
+      ],
+      "confidence": 96.7
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        190.33,
+        480.67,
+        228.67,
+        492.33
+      ],
+      "confidence": 96.12
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        232.33,
+        480.67,
+        253.33,
+        489.67
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "Coi",
+      "bbox": [
+        256.67,
+        480.33,
+        275.0,
+        490.0
+      ],
+      "confidence": 91.5
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        278.67,
+        480.33,
+        292.33,
+        490.0
+      ],
+      "confidence": 94.93
+    },
+    {
+      "text": "giải",
+      "bbox": [
+        296.0,
+        480.33,
+        315.0,
+        492.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "quyết.",
+      "bbox": [
+        319.33,
+        478.0,
+        349.67,
+        492.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "Điều",
+      "bbox": [
+        98.67,
+        497.0,
+        125.0,
+        508.67
+      ],
+      "confidence": 94.77
+    },
+    {
+      "text": "23.",
+      "bbox": [
+        128.67,
+        499.67,
+        144.33,
+        508.67
+      ],
+      "confidence": 96.78
+    },
+    {
+      "text": "Làm",
+      "bbox": [
+        148.33,
+        499.33,
+        174.0,
+        508.67
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "thủ",
+      "bbox": [
+        177.33,
+        499.67,
+        195.67,
+        508.67
+      ],
+      "confidence": 73.04
+    },
+    {
+      "text": "tục",
+      "bbox": [
+        199.0,
+        500.33,
+        216.0,
+        511.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "cho",
+      "bbox": [
+        220.0,
+        499.67,
+        238.33,
+        508.67
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        242.0,
+        499.67,
+        256.67,
+        508.67
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        261.0,
+        499.67,
+        283.33,
+        508.67
+      ],
+      "confidence": 96.57
+    },
+    {
+      "text": "dự",
+      "bbox": [
+        287.33,
+        499.67,
+        302.33,
+        511.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        305.67,
+        499.67,
+        320.33,
+        508.67
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "1.",
+      "bbox": [
+        100.33,
+        518.33,
+        108.0,
+        527.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "Căn",
+      "bbox": [
+        112.33,
+        518.33,
+        133.33,
+        527.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "cứ",
+      "bbox": [
+        137.0,
+        518.33,
+        150.0,
+        527.33
+      ],
+      "confidence": 93.31
+    },
+    {
+      "text": "đữ",
+      "bbox": [
+        153.33,
+        518.33,
+        166.67,
+        527.33
+      ],
+      "confidence": 91.71
+    },
+    {
+      "text": "liệu",
+      "bbox": [
+        170.67,
+        518.33,
+        189.33,
+        529.67
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        193.0,
+        518.33,
+        205.67,
+        527.33
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        209.67,
+        518.33,
+        231.0,
+        527.33
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "đăng",
+      "bbox": [
+        235.0,
+        518.33,
+        259.67,
+        530.33
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        263.33,
+        518.33,
+        276.0,
+        530.33
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "dự",
+      "bbox": [
+        280.33,
+        518.33,
+        293.67,
+        529.67
+      ],
+      "confidence": 89.39
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        297.0,
+        518.33,
+        313.33,
+        529.33
+      ],
+      "confidence": 96.07
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        317.67,
+        518.33,
+        338.33,
+        527.33
+      ],
+      "confidence": 96.46
+    },
+    {
+      "text": "Thư",
+      "bbox": [
+        342.33,
+        518.33,
+        363.0,
+        527.33
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        366.33,
+        518.33,
+        379.33,
+        530.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "Hội",
+      "bbox": [
+        382.67,
+        518.33,
+        401.67,
+        529.67
+      ],
+      "confidence": 96.73
+    },
+    {
+      "text": "đồng",
+      "bbox": [
+        406.0,
+        515.67,
+        431.33,
+        530.33
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        434.67,
+        518.33,
+        448.33,
+        527.33
+      ],
+      "confidence": 96.48
+    },
+    {
+      "text": "hoàn",
+      "bbox": [
+        452.0,
+        518.33,
+        478.67,
+        527.67
+      ],
+      "confidence": 96.82
+    },
+    {
+      "text": "thành",
+      "bbox": [
+        482.0,
+        518.33,
+        510.33,
+        527.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "danh",
+      "bbox": [
+        514.0,
+        518.33,
+        538.67,
+        527.67
+      ],
+      "confidence": 95.86
+    },
+    {
+      "text": "sách",
+      "bbox": [
+        71.33,
+        537.33,
+        94.0,
+        546.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        97.33,
+        537.33,
+        110.33,
+        547.0
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "sinh,",
+      "bbox": [
+        114.67,
+        537.33,
+        138.67,
+        548.67
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "danh",
+      "bbox": [
+        143.0,
+        537.33,
+        168.0,
+        547.0
+      ],
+      "confidence": 93.88
+    },
+    {
+      "text": "sách",
+      "bbox": [
+        171.33,
+        537.33,
+        194.33,
+        547.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "ảnh",
+      "bbox": [
+        197.67,
+        537.33,
+        215.67,
+        546.67
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        219.0,
+        537.33,
+        232.33,
+        546.67
+      ],
+      "confidence": 95.33
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        236.33,
+        537.33,
+        257.33,
+        546.67
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "của",
+      "bbox": [
+        261.0,
+        537.33,
+        279.0,
+        546.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "từng",
+      "bbox": [
+        282.0,
+        537.67,
+        305.67,
+        549.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "phòng",
+      "bbox": [
+        309.0,
+        537.33,
+        341.67,
+        549.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "thi;",
+      "bbox": [
+        345.0,
+        537.33,
+        361.33,
+        548.67
+      ],
+      "confidence": 87.11
+    },
+    {
+      "text": "các",
+      "bbox": [
+        365.67,
+        537.33,
+        382.0,
+        547.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "thông",
+      "bbox": [
+        385.67,
+        537.33,
+        415.33,
+        549.33
+      ],
+      "confidence": 96.73
+    },
+    {
+      "text": "tin",
+      "bbox": [
+        418.67,
+        537.33,
+        432.67,
+        547.0
+      ],
+      "confidence": 94.41
+    },
+    {
+      "text": "liên",
+      "bbox": [
+        435.67,
+        537.33,
+        455.0,
+        547.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "quan",
+      "bbox": [
+        458.67,
+        540.0,
+        484.67,
+        549.33
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "đến",
+      "bbox": [
+        488.0,
+        534.67,
+        506.0,
+        546.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "kỳ",
+      "bbox": [
+        509.33,
+        537.33,
+        522.0,
+        549.33
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        525.33,
+        537.33,
+        538.67,
+        546.67
+      ],
+      "confidence": 96.52
+    },
+    {
+      "text": "phải",
+      "bbox": [
+        70.67,
+        556.33,
+        93.0,
+        568.33
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "được",
+      "bbox": [
+        96.67,
+        556.33,
+        122.33,
+        567.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "gửi",
+      "bbox": [
+        126.0,
+        556.33,
+        142.67,
+        568.33
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "đầy",
+      "bbox": [
+        146.33,
+        553.67,
+        163.67,
+        568.33
+      ],
+      "confidence": 96.35
+    },
+    {
+      "text": "đủ",
+      "bbox": [
+        168.0,
+        556.33,
+        180.0,
+        565.67
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "đến",
+      "bbox": [
+        183.67,
+        553.67,
+        201.67,
+        565.67
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "từng",
+      "bbox": [
+        204.67,
+        556.67,
+        228.0,
+        568.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "tài",
+      "bbox": [
+        231.33,
+        556.33,
+        243.67,
+        565.67
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "khoản",
+      "bbox": [
+        247.0,
+        556.33,
+        279.0,
+        565.67
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "của",
+      "bbox": [
+        282.33,
+        556.33,
+        300.0,
+        565.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        303.33,
+        556.33,
+        316.67,
+        565.67
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        320.33,
+        556.33,
+        341.67,
+        565.67
+      ],
+      "confidence": 96.02
+    },
+    {
+      "text": "trên",
+      "bbox": [
+        344.67,
+        556.33,
+        364.67,
+        565.67
+      ],
+      "confidence": 96.02
+    },
+    {
+      "text": "hệ",
+      "bbox": [
+        367.33,
+        556.33,
+        379.0,
+        567.67
+      ],
+      "confidence": 96.49
+    },
+    {
+      "text": "thống",
+      "bbox": [
+        382.33,
+        553.67,
+        412.0,
+        568.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "đăng",
+      "bbox": [
+        415.33,
+        556.33,
+        440.0,
+        568.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        443.0,
+        556.33,
+        455.67,
+        568.33
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "và",
+      "bbox": [
+        459.33,
+        556.33,
+        472.0,
+        565.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "công",
+      "bbox": [
+        475.67,
+        556.33,
+        500.33,
+        568.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "bố",
+      "bbox": [
+        503.33,
+        553.67,
+        515.67,
+        565.67
+      ],
+      "confidence": 91.66
+    },
+    {
+      "text": "trên",
+      "bbox": [
+        519.33,
+        556.33,
+        539.33,
+        565.67
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "trang",
+      "bbox": [
+        71.0,
+        576.33,
+        97.67,
+        587.33
+      ],
+      "confidence": 96.59
+    },
+    {
+      "text": "thông",
+      "bbox": [
+        101.0,
+        575.0,
+        130.67,
+        587.33
+      ],
+      "confidence": 96.44
+    },
+    {
+      "text": "tin",
+      "bbox": [
+        134.33,
+        575.0,
+        148.0,
+        584.67
+      ],
+      "confidence": 96.19
+    },
+    {
+      "text": "của",
+      "bbox": [
+        151.67,
+        575.33,
+        169.33,
+        584.67
+      ],
+      "confidence": 93.29
+    },
+    {
+      "text": "ĐHBK",
+      "bbox": [
+        172.67,
+        575.33,
+        208.67,
+        584.33
+      ],
+      "confidence": 92.16
+    },
+    {
+      "text": "Hà",
+      "bbox": [
+        212.0,
+        575.33,
+        227.33,
+        584.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "Nội.",
+      "bbox": [
+        230.0,
+        575.0,
+        252.33,
+        586.33
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "2.",
+      "bbox": [
+        99.33,
+        594.0,
+        108.33,
+        603.67
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "Thí",
+      "bbox": [
+        112.67,
+        594.0,
+        130.33,
+        603.33
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        134.33,
+        594.0,
+        155.67,
+        603.67
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "phải",
+      "bbox": [
+        158.67,
+        594.0,
+        180.67,
+        606.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "xuất",
+      "bbox": [
+        184.33,
+        591.67,
+        206.33,
+        603.67
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "trình",
+      "bbox": [
+        209.33,
+        594.0,
+        234.0,
+        603.67
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "1",
+      "bbox": [
+        238.67,
+        594.33,
+        242.0,
+        603.33
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "trong",
+      "bbox": [
+        247.0,
+        595.67,
+        274.0,
+        606.0
+      ],
+      "confidence": 96.63
+    },
+    {
+      "text": "3",
+      "bbox": [
+        278.0,
+        594.33,
+        283.33,
+        603.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "loại",
+      "bbox": [
+        288.0,
+        594.0,
+        306.67,
+        605.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "giấy",
+      "bbox": [
+        310.67,
+        591.67,
+        332.33,
+        606.0
+      ],
+      "confidence": 96.09
+    },
+    {
+      "text": "tờ",
+      "bbox": [
+        336.0,
+        594.67,
+        346.67,
+        603.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "tùy",
+      "bbox": [
+        349.33,
+        594.67,
+        365.67,
+        606.0
+      ],
+      "confidence": 95.5
+    },
+    {
+      "text": "thân",
+      "bbox": [
+        369.0,
+        594.0,
+        391.33,
+        603.67
+      ],
+      "confidence": 95.5
+    },
+    {
+      "text": "sau",
+      "bbox": [
+        395.0,
+        597.0,
+        411.67,
+        603.67
+      ],
+      "confidence": 96.01
+    },
+    {
+      "text": "để",
+      "bbox": [
+        415.67,
+        591.67,
+        427.0,
+        603.67
+      ],
+      "confidence": 96.9
+    },
+    {
+      "text": "làm",
+      "bbox": [
+        431.0,
+        594.0,
+        450.0,
+        603.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "thủ",
+      "bbox": [
+        453.33,
+        594.0,
+        470.67,
+        603.67
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "tục",
+      "bbox": [
+        474.0,
+        595.67,
+        489.67,
+        605.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "dự",
+      "bbox": [
+        493.33,
+        594.0,
+        506.33,
+        605.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        509.33,
+        594.0,
+        523.0,
+        603.67
+      ],
+      "confidence": 94.67
+    },
+    {
+      "text": "tại",
+      "bbox": [
+        526.33,
+        594.33,
+        538.67,
+        605.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        71.33,
+        610.67,
+        99.67,
+        622.33
+      ],
+      "confidence": 96.03
+    },
+    {
+      "text": "thi:",
+      "bbox": [
+        104.0,
+        613.0,
+        120.67,
+        622.33
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "(1)",
+      "bbox": [
+        126.33,
+        613.0,
+        140.67,
+        625.0
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "Căn",
+      "bbox": [
+        145.67,
+        613.0,
+        166.0,
+        622.33
+      ],
+      "confidence": 92.9
+    },
+    {
+      "text": "cước/Căn",
+      "bbox": [
+        170.67,
+        613.0,
+        219.67,
+        622.33
+      ],
+      "confidence": 92.69
+    },
+    {
+      "text": "cước",
+      "bbox": [
+        224.0,
+        613.67,
+        249.0,
+        622.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "công",
+      "bbox": [
+        253.67,
+        613.33,
+        278.67,
+        625.0
+      ],
+      "confidence": 96.56
+    },
+    {
+      "text": "dân",
+      "bbox": [
+        283.33,
+        613.33,
+        302.0,
+        622.33
+      ],
+      "confidence": 96.18
+    },
+    {
+      "text": "gắn",
+      "bbox": [
+        306.33,
+        610.67,
+        324.67,
+        625.0
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "chip;",
+      "bbox": [
+        329.33,
+        613.0,
+        354.0,
+        625.0
+      ],
+      "confidence": 96.72
+    },
+    {
+      "text": "(2)",
+      "bbox": [
+        359.0,
+        613.0,
+        373.0,
+        625.0
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "Chứng",
+      "bbox": [
+        378.0,
+        613.0,
+        413.0,
+        625.0
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "minh",
+      "bbox": [
+        417.33,
+        613.0,
+        443.67,
+        622.33
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "nhân",
+      "bbox": [
+        448.0,
+        613.33,
+        473.67,
+        622.33
+      ],
+      "confidence": 93.31
+    },
+    {
+      "text": "dan;",
+      "bbox": [
+        478.33,
+        613.33,
+        499.67,
+        624.33
+      ],
+      "confidence": 70.48
+    },
+    {
+      "text": "(3)",
+      "bbox": [
+        505.0,
+        613.33,
+        519.0,
+        625.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "Hộ",
+      "bbox": [
+        523.67,
+        613.67,
+        538.67,
+        624.67
+      ],
+      "confidence": 96.31
+    },
+    {
+      "text": "chiếu.",
+      "bbox": [
+        71.67,
+        629.33,
+        102.0,
+        641.33
+      ],
+      "confidence": 96.28
+    },
+    {
+      "text": "Trong",
+      "bbox": [
+        106.33,
+        632.33,
+        138.0,
+        644.0
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "trường",
+      "bbox": [
+        142.0,
+        632.33,
+        176.33,
+        644.0
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "hợp",
+      "bbox": [
+        180.0,
+        632.33,
+        199.0,
+        644.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        202.67,
+        632.33,
+        216.33,
+        641.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        220.33,
+        632.0,
+        241.33,
+        641.33
+      ],
+      "confidence": 96.72
+    },
+    {
+      "text": "không",
+      "bbox": [
+        245.0,
+        632.0,
+        277.67,
+        644.0
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "mang",
+      "bbox": [
+        281.33,
+        635.0,
+        310.0,
+        644.0
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "theo",
+      "bbox": [
+        313.67,
+        632.0,
+        336.0,
+        641.33
+      ],
+      "confidence": 96.91
+    },
+    {
+      "text": "1",
+      "bbox": [
+        338.0,
+        628.0,
+        343.0,
+        645.67
+      ],
+      "confidence": 91.37
+    },
+    {
+      "text": "trong",
+      "bbox": [
+        349.33,
+        633.33,
+        376.33,
+        644.0
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "3",
+      "bbox": [
+        380.33,
+        632.33,
+        385.0,
+        641.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "loại",
+      "bbox": [
+        390.33,
+        632.33,
+        409.0,
+        643.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "giấy",
+      "bbox": [
+        413.0,
+        629.33,
+        434.67,
+        644.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "tờ",
+      "bbox": [
+        438.67,
+        632.33,
+        449.33,
+        641.33
+      ],
+      "confidence": 96.71
+    },
+    {
+      "text": "tùy",
+      "bbox": [
+        452.67,
+        632.33,
+        470.0,
+        644.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "thân",
+      "bbox": [
+        473.33,
+        632.33,
+        496.0,
+        641.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "trên,",
+      "bbox": [
+        499.33,
+        632.33,
+        522.0,
+        643.33
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        526.0,
+        632.33,
+        539.0,
+        641.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        72.0,
+        651.0,
+        93.33,
+        660.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "sẽ",
+      "bbox": [
+        97.0,
+        652.0,
+        107.0,
+        660.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "phải",
+      "bbox": [
+        111.0,
+        651.0,
+        133.67,
+        663.0
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "làm",
+      "bbox": [
+        138.0,
+        651.0,
+        157.33,
+        660.67
+      ],
+      "confidence": 96.58
+    },
+    {
+      "text": "các",
+      "bbox": [
+        161.0,
+        651.0,
+        177.67,
+        660.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thủ",
+      "bbox": [
+        181.67,
+        651.0,
+        198.33,
+        660.67
+      ],
+      "confidence": 78.14
+    },
+    {
+      "text": "tục",
+      "bbox": [
+        201.67,
+        652.33,
+        217.0,
+        662.67
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "cam",
+      "bbox": [
+        221.67,
+        654.0,
+        242.33,
+        660.33
+      ],
+      "confidence": 96.37
+    },
+    {
+      "text": "đoan",
+      "bbox": [
+        246.67,
+        651.0,
+        271.67,
+        660.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "và",
+      "bbox": [
+        275.33,
+        651.33,
+        288.0,
+        660.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "hậu",
+      "bbox": [
+        291.67,
+        651.0,
+        310.33,
+        662.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "kiểm",
+      "bbox": [
+        314.33,
+        648.67,
+        340.33,
+        660.33
+      ],
+      "confidence": 96.14
+    },
+    {
+      "text": "xác",
+      "bbox": [
+        344.0,
+        651.33,
+        361.33,
+        660.33
+      ],
+      "confidence": 96.78
+    },
+    {
+      "text": "thực",
+      "bbox": [
+        365.0,
+        651.0,
+        388.0,
+        662.67
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "thông",
+      "bbox": [
+        391.67,
+        651.33,
+        421.33,
+        663.0
+      ],
+      "confidence": 96.77
+    },
+    {
+      "text": "tin",
+      "bbox": [
+        425.0,
+        651.0,
+        438.67,
+        660.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "sau",
+      "bbox": [
+        443.0,
+        654.0,
+        460.0,
+        660.67
+      ],
+      "confidence": 96.47
+    },
+    {
+      "text": "khi",
+      "bbox": [
+        464.0,
+        651.0,
+        480.67,
+        660.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        484.67,
+        651.33,
+        498.0,
+        660.67
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "thì",
+      "bbox": [
+        502.0,
+        651.33,
+        515.33,
+        660.67
+      ],
+      "confidence": 93.83
+    },
+    {
+      "text": "mới",
+      "bbox": [
+        519.33,
+        651.33,
+        539.33,
+        660.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "được",
+      "bbox": [
+        72.0,
+        670.0,
+        97.67,
+        681.67
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "công",
+      "bbox": [
+        101.33,
+        670.33,
+        126.33,
+        682.0
+      ],
+      "confidence": 96.71
+    },
+    {
+      "text": "nhận",
+      "bbox": [
+        130.0,
+        670.0,
+        155.33,
+        681.33
+      ],
+      "confidence": 96.86
+    },
+    {
+      "text": "kết",
+      "bbox": [
+        158.67,
+        667.67,
+        174.33,
+        679.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "quả",
+      "bbox": [
+        177.67,
+        670.33,
+        196.33,
+        682.0
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "thi.",
+      "bbox": [
+        199.33,
+        670.0,
+        215.33,
+        679.33
+      ],
+      "confidence": 90.75
+    },
+    {
+      "text": "3.",
+      "bbox": [
+        100.33,
+        689.0,
+        109.0,
+        698.33
+      ],
+      "confidence": 96.31
+    },
+    {
+      "text": "Trong",
+      "bbox": [
+        113.67,
+        689.0,
+        145.67,
+        701.0
+      ],
+      "confidence": 96.31
+    },
+    {
+      "text": "thời",
+      "bbox": [
+        149.67,
+        689.0,
+        169.33,
+        698.33
+      ],
+      "confidence": 96.56
+    },
+    {
+      "text": "gian",
+      "bbox": [
+        174.0,
+        689.0,
+        195.67,
+        701.0
+      ],
+      "confidence": 96.82
+    },
+    {
+      "text": "làm",
+      "bbox": [
+        199.67,
+        689.0,
+        218.67,
+        698.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "thủ",
+      "bbox": [
+        222.67,
+        689.0,
+        238.67,
+        698.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "tục",
+      "bbox": [
+        242.67,
+        690.0,
+        258.33,
+        700.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "dự",
+      "bbox": [
+        262.67,
+        689.0,
+        276.0,
+        700.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        279.67,
+        689.0,
+        296.33,
+        700.33
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "Trưởng",
+      "bbox": [
+        300.67,
+        689.0,
+        339.67,
+        701.0
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "Điểm",
+      "bbox": [
+        343.67,
+        686.33,
+        371.67,
+        698.33
+      ],
+      "confidence": 96.22
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        375.67,
+        689.0,
+        389.0,
+        698.33
+      ],
+      "confidence": 96.05
+    },
+    {
+      "text": "phân",
+      "bbox": [
+        393.0,
+        689.0,
+        418.33,
+        701.0
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "công",
+      "bbox": [
+        422.67,
+        689.0,
+        447.33,
+        701.0
+      ],
+      "confidence": 93.3
+    },
+    {
+      "text": "CBCT",
+      "bbox": [
+        451.67,
+        689.0,
+        486.0,
+        698.33
+      ],
+      "confidence": 92.42
+    },
+    {
+      "text": "và",
+      "bbox": [
+        489.67,
+        689.0,
+        501.67,
+        698.67
+      ],
+      "confidence": 92.84
+    },
+    {
+      "text": "CBKT",
+      "bbox": [
+        506.0,
+        689.0,
+        539.67,
+        698.67
+      ],
+      "confidence": 91.94
+    },
+    {
+      "text": "hướng",
+      "bbox": [
+        71.67,
+        708.0,
+        105.0,
+        720.0
+      ],
+      "confidence": 96.99
+    },
+    {
+      "text": "dẫn",
+      "bbox": [
+        109.33,
+        705.67,
+        128.33,
+        717.33
+      ],
+      "confidence": 95.95
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        132.33,
+        708.0,
+        146.0,
+        717.33
+      ],
+      "confidence": 96.63
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        150.67,
+        708.0,
+        171.67,
+        717.33
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "làm",
+      "bbox": [
+        176.0,
+        708.0,
+        195.33,
+        717.67
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "thủ",
+      "bbox": [
+        199.0,
+        708.0,
+        215.33,
+        717.67
+      ],
+      "confidence": 96.62
+    },
+    {
+      "text": "tục",
+      "bbox": [
+        219.33,
+        709.33,
+        234.67,
+        719.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "dự",
+      "bbox": [
+        239.33,
+        708.0,
+        252.33,
+        719.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        256.67,
+        708.0,
+        273.0,
+        719.33
+      ],
+      "confidence": 95.44
+    },
+    {
+      "text": "phổ",
+      "bbox": [
+        277.33,
+        705.33,
+        297.0,
+        720.0
+      ],
+      "confidence": 86.23
+    },
+    {
+      "text": "biến",
+      "bbox": [
+        301.33,
+        705.33,
+        323.67,
+        717.67
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "quy",
+      "bbox": [
+        328.33,
+        710.67,
+        347.0,
+        720.0
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "chế",
+      "bbox": [
+        351.67,
+        705.33,
+        368.67,
+        717.33
+      ],
+      "confidence": 96.48
+    },
+    {
+      "text": "thi,",
+      "bbox": [
+        372.67,
+        708.0,
+        389.33,
+        719.33
+      ],
+      "confidence": 94.21
+    },
+    {
+      "text": "hướng",
+      "bbox": [
+        394.0,
+        708.0,
+        427.67,
+        720.0
+      ],
+      "confidence": 96.94
+    },
+    {
+      "text": "dẫn",
+      "bbox": [
+        432.0,
+        706.0,
+        450.0,
+        717.67
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        454.0,
+        708.0,
+        468.0,
+        717.33
+      ],
+      "confidence": 96.97
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        473.33,
+        708.0,
+        494.0,
+        717.67
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "sử",
+      "bbox": [
+        498.67,
+        708.33,
+        510.33,
+        717.67
+      ],
+      "confidence": 96.7
+    },
+    {
+      "text": "dụng",
+      "bbox": [
+        514.67,
+        708.0,
+        539.67,
+        720.0
+      ],
+      "confidence": 96.7
+    },
+    {
+      "text": "phần",
+      "bbox": [
+        72.0,
+        723.0,
+        97.0,
+        740.33
+      ],
+      "confidence": 96.75
+    },
+    {
+      "text": "mềm",
+      "bbox": [
+        101.0,
+        724.33,
+        127.33,
+        736.33
+      ],
+      "confidence": 94.17
+    },
+    {
+      "text": "thi;",
+      "bbox": [
+        131.33,
+        727.0,
+        148.0,
+        738.0
+      ],
+      "confidence": 96.05
+    },
+    {
+      "text": "ghi",
+      "bbox": [
+        152.67,
+        727.0,
+        168.67,
+        739.0
+      ],
+      "confidence": 95.73
+    },
+    {
+      "text": "xác",
+      "bbox": [
+        173.0,
+        727.33,
+        190.33,
+        736.33
+      ],
+      "confidence": 96.49
+    },
+    {
+      "text": "nhận",
+      "bbox": [
+        194.67,
+        727.0,
+        219.33,
+        738.33
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "những",
+      "bbox": [
+        223.0,
+        727.0,
+        255.67,
+        739.0
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "sai",
+      "bbox": [
+        260.0,
+        727.0,
+        274.0,
+        736.33
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "sót",
+      "bbox": [
+        279.0,
+        727.33,
+        293.67,
+        736.33
+      ],
+      "confidence": 96.81
+    },
+    {
+      "text": "về",
+      "bbox": [
+        297.33,
+        724.33,
+        309.33,
+        736.33
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "họ,",
+      "bbox": [
+        313.33,
+        727.0,
+        329.0,
+        738.33
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "tên,",
+      "bbox": [
+        333.67,
+        727.0,
+        352.0,
+        738.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "đối",
+      "bbox": [
+        356.67,
+        724.33,
+        372.0,
+        736.33
+      ],
+      "confidence": 96.61
+    },
+    {
+      "text": "tượng,",
+      "bbox": [
+        376.33,
+        728.0,
+        409.67,
+        739.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "nơi",
+      "bbox": [
+        414.0,
+        727.0,
+        430.67,
+        736.33
+      ],
+      "confidence": 96.74
+    },
+    {
+      "text": "thường",
+      "bbox": [
+        435.0,
+        727.0,
+        472.67,
+        739.0
+      ],
+      "confidence": 96.05
+    },
+    {
+      "text": "trú,",
+      "bbox": [
+        476.33,
+        727.33,
+        493.33,
+        738.33
+      ],
+      "confidence": 92.16
+    },
+    {
+      "text": "khu",
+      "bbox": [
+        498.0,
+        727.0,
+        517.0,
+        736.33
+      ],
+      "confidence": 96.58
+    },
+    {
+      "text": "vực",
+      "bbox": [
+        521.0,
+        729.67,
+        539.67,
+        738.33
+      ],
+      "confidence": 96.76
+    },
+    {
+      "text": "của",
+      "bbox": [
+        72.67,
+        746.0,
+        90.33,
+        755.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        93.0,
+        746.0,
+        106.33,
+        755.33
+      ],
+      "confidence": 96.21
+    },
+    {
+      "text": "sinh",
+      "bbox": [
+        110.33,
+        745.67,
+        131.67,
+        755.33
+      ],
+      "confidence": 96.31
+    },
+    {
+      "text": "và",
+      "bbox": [
+        134.33,
+        746.0,
+        147.0,
+        755.33
+      ],
+      "confidence": 97.02
+    },
+    {
+      "text": "chuyển",
+      "bbox": [
+        150.0,
+        743.33,
+        186.67,
+        758.0
+      ],
+      "confidence": 76.85
+    },
+    {
+      "text": "những",
+      "bbox": [
+        190.33,
+        746.0,
+        222.33,
+        758.0
+      ],
+      "confidence": 96.93
+    },
+    {
+      "text": "thông",
+      "bbox": [
+        225.33,
+        746.0,
+        254.67,
+        758.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "tin",
+      "bbox": [
+        257.67,
+        746.0,
+        271.33,
+        755.33
+      ],
+      "confidence": 96.98
+    },
+    {
+      "text": "này",
+      "bbox": [
+        274.67,
+        746.0,
+        293.67,
+        758.0
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "cho",
+      "bbox": [
+        297.0,
+        746.0,
+        315.0,
+        755.33
+      ],
+      "confidence": 96.92
+    },
+    {
+      "text": "Ban",
+      "bbox": [
+        318.33,
+        746.0,
+        339.0,
+        755.33
+      ],
+      "confidence": 96.95
+    },
+    {
+      "text": "Thư",
+      "bbox": [
+        342.33,
+        745.67,
+        363.0,
+        755.33
+      ],
+      "confidence": 96.42
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        366.0,
+        746.0,
+        378.67,
+        758.0
+      ],
+      "confidence": 96.96
+    },
+    {
+      "text": "Hội",
+      "bbox": [
+        381.67,
+        745.67,
+        400.67,
+        757.0
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "đồng",
+      "bbox": [
+        404.33,
+        743.33,
+        429.67,
+        758.0
+      ],
+      "confidence": 96.68
+    },
+    {
+      "text": "thi",
+      "bbox": [
+        433.0,
+        746.0,
+        446.33,
+        755.33
+      ],
+      "confidence": 96.54
+    },
+    {
+      "text": "xem",
+      "bbox": [
+        449.67,
+        749.0,
+        472.33,
+        755.33
+      ],
+      "confidence": 96.87
+    },
+    {
+      "text": "xét,",
+      "bbox": [
+        475.67,
+        746.33,
+        494.0,
+        757.0
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "cập",
+      "bbox": [
+        498.0,
+        746.0,
+        514.67,
+        758.0
+      ],
+      "confidence": 96.85
+    },
+    {
+      "text": "nhật",
+      "bbox": [
+        518.33,
+        746.0,
+        540.0,
+        757.0
+      ],
+      "confidence": 96.63
+    },
+    {
+      "text": "vào",
+      "bbox": [
+        72.33,
+        765.0,
+        90.67,
+        774.33
+      ],
+      "confidence": 96.84
+    },
+    {
+      "text": "dữ",
+      "bbox": [
+        94.67,
+        765.0,
+        108.0,
+        774.33
+      ],
+      "confidence": 94.89
+    },
+    {
+      "text": "liệu",
+      "bbox": [
+        111.67,
+        764.67,
+        130.67,
+        776.33
+      ],
+      "confidence": 96.8
+    },
+    {
+      "text": "đăng",
+      "bbox": [
+        134.67,
+        764.67,
+        159.33,
+        776.67
+      ],
+      "confidence": 96.88
+    },
+    {
+      "text": "ký",
+      "bbox": [
+        162.67,
+        764.67,
+        175.33,
+        776.67
+      ],
+      "confidence": 96.69
+    },
+    {
+      "text": "của",
+      "bbox": [
+        179.33,
+        765.33,
+        197.0,
+        774.33
+      ],
+      "confidence": 97.01
+    },
+    {
+      "text": "thí",
+      "bbox": [
+        200.0,
+        765.0,
+        213.33,
+        774.33
+      ],
+      "confidence": 97.0
+    },
+    {
+      "text": "sinh.",
+      "bbox": [
+        217.33,
+        764.67,
+        240.67,
+        774.33
+      ],
+      "confidence": 96.89
+    },
+    {
+      "text": "SU",
+      "bbox": [
+        578.33,
+        374.67,
+        590.0,
+        410.67
+      ],
+      "confidence": 43.58
+    },
+    {
+      "text": "You",
+      "bbox": [
+        577.67,
+        438.0,
+        590.0,
+        470.0
+      ],
+      "confidence": 21.98
+    },
+    {
+      "text": "=-",
+      "bbox": [
+        578.33,
+        419.0,
+        590.0,
+        428.0
+      ],
+      "confidence": 59.76
+    }
+  ],
+  "engine": "tesserocr/vie+eng",
+  "scale": 3
+}

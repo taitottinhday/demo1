@@ -1,0 +1,57 @@
+                                      40
+
+              Tên chương   Mã      Tên          Phương
+    Mã xét    trình, ngành,   ngành,    ngành,    Chỉ    thức
+TT                                                         Ghi chú
+      tuyển   nhóm ngành   nhóm    nhóm      tiêu    tuyển
+                   xét tuyển    ngành1    ngành             sinh
+                   hai)
+            Kỹ thuật Điện
+                  tử - Viễn thông
+            (ĐTTX   Liên                                   Chuyên
+                thông    Cao                                        ngành: Kỹ
+                              Kỹ   thuật
+    ET1LT;    đẳng     Đại                               Xét     thuật   điện
+ 3                          7520207  Điện  tử  -  120
+    ET1VB2    học); Kỹ thuật                                tuyển    tử    -  Kỹ
+                                      Viễn thông
+               Điện tử - Viễn                                             thuật  máy
+                thông (ĐTTX                                              tính
+             Văn bằng thứ
+                   hai)
+            Kỹ   thuật Y
+                 sinh  (ĐTTX
+                Liên    thông
+    ETE5.LT;  Cao đẳng Đại        Kỹ thuật Y          Xét
+ 4                          7520212            140
+    ETE5VB2  học); Kỹ thuật            sinh                 tuyển
+          Y sinh ( ĐTTX
+             Văn bằng thứ
+                   hai)
+            Kỹ  thuật  cơ
+                 khí   (ĐTTX
+                                                            Chuyên
+                Liên    thông
+                                                                     ngành:
+    ME2LT;   Cao đẳng Đại        Kỹ   thuật          Xét
+ 5                          7520103            50            Công nghệ
+    ME2VB2;  học); Kỹ thuật         Cơ khí              tuyển
+                                                          Chế     tạo
+               cơ khí (ĐTTX
+                                                      máy
+             Văn bằng thứ
+                   hai)
+            Kỹ thuật Ô tô
+            (ĐTTX   Liên
+                thông    Cao
+    TE1LT;    đẳng     Đại        Kỹ thuật Ô          Xét
+ 6                          7520130            120
+    TE1VB2    học); Kỹ thuật             tô                   tuyển
+          Ô  tô (ĐTTX
+             Văn bằng thứ
+                   hai)
+            Kỹ  thuật  cơ
+    ME1LT;    điện tử (ĐTTX        Kỹ   thuật          Xét
+ 7                          7520114            120
+   ME1VB2   Liên    thông           cơ điện tử            tuyển
+             Cao đẳng Đại

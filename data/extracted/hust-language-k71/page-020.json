@@ -1,0 +1,72 @@
+{
+  "page_id": "hust-language-k71-p20",
+  "source_id": "hust-language-k71",
+  "source_version": "168b5c897fe8157d711c53a37d70ee95cd1a72ed2f1c5303548cf7df8163391a",
+  "page": 20,
+  "printed_page": null,
+  "native_text": "                                                            2\n\n       Bảng 7.2 Danh mục các học phần tiếng Nhật thuộc khối ngoại ngữ cơ bản, điều kiện miễn học và chuẩn đầu ra\n                                 với chương trình Hệ thống nhúng thông minh và IoT\n\n    Mã học    Tên học                              Học phần được miễn và học kỳ xếp lớp học\nTT                         Thời lượng\n      phần       phần                     Nhóm 1                Nhóm 2         Nhóm 3  Nhóm 4\n 1    JP1111   Tiếng Nhật 1    4(0-8-0-8)           Kỳ 1              M         M    M\n 2    JP1121   Tiếng Nhật 2    4(0-8-0-8)           Kỳ 2                  Kỳ 1         M    M\n                                  ĐK (Kỳ 3)\n 3    JP1134   Tiếng Nhật 3    4(0-8-0-8)    (Được miễn học nếu có chứng          Kỳ 2           Kỳ 1    M\n                                                      chỉ JLPT từ N3 trở lên)\n                                  ĐK (Kỳ 4)             ĐK (Kỳ 4)\n 4    JP2113   Tiếng Nhật 4    4(0-8-0-8)    (Được miễn học nếu có chứng   (Được miễn học nếu có chứng   Kỳ 2    M\n                                                      chỉ JLPT từ N3 trở lên)          chỉ JLPT từ N3 trở lên)\n                         Đáp ứng một trong các điều kiện sau:\n   Chuẩn đầu ra khi xét tốt\n                                    a) Có chứng chỉ JLPT từ N3 trở lên; hoặc\n                   nghiệp\n                                 b) Đạt toàn bộ các học phần tiếng Nhật gồm {JP1111, JP1121, JP1134, JP2113}\n\n Ghi chú:\n      Nhóm 1: Chưa có chứng chỉ JLPT N5\n      Nhóm 2: Có chứng chỉ JLPT N5\n      Nhóm 3: Có chứng chỉ JLPT N4\n      Nhóm 4: Có chứng chỉ JLPT từ N3 trở lên\n\n      M: Được miễn học (ghi điểm R)\n      Kỳ 1: Được xếp học ở kỳ 1             Kỳ 2: Được xếp học ở kỳ 2\n      ĐK: Sinh viên tự đăng ký học song hành với các học phần của CTĐT tại kỳ tương ứng (trong Bảng 7.2) nếu chưa học hoặc\n       chưa được miễn.",
+  "text": "                                                            2\n\n       Bảng 7.2 Danh mục các học phần tiếng Nhật thuộc khối ngoại ngữ cơ bản, điều kiện miễn học và chuẩn đầu ra\n                                 với chương trình Hệ thống nhúng thông minh và IoT\n\n    Mã học    Tên học                              Học phần được miễn và học kỳ xếp lớp học\nTT                         Thời lượng\n      phần       phần                     Nhóm 1                Nhóm 2         Nhóm 3  Nhóm 4\n 1    JP1111   Tiếng Nhật 1    4(0-8-0-8)           Kỳ 1              M         M    M\n 2    JP1121   Tiếng Nhật 2    4(0-8-0-8)           Kỳ 2                  Kỳ 1         M    M\n                                  ĐK (Kỳ 3)\n 3    JP1134   Tiếng Nhật 3    4(0-8-0-8)    (Được miễn học nếu có chứng          Kỳ 2           Kỳ 1    M\n                                                      chỉ JLPT từ N3 trở lên)\n                                  ĐK (Kỳ 4)             ĐK (Kỳ 4)\n 4    JP2113   Tiếng Nhật 4    4(0-8-0-8)    (Được miễn học nếu có chứng   (Được miễn học nếu có chứng   Kỳ 2    M\n                                                      chỉ JLPT từ N3 trở lên)          chỉ JLPT từ N3 trở lên)\n                         Đáp ứng một trong các điều kiện sau:\n   Chuẩn đầu ra khi xét tốt\n                                    a) Có chứng chỉ JLPT từ N3 trở lên; hoặc\n                   nghiệp\n                                 b) Đạt toàn bộ các học phần tiếng Nhật gồm {JP1111, JP1121, JP1134, JP2113}\n\n Ghi chú:\n      Nhóm 1: Chưa có chứng chỉ JLPT N5\n      Nhóm 2: Có chứng chỉ JLPT N5\n      Nhóm 3: Có chứng chỉ JLPT N4\n      Nhóm 4: Có chứng chỉ JLPT từ N3 trở lên\n\n      M: Được miễn học (ghi điểm R)\n      Kỳ 1: Được xếp học ở kỳ 1             Kỳ 2: Được xếp học ở kỳ 2\n      ĐK: Sinh viên tự đăng ký học song hành với các học phần của CTĐT tại kỳ tương ứng (trong Bảng 7.2) nếu chưa học hoặc\n       chưa được miễn.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        421.32501220703125,
+        28.81900405883789,
+        426.82501220703125,
+        40.996002197265625
+      ],
+      "text": "2\n"
+    },
+    {
+      "bbox": [
+        136.60299682617188,
+        57.253997802734375,
+        750.8010864257812,
+        71.6449966430664
+      ],
+      "text": "Bảng 7.2 Danh mục các học phần tiếng Nhật thuộc khối ngoại ngữ cơ bản, điều kiện miễn học và chuẩn đầu ra \n"
+    },
+    {
+      "bbox": [
+        277.3389892578125,
+        73.38600158691406,
+        570.8140258789062,
+        87.7770004272461
+      ],
+      "text": "với chương trình Hệ thống nhúng thông minh và IoT\n"
+    },
+    {
+      "bbox": [
+        98.94999694824219,
+        325.708984375,
+        147.71299743652344,
+        340.1000061035156
+      ],
+      "text": "Ghi chú:\n"
+    },
+    {
+      "bbox": [
+        134.9499969482422,
+        340.6579895019531,
+        355.5989990234375,
+        404.3780212402344
+      ],
+      "text": "Nhóm 1: Chưa có chứng chỉ JLPT N5\nNhóm 2: Có chứng chỉ JLPT N5\nNhóm 3: Có chứng chỉ JLPT N4\nNhóm 4: Có chứng chỉ JLPT từ N3 trở lên\n"
+    },
+    {
+      "bbox": [
+        134.9499969482422,
+        418.42999267578125,
+        780.1528930664062,
+        482.1500549316406
+      ],
+      "text": "M: Được miễn học (ghi điểm R)\nKỳ 1: Được xếp học ở kỳ 1\nKỳ 2: Được xếp học ở kỳ 2\nĐK: Sinh viên tự đăng ký học song hành với các học phần của CTĐT tại kỳ tương ứng (trong Bảng 7.2) nếu chưa học hoặc \nchưa được miễn.\n"
+    }
+  ],
+  "table_ids": [
+    "hust-language-k71-168b5c897fe8-p20-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1907
+}

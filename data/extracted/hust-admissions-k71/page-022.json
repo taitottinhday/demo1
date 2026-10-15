@@ -1,0 +1,54 @@
+{
+  "page_id": "hust-admissions-k71-p22",
+  "source_id": "hust-admissions-k71",
+  "source_version": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
+  "page": 22,
+  "printed_page": null,
+  "native_text": "                                     21\n\n\n             Bảng 4. Mức học phí các chương trình Elitech\n                                Đơn vị: triệu đồng/năm\nTT  Tên chương trình            Mức học phí trung bình  Ghi chú\nI.   Chương  trình giảng dạy bằng\n      tiếng Anh\n1    Công nghệ thông tin Global ICT\n2   An toàn không gian số\n3    Khoa học và Kỹ thuật Vật liệu\n4   Kỹ thuật thực phẩm\n5   Kỹ thuật sinh học\n6   Kỹ thuật hóa dược\n7   Hệ thống điện và năng lượng tái tạo\n                                   35 - 508   Kỹ thuật Điều khiển và Tự động hóa\n9    Phân tích kinh doanh\n10  Kỹ thuật Cơ điện tử\n11  Kỹ thuật Điện tử Viễn thông\n12  Kỹ thuật Y sinh\n     Truyền thông số và KT đa phương\n13      tiện\n14  Kỹ thuật Ô tô\n    Khoa học tính toán cho các hệ thống\n15     thông minh                                                      Chương\n                                       35-4516  Hóa học mỹ phẩm                                                                            trình mới\n17  Kế toán\n18   Khoa học Dữ liệu và Trí tuệ nhân tạo  ~68\n19   Logistics và Quản lý chuỗi cung ứng  ~65\n    Chương trình có tăng cường ngoại\nII.    ngữ\n20  Hệ thống nhúng thông minh và IoT\n21   Công nghệ thông tin Việt Nhật      40 - 50\n22   Công nghệ thông tin Việt Pháp\nIII.  Chương trình PFIEV\n23   Tin học công nghiệp và TĐH\n                                    40 - 45\n24  Cơ khí hàng không",
+  "text": "                                     21\n\n\n             Bảng 4. Mức học phí các chương trình Elitech\n                                Đơn vị: triệu đồng/năm\nTT  Tên chương trình            Mức học phí trung bình  Ghi chú\nI.   Chương  trình giảng dạy bằng\n      tiếng Anh\n1    Công nghệ thông tin Global ICT\n2   An toàn không gian số\n3    Khoa học và Kỹ thuật Vật liệu\n4   Kỹ thuật thực phẩm\n5   Kỹ thuật sinh học\n6   Kỹ thuật hóa dược\n7   Hệ thống điện và năng lượng tái tạo\n                                   35 - 508   Kỹ thuật Điều khiển và Tự động hóa\n9    Phân tích kinh doanh\n10  Kỹ thuật Cơ điện tử\n11  Kỹ thuật Điện tử Viễn thông\n12  Kỹ thuật Y sinh\n     Truyền thông số và KT đa phương\n13      tiện\n14  Kỹ thuật Ô tô\n    Khoa học tính toán cho các hệ thống\n15     thông minh                                                      Chương\n                                       35-4516  Hóa học mỹ phẩm                                                                            trình mới\n17  Kế toán\n18   Khoa học Dữ liệu và Trí tuệ nhân tạo  ~68\n19   Logistics và Quản lý chuỗi cung ứng  ~65\n    Chương trình có tăng cường ngoại\nII.    ngữ\n20  Hệ thống nhúng thông minh và IoT\n21   Công nghệ thông tin Việt Nhật      40 - 50\n22   Công nghệ thông tin Việt Pháp\nIII.  Chương trình PFIEV\n23   Tin học công nghiệp và TĐH\n                                    40 - 45\n24  Cơ khí hàng không",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        298.8699951171875,
+        42.46797180175781,
+        313.8699951171875,
+        55.75197219848633
+      ],
+      "text": "21 \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        62.390323638916016,
+        74.4540023803711,
+        77.93260192871094
+      ],
+      "text": " \n"
+    },
+    {
+      "bbox": [
+        70.94400024414062,
+        81.59259033203125,
+        453.4599914550781,
+        114.89933776855469
+      ],
+      "text": "Bảng 4. Mức học phí các chương trình Elitech \n \n \n \n \n \n \n \nĐơn vị: triệu đồng/năm \n"
+    },
+    {
+      "bbox": [
+        304.8699951171875,
+        717.9326171875,
+        308.1099853515625,
+        770.1993408203125
+      ],
+      "text": " \n \n \n"
+    }
+  ],
+  "table_ids": [
+    "hust-admissions-k71-9aea5b7b9afb-p22-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1386
+}

@@ -1,6 +1,6 @@
 # Bộ dữ liệu tuyển sinh HUST K71 — nhập học 2026
 
-Bản chuẩn hóa kỹ thuật `k71-2026-v1`, tạo từ 6 PDF trong `raw/`. Chủ dự án xác nhận các nguồn áp dụng cho K71 nhập học năm 2026. Xác nhận này không đổi năm của dữ kiện lịch sử, không mở rộng đối tượng của từng điều khoản, không thay thế việc đối chiếu kết quả OCR/bảng.
+Bản chuẩn hóa kỹ thuật `k71-2026-v2`, tạo từ 6 PDF chuẩn trong `raw/`, dùng chung `source_catalog.json` với ứng dụng sau merge. Chủ dự án xác nhận các nguồn áp dụng cho K71 nhập học năm 2026. Xác nhận này không đổi năm của dữ kiện lịch sử, không mở rộng đối tượng của từng điều khoản, không thay thế việc đối chiếu kết quả OCR/bảng.
 
 ## Đọc nhanh trước khi triển khai
 
@@ -14,7 +14,7 @@ Bản chuẩn hóa kỹ thuật `k71-2026-v1`, tạo từ 6 PDF trong `raw/`. Ch
 | Chương trình tuyển sinh | 68 |
 | Dữ kiện điểm chuẩn lịch sử 2024/2025 | 358 |
 
-Thống kê này mô tả snapshot `k71-2026-v1`; đọc `processed/release.json` để biết số liệu của bản thực tế nhận được. Số bản ghi theo chủ đề có thể chồng lấp, không cộng thành tổng bản ghi. Đã kiểm tra schema, ID, checksum, liên kết bảng/nguồn, độ phủ trang và một số dữ kiện mốc; kiểm tra kỹ thuật không chứng minh accuracy ≥85% hoặc nguồn đã được cán bộ duyệt.
+Thống kê này mô tả snapshot `k71-2026-v2`; đọc `processed/release.json` để biết số liệu thực tế. Số bản ghi theo chủ đề có thể chồng lấp, không cộng thành tổng. Đã kiểm tra schema, ID, checksum toàn bộ snapshot/pipeline, liên kết bảng/nguồn, độ phủ trang và dữ kiện mốc; kiểm tra kỹ thuật không chứng minh accuracy ≥85% hoặc nguồn đã được cán bộ duyệt.
 
 Thứ tự đọc dành cho người triển khai và agent:
 
@@ -36,9 +36,9 @@ Thứ tự đọc dành cho người triển khai và agent:
 - `application_steps.jsonl` là văn bản có nguồn được nhóm theo chủ đề, **chưa phải checklist hoàn chỉnh có schema riêng cho từng bước, giấy tờ và deadline**. Không giả định các trường đó đã có hoặc tự sinh chúng khi nguồn chưa đủ.
 - Tương tự, các file quy định chứa cả section, hàng bảng và bản ghi định lượng. Không coi tất cả là rule có thể tự tính điểm/học phí hoặc kiểm tra đủ điều kiện.
 - 19 trang TSA và bảng ảnh ngoại ngữ trang PDF 17 đã OCR nhưng cần đối chiếu. Ô gộp chưa giải quyết giữ nguyên null; không tự điền từ hàng trên.
-- Điểm chuẩn 2026 và quy định học bổng chi tiết trên web chưa được lưu trong release này. Không dùng điểm chuẩn lịch sử hoặc học bổng tổng quan để suy ra dữ kiện còn thiếu.
+- `admissions_facts_2026.json` và `cutoffs_2026_summary.json` từ main giữ một số dữ kiện web tóm tắt năm 2026, chưa có bản lưu web đầy đủ. Chúng nằm riêng với `records.jsonl` (điểm chuẩn lịch sử 2024/2025). Không gộp năm hoặc suy rộng thành bảng điểm đầy đủ. Học bổng chi tiết vẫn thiếu nguồn.
 - Chưa có embedding, vector index, model reranker hay kết quả đánh giá chatbot trên snapshot này. Corpus là đầu vào để các bên triển khai các thành phần đó.
-- `eval/retrieval-dev.jsonl` có 25 ca development với vị trí nguồn kỳ vọng; các candidate ID chỉ là đoạn cùng vùng trang, chưa phải nhãn relevance đã duyệt. Không dùng kết quả trên bộ này để tuyên bố đạt KPI đề tài.
+- `eval/retrieval-dev.jsonl` có 25 ca development chỉ cho `normalized_pdf_records_only`, gắn `dataset_release`; các candidate ID chỉ là đoạn cùng vùng trang, chưa phải nhãn relevance đã duyệt. Ca thiếu điểm chuẩn 2026 là kỳ vọng cho corpus PDF này, không áp dụng cho facts web riêng của runtime. Không dùng kết quả trên bộ này để tuyên bố đạt KPI đề tài.
 - Việc backend hiện có đọc PDF/`knowledge.json` không đồng nghĩa đã dùng bộ chuẩn này: bên backend cần viết adapter/importer chủ động cho records/chunks. Người phụ trách Data không thay đổi code backend trong lần bàn giao này.
 
 ## Hướng dẫn tích hợp cho backend và agent
@@ -82,7 +82,7 @@ programs = [r for r in records.values() if r["record_type"] == "program"]
 
 Khuyến nghị cập nhật bằng snapshot: nạp bản mới vào vùng riêng, kiểm tra schema/checksum/liên kết, dựng index, rồi chuyển phiên bản phục vụ. Giữ bản cũ để truy nguồn câu trả lời đã lưu và để rollback. Không trộn records của bản mới với chunks của bản cũ; vô hiệu hóa cache theo phiên bản kho. Nếu chỉ upsert theo ID mới mà không xử lý ID cũ, dữ kiện cũ có thể tiếp tục được truy xuất.
 
-Khi bàn giao bản tiếp theo, ghi mã phiên bản mới cùng nguồn đã đổi, dữ kiện sửa, trạng thái đã duyệt và thay đổi schema; không ghi đè một gói đã bàn giao mà vẫn gọi nó là snapshot cũ. Script normalizer hiện còn dùng hằng `VERSION = "k71-2026-v1"`; người phát hành phải đổi mã này trước lần phát hành dữ liệu mới. Không chạy lại normalizer để áp dụng duyệt thủ công mà chưa lưu cơ chế giữ các quyết định duyệt: script hiện tái tạo dữ liệu và trạng thái trích xuất từ PDF.
+Khi bàn giao bản tiếp theo, ghi mã phiên bản mới cùng nguồn đã đổi, dữ kiện sửa, trạng thái đã duyệt và thay đổi schema; không ghi đè một gói đã bàn giao mà vẫn gọi nó là snapshot cũ. Script normalizer hiện còn dùng hằng `VERSION = "k71-2026-v2"`; người phát hành phải đổi mã này trước lần phát hành dữ liệu mới. Không chạy lại normalizer để áp dụng duyệt thủ công mà chưa lưu cơ chế giữ các quyết định duyệt: script hiện tái tạo dữ liệu và trạng thái trích xuất từ PDF.
 
 ## Các file bàn giao
 
@@ -119,7 +119,7 @@ Ngoài ngành, chỉ tiêu, học phí, điểm chuẩn và học bổng:
 - `student_support`: hỗ trợ, quyền/trách nhiệm, khiếu nại và các mục liên quan được nguồn đề cập.
 - `institutional_rules`: nội dung còn lại, gồm tổ chức và hiệu lực; không tự động coi tất cả là nội dung tư vấn ứng viên.
 
-Nhãn chủ đề được gán bằng quy tắc từ khóa: dùng để lấy ứng viên truy xuất, không dùng như phân loại đã được cán bộ duyệt. Nguồn tổng quan có học bổng trang PDF 25–26; website học bổng chi tiết và điểm chuẩn 2026 trong sources.md chưa được tải vào bản này.
+Nhãn chủ đề được gán bằng quy tắc từ khóa: dùng để lấy ứng viên truy xuất, không dùng như phân loại đã được cán bộ duyệt. Nguồn tổng quan có học bổng trang PDF 25–26. Dữ kiện web 2026 chỉ có bản tóm tắt riêng, chưa có bản lưu toàn trang và nội dung học bổng chi tiết.
 
 ## Hợp đồng sử dụng
 
@@ -155,9 +155,26 @@ Dependencies riêng cho Data/OCR ở `requirements-data.txt`; không sửa requi
 ```powershell
 .venv/Scripts/python.exe scripts/setup_data_ocr.py
 .venv/Scripts/python.exe -X utf8 scripts/normalize_admissions_data.py
+.venv/Scripts/python.exe -X utf8 scripts/build_retrieval_dev.py
+.venv/Scripts/python.exe -X utf8 scripts/validate_admissions_data.py --seal --package
+```
+
+Kiểm tra snapshot đã có (chỉ đọc, không cần OCR/model, không tạo ZIP):
+
+```powershell
+.venv/Scripts/python.exe -m pip install -r requirements-data-validation.txt
 .venv/Scripts/python.exe -X utf8 scripts/validate_admissions_data.py
 ```
 
-`--skip-ocr` chỉ để debug, không tạo một release OCR đầy đủ. PDF gốc và sources.md không bị ghi đè. Chỉ các thư mục đầu ra liệt kê ở trên được tái tạo; dữ liệu chuẩn không dùng tên `knowledge.json` đang phục vụ backend MVP.
+`--skip-ocr` không phát hành release đủ 131 trang: pipeline dừng khi gặp trang cần OCR. PDF gốc và sources.md không bị ghi đè. Chỉ các thư mục đầu ra liệt kê ở trên được tái tạo; dữ liệu chuẩn không dùng tên `knowledge.json` đang phục vụ backend MVP. Chỉ dùng `--seal` sau khi hoàn thành build và kiểm tra nội dung; checksum chứng minh tính toàn vẹn, không chứng minh nội dung đúng.
 
-Lưu bộ release cùng nhau khi bàn giao. Thư mục data đang bị ignore theo cấu hình Git cũ; bản ZIP bàn giao nằm trong `data/releases/`. Không đưa data/tools, dữ liệu phiên ứng viên hoặc database vào gói bàn giao.
+Lưu bộ release cùng nhau khi bàn giao. Git theo dõi nguồn công khai, extracted, schema, normalized, quality và corpus; ZIP trong `data/releases/`, tools, database và dữ liệu ứng viên vẫn bị ignore. CI validate snapshot đã commit bằng chế độ chỉ đọc; không cần cài OCR. Không đưa dữ liệu phiên ứng viên hoặc database vào gói bàn giao.
+
+## Thay đổi v2 và ranh giới trước tích hợp AI
+
+- Catalog là metadata chung. Sáu PDF dùng tên chuẩn như runtime; năm bản sao trùng được bỏ. `source_id` corpus giữ nguyên, manifest bổ sung `runtime_source_id` để adapter nối đúng nguồn. Evidence chuyển sang đường dẫn PDF chuẩn.
+- Schema v2 bắt buộc metadata nguồn/trang/phạm vi/đối tượng/chất lượng trên cả record và chunk. OCR và bảng chưa duyệt không được đánh dấu đủ điều kiện trả lời. Không nâng trạng thái duyệt tự động.
+- `checksum_format=sha256_binary_pdf_utf8_lf_text`: PDF băm nguyên byte; file văn bản chuẩn hóa CRLF thành LF trước SHA256 để Windows/Linux kiểm tra cùng một snapshot. `.gitattributes` cố định LF cho dữ liệu và script phát hành.
+- Ngày 07/09/2026 của quy định ngoại ngữ được giữ dưới dạng ghi chú chưa xác minh; `publication_date=null`. Hiệu lực học kỳ 1 năm học 2026–2027 giữ theo Điều 7, không còn cảnh báo sai về sources.md cũ.
+- Gói bàn giao gồm cả catalog, facts tóm tắt, bộ golden 20 ca và bộ development 25 ca. Hai bộ chưa phải holdout, chưa đo chất lượng chatbot trên snapshot v2.
+- Runtime vẫn đọc PDF và facts theo logic hiện có. Chưa nối records/chunks, chưa tạo embedding hoặc thay retrieval/LLM. Bước AI kế tiếp cần adapter, lọc chất lượng/phạm vi và benchmark riêng.

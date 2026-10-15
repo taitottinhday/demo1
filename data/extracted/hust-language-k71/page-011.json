@@ -1,0 +1,36 @@
+{
+  "page_id": "hust-language-k71-p11",
+  "source_id": "hust-language-k71",
+  "source_version": "168b5c897fe8157d711c53a37d70ee95cd1a72ed2f1c5303548cf7df8163391a",
+  "page": 11,
+  "printed_page": null,
+  "native_text": "                                                      2\n\n        Bảng 3.2 Yêu cầu trình độ tiếng Anh theo học kỳ và chuẩn ngoại ngữ đầu ra khi xét tốt nghiệp\n\n               Hạng mục                                  Yêu cầu\nĐăng ký học tập cho học kỳ 1\n                                        Được xếp lớp học theo quy định tại Bảng 3.1\nĐăng ký học tập cho học kỳ 2\n                                                 Sinh viên phải đăng ký học song hành học phần FL1133\nĐăng ký học tập cho học kỳ 3\n                                                Tiếng Anh cơ sở 3 nếu chưa học hoặc chưa được miễn.\n                                                 Sinh viên phải đăng ký học song hành học phần FL1134\nĐăng ký học tập cho học kỳ 4\n                                                Tiếng Anh cơ sở 4 nếu chưa học hoặc chưa được miễn.\n                                                 Sinh viên phải đăng ký học song hành học phần FL1135\nĐăng ký học tập cho học kỳ 5\n                                                Tiếng Anh cơ sở 5 nếu chưa học hoặc chưa được miễn.\nChuẩn đầu ra khi xét tốt nghiệp với CTĐT chuẩn  Có chứng chỉ tiếng Anh được quy đổi tương đương từ Bậc\n(trừ các CTĐT nhóm ngành ngôn ngữ)              3 trở lên theo Bảng 2.1, Phụ lục II\n                                        Đáp ứng đồng thời hai điều kiện sau:\n                                                          a) Có chứng chỉ tiếng Anh được quy đổi tương đương từ\nChuẩn đầu ra khi xét tốt nghiệp với CTĐT tài     Bậc 4 trở lên theo Bảng 2.1 - Phụ lục II\nnăng tích hợp Cử nhân – Thạc sĩ                    b) Đáp ứng yêu cầu chuẩn đầu ra ngoại ngữ theo Chuẩn\n                                  CTĐT kỹ sư, thạc sĩ tài năng thuộc các lĩnh vực STEM do\n                                      Bộ Giáo dục và Đào tạo ban hành.",
+  "text": "                                                      2\n\n        Bảng 3.2 Yêu cầu trình độ tiếng Anh theo học kỳ và chuẩn ngoại ngữ đầu ra khi xét tốt nghiệp\n\n               Hạng mục                                  Yêu cầu\nĐăng ký học tập cho học kỳ 1\n                                        Được xếp lớp học theo quy định tại Bảng 3.1\nĐăng ký học tập cho học kỳ 2\n                                                 Sinh viên phải đăng ký học song hành học phần FL1133\nĐăng ký học tập cho học kỳ 3\n                                                Tiếng Anh cơ sở 3 nếu chưa học hoặc chưa được miễn.\n                                                 Sinh viên phải đăng ký học song hành học phần FL1134\nĐăng ký học tập cho học kỳ 4\n                                                Tiếng Anh cơ sở 4 nếu chưa học hoặc chưa được miễn.\n                                                 Sinh viên phải đăng ký học song hành học phần FL1135\nĐăng ký học tập cho học kỳ 5\n                                                Tiếng Anh cơ sở 5 nếu chưa học hoặc chưa được miễn.\nChuẩn đầu ra khi xét tốt nghiệp với CTĐT chuẩn  Có chứng chỉ tiếng Anh được quy đổi tương đương từ Bậc\n(trừ các CTĐT nhóm ngành ngôn ngữ)              3 trở lên theo Bảng 2.1, Phụ lục II\n                                        Đáp ứng đồng thời hai điều kiện sau:\n                                                          a) Có chứng chỉ tiếng Anh được quy đổi tương đương từ\nChuẩn đầu ra khi xét tốt nghiệp với CTĐT tài     Bậc 4 trở lên theo Bảng 2.1 - Phụ lục II\nnăng tích hợp Cử nhân – Thạc sĩ                    b) Đáp ứng yêu cầu chuẩn đầu ra ngoại ngữ theo Chuẩn\n                                  CTĐT kỹ sư, thạc sĩ tài năng thuộc các lĩnh vực STEM do\n                                      Bộ Giáo dục và Đào tạo ban hành.",
+  "method": "native",
+  "ocr_confidence": null,
+  "blocks": [
+    {
+      "bbox": [
+        421.32501220703125,
+        28.81900405883789,
+        426.82501220703125,
+        40.996002197265625
+      ],
+      "text": "2\n"
+    },
+    {
+      "bbox": [
+        181.19900512695312,
+        57.253997802734375,
+        702.9539794921875,
+        71.6449966430664
+      ],
+      "text": "Bảng 3.2 Yêu cầu trình độ tiếng Anh theo học kỳ và chuẩn ngoại ngữ đầu ra khi xét tốt nghiệp\n"
+    }
+  ],
+  "table_ids": [
+    "hust-language-k71-168b5c897fe8-p11-t1"
+  ],
+  "image_count": 0,
+  "text_characters": 1789
+}

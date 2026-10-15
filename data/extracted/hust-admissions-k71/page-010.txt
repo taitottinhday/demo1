@@ -1,0 +1,29 @@
+                                                            9
+
+
+    Mã xét                     Mã ngành                     ChỉTT             Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú      tuyển                                chuẩn                            tiêu
+                                                                                                        1. Phương thức XTTN
+               Tiếng Anh chuyên nghiệp quốc                                                                     Chương trình song34  FL2                                   7220201   Ngôn ngữ Anh        90    2. Phương thức ĐGTD                    tế                                                                                                     bằng
+                                                                                                        3. Phương thức THPT (D01 (Gốc); K01)
+                                                                                                        1. Phương thức XTTN
+               Tiếng Trung Khoa học và Công            Ngôn ngữ Trung               2. Phương thức ĐGTD35  FL3                                   7220204                       80               nghệ                                 Quốc                           3. Phương thức THPT (D01 (Gốc); D04;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+               Tiếng Hàn Khoa học và Công                                                     2. Phương thức ĐGTD36  FL4                                   7220210   Ngôn ngữ Hàn Quốc   40                                    Chương trình mới               nghệ                                                                                3. Phương thức THPT (D01 (Gốc); DD2;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD37  HE1     Kỹ thuật Nhiệt                 7520115   Kỹ thuật nhiệt        250
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD38  IT1      CNTT: Khoa học Máy tính       7480101   Khoa học máy tính    300
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD39  IT2      CNTT: Kỹ thuật Máy tính        7480106   Kỹ thuật máy tính     200
+                                                                                                        3. Phương thức THPT (A00 (Gốc); A01;
+                                                                             K01)
+                                                                                                        1. Phương thức XTTN
+             Khoa học dữ liệu và Trí tuệ                                                        2. Phương thức ĐGTD                Chương trình học40  ITE10                                 7460108   Khoa học dữ liệu     120               nhân tạo (CT tiên tiến)                                                             3. Phương thức THPT (A00 (Gốc); A01;   bằng tiếng Anh
+                                                                             K01)
+41  ITE15                                 7480202   An toàn thông tin      40    1. Phương thức XTTN

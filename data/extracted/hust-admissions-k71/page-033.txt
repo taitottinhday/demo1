@@ -1,0 +1,32 @@
+                                                           32
+
+
+             Tên                                   Năm 2025            Năm 2024
+              chương
+                  Mã                      Phương
+                  trình,
+   Mã xét               ngành,   Tên ngành, nhóm     thức          Số    Điểm trúng           Số    Điểm trúngTT            ngành,                                      Chỉ                    Chỉ
+     tuyển             nhóm    ngành               tuyển        nhập  tuyển/Thang          nhập   tuyển/Thang            nhóm                                                  tiêu                          tiêu                        ngành                           sinh          học     điểm xét             học      điểm xét              ngành xét
+               tuyển
+                                         XTTN                 61.94/100                     75.31/110                Tiếng Anh
+30  FL1    KHKT và   7220201  Ngôn ngữ Anh     DGTD   210   211    65.81/100    350     366     52.01/100
+              Công nghệ                                            THPT                   24.3/30                        25/30
+                Tiếng Anh                        XTTN                 61.94/100                     75.31/110
+               chuyên31  FL2                  7220201  Ngôn ngữ Anh     DGTD   90    81    65.81/100    60      53     50.29/100                nghiệp
+                                            THPT                   24.3/30                       23.81/30               quốc tế
+                                         XTTN                 56.83/100                     71.05/110
+            Kỹ thuật
+32  HE1                 7520115  Kỹ thuật nhiệt      DGTD   290   293    61.32/100    225     218     56.67/100                 Nhiệt
+                                            THPT                  25.47/30                        25.2/30
+
+                                         XTTN                 93.92/100             CNTT:                                                                                                           103.89/110
+33  IT1      Khoa học    7480101  Khoa học máy tính            300   299               320     330                                       DGTD                 83.39/100                     83.82/100            Máy tính
+                                            THPT                  29.19/30                       28.53/30
+                                         XTTN                 89.62/100                      98.3/110             CNTT: Kỹ
+34  IT2        thuật Máy   7480106  Kỹ thuật máy tính   DGTD   200   210    79.86/100    230     235     82.08/100
+                   tính                                            THPT                  28.83/30                       28.48/30
+              Khoa học
+                                         XTTN                 95.64/100              dữ liệu và                                                                                    104.58/110
+                  Trí tuệ35  ITE10                7460108  Khoa học dữ liệu    DGTD   120   102    86.97/100    135     133     81.6/100               nhân tạo
+              (CT tiên                           THPT                  29.39/30                       28.22/30
+                    tiến)

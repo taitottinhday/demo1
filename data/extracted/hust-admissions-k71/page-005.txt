@@ -1,0 +1,37 @@
+                                                            4
+
+
+     3. Quy tắc quy đổi tương đương ngưỡng đầu vào và điểm trúng tuyển giữa các tổ hợp, phương thức tuyển sinh
+
+  •  Ngưỡng đảm bảo chất lượng và độ lệch giữa các tổ hợp điểm thi Tốt nghiệp THPT sẽ thông báo sau khi có điểm thi Tốt nghiệp THPT 2026.
+
+  Chương trình đào tạo Kỹ thuật Vi điện tử và Công nghệ Nano (MS2) có thêm yêu cầu: Điểm của thí sinh thuộc nhóm 25% thí sinh có điểm tổ
+  hợp môn xét tuyển cao nhất toàn quốc và nhóm 20% thí sinh có điểm môn Toán cao nhất toàn quốc; sẽ thông báo ngưỡng cụ thể sau khi có
+  điểm thi Tốt nghiệp THPT 2026.
+
+  •  Bảng quy đổi tương đương điểm trúng tuyển các phương thức sẽ thông báo sau khi có điểm thi Tốt nghiệp THPT 2026.
+
+     4. Chỉ tiêu tuyển sinh
+
+                          Bảng 1. Bảng thông tin các mã tuyển sinh đại học chính quy năm 2026
+
+    Mã xét                     Mã ngành                     Chỉ
+TT            Tên chương trình đào tạo               Tên ngành chuẩn              Phương thức tuyển sinh             Ghi chú
+      tuyển                                chuẩn                             tiêu
+
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD 1  BF1     Kỹ thuật Sinh học              7420202   Kỹ thuật sinh học     160
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD 2  BF2     Kỹ thuật Thực phẩm            7540102   Kỹ thuật thực phẩm   360
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+            Kỹ thuật Thực phẩm (CT tiên                                                      2. Phương thức ĐGTD                Chương trình học 3  BFE12                                 7540102   Kỹ thuật thực phẩm    60
+                    tiến)                                                                                3. Phương thức THPT (A00 (Gốc); B00;   bằng tiếng Anh
+                                                                              D07; K01)
+                                                                                                        1. Phương thức XTTN
+                                                                                                        2. Phương thức ĐGTD                Chương trình học 4  BFE19   Kỹ thuật sinh học (CT tiên tiến)   7420202   Kỹ thuật sinh học      60
+                                                                                                        3. Phương thức THPT (A00 (Gốc); B00;   bằng tiếng Anh
+                                                                              D07; K01)
