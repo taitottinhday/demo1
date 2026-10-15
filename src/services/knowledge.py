@@ -7,7 +7,6 @@ import re
 import unicodedata
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlparse
 
 import pymupdf
 
@@ -172,7 +171,6 @@ class Knowledge:
             source_id = source_id or self.primary_source_id
             source = self.documents_by_id.get(source_id, primary)
             source_path = source.get("resolved_path")
-            page_fragment = f"#page={page}" if page else ""
             self.chunks.append(
                 {
                     "id": f"chunk-{len(self.chunks) + 1}",

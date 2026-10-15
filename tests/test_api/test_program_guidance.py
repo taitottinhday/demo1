@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 from fastapi import HTTPException
 from pydantic import ValidationError
+from starlette.requests import Request
 
 from src.api.routes import program_guidance, program_guidance_options
 from src.config import Settings
@@ -16,7 +17,21 @@ def guidance_runtime(tmp_path, knowledge):
     store = Store(tmp_path / "program-guidance.db")
     settings = Settings(_env_file=None, answer_mode="extractive", app_env="test")
     runtime = {"settings": settings, "store": store, "knowledge": knowledge}
-    request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace(runtime=runtime)))
+    request = Request(
+        {
+            "type": "http",
+            "http_version": "1.1",
+            "method": "GET",
+            "scheme": "http",
+            "path": "/api/v1/program-guidance",
+            "raw_path": b"/api/v1/program-guidance",
+            "query_string": b"",
+            "headers": [],
+            "client": ("testclient", 50000),
+            "server": ("testserver", 80),
+            "app": SimpleNamespace(state=SimpleNamespace(runtime=runtime)),
+        }
+    )
     return request, store, knowledge
 
 
