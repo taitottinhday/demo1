@@ -323,7 +323,7 @@ class Admissions:
                     "Xem tài liệu tuyển sinh 2026 và kiểm tra trang nguồn liên quan",
                     "Chuyển cán bộ nếu câu hỏi cần xác minh trường hợp cụ thể",
                 ],
-                self.k.manifest,
+                self.k.manifest, question,
             )
         return result
 
@@ -590,7 +590,7 @@ class Admissions:
         result["next_steps"] = ["Mở tài liệu nguồn được dẫn để đối chiếu", followup,
                                 "Chuyển cán bộ nếu cần xét trường hợp cá nhân"]
         result["answer_sections"] = structure_answer(
-            result["response"], result["sources"], result["next_steps"], self.k.manifest
+            result["response"], result["sources"], result["next_steps"], self.k.manifest, question
         )
         # Only non-personal questions are cached. Cache is bounded and versioned.
         if "[đã ẩn" not in question and not re.search(r"\b(?:toi|em|minh)\b", q):

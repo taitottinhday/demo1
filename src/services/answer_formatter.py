@@ -5,7 +5,7 @@ import re
 from src.services.knowledge import normalize, question_intent, tokens
 
 
-def structure_answer(response, sources, next_steps, manifest):
+def structure_answer(response, sources, next_steps, manifest, question=""):
     """Expose a stable presentation contract without changing the raw response."""
     paragraphs = []
     seen = set()
@@ -46,6 +46,11 @@ def structure_answer(response, sources, next_steps, manifest):
     version = (manifest or {}).get("version", "")[:12]
     source_count = (manifest or {}).get("document_count")
     return {
+        "details_title": {
+            "cutoff": "Phạm vi áp dụng", "scholarship": "Điều kiện và mức hỗ trợ",
+            "language": "Điều kiện và lưu ý", "tuition": "Đơn vị và phạm vi học phí",
+            "registration": "Các bước thực hiện",
+        }.get(question_intent(question)["topic"], "Thông tin bổ sung"),
         "short_answer": short_answer,
         "conditions": conditions,
         "source_note": " · ".join(

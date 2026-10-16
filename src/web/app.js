@@ -200,7 +200,7 @@ function appendStructuredAnswer(box,data){
   if(!sections){box.append(node('div','body',data.response));return;}
   const structured=node('div','answer-structured');
   if(sections.short_answer){structured.append(node('h3','answer-section-title','Tóm tắt'),node('p','answer-short',sections.short_answer));}
-  if((sections.conditions||[]).length){structured.append(node('h3','answer-section-title','Điều kiện / ngoại lệ'));sections.conditions.forEach(item=>structured.append(node('p','answer-condition',item)));}
+  if((sections.conditions||[]).length){structured.append(node('h3','answer-section-title',sections.details_title||'Thông tin bổ sung'));sections.conditions.forEach(item=>structured.append(node('p','answer-condition',item)));}
   if(sections.source_note)structured.append(node('p','answer-source-note',sections.source_note));
   if((sections.next_steps||[]).length){structured.append(node('h3','answer-section-title','Bước tiếp theo'));const list=node('ul','answer-next-steps');sections.next_steps.forEach(item=>list.append(node('li','',item)));structured.append(list);}
   box.append(structured);
