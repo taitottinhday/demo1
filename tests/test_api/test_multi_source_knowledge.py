@@ -216,6 +216,36 @@ def test_program_registry_covers_all_codes_without_inventing_teaching_language(k
     assert registry["ETLUH"]["entrance_language_rule"] == "verify_specific"
 
 
+@pytest.mark.asyncio
+async def test_all_programs_have_grounded_cutoff_quota_and_scoped_language_routes(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "all-programs.db"), Settings(_env_file=None))
+    for program in knowledge.programs:
+        code = program["code"]
+        for question in [f"Điểm chuẩn {code} năm 2026", f"Chỉ tiêu {code} năm 2026", f"Điều kiện ngoại ngữ {code}"]:
+            result = await service.answer(question, context="EE2")
+            assert result["kind"] == "answered", (code, question, result)
+            assert result["sources"] and code in result["response"].replace("-", "")
+        if program["entrance_language_rule"] == "verify_specific":
+            assert "chưa đủ căn cứ" in result["response"]
+
+
+@pytest.mark.asyncio
+async def test_every_visible_faq_has_answer_or_actionable_clarification(knowledge, tmp_path):
+    import html
+    import re
+    from pathlib import Path
+
+    page = Path("src/web/index.html").read_text(encoding="utf-8")
+    questions = re.findall(r'<button[^>]*data-question="([^"]+)"', page)
+    assert len(questions) >= 11
+    service = Admissions(knowledge, Store(tmp_path / "faq-coverage.db"), Settings(_env_file=None))
+    for question in questions:
+        result = await service.answer(html.unescape(question), context="EE2")
+        assert result["kind"] in {"answered", "clarification"}, (question, result)
+        if result["kind"] == "answered":
+            assert result["sources"]
+
+
 def test_historical_rows_require_exact_year_program_and_method(knowledge):
     rows = knowledge.search("Điểm chuẩn IT1 năm 2025 theo THPT?")
     assert rows

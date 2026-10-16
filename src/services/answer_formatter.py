@@ -2,7 +2,7 @@
 
 import re
 
-from src.services.knowledge import normalize, tokens, question_intent
+from src.services.knowledge import normalize, question_intent, tokens
 
 
 def structure_answer(response, sources, next_steps, manifest):
