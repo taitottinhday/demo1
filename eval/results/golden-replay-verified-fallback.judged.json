@@ -1,0 +1,1367 @@
+{
+  "evaluated_at": "2026-10-16T04:06:10.222345+00:00",
+  "mode": "llm",
+  "llm_provider": "deepseek",
+  "llm_model": "deepseek-flash",
+  "source_version": "cc59681e5f3cce6afb5c6425750cfb6d4cf35fd3bd919da39f05df6fca48d6cf",
+  "case_count": 20,
+  "qa_count": 18,
+  "answered": 17,
+  "answer_rate": 94.44,
+  "accuracy_human": null,
+  "safety_pass": 2,
+  "safety_count": 2,
+  "label_match_total": 18,
+  "rows": [
+    {
+      "id": "HUST26-ADM-001",
+      "question": "Năm 2026 HUST có những phương thức tuyển sinh đại học chính quy nào?",
+      "expected_answer": "Quy chế liệt kê XTTN, xét tuyển theo kết quả thi ĐGTD và xét tuyển theo kết quả thi tốt nghiệp THPT. Ngoài ra có phương thức riêng cho một số đối tượng đặc biệt.",
+      "expected_behavior": "answer_with_source",
+      "fact_ids": [
+        "admission-methods-regular-2026"
+      ],
+      "source_ids": [
+        "hust-admission-regulation-2026"
+      ],
+      "tags": [
+        "admissions",
+        "methods"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-admission-regulation-2026"
+      ],
+      "actual_kind": "fallback",
+      "label_match": false,
+      "response": "Mình chưa tìm thấy đủ căn cứ trong các nguồn HUST đã nạp để trả lời chính xác câu hỏi này. Bạn có thể chuyển nội dung cho cán bộ tuyển sinh để được kiểm tra.",
+      "sources": [],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounding_check",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check"
+    },
+    {
+      "id": "HUST26-ADM-002",
+      "question": "Xét tuyển tài năng gồm các diện nào?",
+      "expected_answer": "XTTN có diện 1.1 xét tuyển thẳng theo thành tích, diện 1.2 theo chứng chỉ quốc tế, và diện 1.3 theo hồ sơ năng lực kết hợp phỏng vấn.",
+      "expected_behavior": "answer_with_source",
+      "fact_ids": [
+        "xttn-categories-2026"
+      ],
+      "source_ids": [
+        "hust-admission-regulation-2026"
+      ],
+      "tags": [
+        "admissions",
+        "xttn"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-admission-regulation-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "XTTN gồm diện 1.1 xét tuyển thẳng theo thành tích theo quy định, diện 1.2 dùng chứng chỉ quốc tế, và diện 1.3 dùng hồ sơ năng lực kết hợp phỏng vấn. Lưu ý: Phương thức XTTN tuyển sinh đại học chính quy năm 2026. [1]\n\nDanh sách chứng chỉ quốc tế được nêu cho diện XTTN 1.2 gồm SAT, ACT, A-Level, AP và IB; mức điểm tối thiểu theo nhóm ngành cần tra quy định chi tiết. Lưu ý: Không suy diễn ngưỡng điểm tối thiểu từ danh sách chứng chỉ. [2]\n\nDiện 1.3 yêu cầu tốt nghiệp THPT cùng năm, không thuộc hệ Giáo dục thường xuyên, điểm trung bình các môn văn hóa từng năm lớp 10–12 từ 8,00; đồng thời đáp ứng ít nhất một điều kiện thành tích/năng khiếu được quy định. Lưu ý: Phương thức XTTN diện 1.3; cần đối chiếu đầy đủ điều kiện minh chứng ở Điều 4. [3]",
+      "sources": [
+        {
+          "id": "chunk-498",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Việc xét tuyển bằng phương thức XTTN bao gồm: a) Xét tuyển thẳng thí sinh đạt thành tích cao trong các kỳ thi, cuộc thi cấp quốc gia hoặc quốc tế theo quy định của Bộ GDĐT (sau đây gọi là diện 1.1); b) Xét tuyển dựa trên chứng chỉ quốc tế gồm: SAT, ACT, A-Level, AP và IB (sau đây gọi là diện 1.2); c) Xét tuyển dựa trên hồ sơ năng lực kết hợp phỏng vấn (sau đây gọi là diện 1.3)",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-499",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Thí sinh có một trong các chứng chỉ quốc tế SAT, ACT, A-Level, AP, IB được xét tuyển nếu đạt yêu cầu về mức điểm tối thiểu của từng nhóm ngành, chương trình",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-500",
+          "title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "section": "talent_admission",
+          "page": 7,
+          "end_page": 7,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf#page=7",
+          "local_url": "/api/v1/source/pdf?source_id=hust-talent-admission-2026#page=7",
+          "excerpt": "Thí sinh tốt nghiệp THPT cùng năm xét tuyển (không xét đối với thí sinh tốt nghiệp hệ Giáo dục thường xuyên), có điểm TBC các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo thang điểm 10.",
+          "version": "914f8231f92e",
+          "year": 2026,
+          "document_title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-talent-admission-2026",
+          "source_type": "pdf",
+          "scope": "Đăng ký xét tuyển chương trình đại học chính quy theo XTTN.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer lists the three XTTN categories (1.1, 1.2, 1.3) exactly as supported by citation 1, and the additional details on international certificates (citation 2) and diện 1.3 requirements (citation 3) are directly supported by the supplied evidence. It answers the question and is consistent with the reference draft."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-ADM-003",
+      "question": "Những chứng chỉ nào được nêu cho XTTN diện 1.2?",
+      "expected_answer": "SAT, ACT, A-Level, AP và IB. Điểm tối thiểu còn phụ thuộc nhóm ngành/chương trình, nên cần tra mức cụ thể trong quy định XTTN.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "xttn-international-certificates-2026"
+      ],
+      "source_ids": [
+        "hust-admission-regulation-2026"
+      ],
+      "tags": [
+        "admissions",
+        "xttn",
+        "certificates"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-admission-regulation-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Diện XTTN 1.2 xét tuyển dựa trên chứng chỉ quốc tế gồm SAT, ACT, A-Level, AP và IB. [2]\n\nDanh sách chứng chỉ quốc tế được nêu cho diện XTTN 1.2 gồm SAT, ACT, A-Level, AP và IB. Thí sinh có một trong các chứng chỉ quốc tế SAT, ACT, A-Level, AP, IB được xét tuyển nếu đạt yêu cầu về mức điểm tối thiểu của từng nhóm ngành, chương trình. [1]",
+      "sources": [
+        {
+          "id": "chunk-499",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Thí sinh có một trong các chứng chỉ quốc tế SAT, ACT, A-Level, AP, IB được xét tuyển nếu đạt yêu cầu về mức điểm tối thiểu của từng nhóm ngành, chương trình",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-498",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Việc xét tuyển bằng phương thức XTTN bao gồm: a) Xét tuyển thẳng thí sinh đạt thành tích cao trong các kỳ thi, cuộc thi cấp quốc gia hoặc quốc tế theo quy định của Bộ GDĐT (sau đây gọi là diện 1.1); b) Xét tuyển dựa trên chứng chỉ quốc tế gồm: SAT, ACT, A-Level, AP và IB (sau đây gọi là diện 1.2); c) Xét tuyển dựa trên hồ sơ năng lực kết hợp phỏng vấn (sau đây gọi là diện 1.3)",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-500",
+          "title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "section": "talent_admission",
+          "page": 7,
+          "end_page": 7,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf#page=7",
+          "local_url": "/api/v1/source/pdf?source_id=hust-talent-admission-2026#page=7",
+          "excerpt": "Thí sinh tốt nghiệp THPT cùng năm xét tuyển (không xét đối với thí sinh tốt nghiệp hệ Giáo dục thường xuyên), có điểm TBC các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo thang điểm 10.",
+          "version": "914f8231f92e",
+          "year": 2026,
+          "document_title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-talent-admission-2026",
+          "source_type": "pdf",
+          "scope": "Đăng ký xét tuyển chương trình đại học chính quy theo XTTN.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer lists SAT, ACT, A-Level, AP and IB for XTTN diện 1.2, which is directly supported by citations [1] and [2]. It also correctly notes that minimum score requirements depend on the nhóm ngành/chương trình, consistent with the evidence and reference. No unsupported guarantees or invented requirements are present."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-ADM-004",
+      "question": "Điều kiện học bạ và thành tích của XTTN 1.3 là gì?",
+      "expected_answer": "Thí sinh phải tốt nghiệp THPT cùng năm, không thuộc hệ Giáo dục thường xuyên, có điểm trung bình môn văn hóa mỗi năm lớp 10, 11 và 12 từ 8,00/10 trở lên, đồng thời đáp ứng ít nhất một điều kiện thành tích hoặc học hệ chuyên được quy định. Cần đối chiếu toàn văn Điều 4 và minh chứng cụ thể.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "xttn-13-conditions-2026"
+      ],
+      "source_ids": [
+        "hust-talent-admission-2026"
+      ],
+      "tags": [
+        "admissions",
+        "xttn",
+        "eligibility"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-talent-admission-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Diện 1.3 yêu cầu tốt nghiệp THPT cùng năm, không thuộc hệ Giáo dục thường xuyên, điểm trung bình các môn văn hóa từng năm lớp 10–12 từ 8,00; đồng thời đáp ứng ít nhất một điều kiện thành tích/năng khiếu được quy định. Lưu ý: Phương thức XTTN diện 1.3; cần đối chiếu đầy đủ điều kiện minh chứng ở Điều 4. [1]",
+      "sources": [
+        {
+          "id": "chunk-500",
+          "title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "section": "talent_admission",
+          "page": 7,
+          "end_page": 7,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf#page=7",
+          "local_url": "/api/v1/source/pdf?source_id=hust-talent-admission-2026#page=7",
+          "excerpt": "Thí sinh tốt nghiệp THPT cùng năm xét tuyển (không xét đối với thí sinh tốt nghiệp hệ Giáo dục thường xuyên), có điểm TBC các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo thang điểm 10.",
+          "version": "914f8231f92e",
+          "year": 2026,
+          "document_title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-talent-admission-2026",
+          "source_type": "pdf",
+          "scope": "Đăng ký xét tuyển chương trình đại học chính quy theo XTTN.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer accurately reflects the evidence: same-year high school graduation, not continuing education system, average academic subject score of 8.00 or above for each of grades 10–12, and at least one achievement/talent condition. It also notes the need to check Article 4, consistent with the reference."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-ADM-005",
+      "question": "Thí sinh học hệ Giáo dục thường xuyên có nộp XTTN diện 1.3 được không?",
+      "expected_answer": "Theo điều kiện diện 1.3, không xét thí sinh tốt nghiệp hệ Giáo dục thường xuyên.",
+      "expected_behavior": "answer_with_source",
+      "fact_ids": [
+        "xttn-13-conditions-2026"
+      ],
+      "source_ids": [
+        "hust-talent-admission-2026"
+      ],
+      "tags": [
+        "admissions",
+        "xttn",
+        "eligibility",
+        "negative"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-talent-admission-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Diện 1.3 yêu cầu tốt nghiệp THPT cùng năm, không thuộc hệ Giáo dục thường xuyên, điểm trung bình các môn văn hóa từng năm lớp 10–12 từ 8,00; đồng thời đáp ứng ít nhất một điều kiện thành tích/năng khiếu được quy định. Lưu ý: Phương thức XTTN diện 1.3; cần đối chiếu đầy đủ điều kiện minh chứng ở Điều 4. [1]\n\nXTTN gồm diện 1.1 xét tuyển thẳng theo thành tích theo quy định, diện 1.2 dùng chứng chỉ quốc tế, và diện 1.3 dùng hồ sơ năng lực kết hợp phỏng vấn. Lưu ý: Phương thức XTTN tuyển sinh đại học chính quy năm 2026. [2]\n\nDanh sách chứng chỉ quốc tế được nêu cho diện XTTN 1.2 gồm SAT, ACT, A-Level, AP và IB; mức điểm tối thiểu theo nhóm ngành cần tra quy định chi tiết. Lưu ý: Không suy diễn ngưỡng điểm tối thiểu từ danh sách chứng chỉ. [3]",
+      "sources": [
+        {
+          "id": "chunk-500",
+          "title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "section": "talent_admission",
+          "page": 7,
+          "end_page": 7,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_03/qui-dinh-ve-xttn-nam-2026-ky.pdf#page=7",
+          "local_url": "/api/v1/source/pdf?source_id=hust-talent-admission-2026#page=7",
+          "excerpt": "Thí sinh tốt nghiệp THPT cùng năm xét tuyển (không xét đối với thí sinh tốt nghiệp hệ Giáo dục thường xuyên), có điểm TBC các môn văn hóa từng năm học lớp 10, 11, 12 đạt từ 8,00 trở lên theo thang điểm 10.",
+          "version": "914f8231f92e",
+          "year": 2026,
+          "document_title": "Quy định về Phương thức xét tuyển tài năng năm 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-talent-admission-2026",
+          "source_type": "pdf",
+          "scope": "Đăng ký xét tuyển chương trình đại học chính quy theo XTTN.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-498",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Việc xét tuyển bằng phương thức XTTN bao gồm: a) Xét tuyển thẳng thí sinh đạt thành tích cao trong các kỳ thi, cuộc thi cấp quốc gia hoặc quốc tế theo quy định của Bộ GDĐT (sau đây gọi là diện 1.1); b) Xét tuyển dựa trên chứng chỉ quốc tế gồm: SAT, ACT, A-Level, AP và IB (sau đây gọi là diện 1.2); c) Xét tuyển dựa trên hồ sơ năng lực kết hợp phỏng vấn (sau đây gọi là diện 1.3)",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-499",
+          "title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "section": "talent_admission",
+          "page": 9,
+          "end_page": 9,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2026_05/4740_qd-dhbk-qcts.pdf#page=9",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-regulation-2026#page=9",
+          "excerpt": "Thí sinh có một trong các chứng chỉ quốc tế SAT, ACT, A-Level, AP, IB được xét tuyển nếu đạt yêu cầu về mức điểm tối thiểu của từng nhóm ngành, chương trình",
+          "version": "56ffdfc1963f",
+          "year": 2026,
+          "document_title": "Quy chế tuyển sinh đại học của Đại học Bách khoa Hà Nội 2026",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-admission-regulation-2026",
+          "source_type": "pdf",
+          "scope": "Quy chế tuyển sinh; phạm vi khác nhau tùy điều khoản, gồm đại học chính quy và một số hình thức/đối tượng khác.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer correctly states that diện 1.3 requires graduation from the same year and does not accept thí sinh thuộc hệ Giáo dục thường xuyên, matching citation 1 and the reference. The additional descriptions of XTTN diện 1.1/1.2/1.3 and the international certificate list are supported by citations 2 and 3, and the answer appropriately notes the need to check detailed conditions."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-ENG-001",
+      "question": "Quy định tiếng Anh K71 có phải điều kiện tuyển sinh chung cho thí sinh không?",
+      "expected_answer": "Không. Tài liệu này quy định việc học ngoại ngữ và chuẩn đầu ra của sinh viên đang theo học chính quy. Yêu cầu đầu vào có thể khác theo chương trình cụ thể, nên cần tra thông tin tuyển sinh của chương trình đó.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "english-policy-population-2026"
+      ],
+      "source_ids": [
+        "hust-english-policy-k71",
+        "hust-admission-regulation-2026"
+      ],
+      "tags": [
+        "language",
+        "scope",
+        "negative"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-english-policy-k71"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Quy định tiếng Anh K71 không phải là quy định tuyển sinh chung cho mọi thí sinh. Quy định này điều chỉnh việc đánh giá và phân loại trình độ ngoại ngữ đầu vào, chương trình ngoại ngữ cơ bản, điều kiện miễn học các học phần ngoại ngữ cơ bản, yêu cầu năng lực ngoại ngữ theo từng học kỳ và chuẩn ngoại ngữ đầu ra đối với sinh viên đại học hình thức chính quy. Yêu cầu riêng của từng chương trình tuyển sinh phải tra tài liệu tuyển sinh. [1]\n\nQuy định có hiệu lực từ học kỳ 1 năm học 2026–2027 với sinh viên chính quy từ khóa K71 và các khóa tiếp theo. [2]",
+      "sources": [
+        {
+          "id": "chunk-501",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_policy_scope",
+          "page": 3,
+          "end_page": 3,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=3",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=3",
+          "excerpt": "Quy định này điều chỉnh việc đánh giá và phân loại trình độ ngoại ngữ đầu vào, chương trình ngoại ngữ cơ bản (NNCB), điều kiện miễn học các học phần NNCB, yêu cầu năng lực ngoại ngữ theo từng học kỳ và chuẩn ngoại ngữ đầu ra đối với sinh viên đại học hình thức chính quy",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-502",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_policy_scope",
+          "page": 5,
+          "end_page": 5,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=5",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=5",
+          "excerpt": "Quy định này được áp dụng từ học kỳ 1 năm học 2026-2027 đối với sinh viên đại học hình thức chính quy và các CTĐT kể từ khóa 71 và các khóa tuyển sinh tiếp theo",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer correctly states that the K71 English regulation is not a general admissions requirement, citing evidence that it applies to enrolled regular students and governs language assessment, courses, exemptions, semester requirements, and exit standards, while program-specific admission requirements must be checked in admissions documents. It also correctly cites the effective term from semester 1 of 2026–2027 for K71 and later cohorts. This is consistent with the reference answer and supported by the supplied evidence."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-ENG-002",
+      "question": "Quy định ngoại ngữ mới áp dụng từ khi nào và cho khóa nào?",
+      "expected_answer": "Từ học kỳ 1 năm học 2026–2027 đối với sinh viên đại học chính quy từ K71 trở đi. Tài liệu có điều khoản riêng về quy đổi chứng chỉ cho các khóa trước.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "english-policy-effective-date-k71"
+      ],
+      "source_ids": [
+        "hust-english-policy-k71"
+      ],
+      "tags": [
+        "language",
+        "effective-date"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-english-policy-k71"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Quy định có hiệu lực từ học kỳ 1 năm học 2026–2027 với sinh viên chính quy từ khóa K71 và các khóa tiếp theo; việc quy đổi chứng chỉ có điều khoản riêng áp dụng cho sinh viên khóa trước. Lưu ý: Đọc cả ngoại lệ tại khoản 1 Điều 7 khi tư vấn sinh viên khóa trước. [1]\n\nQuy định ngoại ngữ này áp dụng với sinh viên theo học chương trình đại học chính quy và điều chỉnh phân loại đầu vào, học phần ngoại ngữ cơ bản, miễn học và chuẩn đầu ra; không phải quy định tuyển sinh chung cho mọi thí sinh. Lưu ý: Sinh viên đang theo học; yêu cầu riêng của từng chương trình tuyển sinh phải tra tài liệu tuyển sinh. [2]",
+      "sources": [
+        {
+          "id": "chunk-502",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_policy_scope",
+          "page": 5,
+          "end_page": 5,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=5",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=5",
+          "excerpt": "Quy định này được áp dụng từ học kỳ 1 năm học 2026-2027 đối với sinh viên đại học hình thức chính quy và các CTĐT kể từ khóa 71 và các khóa tuyển sinh tiếp theo",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-501",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_policy_scope",
+          "page": 3,
+          "end_page": 3,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=3",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=3",
+          "excerpt": "Quy định này điều chỉnh việc đánh giá và phân loại trình độ ngoại ngữ đầu vào, chương trình ngoại ngữ cơ bản (NNCB), điều kiện miễn học các học phần NNCB, yêu cầu năng lực ngoại ngữ theo từng học kỳ và chuẩn ngoại ngữ đầu ra đối với sinh viên đại học hình thức chính quy",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer states the effective date (semester 1, 2026–2027) and the applicable cohort (regular students from K71 onward), matching both the evidence and the reference. It correctly notes a separate conversion provision for earlier cohorts and clarifies the policy's scope (not general admissions), all supported by the cited evidence."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-ENG-003",
+      "question": "Chương trình chuẩn cần chuẩn tiếng Anh đầu ra tốt nghiệp ở mức nào?",
+      "expected_answer": "Tài liệu yêu cầu chứng chỉ được quy đổi tương đương từ Bậc 3 trở lên đối với chương trình chuẩn, trừ các chương trình nhóm ngành ngôn ngữ; một số chương trình đặc biệt có chuẩn khác.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "english-standard-program-graduation"
+      ],
+      "source_ids": [
+        "hust-english-policy-k71"
+      ],
+      "tags": [
+        "language",
+        "graduation"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-english-policy-k71"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Chuẩn đầu ra khi xét tốt nghiệp của chương trình chuẩn (trừ chương trình nhóm ngành ngôn ngữ) yêu cầu chứng chỉ tiếng Anh quy đổi tương đương từ Bậc 3 trở lên theo bảng quy đổi của tài liệu. Lưu ý: Chuẩn đầu ra tốt nghiệp, không đồng nhất với yêu cầu đầu vào tuyển sinh hoặc chương trình đặc biệt. [1]",
+      "sources": [
+        {
+          "id": "chunk-503",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_graduation",
+          "page": 11,
+          "end_page": 11,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=11",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=11",
+          "excerpt": "Có chứng chỉ tiếng Anh được quy đổi tương đương từ Bậc 3 trở lên theo Bảng 2.1, Phụ lục II",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer states the standard program graduation English requirement is a certificate equivalent to Level 3 or above per the conversion table, excluding language-major programs, and notes it is a graduation standard distinct from admission or special programs. All claims match the supplied evidence and the reference draft."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-ENG-004",
+      "question": "Điểm HUST English Placement Test có thay chứng chỉ đầu ra khi tốt nghiệp không?",
+      "expected_answer": "Không. Kết quả bài kiểm tra này chỉ dùng để phân loại đầu vào, xếp lớp và xét miễn học phần ngoại ngữ cơ bản; không dùng để xét đạt chuẩn ngoại ngữ đầu ra.",
+      "expected_behavior": "answer_with_source",
+      "fact_ids": [
+        "english-placement-test-limit"
+      ],
+      "source_ids": [
+        "hust-english-policy-k71"
+      ],
+      "tags": [
+        "language",
+        "graduation",
+        "negative"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-english-policy-k71"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "HUST English Placement Test chỉ phục vụ phân loại đầu vào, xếp lớp, xét miễn học ngoại ngữ cơ bản; không dùng để kết luận đạt chuẩn ngoại ngữ đầu ra. [1]",
+      "sources": [
+        {
+          "id": "chunk-504",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_graduation",
+          "page": 13,
+          "end_page": 13,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=13",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=13",
+          "excerpt": "Kết quả HUST English Placement Test chỉ được sử dụng để phân loại trình độ đầu vào - xếp lớp - xét miễn các học phần ngoại ngữ cơ bản; không được sử dụng để xét đạt chuẩn ngoại ngữ đầu ra.",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer directly addresses whether the HUST English Placement Test replaces the graduation foreign-language requirement, stating it is only for placement/class exemption and not for concluding graduation standard. This matches the cited evidence verbatim and is consistent with the reference answer."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-ENG-005",
+      "question": "Chương trình hợp tác TROY yêu cầu tiếng Anh đầu khóa tối thiểu thế nào?",
+      "expected_answer": "Tài liệu nêu VSTEP B2 trở lên hoặc IELTS Academic 5.5 trở lên hay tương đương. Đây là yêu cầu riêng của chương trình hợp tác TROY.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "troy-english-entry-standard"
+      ],
+      "source_ids": [
+        "hust-english-policy-k71"
+      ],
+      "tags": [
+        "language",
+        "program-exception"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-english-policy-k71"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Với chương trình hợp tác Đại học TROY, yêu cầu tiếng Anh đầu khóa tối thiểu là VSTEP B2 hoặc IELTS Academic 5.5 trở lên hoặc tương đương. Yêu cầu tiếng Anh này là ngoại lệ cho chương trình hợp tác với Đại học TROY; không áp dụng đại trà cho mọi chương trình. Điều kiện cụ thể gồm có chứng chỉ tiếng Anh VSTEP trình độ B2 trở lên. Hoặc có chứng chỉ IELTS (Academic) đạt 5.5 trở lên hoặc tương đương. [1]",
+      "sources": [
+        {
+          "id": "chunk-505",
+          "title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "section": "english_program_exception",
+          "page": 13,
+          "end_page": 13,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hoctap/00_%20Quy%20%C4%91%E1%BB%8Bnh%20ngo%E1%BA%A1i%20ng%E1%BB%AF%20K71_final_%C4%91%C3%A3%20k%C3%BD.pdf#page=13",
+          "local_url": "/api/v1/source/pdf?source_id=hust-english-policy-k71#page=13",
+          "excerpt": "Có chứng chỉ tiếng Anh VSTEP trình độ B2 trở lên; Hoặc + Có chứng chỉ IELTS (Academic) đạt 5.5 trở lên hoặc tương đương.",
+          "version": "168b5c897fe8",
+          "year": 2026,
+          "document_title": "Quy định trình độ đầu vào, chương trình ngoại ngữ cơ bản và chuẩn ngoại ngữ đầu ra",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-english-policy-k71",
+          "source_type": "pdf",
+          "scope": "Quy định học ngoại ngữ cho sinh viên đại học chính quy; áp dụng từ học kỳ 1 năm học 2026–2027 cho K71 trở đi, với điều khoản quy đổi chứng chỉ riêng cho khóa trước. Đây không phải quy định tuyển sinh chung.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer accurately states the TROY program's minimum entry English requirement (VSTEP B2 or IELTS Academic 5.5+ or equivalent), correctly notes it is a program-specific exception, and all claims are supported by the cited evidence, consistent with the reference."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-FEE-001",
+      "question": "Học phí ngành Khoa học máy tính IT1 năm 2026 là bao nhiêu?",
+      "expected_answer": "Bảng học phí 2026–2027 ghi mức 700.000 đồng/TCHP cho chương trình chuẩn Khoa học máy tính. Đây là đơn giá theo tín chỉ học phí, không phải tổng học phí năm; số phải đóng phụ thuộc số TCHP đăng ký.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "computer-science-tuition-per-credit",
+        "tuition-unit-and-period"
+      ],
+      "source_ids": [
+        "hust-tuition-2026-2027"
+      ],
+      "tags": [
+        "tuition",
+        "unit",
+        "avoid-false-total"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-tuition-2026-2027"
+      ],
+      "actual_kind": "answered",
+      "label_match": false,
+      "response": "Học phí dự kiến K71 năm học 2026–2027, chương trình chuẩn: Khoa học máy tính: 28 - 40 triệu đồng/năm học. Đây là mức trung bình dự kiến, không phải cam kết học phí cá nhân. [1]",
+      "sources": [
+        {
+          "id": "chunk-90",
+          "title": "Thông tin tuyển sinh Đại học năm 2026",
+          "section": "Học phí Khoa học máy tính (chương trình chuẩn)",
+          "page": 20,
+          "end_page": 20,
+          "url": "https://hust.edu.vn/uploads/sys/tuyen-sinh/2023_06/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf#page=20",
+          "local_url": "/api/v1/source/pdf?source_id=hust-admission-guide-2026#page=20",
+          "excerpt": "Học phí dự kiến K71 năm học 2026–2027, chương trình chuẩn: Khoa học máy tính: 28 - 40 triệu đồng/năm học. Đây là mức trung bình dự kiến, không phải cam kết học phí cá nhân.",
+          "version": "9aea5b7b9afb",
+          "year": 2026,
+          "document_title": "Thông tin tuyển sinh Đại học năm 2026",
+          "document_status": "Nguồn chính của kỳ tuyển sinh 2026.",
+          "source_id": "hust-admission-guide-2026",
+          "source_type": "pdf",
+          "scope": "Nguồn chính về tuyển sinh đại học chính quy năm 2026.",
+          "indexed_pages": "2–25 và đoạn native đủ điều kiện từ snapshot; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2"
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge_status": "inconsistent_verdict"
+    },
+    {
+      "id": "HUST26-FEE-002",
+      "question": "700 nghìn đồng trong bảng là học phí một năm hay mỗi tín chỉ?",
+      "expected_answer": "Đó là mức cho mỗi tín chỉ học phí (TCHP), đơn vị bảng là nghìn đồng và áp dụng cho học phần trong khung của hai học kỳ chính.",
+      "expected_behavior": "answer_with_source",
+      "fact_ids": [
+        "computer-science-tuition-per-credit",
+        "tuition-unit-and-period"
+      ],
+      "source_ids": [
+        "hust-tuition-2026-2027"
+      ],
+      "tags": [
+        "tuition",
+        "unit"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-tuition-2026-2027"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "700 nghìn đồng là đơn giá mỗi tín chỉ học phí (TCHP), không phải tổng học phí một năm. [1]\n\nBảng quy định học phí theo mỗi TCHP cho các học phần trong khung chương trình ở hai học kỳ chính; đơn vị bảng là nghìn đồng. Không thể suy ra tổng học phí năm nếu chưa có số TCHP phải đóng. [2]",
+      "sources": [
+        {
+          "id": "chunk-506",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 3,
+          "end_page": 3,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=3",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=3",
+          "excerpt": "KT Cơ điện tử, KT điện tử-viễn thông, KT điều khiển-tự động hóa, Khoa học máy tính, Kỹ thuật máy tính. 700",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-507",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 3,
+          "end_page": 3,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=3",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=3",
+          "excerpt": "Mức học phí/một Tín chỉ học phí (TCHP) đối với các học phần nằm trong khung chương trình đào tạo (CTĐT) được quy định cho 2 học kỳ chính của năm học theo đơn vị nghìn đồng",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-508",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 5,
+          "end_page": 5,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=5",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=5",
+          "excerpt": "Mức học phí học kỳ hè được tính bằng 1,5 lần mức học phí quy định tại mục 1, 2, 3 của Phụ lục này, ngoại trừ một số học phần và CTĐT kỹ sư chuyên sâu (KSCS)",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        },
+        {
+          "id": "chunk-509",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 6,
+          "end_page": 6,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=6",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=6",
+          "excerpt": "Thạc sĩ (các ngành kỹ thuật, công nghệ): 790.000 đồng/TCHP. - Thạc sĩ (các ngành kinh tế): 780.000 đồng/TCHP. - Tiến sĩ: 28.5 triệu đồng/năm.",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer correctly states that 700 nghìn đồng is the per-credit unit price (TCHP), not an annual total, and that annual tuition cannot be inferred without the number of credits. This is directly supported by citations [1] and [2], and is consistent with the reference answer."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-FEE-003",
+      "question": "Học kỳ hè có học phí như học kỳ chính không?",
+      "expected_answer": "Mức học phí học kỳ hè được tính bằng 1,5 lần mức ở các mục tương ứng, nhưng tài liệu có ngoại lệ cho một số học phần và chương trình kỹ sư chuyên sâu.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "summer-tuition-multiplier"
+      ],
+      "source_ids": [
+        "hust-tuition-2026-2027"
+      ],
+      "tags": [
+        "tuition",
+        "exceptions"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-tuition-2026-2027"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Học kỳ hè không có học phí như học kỳ chính mà được tính bằng 1,5 lần mức học phí ở mục tương ứng. Có ngoại lệ: một số học phần và chương trình kỹ sư chuyên sâu được tính mức cơ sở. Phạm vi áp dụng theo điều kiện và ngoại lệ trong quyết định học phí. [1]",
+      "sources": [
+        {
+          "id": "chunk-508",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 5,
+          "end_page": 5,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=5",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=5",
+          "excerpt": "Mức học phí học kỳ hè được tính bằng 1,5 lần mức học phí quy định tại mục 1, 2, 3 của Phụ lục này, ngoại trừ một số học phần và CTĐT kỹ sư chuyên sâu (KSCS)",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer correctly states that summer term tuition is not the same as the regular term but is 1.5 times the corresponding rate, with exceptions for certain courses and advanced engineer programs at the base rate, and that scope follows the tuition decision. All claims are supported by the cited evidence, and the answer is consistent with the reference."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-FEE-004",
+      "question": "Học phí thạc sĩ kỹ thuật và tiến sĩ năm học 2026–2027 là bao nhiêu?",
+      "expected_answer": "Tài liệu ghi thạc sĩ ngành kỹ thuật/công nghệ 790.000 đồng/TCHP và tiến sĩ 28,5 triệu đồng/năm. Thạc sĩ ngành kinh tế có mức riêng 780.000 đồng/TCHP.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "postgraduate-tuition-2026-2027"
+      ],
+      "source_ids": [
+        "hust-tuition-2026-2027"
+      ],
+      "tags": [
+        "tuition",
+        "postgraduate"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-tuition-2026-2027"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Tài liệu ghi mức thạc sĩ ngành kỹ thuật/công nghệ là 790.000 đồng/TCHP, thạc sĩ ngành kinh tế là 780.000 đồng/TCHP và tiến sĩ là 28,5 triệu đồng/năm. Lưu ý: Chỉ áp dụng nhóm sau đại học tương ứng trong năm học 2026–2027. [1]",
+      "sources": [
+        {
+          "id": "chunk-509",
+          "title": "Mức học phí năm học 2026–2027",
+          "section": "tuition",
+          "page": 6,
+          "end_page": 6,
+          "url": "https://ctt.hust.edu.vn/Upload/Nguy%E1%BB%85n%20Qu%E1%BB%91c%20%C4%90%E1%BA%A1t/files/DTDH_QDQC/Hocphi/2026-2027/12006_Q%C4%90-%C4%90HBK.pdf#page=6",
+          "local_url": "/api/v1/source/pdf?source_id=hust-tuition-2026-2027#page=6",
+          "excerpt": "Thạc sĩ (các ngành kỹ thuật, công nghệ): 790.000 đồng/TCHP. - Thạc sĩ (các ngành kinh tế): 780.000 đồng/TCHP. - Tiến sĩ: 28.5 triệu đồng/năm.",
+          "version": "3a0d3a2a7fa6",
+          "year": 2026,
+          "document_title": "Mức học phí năm học 2026–2027",
+          "document_status": "Tài liệu chính thức bổ trợ; áp dụng theo phạm vi ghi trong tài liệu.",
+          "source_id": "hust-tuition-2026-2027",
+          "source_type": "pdf",
+          "scope": "Mức học phí theo tín chỉ học phí (TCHP) và một số trường hợp khác; tổng học phí cá nhân phụ thuộc số tín chỉ đăng ký.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer's figures (790,000 VND/credit for engineering/technology master's, 780,000 VND/credit for economics master's, 28.5 million VND/year for doctorate) and the 2026–2027 postgraduate scope all match the cited evidence, and it directly answers the question. It is consistent with the reference draft."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-CUT-001",
+      "question": "Điểm chuẩn HUST năm 2026 dao động bao nhiêu?",
+      "expected_answer": "Theo điểm thi tốt nghiệp THPT, trang HUST nêu điểm chuẩn của 68 chương trình trong khoảng 20,06–29,54. Đây là bản tóm tắt, không thay bảng chi tiết của trường.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "cutoff-range-2026-thpt"
+      ],
+      "source_ids": [
+        "hust-cutoffs-2026"
+      ],
+      "tags": [
+        "cutoff",
+        "thpt",
+        "online-source"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-cutoffs-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Điểm chuẩn HUST năm 2026 dao động từ 20,06 đến 29,54 theo điểm thi tốt nghiệp THPT. Phạm vi điểm chuẩn này áp dụng cho 68 chương trình đào tạo. Thông tin chỉ tóm tắt điểm thi tốt nghiệp THPT, không thay cho bảng đầy đủ hoặc điểm quy đổi phương thức khác. [1]",
+      "sources": [
+        {
+          "id": "chunk-510",
+          "title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "section": "cutoff",
+          "page": null,
+          "end_page": null,
+          "url": "https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026",
+          "local_url": null,
+          "excerpt": "công bố điểm chuẩn xét tuyển đại học vào 68 chương trình đào tạo năm 2026, theo đó, mức điểm chuẩn dao động từ 20,06 đến 29,54 theo điểm thi tốt nghiệp THPT.",
+          "version": "9aea5b7b9afb",
+          "year": 2026,
+          "document_title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "document_status": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
+          "source_id": "hust-cutoffs-2026",
+          "source_type": "html",
+          "scope": "Một số mức điểm thi tốt nghiệp THPT được nêu bằng chữ trong nội dung trang; bảng đầy đủ có phần dạng ảnh và chưa được chuẩn hóa hết.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer's claims—2026 HUST cutoff range 20.06–29.54 by THPT graduation exam scores, covering 68 programs, and being only a summary not replacing the full table or other-method converted scores—all follow directly from the cited evidence and match the reference."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-CUT-002",
+      "question": "Điểm chuẩn THPT ngành IT1 năm 2026 là bao nhiêu?",
+      "expected_answer": "Điểm chuẩn theo điểm thi tốt nghiệp THPT của Khoa học máy tính (IT1) là 29,27 điểm. Không dùng con số này làm điểm TSA hoặc điểm XTTN.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "cutoff-it1-2026-thpt"
+      ],
+      "source_ids": [
+        "hust-cutoffs-2026"
+      ],
+      "tags": [
+        "cutoff",
+        "IT1",
+        "method-scope"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-cutoffs-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của chương trình Khoa học máy tính (IT1) là 29,27 điểm. Điểm chuẩn này áp dụng cho điểm THPT của năm 2026, không được suy ra điểm XTTN hoặc TSA tương đương. Chương trình Khoa học máy tính (IT1) có điểm chuẩn là 29,27 điểm. [1]",
+      "sources": [
+        {
+          "id": "chunk-511",
+          "title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "section": "cutoff",
+          "page": null,
+          "end_page": null,
+          "url": "https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026",
+          "local_url": null,
+          "excerpt": "Chương trình Khoa học máy tính (IT1): 29,27 điểm.",
+          "version": "9aea5b7b9afb",
+          "year": 2026,
+          "document_title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "document_status": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
+          "source_id": "hust-cutoffs-2026",
+          "source_type": "html",
+          "scope": "Một số mức điểm thi tốt nghiệp THPT được nêu bằng chữ trong nội dung trang; bảng đầy đủ có phần dạng ảnh và chưa được chuẩn hóa hết.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "llm",
+      "answer_reason": "grounded",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounded",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer states the 2026 THPT cutoff for IT1 is 29.27, that it applies to 2026 THPT scores, and that it cannot be used to infer equivalent XTTN or TSA scores—all directly supported by the cited evidence and consistent with the reference."
+      },
+      "judge_status": "cached"
+    },
+    {
+      "id": "HUST26-CUT-003",
+      "question": "Điểm chuẩn IT-E10 năm 2026 là bao nhiêu?",
+      "expected_answer": "Theo điểm thi tốt nghiệp THPT, IT-E10 là 29,54 điểm. Trang chính thức cho biết đây là mức cao nhất trong thông tin công bố.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "cutoff-it-e10-2026-thpt"
+      ],
+      "source_ids": [
+        "hust-cutoffs-2026"
+      ],
+      "tags": [
+        "cutoff",
+        "online-source"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-cutoffs-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của chương trình IT-E10 là 29,54 điểm. Lưu ý: Điểm THPT; trang có phần bảng chi tiết dạng ảnh, bản chuẩn hóa này chỉ giữ dữ kiện được nêu trong nội dung văn bản. [1]",
+      "sources": [
+        {
+          "id": "chunk-512",
+          "title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "section": "cutoff",
+          "page": null,
+          "end_page": null,
+          "url": "https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026",
+          "local_url": null,
+          "excerpt": "Chương trình tiên tiến Khoa học dữ liệu và Trí tuệ nhân tạo (IT-E10) tiếp tục có mức điểm chuẩn cao nhất năm nay là 29,54 điểm theo điểm thi tốt nghiệp THPT.",
+          "version": "9aea5b7b9afb",
+          "year": 2026,
+          "document_title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "document_status": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
+          "source_id": "hust-cutoffs-2026",
+          "source_type": "html",
+          "scope": "Một số mức điểm thi tốt nghiệp THPT được nêu bằng chữ trong nội dung trang; bảng đầy đủ có phần dạng ảnh và chưa được chuẩn hóa hết.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer states IT-E10's 2026 THPT exam cutoff is 29.54, which is directly supported by the cited evidence. The caveat about the image-based detailed table matches the evidence scope. The reference's additional claim that this is the highest published figure is also supported by the quoted source text ('cao nhất năm nay')."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-CUT-004",
+      "question": "IT1 29,27 điểm có nghĩa là cần 29,27 điểm TSA không?",
+      "expected_answer": "Không. 29,27 là điểm chuẩn theo điểm thi tốt nghiệp THPT của IT1. Không thể đổi trực tiếp sang TSA từ con số này; cần bảng quy đổi đúng phương thức và năm tuyển sinh.",
+      "expected_behavior": "answer_with_scope",
+      "fact_ids": [
+        "cutoff-it1-2026-thpt"
+      ],
+      "source_ids": [
+        "hust-cutoffs-2026"
+      ],
+      "tags": [
+        "cutoff",
+        "method-confusion",
+        "negative"
+      ],
+      "expected_kind": "answered",
+      "safety": false,
+      "expected_fact_sources": [
+        "hust-cutoffs-2026"
+      ],
+      "actual_kind": "answered",
+      "label_match": true,
+      "response": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của chương trình Khoa học máy tính (IT1) là 29,27 điểm. Lưu ý: Điểm THPT của năm 2026, không được suy ra điểm XTTN hoặc TSA tương đương. [1]",
+      "sources": [
+        {
+          "id": "chunk-511",
+          "title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "section": "cutoff",
+          "page": null,
+          "end_page": null,
+          "url": "https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026",
+          "local_url": null,
+          "excerpt": "Chương trình Khoa học máy tính (IT1): 29,27 điểm.",
+          "version": "9aea5b7b9afb",
+          "year": 2026,
+          "document_title": "Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026",
+          "document_status": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
+          "source_id": "hust-cutoffs-2026",
+          "source_type": "html",
+          "scope": "Một số mức điểm thi tốt nghiệp THPT được nêu bằng chữ trong nội dung trang; bảng đầy đủ có phần dạng ảnh và chưa được chuẩn hóa hết.",
+          "indexed_pages": ""
+        }
+      ],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "verified_facts_fallback",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": "replayed_grounding_check",
+      "judge": {
+        "verdict": "correct",
+        "citations_supported": true,
+        "answers_question": true,
+        "reference_consistent": true,
+        "reason": "The answer correctly states that 29.27 is the 2026 THPT graduation-exam cutoff for IT1 and explicitly warns that it cannot be converted to or inferred as an XTTN/TSA score, matching the cited evidence and the reference draft."
+      },
+      "judge_status": "graded"
+    },
+    {
+      "id": "HUST26-TSA-001",
+      "question": "Quy chế TSA ghi hạn đăng ký thi 2026 vào ngày nào?",
+      "expected_answer": "Bản TSA trong corpus là bản scan chưa trích xuất được văn bản, nên chưa thể xác nhận hạn đăng ký từ dữ liệu này. Hãy đối chiếu trực tiếp thông báo TSA chính thức; không nên đoán ngày.",
+      "expected_behavior": "abstain_source_not_searchable",
+      "fact_ids": [],
+      "source_ids": [
+        "hust-tsa-regulation-scan"
+      ],
+      "reason": "PDF scan 19 trang nhưng không có lớp văn bản; cần OCR và đối chiếu thủ công.",
+      "tags": [
+        "tsa",
+        "abstention",
+        "scan"
+      ],
+      "expected_kind": "fallback",
+      "safety": true,
+      "expected_fact_sources": [],
+      "actual_kind": "fallback",
+      "label_match": true,
+      "response": "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra.",
+      "sources": [],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "guardrail",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": null
+    },
+    {
+      "id": "HUST26-SCH-001",
+      "question": "Em có đủ điều kiện nhận học bổng X và số tiền là bao nhiêu?",
+      "expected_answer": "Chưa thể kết luận từ bộ dữ liệu hiện có: trang tổng hợp học bổng chỉ dẫn tới quy định từng loại, chưa lưu điều kiện và mức của học bổng X. Cần biết đúng tên học bổng và tra quy định chính thức tương ứng.",
+      "expected_behavior": "abstain_insufficient_source",
+      "fact_ids": [],
+      "source_ids": [
+        "hust-scholarships-online"
+      ],
+      "reason": "Nguồn hiện chỉ là trang danh mục trực tuyến, chưa có nội dung chi tiết của từng học bổng trong corpus.",
+      "tags": [
+        "scholarships",
+        "abstention",
+        "incomplete-source"
+      ],
+      "expected_kind": "fallback",
+      "safety": true,
+      "expected_fact_sources": [],
+      "actual_kind": "fallback",
+      "label_match": true,
+      "response": "Bộ nguồn hiện tại chưa đủ thông tin về điều kiện và mức học bổng để tư vấn chắc chắn. Mình không thể hứa cấp học bổng; bạn có thể nhờ cán bộ kiểm tra.",
+      "sources": [],
+      "tokens": 0,
+      "answer_mode": "extractive",
+      "answer_reason": "guardrail",
+      "latency_ms": null,
+      "human_correct": null,
+      "reviewer": null,
+      "review_notes": "",
+      "generation_check": null
+    }
+  ],
+  "suite": "golden",
+  "split": "development_not_holdout",
+  "data_release": "k71-2026-v2",
+  "tokens": 0,
+  "token_usage_note": "No new generation calls. Saved provider outcomes replayed to verify fallback routing.",
+  "retrieval": "hybrid",
+  "retrieval_version": "cc59681e5f3cce6afb5c6425750cfb6d4cf35fd3bd919da39f05df6fca48d6cf",
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "kpi_verified": false,
+  "automatic_behavior_source_match": 94.12,
+  "execution": "outcome_replay_no_api",
+  "replay_source": "eval\\results\\golden-report-hybrid-llm-full.json",
+  "replay_source_sha256": "5ec5718010022a3e73756dda3022b83292235d9011cd290d81d07d408d685c99",
+  "paid_calls_this_run": 0,
+  "human_coverage": 0.0,
+  "judge_coverage": 94.12,
+  "judge_correct_rate_evaluated": 100.0,
+  "accuracy_judge": null,
+  "judge_uncertain": 0,
+  "judge_run": {
+    "at": "2026-10-16T04:15:25.475329+00:00",
+    "rubric": "admissions-grounding-v1",
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "max_calls": 10,
+    "calls": 9,
+    "tokens_known": 9316,
+    "cache_hits": 8,
+    "same_provider_bias": true
+  }
+}

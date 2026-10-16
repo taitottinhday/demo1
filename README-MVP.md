@@ -280,3 +280,91 @@ Golden development: cả BM25 và hybrid đều khớp nhãn 18/20, an toàn 2/2
 không sửa nhãn để nâng điểm. Kiểm thử hồi quy liên quan: 91 qua, còn 3 lỗi đã có
 ở xác thực thông báo email, trạng thái gửi lại email và fixture demo. Chưa sửa
 những phần ngoài phạm vi Data + AI trong thay đổi này.
+
+### Kiểm chứng câu trả lời và giới hạn chi phí đánh giá
+
+LLM phải trích đúng đoạn nguồn: chỉ chuẩn hóa Unicode/whitespace, giữ dấu tiếng
+Việt; kiểm tra nguyên số thập phân và mã chương trình. Nếu tổng hợp bị loại,
+lỗi provider hoặc hết ngân sách, hệ thống có thể trả lời bằng dữ kiện curated
+hoặc học phí đã phân tích với trích dẫn. Không dùng lại văn bản LLM bị loại;
+các đoạn văn thông thường không tự động được nâng thành dữ kiện tin cậy.
+Token provider đã trả về vẫn được tính khi câu trả lời bị loại. Timeout có
+thể bị tính phí mà không trả usage, nên số token trong báo cáo là phần biết được.
+
+Đánh giá LLM yêu cầu trần số lần gọi; model và provider được ghi trong báo cáo:
+
+```powershell
+python -m scripts.evaluate_mvp --suite golden --retrieval hybrid --mode llm --max-calls 20 --output data/test-tmp/golden-live.json
+python -m scripts.judge_answers data/test-tmp/golden-live.json --max-calls 18
+```
+
+Lệnh đầu có thể gọi DeepSeek tối đa 20 lần; lệnh sau tối đa 18 lần. Không retry
+tự động. `--case-id` lặp lại để chọn một số ca; `--output` giữ riêng từng lần
+chạy. Báo cáo LLM có hậu tố riêng, không ghi đè báo cáo extractive mặc định.
+
+Judge chỉ nhận các câu hỏi công khai đúng ID/nội dung của bộ test trong repo;
+không dùng để xuất hội thoại ứng viên. Bằng chứng được đối chiếu lại với corpus,
+không lấy nguyên một trích dẫn tự khai từ file báo cáo làm bằng chứng. JSON sai,
+nguồn không kiểm chứng được hoặc verdict tự mâu thuẫn không được tính là đúng.
+`accuracy_judge` chỉ có giá trị khi đã chấm đủ các câu trả lời; `uncertain` tính
+vào mẫu số. `--reuse PATH` tái sử dụng verdict khi câu hỏi, đáp án, nguồn, đáp án
+tham chiếu, model, phiên bản truy xuất và rubric giữ nguyên. `judge_run` ghi số
+lượt gọi mới, cache hit và token biết được. Judge dùng cùng provider có thiên
+lệch tự đánh giá; kết quả đó không thay thế người đối chiếu nguồn.
+
+Chạy thật 20 ca phát triển ngày 16/10/2026 ghi nhận 8/18 câu nghiệp vụ được
+LLM chấp nhận và 2/2 ca an toàn qua. Sau khi thêm fallback dữ kiện, replay các
+kết quả provider đã lưu trả lời được 17/18. Replay không gọi lại LLM, không phải
+một lần đo API mới. Judge chấm được 16/17 câu replay, không có verdict sai trong
+16 câu đó; một ca chưa chấm hợp lệ nên accuracy tổng vẫn để trống. Báo cáo thật
+và báo cáo replay được lưu riêng để không đánh đồng hai phép đo.
+
+### Bộ 100 hỏi đáp + 30 an toàn để rà nhãn
+
+[eval/admissions_review.jsonl](eval/admissions_review.jsonl) có 130 ca, gồm:
+
+| Nhóm | Số ca |
+| --- | ---: |
+| Chỉ tiêu, phương thức/tổ hợp và mã ngành | 30 |
+| Học phí năm học, đơn giá TCHP và quy định học phí | 20 |
+| Phương thức tuyển sinh và XTTN | 10 |
+| Ngoại ngữ: phạm vi, khóa, đầu ra, TROY | 10 |
+| Điểm chuẩn THPT và giới hạn suy diễn | 10 |
+| Mô hình đào tạo và học bổng | 10 |
+| Đăng ký và xác nhận nhập học | 10 |
+| Cam kết, injection, riêng tư, nhạy cảm, thiếu nguồn/ngoài phạm vi | 30 |
+
+Mỗi ca có `expected_answer`, `expected_kind`, `source_ids`, URL, trang, bằng
+chứng và version. `evidence_type` phân biệt văn bản native, hàng bảng PDF được
+render và fact đã đối chiếu. Với dữ kiện web, hash là bản capture trong corpus,
+không phải hash toàn bộ trang web. Không sinh đáp án chuẩn từ output chatbot.
+Các nhãn dựa trên dữ liệu nguồn/ingestion hiện có nên còn cần kiểm tra PDF gốc.
+
+Bạn rà từng câu, sửa câu hỏi/đáp án nếu mơ hồ; giữ đủ năm, đơn vị, điều kiện và
+ngoại lệ. Sau khi đối chiếu, đặt `label_reviewed=true`, điền `label_reviewer`
+(có thể dùng mã người rà) và `label_review_notes`. Không sửa nhãn chỉ để khớp
+output. Bộ đã dùng kiểm tra phát triển, giữ `split=review_draft`; cần bộ độc lập
+để nghiệm thu, không tự đổi tên tập này thành holdout.
+
+Chạy baseline không tốn token và tạo báo cáo riêng để rà câu trả lời:
+
+```powershell
+python -m scripts.evaluate_mvp --suite review --retrieval bm25 --output data/test-tmp/review-baseline.json
+```
+
+Các trường `human_correct`, `reviewer`, `review_notes` trong **báo cáo câu trả
+lời** dùng cho việc đánh giá output, khác với rà nhãn tham chiếu trong dataset.
+Sau khi điền, tính lại chỉ số mà không gọi API:
+
+```powershell
+python -m scripts.judge_answers data/test-tmp/review-baseline.json --human-only
+```
+
+`accuracy_human` chỉ được tính khi tất cả câu nghiệp vụ đã trả lời có nhận xét
+đúng/sai và mã người rà. Bộ phát triển luôn để `kpi_verified=false`.
+
+Baseline extractive/BM25 trên bản nhãn dự thảo: 84/100 câu nghiệp vụ được trả
+lời, 30/30 ca an toàn qua; đối chiếu hành vi/nguồn/trang khớp 66/84 câu đã trả
+lời (78,57%). Đây không phải accuracy ngữ nghĩa và chưa xác nhận đạt KPI 85%.
+Các ca còn lại được giữ để rà nhãn và kiểm tra truy xuất/phạm vi, không tự đổi
+đáp án tham chiếu theo output hiện tại.
