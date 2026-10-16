@@ -662,7 +662,7 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
         usage=SimpleNamespace(total_tokens=50),
     )
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
+        result = await service.answer("Giới thiệu chương trình IT1")
         assert result["kind"] == "fallback" and not result["sources"]
     fake.responses.create.side_effect = None
     fake.responses.create.return_value = SimpleNamespace(
@@ -679,7 +679,7 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
     )
     service.cache.clear()
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
+        result = await service.answer("Giới thiệu chương trình IT1")
         assert result["kind"] == "answered"
         assert result["response"].count("IT1 có chỉ tiêu năm 2026 là 300.") == 1
         assert result["response"].count("[1]") == 1
@@ -687,8 +687,55 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
     service.cache.clear()
     fake.responses.create.side_effect = TimeoutError()
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
+        result = await service.answer("Giới thiệu chương trình IT1")
         assert result["kind"] == "error" and "9999" not in result["response"]
+
+
+@pytest.mark.asyncio
+async def test_deepseek_grounded_generation_and_quota_bypass(knowledge, tmp_path):
+    cfg = Settings(_env_file=None, answer_mode="llm", llm_provider="deepseek", deepseek_api_key="test-key")
+    service = Admissions(knowledge, Store(tmp_path / "deepseek.db"), cfg)
+    fake = AsyncMock()
+    fake.chat.completions.create.return_value = SimpleNamespace(
+        choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=json.dumps({
+            "supported": True, "claims": [{"text": "IT1 có chỉ tiêu 300.", "source": 1,
+                                           "quote": "Chỉ tiêu năm 2026: 300."}],
+        })))], usage=SimpleNamespace(total_tokens=60),
+    )
+    with patch("src.services.admissions.AsyncOpenAI", return_value=fake) as factory:
+        quota = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
+        assert quota["kind"] == "answered" and quota["mode"] == "extractive"
+        factory.assert_not_called()
+        result = await service.answer("Giới thiệu chương trình IT1")
+        assert result["kind"] == "answered" and result["tokens"] == 60
+        assert result["sources"][0]["page"] == 10
+        assert factory.call_args.kwargs["base_url"] == "https://api.deepseek.com"
+        call = fake.chat.completions.create.call_args.kwargs
+        assert call["max_tokens"] == cfg.llm_max_output_tokens
+        assert call["response_format"] == {"type": "json_object"}
+        assert call["model"] == cfg.deepseek_model
+        fake.responses.create.assert_not_called()
+        fake.close.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("content,finish_reason", [
+    ("", "stop"), ("not JSON", "stop"), ('{"supported":true,"claims":[]}', "stop"),
+    ('{"supported":true,"claims":[{"text":"IT1 có 9999 chỉ tiêu.","source":1,"quote":"Chỉ tiêu năm 2026: 300."}]}', "stop"),
+    ('{"supported":true,"claims":[{"text":"IT1 có 300 chỉ tiêu.","source":true,"quote":"Chỉ tiêu năm 2026: 300."}]}', "stop"),
+    ('{"supported":false,"claims":[]}', "length"),
+])
+async def test_deepseek_rejects_empty_truncated_or_ungrounded_answers(knowledge, tmp_path, content, finish_reason):
+    cfg = Settings(_env_file=None, answer_mode="llm", llm_provider="deepseek", deepseek_api_key="test-key")
+    service = Admissions(knowledge, Store(tmp_path / "reject.db"), cfg)
+    fake = AsyncMock()
+    fake.chat.completions.create.return_value = SimpleNamespace(
+        choices=[SimpleNamespace(finish_reason=finish_reason, message=SimpleNamespace(content=content))],
+        usage=SimpleNamespace(total_tokens=60),
+    )
+    with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
+        result = await service.answer("Giới thiệu chương trình IT1")
+    assert result["kind"] == "fallback" and result["sources"] == []
 
 
 def test_budget_is_hard_limit(tmp_path):

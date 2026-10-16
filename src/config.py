@@ -22,6 +22,9 @@ class Settings(BaseSettings):
 
     # LLM
     openai_api_key: str = ""
+    llm_provider: Literal["openai", "deepseek"] = "openai"
+    deepseek_api_key: str = ""
+    deepseek_model: str = "deepseek-flash"
     model_name: str = "gpt-4o-mini"
     llm_temperature: float = Field(default=0.7, ge=0.0, le=2.0)
 
@@ -75,6 +78,7 @@ class Settings(BaseSettings):
     secure_cookies: bool = False
     llm_daily_limit: int = Field(default=100, ge=0, le=10000)
     llm_timeout: int = Field(default=15, ge=1, le=20)
+    llm_max_output_tokens: int = Field(default=1200, ge=128, le=2000)
 
 
 @lru_cache

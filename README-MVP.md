@@ -31,6 +31,9 @@ Sau khi sửa Python hoặc cấu hình `.env`, dừng và chạy lại server �
 | Biến môi trường MVP | Mặc định / ý nghĩa |
 |---|---|
 | `ANSWER_MODE` | `extractive`; `llm` cần API key |
+| `LLM_PROVIDER` | `openai` hoặc `deepseek`; `.env.example` đề xuất DeepSeek |
+| `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL` | Key ở server; model mặc định `deepseek-flash` |
+| `LLM_MAX_OUTPUT_TOKENS` | `1200`; giới hạn output mỗi lượt (128–2000) |
 | `OPENAI_API_KEY`, `MODEL_NAME` | Chỉ dùng khi bật LLM; không đưa key vào Git |
 | `STAFF_USERNAME`, `STAFF_PASSWORD` | Tài khoản demo; đổi mật khẩu trước khi public |
 | `MVP_DATA_DIR` | `data`; thư mục nguồn tuyển sinh và dữ liệu xử lý knowledge |
@@ -59,6 +62,24 @@ LLM_TIMEOUT=15
 ```
 
 Không gửi key trong chat hoặc commit `.env`. Chế độ LLM dùng Responses API và đầu ra có schema theo [official OpenAI documentation](https://developers.openai.com/api/docs/guides/structured-outputs). Quote và dữ kiện số được kiểm tra trước hiển thị; thiếu nguồn/lỗi model/hết hạn mức chuyển fallback. Hạn mức theo số lượt gọi, chưa phải trần tiền. Cấu hình placeholder hiện có sẽ không chạy AI; chế độ tra cứu vẫn demo được.
+
+### DeepSeek
+
+Để thử DeepSeek, tự nhập key vào `.env` rồi khởi động lại server:
+
+```dotenv
+ANSWER_MODE=llm
+LLM_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your-real-key
+DEEPSEEK_MODEL=deepseek-flash
+LLM_DAILY_LIMIT=20
+LLM_MAX_OUTPUT_TOKENS=1200
+LLM_TIMEOUT=15
+```
+
+Adapter DeepSeek dùng Chat Completions + JSON Output, validate cấu trúc tại server rồi kiểm tra quote/số liệu trước hiển thị. Output rỗng, bị cắt, sai schema hoặc thiếu căn cứ chuyển fallback; lỗi provider/timeout trả thông báo lỗi có đường chuyển cán bộ. Không retry ngầm; giới hạn 24.000 ký tự câu hỏi + nguồn trước khi gọi. Các giới hạn này chưa thay thế trần chi phí tiền tệ hoặc benchmark tải. Câu chỉ tiêu vẫn dùng trích xuất xác định và không gọi model. Tham khảo [DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/).
+
+Key chưa được dùng để kiểm thử live trong đợt triển khai này; kiểm thử provider dùng mock. Embedding/pgvector/reranker chưa được tích hợp. Corpus chuẩn hóa hiện thay phần trích trang PDF bổ trợ, có kiểm tra checksum và lọc quality/scope; bảng chương trình/học phí nguồn chính giữ parser hiện tại. API/citation và giao diện không thay đổi.
 
 ## Demo theo trình tự
 

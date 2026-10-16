@@ -1,8 +1,10 @@
+import asyncio
 import json
 import re
 import time
 
 from openai import AsyncOpenAI
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.services.answer_formatter import format_answer, structure_answer
 from src.services.knowledge import normalize
@@ -39,6 +41,19 @@ PROGRAM_SCOPE_MARKERS = (
     "chuong trinh",
     "hoc bong",
 )
+
+
+class GroundedClaim(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    text: str = Field(min_length=1, max_length=2000)
+    source: int = Field(ge=1)
+    quote: str = Field(min_length=12, max_length=6000)
+
+
+class GroundedAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    supported: bool
+    claims: list[GroundedClaim] = Field(max_length=5)
 
 
 class Admissions:
@@ -122,6 +137,7 @@ class Admissions:
                 chunk.get("title"),
                 chunk.get("kind"),
                 chunk.get("code"),
+                chunk.get("record_id"),
             )
             existing = by_source.get(key)
             if existing is None:
@@ -131,6 +147,8 @@ class Admissions:
                 continue
             if chunk.get("text") and chunk["text"] not in existing["text"]:
                 existing["text"] = join_text(existing["text"], chunk["text"])
+                if chunk.get("evidence"):
+                    existing["evidence"] = join_text(existing.get("evidence", ""), chunk["evidence"])
             pages = [
                 page
                 for page in (existing.get("end_page"), existing.get("page"), chunk.get("end_page"), chunk.get("page"))
@@ -370,7 +388,9 @@ class Admissions:
                         response="Bạn hỏi chương trình chuẩn, tiên tiến hay hợp tác quốc tế? Hãy chọn mã chương trình để tránh nhầm mức học phí.",
                         reason="ambiguous_program",
                     )
-        key = (self.k.manifest["version"], normalize(question), answer_program, self.settings.answer_mode)
+        key = (self.k.manifest["version"], normalize(question), answer_program, self.settings.answer_mode,
+               self.settings.llm_provider, self.settings.deepseek_model if self.settings.llm_provider == "deepseek"
+               else self.settings.model_name)
         if key in self.cache:
             value, created = self.cache[key]
             if time.time() - created < 3600:
@@ -388,7 +408,8 @@ class Admissions:
                 return dict(base, response=FALLBACK)
             result.update(response=rendered, mode="extractive")
         elif self.settings.answer_mode == "llm":
-            if not self.settings.openai_api_key or "your-key" in self.settings.openai_api_key:
+            api_key = self.settings.deepseek_api_key if self.settings.llm_provider == "deepseek" else self.settings.openai_api_key
+            if not api_key or "your-key" in api_key:
                 return dict(
                     base,
                     kind="error",
@@ -403,7 +424,9 @@ class Admissions:
                     reason="budget_limit",
                 )
             try:
-                generated = await self.generate(question, chunks, history or [])
+                generated = await asyncio.wait_for(
+                    self.generate(question, chunks, history or []), timeout=self.settings.llm_timeout
+                )
                 if not generated:
                     return dict(base, response=FALLBACK, reason="grounding_check")
                 result.update(generated, mode="llm")
@@ -464,30 +487,48 @@ class Admissions:
             "quote nguyên văn đủ hỗ trợ claim. Giữ rõ năm, đơn vị, 'dự kiến', điều kiện ngoại lệ. "
             "Không đưa thêm checklist/hạn/chính sách ngoài nguồn. Trả lời tiếng Việt, tối đa 5 claim."
         )
-        client = AsyncOpenAI(api_key=self.settings.openai_api_key, timeout=self.settings.llm_timeout, max_retries=0)
+        deepseek = self.settings.llm_provider == "deepseek"
+        if len(question) + sum(len(c["text"]) for c in chunks) > 24000:
+            return None
+        client = AsyncOpenAI(
+            api_key=self.settings.deepseek_api_key if deepseek else self.settings.openai_api_key,
+            base_url="https://api.deepseek.com" if deepseek else None,
+            timeout=self.settings.llm_timeout,
+            max_retries=0,
+        )
         try:
-            response = await client.responses.create(
-                model=self.settings.model_name,
-                store=False,
-                max_output_tokens=1600,
-                input=[
-                    {"role": "system", "content": system},
-                    {
-                        "role": "user",
-                        "content": json.dumps(
-                            {
-                                "question": question,
-                                "sources": [{"source": i + 1, "text": c["text"]} for i, c in enumerate(chunks)],
-                            },
-                            ensure_ascii=False,
-                        ),
-                    },
-                ],
-                text={
-                    "format": {"type": "json_schema", "name": "grounded_admissions", "strict": True, "schema": schema}
-                },
-            )
-            data = json.loads(response.output_text)
+            messages = [
+                {"role": "system", "content": system + " Trả JSON với supported và claims (text, source, quote)."},
+                {"role": "user", "content": json.dumps({
+                    "question": question,
+                    "sources": [{"source": i + 1, "text": c["text"]} for i, c in enumerate(chunks)],
+                }, ensure_ascii=False)},
+            ]
+            if deepseek:
+                response = await client.chat.completions.create(
+                    model=self.settings.deepseek_model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                    temperature=0.1,
+                    max_tokens=self.settings.llm_max_output_tokens,
+                    extra_body={"thinking": {"type": "disabled"}},
+                )
+                if not response.choices or response.choices[0].finish_reason != "stop":
+                    return None
+                content = response.choices[0].message.content or ""
+            else:
+                response = await client.responses.create(
+                    model=self.settings.model_name,
+                    store=False,
+                    max_output_tokens=self.settings.llm_max_output_tokens,
+                    input=messages,
+                    text={"format": {"type": "json_schema", "name": "grounded_admissions", "strict": True, "schema": schema}},
+                )
+                content = response.output_text
+            try:
+                data = GroundedAnswer.model_validate_json(content).model_dump()
+            except (ValidationError, TypeError):
+                return None
             if not data.get("supported") or not 0 < len(data.get("claims", [])) <= 5:
                 return None
             claims_by_source = {}

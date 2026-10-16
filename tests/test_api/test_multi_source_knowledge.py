@@ -5,6 +5,20 @@ from src.services.admissions import Admissions
 from src.services.store import Store
 
 
+def test_merged_passages_keep_evidence_and_do_not_merge_different_parents():
+    base = {"source_id": "source", "page": 3, "end_page": 3,
+            "title": "Article", "kind": "document_text", "record_id": "parent"}
+    chunks = [
+        {**base, "text": "First condition.", "evidence": "First condition."},
+        {**base, "text": "Second exception.", "evidence": "Second exception."},
+        {**base, "record_id": "another-parent", "text": "Unrelated rule.", "evidence": "Unrelated rule."},
+    ]
+    merged = Admissions._merge_source_chunks(chunks)
+    assert len(merged) == 2
+    assert merged[0]["text"] == merged[0]["evidence"] == "First condition. Second exception."
+    assert merged[1]["text"] == "Unrelated rule."
+
+
 def test_ingestion_indexes_every_readable_source_and_marks_unreadable_assets(knowledge):
     assert len(knowledge.documents) == 8
     assert knowledge.manifest["document_count"] == 8
