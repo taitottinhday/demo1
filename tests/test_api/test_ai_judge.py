@@ -182,6 +182,30 @@ async def test_evidenced_academic_year_is_allowed_without_opening_future_admissi
 
 
 @pytest.mark.asyncio
+async def test_tsa_reference_year_requires_exact_primary_source_quote(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "reference-year.db"), Settings(
+        _env_file=None, llm_provider="deepseek", deepseek_api_key="test",
+    ))
+    quote = "Thí sinh có điểm thi ĐGTD năm 2025 hoặc 2026 theo quy định."
+    client = AsyncMock()
+    client.chat.completions.create.return_value = SimpleNamespace(
+        choices=[SimpleNamespace(finish_reason="stop", message=SimpleNamespace(content=json.dumps({
+            "supported": True, "claims": [{"text": quote, "source": 1, "quote": quote}],
+        })))], usage=SimpleNamespace(total_tokens=20),
+    )
+    with patch("src.services.admissions.AsyncOpenAI", return_value=client):
+        result = await service.generate("Giải thích điều kiện ĐGTD năm 2026", [
+            {"text": quote, "source_id": knowledge.primary_source_id},
+        ], [])
+        assert result and "2025" in result["response"]
+        rejected = await service.generate("Giải thích điều kiện ĐGTD năm 2026", [
+            {"text": quote, "source_id": "unrelated-source"},
+        ], [])
+        assert rejected is None
+    assert service.guard("Điều kiện tuyển sinh năm 2027?")
+
+
+@pytest.mark.asyncio
 async def test_quote_validation_preserves_vietnamese_accents(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "accents.db"), Settings(
         _env_file=None, llm_provider="deepseek", deepseek_api_key="test",

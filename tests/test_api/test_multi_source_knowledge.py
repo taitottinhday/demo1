@@ -366,6 +366,26 @@ async def test_entrance_language_follows_program_group_in_llm_mode(knowledge, tm
 
 
 @pytest.mark.asyncio
+async def test_explanation_calls_llm_and_keeps_policy_when_generation_is_rejected(knowledge, tmp_path):
+    from unittest.mock import AsyncMock
+
+    service = Admissions(knowledge, Store(tmp_path / "synthesis.db"),
+                         Settings(_env_file=None, answer_mode="llm", llm_provider="deepseek", deepseek_api_key="test", llm_daily_limit=2))
+    service.generate = AsyncMock(return_value=None)
+    question = "Giải thích cách đăng ký xét tuyển đánh giá tư duy và vì sao đăng ký dự thi chưa đủ?"
+    answer = await service.answer(question)
+    service.generate.assert_awaited_once()
+    assert answer["kind"] == "answered"
+    assert "https://tsa.hust.edu.vn/dk" in answer["response"]
+    assert answer["reason"] == "verified_facts_fallback"
+    service.cache.clear()
+    service.generate = AsyncMock(return_value={"response": "Giải thích có nguồn. [1]", "tokens": 20})
+    answer = await service.answer(question)
+    assert answer["mode"] == "llm" and answer["tokens"] == 20
+    service.generate.assert_awaited_once()
+
+
+@pytest.mark.asyncio
 async def test_tuition_uses_yearly_estimate_or_per_credit_source_as_asked(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "tuition.db"), Settings(_env_file=None, answer_mode="extractive"))
 

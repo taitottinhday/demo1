@@ -289,6 +289,15 @@ những phần ngoài phạm vi Data + AI trong thay đổi này.
 
 ### Kiểm chứng câu trả lời và giới hạn chi phí đánh giá
 
+`ANSWER_MODE=llm` không có nghĩa mọi tin nhắn đều gọi API. Câu hỏi dữ kiện được
+tra trực tiếp; câu hỏi có yêu cầu giải thích, vì sao, so sánh hoặc tổng hợp đi
+qua LLM nếu có nguồn và còn hạn mức. Ví dụ: “Giải thích cách đăng ký xét tuyển
+đánh giá tư duy và vì sao đăng ký dự thi chưa đủ?”. Nếu LLM bị loại, lỗi hoặc
+hết hạn mức, các chính sách đã có bộ render theo nguồn vẫn được trả dự phòng.
+`mode=llm` và usage token xác nhận câu trả lời dùng LLM; `mode=extractive` có
+thể là tra cứu trực tiếp hoặc fallback sau một lời gọi đã bị loại. Xem `reason`
+và `tokens` trong response API để phân biệt. Cache không tạo thêm lời gọi API.
+
 LLM phải trích đúng đoạn nguồn: chỉ chuẩn hóa Unicode/whitespace, giữ dấu tiếng
 Việt; kiểm tra nguyên số thập phân và mã chương trình. Nếu tổng hợp bị loại,
 lỗi provider hoặc hết ngân sách, hệ thống có thể trả lời bằng dữ kiện curated

@@ -179,7 +179,7 @@ class Admissions:
             existing["end_page"] = max(pages) if pages else None
         return merged
 
-    def guard(self, question, *, allow_academic_year=False):
+    def guard(self, question, *, allow_academic_year=False, source_reference_years=()):
         q = normalize(question)
         if any(term in q for term in ["nguoi khac", "ung vien khac", "thi sinh khac"]) and any(
             term in q for term in ["email", "dien thoai", "ho so", "du lieu", "tai khoan", "mat khau", "ticket"]
@@ -261,7 +261,7 @@ class Admissions:
         if "ho so" in q and any(s in q for s in ["giay to", "can gi", "gom gi", "nhung gi"]):
             return "Bộ nguồn hiện tại chưa đủ danh sách giấy tờ chi tiết cho hồ sơ bạn hỏi. Mình có thể hướng dẫn kênh đăng ký ĐGTD hoặc chuyển cán bộ kiểm tra danh sách hồ sơ đúng phương thức."
         requested_years = set(re.findall(r"\b20\d{2}\b", q))
-        unsupported_years = requested_years - {"2026"}
+        unsupported_years = requested_years - {"2026"} - set(source_reference_years)
         historical_cutoff = (
             len(requested_years) == 1
             and any(term in q for term in ["diem chuan", "diem trung tuyen"])
@@ -476,7 +476,12 @@ class Admissions:
             or (bool(answer_program) and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"])
                 and not any(w in q for w in ["quy doi", "dau ra", "tot nghiep", "xac thuc"]))
         )
-        if quota_question or scholarship_policy or historical_cutoff or cutoff_fact or source_policy:
+        needs_synthesis = any(term in q for term in [
+            "giai thich", "vi sao", "tai sao", "khac nhau", "so sanh", "tong hop", "phan tich"
+        ])
+        direct_policy = quota_question or scholarship_policy or historical_cutoff or cutoff_fact or source_policy
+        safe_policy_answer = format_answer(question, chunks, answer_program) if direct_policy else None
+        if direct_policy and (not needs_synthesis or self.settings.answer_mode != "llm"):
             # Render atomic quotas and complete scholarship policy sections
             # directly from their official source without paid synthesis.
             rendered = format_answer(question, chunks, answer_program)
@@ -493,7 +498,7 @@ class Admissions:
                     reason="llm_not_configured",
                 )
             if not self.store.reserve_llm(self.settings.llm_daily_limit):
-                verified = self._verified_fact_fallback(question, chunks, answer_program)
+                verified = safe_policy_answer or self._verified_fact_fallback(question, chunks, answer_program)
                 if verified:
                     return dict(result, response=verified, mode="extractive", reason="verified_facts_budget_fallback")
                 return dict(
@@ -509,14 +514,14 @@ class Admissions:
                     self.generate(question, chunks, history or [], usage=usage), timeout=self.settings.llm_timeout
                 )
                 if not generated:
-                    verified = self._verified_fact_fallback(question, chunks, answer_program)
+                    verified = safe_policy_answer or self._verified_fact_fallback(question, chunks, answer_program)
                     if not verified:
                         return dict(base, response=FALLBACK, reason="grounding_check", mode="llm", tokens=usage["tokens"])
                     result.update(response=verified, mode="extractive", reason="verified_facts_fallback", tokens=usage["tokens"])
                 else:
                     result.update(generated, mode="llm")
             except Exception:
-                verified = self._verified_fact_fallback(question, chunks, answer_program)
+                verified = safe_policy_answer or self._verified_fact_fallback(question, chunks, answer_program)
                 if verified:
                     return dict(result, response=verified, mode="extractive", reason="verified_facts_provider_fallback",
                                 tokens=usage["tokens"])
@@ -588,7 +593,9 @@ class Admissions:
             "Không cam kết trúng tuyển/học bổng; không đoán điều kiện, hạn, học phí. "
             "Nếu thiếu thông tin, supported=false. Mỗi claim có source (số từ 1), "
             "quote nguyên văn đủ hỗ trợ claim. Giữ rõ năm, đơn vị, 'dự kiến', điều kiện ngoại lệ. "
-            "Không đưa thêm checklist/hạn/chính sách ngoài nguồn. Trả lời tiếng Việt, tối đa 5 claim."
+            "Không đưa thêm checklist/hạn/chính sách ngoài nguồn. Chỉ chọn nội dung trực tiếp trả lời câu hỏi; "
+            "không thêm học phí, lệ phí hoặc điều kiện khác nếu không được hỏi. "
+            "Mỗi ý chỉ nêu một lần, tránh lặp lại lời giải thích. Trả lời tiếng Việt, tối đa 5 claim."
         )
         deepseek = self.settings.llm_provider == "deepseek"
         if usage is not None:
@@ -676,9 +683,18 @@ class Admissions:
                     return None
                 if usage is not None:
                     usage["check"] = "claim_guardrail"
-                if self.guard(claim["text"], allow_academic_year=chunks[n - 1].get("source_id") in {
+                quote_norm = normalize(claim["quote"])
+                reference_years = {"2025"} if (
+                    chunks[n - 1].get("source_id") == self.k.primary_source_id
+                    and "2025" in quote_norm and "2026" in quote_norm
+                    and any(term in quote_norm for term in ["danh gia tu duy", "dgtd"])
+                ) else set()
+                guard_error = self.guard(claim["text"], allow_academic_year=chunks[n - 1].get("source_id") in {
                     "hust-english-policy-k71", "hust-tuition-2026-2027",
-                }):
+                }, source_reference_years=reference_years)
+                if guard_error:
+                    if usage is not None:
+                        usage["guard_reason"] = guard_error
                     return None
                 claim_key = normalize(claim["text"])
                 if claim_key in seen_claims:
