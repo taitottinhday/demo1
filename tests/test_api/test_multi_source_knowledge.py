@@ -216,6 +216,30 @@ def test_program_registry_covers_all_codes_without_inventing_teaching_language(k
     assert registry["ETLUH"]["entrance_language_rule"] == "verify_specific"
 
 
+def test_ai_operational_metrics_are_bounded_and_exclude_conversation_text(tmp_path):
+    import json
+
+    store = Store(tmp_path / "telemetry.db")
+    _, session = store.session(None, 24)
+    store.add_message(session["id"], "assistant", {
+        "response": "private@example.com", "reason": "grounded", "cached": True,
+    })
+    store.record("answered", "extractive", 10, 2)
+    store.record("answered", "llm", 20, 3)
+    assert store.reserve_llm(2)
+    result = store.ai_metrics(sample_limit=1)
+    assert result["sample_count"] == 1 and result["known_tokens_sample"] == 3
+    assert result["p50_ms"] == result["p95_ms"] == 20
+    assert result["calls_reserved_today"] == 1 and result["cache_hits_sample"] == 1
+    assert "private@example.com" not in json.dumps(result)
+
+
+@pytest.mark.asyncio
+async def test_ai_metrics_require_staff_authentication(client):
+    result = await client.get("/api/v1/staff/ai/metrics")
+    assert result.status_code == 401
+
+
 @pytest.mark.asyncio
 async def test_all_programs_have_grounded_cutoff_quota_and_scoped_language_routes(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "all-programs.db"), Settings(_env_file=None))

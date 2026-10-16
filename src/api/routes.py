@@ -1116,6 +1116,27 @@ def metrics(request: Request, user=Depends(staff)):
     return runtime(request)["store"].metrics(owner=user)
 
 
+@router.get("/staff/ai/metrics")
+def ai_metrics(request: Request, user=Depends(staff)):
+    rt = runtime(request)
+    k, cfg = rt["knowledge"], rt["settings"]
+    result = rt["store"].ai_metrics()
+    index_ready = None
+    if k.retrieval:
+        try:
+            k.retrieval.check()
+            index_ready = True
+        except Exception:
+            index_ready = False
+    with k.retrieval_counts_lock:
+        counts = dict(k.retrieval_counts)
+    return {**result, "llm_daily_limit": cfg.llm_daily_limit,
+            "calls_remaining_today": max(0, cfg.llm_daily_limit - result["calls_reserved_today"]),
+            "source_version": k.manifest.get("version"), "source_checked_on": k.manifest.get("source_checked_on"),
+            "source_ready": bool(k.chunks), "retrieval_mode": k.manifest.get("retrieval"),
+            "retrieval_index_ready": index_ready, "retrieval_since_process_start": counts}
+
+
 @router.post("/staff/tickets/{ticket_id}/reject")
 def reject_ticket(ticket_id: str, body: ReplyInput, request: Request, user=Depends(staff)):
     if not body.reply.strip():

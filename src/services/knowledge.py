@@ -5,6 +5,7 @@ import json
 import logging
 import math
 import re
+import threading
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -121,6 +122,8 @@ class Knowledge:
         self.primary_source_id = ""
         self.version = ""
         self.records = {}
+        self.retrieval_counts = Counter()
+        self.retrieval_counts_lock = threading.Lock()
 
     def _normalized_snapshot(self):
         """Verify the data/runtime boundary before using normalized passages."""
@@ -276,6 +279,7 @@ class Knowledge:
             "indexed_pages": "Toàn bộ đoạn native đủ điều kiện thuộc đại học chính quy; dữ liệu lịch sử chỉ dùng khi hỏi đúng năm",
             "document_count": len(self.documents),
             "data_release": release["release"],
+            "source_checked_on": catalog.get("verified_on"),
             "normalized_passages": len(normalized),
             "normalized_coverage": self.normalized_coverage,
             "indexable_pdf_count": sum(1 for item in self.documents if item.get("type") == "pdf" and item.get("indexable")),
@@ -632,6 +636,13 @@ class Knowledge:
         return context if not explicit else ""
 
     def search(self, question: str, program: str = "", limit=4):
+        result = self._search(question, program, limit)
+        with self.retrieval_counts_lock:
+            self.retrieval_counts["queries"] += 1
+            self.retrieval_counts["with_evidence" if result else "no_evidence"] += 1
+        return result
+
+    def _search(self, question: str, program: str = "", limit=4):
         query = tokens(question)
         query = list(dict.fromkeys(query))
         norm = normalize(question)
@@ -959,6 +970,8 @@ class Knowledge:
                 return self.retrieval.search(question, [c["id"] for _, c in scored], scored, limit)
             except Exception as exc:
                 logging.warning("Hybrid query failed: %s; using BM25", type(exc).__name__)
+                with self.retrieval_counts_lock:
+                    self.retrieval_counts["hybrid_query_fallback"] += 1
         # Require lexical support beyond incidental overlap.
         return [dict(c, score=round(s, 2)) for s, c in scored[:limit]]
 

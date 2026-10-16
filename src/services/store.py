@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import math
 import secrets
 import sqlite3
 import time
@@ -929,6 +930,29 @@ class Store:
                 "INSERT INTO events(kind,mode,latency,tokens,created) VALUES(?,?,?,?,?)",
                 (kind, mode, latency, token_count, time.time()),
             )
+
+    def ai_metrics(self, sample_limit=1000):
+        """Bounded aggregates only: never return candidate text, identifiers or prompts."""
+        limit = max(1, min(int(sample_limit), 1000))
+        day = time.strftime("%Y-%m-%d", time.gmtime())
+        with self.connect() as db:
+            rows = db.execute("SELECT kind,mode,latency,tokens FROM events ORDER BY rowid DESC LIMIT ?", (limit,)).fetchall()
+            outcomes = db.execute(
+                "SELECT json_extract(payload,'$.reason'),json_extract(payload,'$.cached') "
+                "FROM messages WHERE role='assistant' ORDER BY id DESC LIMIT ?", (limit,),
+            ).fetchall()
+            budget = db.execute("SELECT calls FROM budgets WHERE day=?", (day,)).fetchone()
+        latencies = sorted(row["latency"] for row in rows)
+        reasons = {}
+        for reason, _ in outcomes:
+            reasons[reason or "unknown"] = reasons.get(reason or "unknown", 0) + 1
+        return {"sample_limit": limit, "sample_count": len(rows), "budget_day_utc": day,
+                "calls_reserved_today": budget[0] if budget else 0,
+                "known_tokens_sample": sum(row["tokens"] for row in rows),
+                "cache_hits_sample": sum(bool(row[1]) for row in outcomes),
+                "outcome_reasons_sample": reasons,
+                "p50_ms": latencies[math.ceil(len(latencies) * .5) - 1] if latencies else None,
+                "p95_ms": latencies[math.ceil(len(latencies) * .95) - 1] if latencies else None}
 
     def metrics(self, owner=None):
         with self.connect() as db:
