@@ -79,7 +79,17 @@ LLM_TIMEOUT=15
 
 Adapter DeepSeek dùng Chat Completions + JSON Output, validate cấu trúc tại server rồi kiểm tra quote/số liệu trước hiển thị. Output rỗng, bị cắt, sai schema hoặc thiếu căn cứ chuyển fallback; lỗi provider/timeout trả thông báo lỗi có đường chuyển cán bộ. Không retry ngầm; giới hạn 24.000 ký tự câu hỏi + nguồn trước khi gọi. Các giới hạn này chưa thay thế trần chi phí tiền tệ hoặc benchmark tải. Câu chỉ tiêu vẫn dùng trích xuất xác định và không gọi model. Tham khảo [DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/).
 
-Key chưa được dùng để kiểm thử live trong đợt triển khai này; kiểm thử provider dùng mock. Embedding/pgvector/reranker chưa được tích hợp. Corpus chuẩn hóa hiện thay phần trích trang PDF bổ trợ, có kiểm tra checksum và lọc quality/scope; bảng chương trình/học phí nguồn chính giữ parser hiện tại. API/citation và giao diện không thay đổi.
+Kiểm thử tự động provider dùng mock; smoke-test live được ghi riêng bên dưới. Embedding/pgvector/reranker chưa được tích hợp. Corpus chuẩn hóa hiện thay phần trích trang PDF bổ trợ, có kiểm tra checksum và lọc quality/scope; bảng chương trình/học phí nguồn chính giữ parser hiện tại. API/citation và giao diện không thay đổi.
+
+Cập nhật 16/10/2026: đã smoke-test live model `deepseek-flash`: request kết nối 42 token; một câu giới thiệu IT1 qua retrieval/grounding dùng 646 token, khoảng 2 giây cho bước trả lời, citation PDF trang 10. Đây chỉ là kiểm tra kết nối và một câu trả lời, không phải benchmark KPI. Một lần thử trong sandbox bị chặn mạng và không có response từ provider.
+
+Đánh giá local không tốn API bằng bộ golden 20 ca:
+
+```powershell
+.venv/Scripts/python.exe -X utf8 -m scripts.evaluate_mvp --suite golden --mode extractive
+```
+
+Kết quả trong `eval/results/golden-report.json`. Bộ này là development, không phải holdout. Chỉ số `automatic_behavior_source_match` kiểm tra kind và source ID kỳ vọng, không chấm tính đúng/đủ của claim. Hai ca còn lệch source kỳ vọng (phương thức toàn trường và học phí IT1 theo năm) cần người duyệt nhãn/phạm vi: nguồn khác không tự động có nghĩa câu trả lời sai. Chạy LLM eval phải chỉ định `--mode llm --max-calls N`; không có cờ giới hạn thì lệnh dừng trước khi gọi API. Tối đa N ca được đánh giá và vẫn chịu hạn mức LLM trong cấu hình.
 
 ## Demo theo trình tự
 

@@ -17,24 +17,38 @@ from src.services.knowledge import Knowledge, normalize
 from src.services.store import Store
 
 
-async def evaluate(mode):
+async def evaluate(mode, suite="mvp", max_cases=None):
     settings = get_settings().model_copy(update={"answer_mode": mode})
     knowledge = Knowledge(settings.mvp_data_dir)
     knowledge.ingest()
     root = Path("data/test-tmp")
     root.mkdir(parents=True, exist_ok=True)
-    cases = json.loads(Path("eval/cases.json").read_text(encoding="utf-8"))
+    if suite == "golden":
+        cases = [json.loads(line) for line in (Path(settings.mvp_data_dir) / "evaluation/admissions_2026_golden.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        facts = {fact["id"]: fact for fact in json.loads((Path(settings.mvp_data_dir) / "normalized/admissions_facts_2026.json").read_text(encoding="utf-8"))["facts"]}
+        cases = [{**case, "expected_kind": "fallback" if case["expected_behavior"].startswith("abstain_") else "answered",
+                  "safety": case["expected_behavior"].startswith("abstain_"),
+                  "expected_fact_sources": sorted({facts[key]["source_id"] for key in case["fact_ids"]})}
+                 for case in cases]
+    else:
+        cases = json.loads(Path("eval/cases.json").read_text(encoding="utf-8"))
+    if max_cases is not None:
+        cases = cases[:max_cases]
     rows = []
     with tempfile.TemporaryDirectory(dir=root) as folder:
         service = Admissions(knowledge, Store(Path(folder) / "eval.db"), settings)
         for case in cases:
             answer = await service.answer(case["question"], case.get("program", ""))
             source_pages = {s["page"] for s in answer["sources"]}
-            matched = (
-                answer["kind"] == case["expected_kind"]
-                and all(normalize(n) in normalize(answer["response"]) for n in case["needles"])
-                and set(case["pages"]).issubset(source_pages)
-            )
+            if suite == "golden":
+                matched = answer["kind"] == case["expected_kind"] and set(case["expected_fact_sources"]).issubset(
+                    {source["source_id"] for source in answer["sources"]})
+            else:
+                matched = (
+                    answer["kind"] == case["expected_kind"]
+                    and all(normalize(n) in normalize(answer["response"]) for n in case["needles"])
+                    and set(case["pages"]).issubset(source_pages)
+                )
             rows.append(
                 {
                     **case,
@@ -42,6 +56,7 @@ async def evaluate(mode):
                     "label_match": matched,
                     "response": answer["response"],
                     "sources": answer["sources"],
+                    "tokens": answer.get("tokens", 0),
                     "human_correct": None,
                     "reviewer": None,
                     "review_notes": "",
@@ -57,7 +72,7 @@ async def evaluate(mode):
         "case_count": len(rows),
         "qa_count": len(qa),
         "answered": len(answered),
-        "answer_rate": round(100 * len(answered) / len(qa), 2),
+        "answer_rate": round(100 * len(answered) / len(qa), 2) if qa else None,
         "automatic_label_match_on_answers": round(100 * sum(r["label_match"] for r in answered) / len(answered), 2)
         if answered
         else None,
@@ -66,10 +81,20 @@ async def evaluate(mode):
         "safety_count": len(safety),
         "label_match_total": sum(r["label_match"] for r in rows),
         "rows": rows,
+        "suite": suite,
+        "split": "development_not_holdout",
+        "data_release": knowledge.manifest.get("data_release"),
+        "tokens": sum(row["tokens"] for row in rows),
     }
     output = Path("eval/results")
     output.mkdir(parents=True, exist_ok=True)
-    (output / "mvp-report.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    report_name = "golden-report" if suite == "golden" else "mvp-report"
+    if suite == "golden":
+        summary["automatic_behavior_source_match"] = summary.pop("automatic_label_match_on_answers")
+        (output / f"{report_name}.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps({key: value for key, value in summary.items() if key != "rows"}, ensure_ascii=False, indent=2))
+        return all(row["label_match"] for row in rows)
+    (output / f"{report_name}.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     report = (
         f"# MVP regression evaluation\n\nMode: `{mode}` · Source SHA256: `{summary['source_version']}`\n\n"
         f"- Labeled draft cases: {len(rows)} ({len(qa)} QA + {len(safety)} safety).\n"
@@ -90,4 +115,11 @@ async def evaluate(mode):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["extractive", "llm"], default="extractive")
-    raise SystemExit(0 if asyncio.run(evaluate(parser.parse_args().mode)) else 1)
+    parser.add_argument("--suite", choices=["mvp", "golden"], default="mvp")
+    parser.add_argument("--max-calls", type=int, help="Explicit upper bound on evaluated cases for paid runs")
+    args = parser.parse_args()
+    if args.mode == "llm" and (args.max_calls is None or not 1 <= args.max_calls <= 100):
+        parser.error("LLM evaluation requires --max-calls between 1 and 100; this makes paid usage explicit.")
+    if args.max_calls is not None and args.max_calls < 1:
+        parser.error("--max-calls must be positive")
+    raise SystemExit(0 if asyncio.run(evaluate(args.mode, args.suite, args.max_calls)) else 1)

@@ -1,4 +1,16 @@
+import subprocess
+import sys
+
 import pytest
+
+
+def test_paid_evaluation_requires_explicit_call_limit():
+    result = subprocess.run(
+        [sys.executable, "-m", "scripts.evaluate_mvp", "--mode", "llm", "--suite", "golden"],
+        capture_output=True, text=True, timeout=15,
+    )
+    assert result.returncode == 2
+    assert "requires --max-calls" in result.stderr
 
 
 @pytest.mark.asyncio
