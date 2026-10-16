@@ -197,6 +197,9 @@ Nếu nguồn chưa sẵn sàng: kiểm tra `/api/v1/status`, đường dẫn PD
 
 ## Railway persistence
 
+Hướng dẫn triển khai và bàn giao từng bước, kết quả kiểm tra web online và các
+gate cần xử lý trước merge: [deployment-railway-persistence.md](docs/deployment-railway-persistence.md).
+
 The mutable SQLite state (staff accounts, candidate accounts, tickets, statuses, sessions and audit history) must live on a Railway Volume. Configure the service once:
 
 1. Add a Railway Volume and mount it at `/app/state`.
