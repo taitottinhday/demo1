@@ -199,3 +199,21 @@ The mutable SQLite state (staff accounts, candidate accounts, tickets, statuses,
 4. With one replica, deploy and verify that a test ticket and its status still exist after a restart.
 
 Production now refuses to start without `PERSISTENT_DATA_DIR` or when it points to the knowledge directory. This prevents a deploy from appearing healthy while silently creating a blank database. SQLite on a shared Volume is intended for one replica; use PostgreSQL before scaling horizontally.
+
+## PostgreSQL + pgvector local cho RAG
+
+Database RAG chạy riêng với SQLite của ứng dụng. Mở Docker Desktop, đặt
+`RAG_POSTGRES_PASSWORD` và `RAG_DATABASE_URL` trong `.env` (xem `.env.example`), rồi chạy:
+
+```powershell
+docker compose -f docker-compose.rag.yml up -d --wait
+docker compose -f docker-compose.rag.yml exec -T rag-db psql -U admissions_rag -d admissions_rag -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+PostgreSQL chỉ lắng nghe trên `127.0.0.1:55432`. Named volume `rag-postgres`
+giữ dữ liệu qua các lần khởi động lại. Dừng bằng
+`docker compose -f docker-compose.rag.yml down`; không thêm `-v` nếu muốn giữ dữ liệu.
+Nếu backend cũng chạy trong Docker, URL kết nối cần dùng hostname của service trên
+cùng Docker network thay cho `127.0.0.1`.
+Việc dựng database chưa bật vector retrieval; runtime hiện vẫn dùng BM25 cho đến
+khi hoàn tất embedding, index và kiểm thử truy xuất.
