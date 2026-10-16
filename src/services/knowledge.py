@@ -42,6 +42,18 @@ def clean(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip()
 
 
+def admission_charge_label(question):
+    """Identify an admissions charge, separately from tuition/language conditions."""
+    q = normalize(question)
+    if not re.search(r"\bphi\b", q) or "hoc phi" in q:
+        return None
+    if any(term in q for term in ["tsa", "dgtd", "danh gia tu duy"]):
+        return "Đăng ký tham dự kỳ thi đánh giá tư duy"
+    if "xac thuc" in q and any(term in q for term in ["ngoai ngu", "chung chi"]):
+        return "Xác thực chứng chỉ ngoại ngữ"
+    return None
+
+
 def canonical_quote(text: str) -> str:
     """Normalize PDF whitespace and Unicode without dropping Vietnamese accents."""
     return clean(unicodedata.normalize("NFC", text))
@@ -541,6 +553,13 @@ class Knowledge:
         )
         return self.manifest
 
+    def admission_charge_chunks(self, question):
+        label = admission_charge_label(question)
+        if not label:
+            return []
+        return [c for c in self.chunks if c.get("source_id") == self.primary_source_id
+                and c.get("page") == 20 and label + ":" in c["text"]]
+
     def program_matches(self, question):
         """Return explicit program matches in the question, without using session context."""
         q = normalize(question)
@@ -687,6 +706,9 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
+        charge_chunks = self.admission_charge_chunks(question)
+        if charge_chunks:
+            return [dict(c, score=100) for c in charge_chunks[:limit]]
         named_fees = self.fee_matches(question) if fee_query and not any(
             term in norm for term in ["ky he", "tin chi", "tchp"]
         ) else []

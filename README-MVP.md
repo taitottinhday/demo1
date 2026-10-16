@@ -198,7 +198,10 @@ Nếu nguồn chưa sẵn sàng: kiểm tra `/api/v1/status`, đường dẫn PD
 ## Railway persistence
 
 Hướng dẫn triển khai và bàn giao từng bước, kết quả kiểm tra web online và các
-gate cần xử lý trước merge: [deployment-railway-persistence.md](docs/deployment-railway-persistence.md).
+gate trước merge: [deployment-railway-persistence.md](docs/deployment-railway-persistence.md).
+Sau sửa luồng phí tuyển sinh, hệ số K01 và phạm vi ngoại ngữ, bộ regression 40 ca
+đã qua trên cả BM25 và hybrid. Nhãn học bổng/điểm chuẩn được cập nhật theo nguồn;
+đây vẫn là kiểm tra phát triển, không phải chứng nhận accuracy bởi người rà.
 
 The mutable SQLite state (staff accounts, candidate accounts, tickets, statuses, sessions and audit history) must live on a Railway Volume. Configure the service once:
 

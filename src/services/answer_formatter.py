@@ -2,7 +2,7 @@
 
 import re
 
-from src.services.knowledge import normalize, question_intent, tokens
+from src.services.knowledge import admission_charge_label, normalize, question_intent, tokens
 
 
 def structure_answer(response, sources, next_steps, manifest, question=""):
@@ -97,6 +97,13 @@ def _admission_methods(text):
 
 
 def format_answer(question, chunks, program=""):
+    charge = admission_charge_label(question)
+    if charge:
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(re.escape(charge) + r":\s*([\d.,]+)\s*đồng", chunk["text"])
+            if match:
+                return f"{charge}: {match[1]} đồng theo tài liệu tuyển sinh 2026. [{i}]"
+        return None
     if chunks and chunks[0].get("cutoff_methods"):
         c = chunks[0]
         q = normalize(question)

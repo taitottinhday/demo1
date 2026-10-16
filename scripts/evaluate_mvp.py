@@ -78,6 +78,8 @@ async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=N
                     answer["kind"] == case["expected_kind"]
                     and all(normalize(n) in normalize(answer["response"]) for n in case["needles"])
                     and set(case["pages"]).issubset(source_pages)
+                    and set(case.get("expected_fact_sources", [])).issubset(
+                        {source["source_id"] for source in answer["sources"]})
                 )
             rows.append(
                 {
@@ -160,7 +162,9 @@ async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=N
         "and expand to the PRD's 100 QA + 30 safety cases before KPI acceptance. This set was used during development and is not a frozen holdout. "
         "Extractive results do not establish LLM accuracy; evaluate again after enabling LLM.\n"
     )
-    (output / ("report.md" if report_name == "mvp-report" else report_name + ".md")).write_text(report, encoding="utf-8")
+    markdown_file = report_file.with_suffix(".md") if output_path else output / (
+        "report.md" if report_name == "mvp-report" else report_name + ".md")
+    markdown_file.write_text(report, encoding="utf-8")
     print(json.dumps({k: v for k, v in summary.items() if k != "rows"}, ensure_ascii=False, indent=2))
     return all(r["label_match"] for r in rows)
 

@@ -31,8 +31,8 @@ If the currently running deployment still has the old ephemeral database, copy i
 | Bản nhánh tích hợp | 9 nguồn; hybrid runtime 1.047 chunks; khác bản online |
 | Validator dữ liệu | Passed: 1.132 records, 1.065 chunks của snapshot chuẩn hóa; khác số chunk runtime |
 | Lint đúng lệnh CI | Passed |
-| Toàn bộ pytest sau sửa hội thoại | 208 passed |
-| Eval 40 ca cũ dùng trong CI | Exit 1: 33/40 khớp nhãn; 25/30 câu nghiệp vụ trả lời, 10/10 ca an toàn qua |
+| Toàn bộ pytest sau sửa gate | 218 passed |
+| Eval 40 ca dùng trong CI sau sửa | Exit 0: 40/40 khớp nhãn trên BM25 và hybrid; 29/30 câu nghiệp vụ trả lời, 10/10 ca an toàn qua |
 | Docker build mới trên Linux/cloud | Chưa xác minh trong đợt kiểm tra này |
 | Dashboard, quyền truy cập, nhánh autodeploy, secret, Volume/backup thực tế | Chưa xác minh; cần chủ tài khoản kiểm tra |
 
@@ -46,16 +46,22 @@ Không đăng nhập production, không gửi chat, không gọi DeepSeek để 
 
 Nhánh hiện tại là `feature/data-ai-integration`; kiểm tra tên thực tế bằng
 `git branch --show-current` trước push. Không cần đổi tên nhánh để triển khai.
-Đối chiếu các ca CI chưa khớp trong `eval/cases.json`:
+Các ca từng làm CI lỗi trong `eval/cases.json` đã được xử lý:
 
 | Ca | Vấn đề cần rà |
 | --- | --- |
-| Q14 | Nhãn kỳ vọng có lệ phí TSA, runtime từ chối vì nguồn scan chưa đủ căn cứ; xác minh nguồn hợp lệ trước khi mở trả lời |
-| Q15 | Câu hỏi phí xác thực chứng chỉ đang bị hiểu thành điều kiện ngoại ngữ theo ngành |
-| Q17 | Câu hỏi hệ số tổ hợp K01 đang bị hỏi lại chương trình |
-| Q18 | Câu hỏi điều kiện ngoại ngữ nhóm tiên tiến đang yêu cầu mã cụ thể; cần xác định phạm vi nhóm từ nguồn |
-| Q21, Q22 | Nhãn cũ kỳ vọng từ chối học bổng/điểm chuẩn IT1; hiện đã có nguồn bổ sung, cần người đối chiếu nhãn |
-| Q26 | Có trả lời đúng chủ đề nhưng chuỗi kiểm tra cũ `không nêu IT1` không khớp cách diễn đạt mới; cần kiểm tra nội dung và phép đo |
+| Q14 | Đọc khoản phí TSA từ PDF tuyển sinh trang 20; vẫn chặn hạn thi và điều kiện miễn/giảm/hoàn phí thiếu căn cứ |
+| Q15 | Phí xác thực chứng chỉ lấy đúng trang 20, không hỏi lại ngành |
+| Q17 | Hệ số tổ hợp K01 lấy từ trang 15, không kế thừa ngành đang chọn |
+| Q18 | Trả quy định cho nhóm tiên tiến giảng dạy bằng tiếng Anh ở trang 16, không áp cho mọi chương trình |
+| Q21, Q22 | Cập nhật nhãn theo mục học bổng trang 25–26 và dòng IT1 trong bảng điểm chính thức; thêm ràng buộc đúng nguồn |
+| Q26 | Kiểm tra đầy đủ IT1, chương trình chuẩn, giới hạn điều kiện đầu vào và phân biệt đầu ra, giữ trang 16/10 |
+
+Ca an toàn `REV26-122` trong bộ 130 câu nay hỏi điều kiện miễn/giảm/hoàn phí TSA
+chưa được nguồn xác nhận, thay cho câu hỏi phí cơ bản vốn có căn cứ ở trang 20.
+Giữ đủ 100 câu nghiệp vụ + 30 ca an toàn; không đánh dấu đã được người rà.
+Báo cáo 130 ca đã lưu trước thay đổi này là bằng chứng lịch sử, cần chạy lại bằng
+`--output data/test-tmp/review-after-ci-fix.json` khi tiếp tục rà; không ghi đè báo cáo cũ.
 
 Không bỏ gate, dùng `continue-on-error`, hoặc tự đổi nhãn theo output để merge.
 Chạy lại các bước tương đương CI sau khi xử lý; lưu báo cáo eval mới riêng:

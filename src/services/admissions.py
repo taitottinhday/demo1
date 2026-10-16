@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.services.answer_formatter import format_answer, structure_answer
-from src.services.knowledge import PROGRAM_CODE_RE, canonical_quote, normalize, question_intent
+from src.services.knowledge import PROGRAM_CODE_RE, admission_charge_label, canonical_quote, normalize, question_intent
 
 
 def redact(text):
@@ -75,6 +75,8 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        if admission_charge_label(question) or ("k01" in normalized and "he so" in normalized):
+            return {"scope": "general", "program": "", "explicit": False}
         if "hoc bong" in normalized and not explicit:
             return {"scope": "general", "program": "", "explicit": False}
         if "tu dong hoa" in normalized and not explicit:
@@ -85,6 +87,8 @@ class Admissions:
         general_language_policy = any(term in normalized for term in ["ngoai ngu", "tieng anh"]) and (
             any(term in normalized for term in ["ap dung", "hieu luc", "khoa nao"])
             or ("troy" in normalized and "chuong trinh" in normalized)
+            or ("chuong trinh tien tien" in normalized
+                and not any(term in normalized for term in ["dau ra", "tot nghiep", "quy doi"]))
         )
         if (general_fee_policy or general_language_policy) and not explicit:
             return {"scope": "general", "program": "", "explicit": False}
@@ -193,7 +197,11 @@ class Admissions:
             return "Mình không cung cấp hồ sơ, thông tin liên hệ hay dữ liệu riêng tư của người khác. Bạn có thể liên hệ cán bộ qua kênh chính thức để được hỗ trợ đúng thẩm quyền."
         tsa_question = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy"])
         tsa_admission = "dang ky xet tuyen" in q and not any(term in q for term in ["han", "le phi", "phong thi"])
-        if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]) and not tsa_admission:
+        verified_charge = self.k.admission_charge_chunks(question) if not any(
+            term in q for term in ["han", "quy che", "phong thi", "mien", "giam", "hoan",
+                                  "khi nao", "ngay", "bao gio", "thoi gian"]
+        ) else []
+        if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]) and not tsa_admission and not verified_charge:
             return "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra."
         if any(re.search(r"\b" + t + r"\b", q) for t in ["ktx", "ky tuc xa", "ki tuc xa", "noi tru"]):
             return "Bộ nguồn hiện tại chưa có hướng dẫn đăng ký ký túc xá đã được xác minh. Mình không thể dùng quy trình đăng ký xét tuyển để hướng dẫn thuê chỗ ở. Bạn có thể gửi câu hỏi này cho cán bộ để nhờ kiểm tra thông tin ký túc xá."
@@ -531,6 +539,10 @@ class Admissions:
         cutoff_fact = cutoff_request and all(c.get("topic") == "cutoff" for c in chunks)
         source_policy = (
             all(c.get("kind") == "fee" for c in chunks)
+            or bool(admission_charge_label(question))
+            or ("k01" in q and "he so" in q)
+            or (not answer_program and "chuong trinh tien tien" in q
+                and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"]))
             or ("dang ky" in q and any(w in q for w in ["tu duy", "tsa", "dgtd"])
                 and any("https://tsa.hust.edu.vn/dk" in c["text"]
                         and "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login" in c["text"] for c in chunks))

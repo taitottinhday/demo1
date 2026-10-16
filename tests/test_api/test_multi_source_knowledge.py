@@ -147,7 +147,12 @@ def test_merged_passages_keep_evidence_and_do_not_merge_different_parents():
 @pytest.mark.asyncio
 @pytest.mark.parametrize("question,needle,kind", [
     ("Quy chế TSA ghi hạn đăng ký thi 2026 vào ngày nào?", "chưa đủ căn cứ", "fallback"),
-    ("Lệ phí thi TSA là bao nhiêu?", "chưa đủ căn cứ", "fallback"),
+    ("Lệ phí thi TSA là bao nhiêu?", "500.000", "answered"),
+    ("Lệ phí thi TSA và hạn đăng ký là gì?", "chưa đủ căn cứ", "fallback"),
+    ("Lệ phí thi TSA có được miễn giảm không?", "chưa đủ căn cứ", "fallback"),
+    ("Phí xác thực chứng chỉ ngoại ngữ là bao nhiêu?", "100.000", "answered"),
+    ("Tổ hợp K01 có hệ số các môn như thế nào?", "Toán hệ số 3", "answered"),
+    ("Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?", "giảng dạy bằng tiếng Anh", "answered"),
     ("Quy định ngoại ngữ mới áp dụng từ khi nào và cho khóa nào?", "2026", "answered"),
     ("Chương trình hợp tác TROY yêu cầu tiếng Anh đầu khóa tối thiểu thế nào?", "5.5", "answered"),
     ("700 nghìn đồng trong bảng là học phí một năm hay mỗi tín chỉ?", "TCHP", "answered"),
@@ -486,6 +491,30 @@ async def test_unknown_field_and_ambiguous_names_do_not_return_overall_cutoff(kn
     assert unknown["kind"] == "clarification" and not unknown["sources"]
     assert not knowledge.program_matches("Ai được xét học bổng?")
     assert [p["code"] for p in knowledge.program_matches("điểm chuẩn AI IT1")] == ["IT1"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question,needle,page", [
+    ("Lệ phí thi TSA là bao nhiêu?", "500.000", 20),
+    ("Phí xác thực chứng chỉ ngoại ngữ là bao nhiêu?", "100.000", 20),
+    ("Tổ hợp K01 có hệ số các môn như thế nào?", "Toán hệ số 3", 15),
+    ("Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?", "giảng dạy bằng tiếng Anh", 16),
+])
+async def test_general_admissions_policies_ignore_selected_program_without_llm(knowledge, tmp_path, question, needle, page):
+    service = Admissions(knowledge, Store(tmp_path / "general-policies.db"),
+                         Settings(_env_file=None, answer_mode="llm", llm_provider="deepseek"))
+    answer = await service.answer(question, context="CH1")
+    assert answer["kind"] == "answered" and answer["mode"] == "extractive"
+    assert answer["scope"] == "general" and answer["tokens"] == 0
+    assert needle in answer["response"]
+    assert {s["source_id"] for s in answer["sources"]} == {knowledge.primary_source_id}
+    assert page in {s["page"] for s in answer["sources"]}
+
+
+def test_tsa_charge_guard_requires_independent_readable_evidence(knowledge, tmp_path, monkeypatch):
+    service = Admissions(knowledge, Store(tmp_path / "missing-charge.db"), Settings(_env_file=None))
+    monkeypatch.setattr(knowledge, "admission_charge_chunks", lambda question: [])
+    assert "chưa đủ căn cứ" in service.guard("Lệ phí thi TSA là bao nhiêu?")
 
 
 @pytest.mark.asyncio
