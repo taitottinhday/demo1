@@ -132,6 +132,20 @@ def format_answer(question, chunks, program=""):
         for index, chunk in enumerate(chunks, 1):
             if normalize(chunk["title"]) != "12.4 hoc bong" or not chunk.get("record_id"):
                 continue
+            if not names and all(term in normalize(chunk["text"]) for term in [
+                "1,5", "tran dai nghia", "50%", "100%", "loai xuat sac"
+            ]):
+                return (
+                    f"Điều kiện phụ thuộc từng loại học bổng; tài liệu nêu hai nhóm chính sách sau. [{index}]\n\n"
+                    f"• Khuyến khích học tập: xét theo học kỳ dựa trên kết quả học tập và rèn luyện. "
+                    f"Mức khá, giỏi, xuất sắc yêu cầu cả hai kết quả đạt từ loại tương ứng trở lên. "
+                    f"Học bổng loại khá tương đương học phí phải đóng; loại giỏi bằng 1,2 lần, loại xuất sắc bằng 1,5 lần mức khá. [{index}]\n\n"
+                    f"• Trần Đại Nghĩa: dành cho sinh viên có hoàn cảnh kinh tế gia đình đặc biệt khó khăn, "
+                    f"có ý chí và nghị lực vươn lên; xét theo học kỳ, với mức 50% hoặc 100% học phí. [{index}]\n\n"
+                    f"Tài liệu còn nêu học bổng tài trợ, gắn kết quê hương và trao đổi sinh viên quốc tế. [{index}]\n\n"
+                    "Bạn muốn tìm hiểu loại nào? Điều kiện chính sách không đồng nghĩa chắc chắn được cấp; "
+                    "hồ sơ và thời hạn cần theo thông báo từng đợt."
+                )
             for section in re.split(r"(?=\([1-5]\) Học bổng)", chunk["text"]):
                 if not re.match(r"\([1-5]\) Học bổng", section):
                     continue
@@ -147,6 +161,17 @@ def format_answer(question, chunks, program=""):
             )
     q = normalize(question)
     first = chunks[0]
+    if program == "EE2" and any(word in q for word in ["ngoai ngu", "ielts", "tieng anh"]) and not any(
+        word in q for word in ["dau ra", "tot nghiep", "quy doi"]
+    ):
+        rule = next((i for i, c in enumerate(chunks, 1)
+                     if c.get("page") == 16 and "VSTEP" in c["text"] and "5.5" in c["text"]), None)
+        if rule:
+            return (f"Không nên áp dụng ngưỡng IELTS/VSTEP của chương trình tiên tiến cho EE2. "
+                    f"Mục 5.2 nêu yêu cầu riêng cho các chương trình tiên tiến, nhóm ngôn ngữ và liên kết TROY; "
+                    f"không nêu ngưỡng chứng chỉ riêng cho EE2 trong mục này. [{rule}]\n\n"
+                    "Chuẩn ngoại ngữ đầu ra khi tốt nghiệp là quy định riêng. Bạn muốn hỏi ngoại ngữ đầu vào, "
+                    "xác thực chứng chỉ để xét tuyển, hay chuẩn đầu ra?")
 
     if first.get("kind") == "program" and any(term in q for term in ["chi tieu", "quota"]):
         requested_code = program or first.get("code", "")

@@ -767,6 +767,8 @@ class Knowledge:
                 continue
             if fee_query and selected and chunk["kind"] == "fee":
                 aliases = {
+                    "EE2": "Kỹ thuật Điều khiển và Tự động hóa",
+                    "EEE8": "Kỹ thuật Điều khiển và Tự động hóa",
                     "IT1": "Khoa học máy tính",
                     "IT2": "Kỹ thuật máy tính",
                     "ITE7": "Công nghệ thông tin Global ICT",

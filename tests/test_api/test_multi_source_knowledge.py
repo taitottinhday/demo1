@@ -319,6 +319,29 @@ async def test_automation_alias_and_complete_method_table(knowledge, tmp_path):
 
 
 @pytest.mark.asyncio
+async def test_chat_followups_work_in_llm_mode_without_provider_for_source_policies(knowledge, tmp_path):
+    from unittest.mock import AsyncMock
+
+    service = Admissions(knowledge, Store(tmp_path / "followups.db"), Settings(_env_file=None, answer_mode="llm"))
+    service.generate = AsyncMock(side_effect=AssertionError("These source policies must work without LLM synthesis"))
+    cases = [
+        ("điểm chuẩn tự động hóa 2026", "28,98"),
+        ("Học phí EE2 năm học 2026–2027 là bao nhiêu?", "28 - 40"),
+        ("Điều kiện ngoại ngữ EE2 là gì?", "không nêu ngưỡng chứng chỉ riêng"),
+        ("Đăng ký xét tuyển đánh giá tư duy như thế nào?", "https://tsa.hust.edu.vn/dk"),
+        ("Điều kiện học bổng của trường là gì?", "1,5"),
+    ]
+    for question, expected in cases:
+        result = await service.answer(question, context="EE2")
+        assert result["kind"] == "answered", (question, result)
+        assert expected in result["response"]
+        assert result["sources"] and result["tokens"] == 0
+        if "học bổng" in question:
+            assert len(result["response"]) < 1500
+    service.generate.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_tuition_uses_yearly_estimate_or_per_credit_source_as_asked(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "tuition.db"), Settings(_env_file=None, answer_mode="extractive"))
 

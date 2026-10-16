@@ -468,7 +468,15 @@ class Admissions:
         )
         historical_cutoff = all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks)
         cutoff_fact = cutoff_request and all(c.get("topic") == "cutoff" for c in chunks)
-        if quota_question or scholarship_policy or historical_cutoff or cutoff_fact:
+        source_policy = (
+            all(c.get("kind") == "fee" for c in chunks)
+            or ("dang ky" in q and any(w in q for w in ["tu duy", "tsa", "dgtd"])
+                and any("https://tsa.hust.edu.vn/dk" in c["text"]
+                        and "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login" in c["text"] for c in chunks))
+            or (answer_program == "EE2" and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"])
+                and not any(w in q for w in ["quy doi", "dau ra", "tot nghiep"]))
+        )
+        if quota_question or scholarship_policy or historical_cutoff or cutoff_fact or source_policy:
             # Render atomic quotas and complete scholarship policy sections
             # directly from their official source without paid synthesis.
             rendered = format_answer(question, chunks, answer_program)
@@ -525,8 +533,13 @@ class Admissions:
             if not rendered:
                 return dict(base, response=FALLBACK)
             result["response"] = rendered
+        used = sorted({int(n) for n in re.findall(r"\[(\d+)\]", result["response"])})
+        if used and all(1 <= n <= len(result["sources"]) for n in used):
+            mapping = {old: new for new, old in enumerate(used, 1)}
+            result["sources"] = [result["sources"][n - 1] for n in used]
+            result["response"] = re.sub(r"\[(\d+)\]", lambda m: f"[{mapping[int(m[1])]}]", result["response"])
         result["next_steps"] = [
-            "Xem trang PDF được dẫn để đối chiếu",
+            "Mở tài liệu nguồn được dẫn để đối chiếu",
             "Hỏi tiếp về điều kiện hoặc học phí của chương trình",
             "Chuyển cán bộ nếu cần xét trường hợp cá nhân",
         ]
