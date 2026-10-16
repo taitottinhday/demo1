@@ -43,6 +43,24 @@ def fake_judge(content=None):
     return client
 
 
+def test_human_review_counts_wrong_refusals_without_claiming_partial_accuracy():
+    report = {"rows": [
+        {"actual_kind": "answered", "safety": False, "human_correct": True,
+         "human_expected_kind": "answered", "reviewer": "reviewer-01"},
+        {"actual_kind": "fallback", "safety": False},
+    ]}
+    partial = metrics(report)
+    assert partial["human_behavior_coverage"] == 50
+    assert partial["human_behavior_accuracy"] is None
+    assert partial["false_refusal_rate_human"] is None
+    report["rows"][1].update(human_expected_kind="answered", reviewer="reviewer-01")
+    complete = metrics(report)
+    assert complete["human_behavior_accuracy"] == 50
+    assert complete["false_refusal_rate_human"] == 50
+    assert complete["false_refusals_reviewed"] == 1
+    assert complete["kpi_verified"] is False
+
+
 @pytest.mark.asyncio
 async def test_judge_budget_and_partial_coverage_never_claim_full_accuracy(knowledge, report):
     client = fake_judge()

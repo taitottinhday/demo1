@@ -92,6 +92,7 @@ async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=N
                     "latency_ms": latency_ms,
                     "generation_check": diagnostics.get("check"),
                     "human_correct": None,
+                    "human_expected_kind": None,
                     "reviewer": None,
                     "review_notes": "",
                 }

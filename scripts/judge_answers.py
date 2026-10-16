@@ -82,7 +82,19 @@ def metrics(report):
     correct = sum(row["judge"]["verdict"] == "correct" for row in graded)
     reviewed = [row for row in answered if type(row.get("human_correct")) is bool
                 and isinstance(row.get("reviewer"), str) and row["reviewer"].strip()]
+    behavior = [row for row in report["rows"]
+                if row.get("human_expected_kind") in {"answered", "fallback", "clarification", "error"}
+                and isinstance(row.get("reviewer"), str) and row["reviewer"].strip()]
+    should_answer = [row for row in behavior if row["human_expected_kind"] == "answered"]
+    false_refusals = sum(row["actual_kind"] != "answered" for row in should_answer)
+    complete_behavior = bool(report["rows"]) and len(behavior) == len(report["rows"])
     return {
+        "human_behavior_coverage": round(100 * len(behavior) / len(report["rows"]), 2) if report["rows"] else None,
+        "human_behavior_accuracy": round(100 * sum(row["actual_kind"] == row["human_expected_kind"]
+                                                   for row in behavior) / len(behavior), 2) if complete_behavior else None,
+        "false_refusals_reviewed": false_refusals,
+        "false_refusal_rate_human": round(100 * false_refusals / len(should_answer), 2)
+        if complete_behavior and should_answer else None,
         "human_coverage": round(100 * len(reviewed) / len(answered), 2) if answered else None,
         "accuracy_human": round(100 * sum(row["human_correct"] for row in reviewed) / len(answered), 2)
         if answered and len(reviewed) == len(answered) else None,
