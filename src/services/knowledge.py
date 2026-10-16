@@ -20,6 +20,18 @@ def normalize(text: str) -> str:
 STOP = set("toi em ban cho hoi la cua va co duoc nao nhung mot nam voi xin muon ve tai truong bao nhieu".split())
 PROGRAM_CODE_RE = r"\b[A-Z]{1,8}(?:-[A-Z]{1,3})?\d{0,3}\b"
 
+# Common names resolve to catalog codes; ambiguous families remain explicit choices.
+PROGRAM_ALIASES = {
+    "ITE10": ("tri tue nhan tao", "khoa hoc du lieu", "artificial intelligence", "data science"),
+    "ITE15": ("an toan thong tin", "an ninh mang", "cyber security"),
+    "ME1": ("co dien tu",),
+    "TE1": ("o to",),
+    "ET1": ("dien tu vien thong",),
+    "EME14": ("logistics", "chuoi cung ung"),
+    "EM5": ("tai chinh ngan hang",),
+    "EME17": ("ke toan",),
+}
+
 
 def tokens(text: str) -> list[str]:
     return [t for t in re.findall(r"[a-z0-9]+", normalize(text)) if t not in STOP]
@@ -475,6 +487,16 @@ class Knowledge:
             ) else "EE2" if not any(word in q for word in ["tai nang", "tat ca", "cac chuong trinh"]) else None
             if alias_code:
                 return [p for p in self.programs if p["code"] == alias_code]
+        alias_codes = set()
+        for code, aliases in PROGRAM_ALIASES.items():
+            if any(re.search(r"(?<!\w)" + re.escape(alias) + r"(?!\w)", q) for alias in aliases):
+                alias_codes.add(code)
+        if re.search(r"\bAI\b", question) or re.search(r"\b(?:nganh|diem chuan|hoc phi|chuong trinh)\s+ai\b", q):
+            alias_codes.add("ITE10")
+        if "tien tien" in q:
+            alias_codes = {dict(ME1="MEE1", TE1="TEE2", ET1="ETE4").get(code, code) for code in alias_codes}
+        # Specific full names (e.g. overseas partner tracks) take precedence over
+        # shortened names; collect both sides for multi-program questions.
         matched_codes = {p["code"] for p in matches}
         for program in self.programs:
             names = {
@@ -488,6 +510,25 @@ class Knowledge:
             ) and program["code"] not in matched_codes:
                 matches.append(program)
                 matched_codes.add(program["code"])
+        if alias_codes:
+            specific = [p for p in matches if any(marker in normalize(p["name"])
+                        and marker in q for marker in ["global ict", "viet nhat", "viet phap", "griffith", "nagaoka", "hannover"])]
+            if specific and not any(term in q for term in ["so sanh", "khac nhau", " va "]):
+                return specific
+            # A named family has a standard default; keep independent aliases
+            # when the question explicitly names several programs.
+            candidates = [p for p in self.programs if p["code"] in alias_codes]
+            family_codes = set(alias_codes)
+            for standard, family in {
+                "ME1": {"ME1", "MEE1", "MELUH", "MENUT"},
+                "MEE1": {"ME1", "MEE1", "MELUH", "MENUT"},
+                "TE1": {"TE1", "TEE2"}, "TEE2": {"TE1", "TEE2"},
+                "ET1": {"ET1", "ETE4", "ETLUH"}, "ETE4": {"ET1", "ETE4", "ETLUH"},
+            }.items():
+                if standard in alias_codes:
+                    family_codes.update(family)
+            candidates.extend(p for p in matches if p["code"] not in family_codes)
+            return candidates or matches
         return matches
 
     def resolve_program(self, question, context=""):

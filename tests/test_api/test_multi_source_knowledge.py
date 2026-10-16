@@ -385,6 +385,33 @@ async def test_explanation_calls_llm_and_keeps_policy_when_generation_is_rejecte
     service.generate.assert_awaited_once()
 
 
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("name,code", [
+    ("trí tuệ nhân tạo", "ITE10"), ("tri tue nhan tao", "ITE10"),
+    ("AI", "ITE10"), ("ai", "ITE10"), ("khoa học dữ liệu", "ITE10"),
+    ("an ninh mạng", "ITE15"), ("cơ điện tử", "ME1"),
+    ("cơ điện tử tiên tiến", "MEE1"), ("logistics", "EME14"),
+])
+async def test_common_program_names_resolve_without_inheriting_previous_program(knowledge, tmp_path, name, code):
+    service = Admissions(knowledge, Store(tmp_path / "aliases.db"), Settings(_env_file=None))
+    question = f"cho tôi điểm chuẩn ngành {name}"
+    result = await service.answer(question, context="EE2")
+    assert result["kind"] == "answered"
+    assert result["scope"] == "program"
+    assert service.classify_scope(question, "EE2")["program"] == code
+    assert "68 chương trình" not in result["response"]
+
+
+@pytest.mark.asyncio
+async def test_unknown_field_and_ambiguous_names_do_not_return_overall_cutoff(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "alias-limits.db"), Settings(_env_file=None))
+    unknown = await service.answer("điểm chuẩn ngành thiết kế đồ họa", context="EE2")
+    assert unknown["kind"] == "clarification" and not unknown["sources"]
+    assert not knowledge.program_matches("Ai được xét học bổng?")
+    assert [p["code"] for p in knowledge.program_matches("điểm chuẩn AI IT1")] == ["IT1"]
+
+
 @pytest.mark.asyncio
 async def test_tuition_uses_yearly_estimate_or_per_credit_source_as_asked(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "tuition.db"), Settings(_env_file=None, answer_mode="extractive"))

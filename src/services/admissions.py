@@ -99,6 +99,10 @@ class Admissions:
             return {"scope": "program", "program": explicit[0]["code"], "explicit": True}
         if any(marker in normalized for marker in GENERAL_SCOPE_MARKERS):
             return {"scope": "general", "program": "", "explicit": False}
+        if (any(term in normalized for term in ["diem chuan", "diem trung tuyen"])
+                and re.search(r"\bnganh\s+\w", normalized)
+                and not any(term in normalized for term in ["nganh nao", "cac nganh", "nhung nganh", "cao nhat", "thap nhat"])):
+            return {"scope": "ambiguous", "program": "", "explicit": False}
         if any(marker in normalized for marker in ["dau ra", "tot nghiep", "hust ept", "k71"]):
             if selected and "dau vao" in normalized:
                 return {"scope": "program", "program": selected, "explicit": False}
