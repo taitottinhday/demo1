@@ -16,7 +16,15 @@ eval/
 Dockerfile
 docker-compose.yml
 data/*.db*
-data/processed/
+data/processed/*
+!data/processed/release.json
+!data/processed/chunks.jsonl
+# Runtime needs the normalized snapshot, not OCR/build tools or local state.
+data/extracted/
+data/tools/
+data/releases/
+data/test-tmp/
+data/state/
 .ai-log/
 .g1-review-profile/
 gate-1/
