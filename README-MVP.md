@@ -378,8 +378,17 @@ python -m scripts.judge_answers data/test-tmp/review-baseline.json --human-only
 `accuracy_human` chỉ được tính khi tất cả câu nghiệp vụ đã trả lời có nhận xét
 đúng/sai và mã người rà. Bộ phát triển luôn để `kpi_verified=false`.
 
-Sau mở rộng độ phủ, baseline extractive/BM25 trên bản nhãn dự thảo: 90/100 câu
-nghiệp vụ được trả lời, 30/30 ca an toàn qua; đối chiếu hành vi/nguồn/trang khớp
-71/90 câu đã trả lời (78,89%). Đây không phải accuracy ngữ nghĩa và chưa xác nhận đạt KPI 85%.
+Đợt tối ưu luồng ngày 17/10/2026: baseline extractive/BM25 trên cùng bản nhãn
+dự thảo tăng từ 93/100 lên 99/100 câu nghiệp vụ được trả lời, giữ 30/30 ca an toàn.
+Đối chiếu hành vi/nguồn/trang khớp 77/99 câu đã trả lời (77,78%). Đây không phải
+accuracy ngữ nghĩa và chưa xác nhận đạt KPI 85%; một số nhãn nguồn còn thuộc
+bản trước khi bổ sung bảng điểm chính thức. Không tự thay nhãn theo output.
 Các ca còn lại được giữ để rà nhãn và kiểm tra truy xuất/phạm vi, không tự đổi
 đáp án tham chiếu theo output hiện tại.
+
+Luồng nối tiếp ngắn: hỏi “điểm chuẩn tự động hóa 2026”, sau đó “còn năm 2025?”
+hoặc “còn TSA?”. Backend chỉ dùng metadata của câu trả lời trước gồm chủ đề,
+mã chương trình và năm; không gửi lịch sử hội thoại tự do cho LLM. Đổi chủ đề,
+chọn chương trình khác hoặc xóa chat sẽ giới hạn việc kế thừa ngữ cảnh tương ứng.
+FAQ công khai được cache theo nguồn, câu hỏi, chương trình và cấu hình model;
+câu có đại từ cá nhân hoặc dữ liệu đã được che không đưa vào cache dùng chung.

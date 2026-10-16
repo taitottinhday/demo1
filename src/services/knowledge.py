@@ -46,6 +46,11 @@ def canonical_quote(text: str) -> str:
     return clean(unicodedata.normalize("NFC", text))
 
 
+def program_label(text: str) -> str:
+    """Compare table labels without treating conjunction/punctuation as different names."""
+    return " ".join(word for word in re.findall(r"[a-z0-9]+", normalize(text)) if word != "va")
+
+
 class Knowledge:
     def __init__(self, data_dir: str | Path, settings=None):
         self.settings = settings
@@ -529,6 +534,37 @@ class Knowledge:
                     family_codes.update(family)
             candidates.extend(p for p in matches if p["code"] not in family_codes)
             return candidates or matches
+        # A full, longer name takes precedence over a shorter name embedded in it.
+        spans = {}
+        for p in matches:
+            name = normalize(p["name"].replace("CNTT: ", "").split("(")[0]).strip()
+            match = re.search(re.escape(name), q)
+            if match:
+                spans[p["code"]] = match.span()
+        return [p for p in matches if not any(
+            other != p["code"] and start <= spans.get(p["code"], (-1, -1))[0]
+            and end >= spans.get(p["code"], (-1, -1))[1]
+            and (start, end) != spans.get(p["code"])
+            for other, (start, end) in spans.items()
+        )]
+
+    def fee_matches(self, question):
+        """Match a named annual-fee row, keeping its explicit table grouping."""
+        q = program_label(question)
+        matches = []
+        for c in self.chunks:
+            if c["kind"] != "fee":
+                continue
+            name = program_label(c["title"].removeprefix("Học phí ").split("(")[0])
+            if name and re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", q):
+                category = c["title"].rsplit("(", 1)[-1].rstrip(")")
+                if any(group in q for group in ["chuong trinh chuan", "elitech", "hop tac quoc te tai nang"]):
+                    if program_label(category) not in q:
+                        continue
+                matches.append(c)
+        if matches:
+            longest = max(len(program_label(c["title"].split("(")[0])) for c in matches)
+            matches = [c for c in matches if len(program_label(c["title"].split("(")[0])) == longest]
         return matches
 
     def resolve_program(self, question, context=""):
@@ -582,6 +618,11 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
+        named_fees = self.fee_matches(question) if fee_query and not any(
+            term in norm for term in ["ky he", "tin chi", "tchp"]
+        ) else []
+        if len(named_fees) == 1:
+            return [dict(named_fees[0], score=100)]
         scholarship_query = "hoc bong" in norm
         scholarship_names = [name for name in (
             "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
@@ -599,7 +640,7 @@ class Knowledge:
                 parent = self.records[sections[0]["record_id"]]
                 return [dict(sections[0], text=clean(parent["text"]),
                              evidence=clean(parent["evidence"]["quote"]), score=100)]
-        per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi", "hoc ky he"])
+        per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi", "ky he"])
         postgraduate_fee_query = fee_query and any(term in norm for term in ["thac si", "tien si", "sau dai hoc"])
         language_query = any(t in norm for t in ["ngoai ngu", "tieng anh", "ielts", "vstep", "placement test", "hust ept", "k71"]) and not any(
             t in norm for t in ["phi", "xac thuc", "quy doi", "diem thuong"]
@@ -773,7 +814,7 @@ class Knowledge:
                 continue
             if fee_query and not per_credit_fee_query and not postgraduate_fee_query and chunk["kind"] != "fee":
                 continue
-            if "hoc ky he" in norm and chunk.get("fact_id") != "summer-tuition-multiplier":
+            if "ky he" in norm and chunk.get("fact_id") != "summer-tuition-multiplier":
                 continue
             if (
                 not selected
@@ -825,8 +866,8 @@ class Knowledge:
                     if p["code"] in selected
                 ]
                 if not any(
-                    normalize(n.split("(")[0]).strip().replace(" - ", " ")
-                    in normalize(chunk["title"]).replace(" - ", " ")
+                    program_label(n.split("(")[0])
+                    in program_label(chunk["title"])
                     for n in names
                 ):
                     continue

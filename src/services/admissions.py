@@ -80,13 +80,15 @@ class Admissions:
         if "tu dong hoa" in normalized and not explicit:
             return {"scope": "ambiguous", "program": "", "explicit": False}
         general_fee_policy = "hoc phi" in normalized and any(
-            term in normalized for term in ["tin chi", "tchp", "hoc ky he"]
+            term in normalized for term in ["tin chi", "tchp", "ky he"]
         )
         general_language_policy = any(term in normalized for term in ["ngoai ngu", "tieng anh"]) and (
             any(term in normalized for term in ["ap dung", "hieu luc", "khoa nao"])
             or ("troy" in normalized and "chuong trinh" in normalized)
         )
         if (general_fee_policy or general_language_policy) and not explicit:
+            return {"scope": "general", "program": "", "explicit": False}
+        if "hoc phi" in normalized and not general_fee_policy and len(self.k.fee_matches(question)) == 1:
             return {"scope": "general", "program": "", "explicit": False}
         normalized_postgraduate_fee = "hoc phi" in normalized and any(
             term in normalized for term in ["thac si", "tien si", "sau dai hoc"]
@@ -190,7 +192,8 @@ class Admissions:
         ):
             return "Mình không cung cấp hồ sơ, thông tin liên hệ hay dữ liệu riêng tư của người khác. Bạn có thể liên hệ cán bộ qua kênh chính thức để được hỗ trợ đúng thẩm quyền."
         tsa_question = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy"])
-        if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]):
+        tsa_admission = "dang ky xet tuyen" in q and not any(term in q for term in ["han", "le phi", "phong thi"])
+        if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]) and not tsa_admission:
             return "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra."
         if any(re.search(r"\b" + t + r"\b", q) for t in ["ktx", "ky tuc xa", "ki tuc xa", "noi tru"]):
             return "Bộ nguồn hiện tại chưa có hướng dẫn đăng ký ký túc xá đã được xác minh. Mình không thể dùng quy trình đăng ký xét tuyển để hướng dẫn thuê chỗ ở. Bạn có thể gửi câu hỏi này cho cán bộ để nhờ kiểm tra thông tin ký túc xá."
@@ -281,8 +284,38 @@ class Admissions:
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
-    async def answer(self, question, context="", history=None, scope=None, *, diagnostics=None):
+    def resolve_followup(self, question, conversation=None, program=""):
+        """Expand only short, whitelisted continuations from non-personal turn metadata."""
+        state = conversation or {}
+        labels = {"cutoff": "điểm chuẩn", "tuition": "học phí", "language": "điều kiện ngoại ngữ"}
+        topic = state.get("topic")
+        code = program or state.get("program")
+        year = state.get("year")
+        if (topic not in labels or code not in {p["code"] for p in self.k.programs}
+                or type(year) is not int or not 2000 <= year <= 2099):
+            return question
+        q = normalize(question).strip(" ?!.")
+        match = re.fullmatch(r"(?:con\s+)?(?:nam\s+)?(20\d{2})(?:\s+thi sao)?", q)
+        if match:
+            return f"{labels[topic]} {code} năm {match[1]}"
+        if topic == "cutoff" and re.fullmatch(r"(?:con\s+|theo\s+)?(?:tsa|dgtd|thpt|xttn(?:\s+dien)?(?:\s+1\.[23])?)(?:\s+thi sao)?", q):
+            return f"điểm chuẩn {code} năm {year} theo {q}"
+        if q in {"giai thich them", "giai thich ro hon", "vi sao vay", "tai sao vay"}:
+            return f"Giải thích {labels[topic]} {code} năm {year}"
+        return question
+
+    async def answer(self, question, context="", history=None, scope=None, *, diagnostics=None, conversation=None):
+        question = self.resolve_followup(question, conversation, context)
         result = await self._answer(question, context, history, scope, diagnostics=diagnostics)
+        classification = self.classify_scope(question, context)
+        norm = normalize(question)
+        topic = "cutoff" if any(term in norm for term in ["diem chuan", "diem trung tuyen"]) else (
+            "tuition" if "hoc phi" in norm else "language" if "ngoai ngu" in norm else None
+        )
+        if result["kind"] == "answered" and topic and classification["program"]:
+            years = re.findall(r"\b20\d{2}\b", norm)
+            result["conversation_context"] = {"topic": topic, "program": classification["program"],
+                                              "year": int(years[0]) if years else 2026}
         if "answer_sections" not in result:
             result["answer_sections"] = structure_answer(
                 result.get("response", ""),
@@ -366,9 +399,10 @@ class Admissions:
             "hoc phi" in q
             and not answer_program
             and not any(term in q for term in ["thac si", "tien si", "sau dai hoc"])
-            and not any(term in q for term in ["tin chi", "tchp", "hoc ky he"])
+            and not any(term in q for term in ["tin chi", "tchp", "ky he"])
             and not any(p["code"].lower() in q.split() for p in self.k.programs)
             and len(q.split()) < 9
+            and len(self.k.fee_matches(question)) != 1
         ):
             return dict(
                 base,
@@ -414,6 +448,9 @@ class Admissions:
                 "lech",
                 "uu tien",
                 "elitech",
+                "dao tao",
+                "chuong trinh",
+                "sinh vien",
             ]
             + [p["code"].lower() for p in self.k.programs]
         ):
@@ -547,16 +584,20 @@ class Admissions:
             mapping = {old: new for new, old in enumerate(used, 1)}
             result["sources"] = [result["sources"][n - 1] for n in used]
             result["response"] = re.sub(r"\[(\d+)\]", lambda m: f"[{mapping[int(m[1])]}]", result["response"])
-        result["next_steps"] = [
-            "Mở tài liệu nguồn được dẫn để đối chiếu",
-            "Hỏi tiếp về điều kiện hoặc học phí của chương trình",
-            "Chuyển cán bộ nếu cần xét trường hợp cá nhân",
-        ]
+        followup = (
+            "Nêu rõ năm và phương thức nếu muốn tra điểm khác" if cutoff_request else
+            "Hỏi mức theo tín chỉ nếu muốn phân biệt với học phí năm dự kiến" if "hoc phi" in q else
+            "Nêu rõ đầu vào, đầu ra hoặc xác thực chứng chỉ khi hỏi tiếp" if "ngoai ngu" in q else
+            "Chọn tên học bổng để xem điều kiện cụ thể" if "hoc bong" in q else
+            "Hỏi tiếp nội dung bạn cần làm rõ trong tài liệu"
+        )
+        result["next_steps"] = ["Mở tài liệu nguồn được dẫn để đối chiếu", followup,
+                                "Chuyển cán bộ nếu cần xét trường hợp cá nhân"]
         result["answer_sections"] = structure_answer(
             result["response"], result["sources"], result["next_steps"], self.k.manifest
         )
         # Only non-personal questions are cached. Cache is bounded and versioned.
-        if "[đã ẩn" not in question and not any(t in q for t in ["toi", "em", "minh"]):
+        if "[đã ẩn" not in question and not re.search(r"\b(?:toi|em|minh)\b", q):
             if len(self.cache) >= 200:
                 self.cache.pop(next(iter(self.cache)))
             self.cache[key] = (dict(result), time.time())

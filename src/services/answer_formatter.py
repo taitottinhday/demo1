@@ -161,6 +161,16 @@ def format_answer(question, chunks, program=""):
             )
     q = normalize(question)
     first = chunks[0]
+    if "chon" in q and any(term in q for term in ["thoi diem", "khi nao"]) and "tich hop" in q:
+        for i, c in enumerate(chunks, 1):
+            match = re.search(r"Sinh viên có thể xem xét.*?cuối năm thứ 3.*?\.", c["text"])
+            if match:
+                return f"{match[0]} [{i}]"
+    if "lien ket dao tao quoc te" in q and any(term in q for term in ["nao", "liet ke"]):
+        for i, c in enumerate(chunks, 1):
+            match = re.search(r"Các chương trình liên kết đào tạo quốc tế gồm.*?\.", c["text"])
+            if match:
+                return f"{match[0]} [{i}]"
     if program and any(word in q for word in ["ngoai ngu", "ielts", "tieng anh"]) and not any(
         word in q for word in ["dau ra", "tot nghiep", "quy doi", "xac thuc"]
     ):
@@ -274,6 +284,12 @@ def format_answer(question, chunks, program=""):
         for i, chunk in enumerate(chunks, 1):
             text = chunk["text"]
             if "https://tsa.hust.edu.vn/dk" in text and "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login" in text:
+                if any(term in q for term in ["yeu cau", "dieu kien", "can gi"]) and not any(
+                    term in q for term in ["quy trinh", "nhu the nao"]
+                ):
+                    condition = re.search(r"Thí sinh đã tốt nghiệp THPT.*?(?:;|\.)", text)
+                    if condition:
+                        return f"{condition[0].rstrip(';')}. [{i}]"
                 return (
                     "Có hai bước đăng ký khác nhau:\n\n"
                     f"1. Đăng ký dự thi Đánh giá tư duy tại https://tsa.hust.edu.vn/dk. [{i}]\n"

@@ -981,8 +981,8 @@ async def test_it1_language_conditions_use_rules_and_program(knowledge, tmp_path
     result = await service.answer(question, context="ETE4")
     assert result["kind"] == "answered"
     assert {s["page"] for s in result["sources"]} == {10, 16}
-    assert "không nêu IT1" in result["response"]
-    assert "không áp các ngưỡng đó cho IT1" in result["response"]
+    assert "không nêu ngưỡng chứng chỉ riêng cho IT1" in result["response"]
+    assert "không áp ngưỡng IELTS/VSTEP" in result["response"]
     assert "chỉ tiêu" not in result["response"].lower()
 
 

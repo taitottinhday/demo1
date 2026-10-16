@@ -761,7 +761,12 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
         selected_program = selected_program or ""
         if selected_program and selected_program not in {p["code"] for p in rt["knowledge"].programs}:
             raise HTTPException(422, "Mã chương trình chưa có trong nguồn.")
-        classification = rt["admissions"].classify_scope(body.message, selected_program)
+        effective_question = body.message
+        if len(body.message) <= 80:
+            previous = rt["store"].messages(row["id"])
+            state = previous[-1].get("conversation_context") if previous and previous[-1]["role"] == "assistant" else None
+            effective_question = rt["admissions"].resolve_followup(body.message, state, selected_program)
+        classification = rt["admissions"].classify_scope(effective_question, selected_program)
         scope = classification["scope"]
         answer_program = classification["program"] if scope == "program" else ""
         # Keep an explicitly selected program as the next-turn context even when the
@@ -780,7 +785,7 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
                 "scope": scope,
             }
         else:
-            answer = await rt["admissions"].answer(body.message, answer_program, scope=scope)
+            answer = await rt["admissions"].answer(effective_question, answer_program, scope=scope)
         elapsed = (time.perf_counter() - started) * 1000
         answer["latency_ms"] = round(elapsed, 1)
         answer["request_id"] = secrets.token_hex(8)
