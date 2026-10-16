@@ -491,6 +491,19 @@ class Knowledge:
         scholarship_names = [name for name in (
             "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
         ) if name in norm]
+        if scholarship_query:
+            # Use the complete normalized scholarship section, including its
+            # continuation page; incidental fee/contact mentions are not rules.
+            sections = [c for c in self.chunks if c.get("record_id")
+                        and normalize(c["title"]) == "12.4 hoc bong"
+                        and c.get("source_id") == self.primary_source_id]
+            if sections and all(any(name in normalize(c["text"]) for c in sections)
+                                for name in scholarship_names):
+                # Retrieve the parent section atomically so continuation chunks
+                # cannot omit the highest award level or exchange grant limits.
+                parent = self.records[sections[0]["record_id"]]
+                return [dict(sections[0], text=clean(parent["text"]),
+                             evidence=clean(parent["evidence"]["quote"]), score=100)]
         per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi", "hoc ky he"])
         postgraduate_fee_query = fee_query and any(term in norm for term in ["thac si", "tien si", "sau dai hoc"])
         language_query = any(t in norm for t in ["ngoai ngu", "tieng anh", "ielts", "vstep", "placement test", "hust ept", "k71"]) and not any(

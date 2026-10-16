@@ -57,9 +57,11 @@ Ghi chú vận hành: Runtime đọc toàn bộ PDF cục bộ có lớp văn b�
 Giới hạn cần giữ để tránh trả lời sai:
 - PDF quy chế TSA là bản scan chưa có lớp văn bản OCR đã kiểm chứng, vì vậy chưa dùng để trả lời nội dung chi tiết.
 - Bài điểm chuẩn 2026 có phần bảng dạng ảnh; chỉ trả lời chương trình/phương thức đã được ghi chính xác trong dữ liệu chuẩn hóa. Mã chưa có dữ kiện phải được báo chưa đủ nguồn.
-- Trang học bổng trực tuyến hiện chỉ được catalog hóa; chưa có nội dung điều kiện/mức học bổng cụ thể được xác minh trong bộ dữ liệu này.
+- Trang học bổng trực tuyến hiện chỉ được catalog hóa. Thông tin chính sách học bổng có trong mục 12.4 của PDF tuyển sinh chính, trang 25–26, đã được nối vào runtime qua snapshot native. Không suy ra thời hạn, hồ sơ hoặc kết quả cấp học bổng cá nhân từ thông tin chính sách này.
 
 # Tích hợp nhánh data và ứng dụng
 Snapshot `k71-2026-v2` dùng cùng sáu đường dẫn PDF chuẩn trong `source_catalog.json` cho pipeline và ứng dụng. Năm bản sao trùng SHA256 từ nhánh cũ đã được loại bỏ; bản `v1` và tên cũ có thể truy nguyên trong lịch sử Git. Manifest nối `source_id` của corpus với `runtime_source_id` của catalog.
 
-Dữ liệu OCR của nhánh data nằm trong `extracted/`, có trạng thái cần đối chiếu; runtime trên main chưa dùng dữ liệu OCR này. Các file `normalized/records.jsonl` và `processed/chunks.jsonl` thuộc snapshot data, còn runtime hiện đọc `normalized/admissions_facts_2026.json`. Hai bộ chưa được nối bằng adapter.
+Dữ liệu OCR của nhánh data nằm trong `extracted/`, có trạng thái cần đối chiếu; runtime chưa dùng dữ liệu OCR này. Runtime đã nối `normalized/records.jsonl` và `processed/chunks.jsonl` qua adapter kiểm tra checksum của `processed/release.json`, phiên bản nguồn, quyền trả lời, phạm vi và phương pháp trích xuất. Nguồn chính giữ bộ phân tích bảng chương trình/học phí và bổ sung đoạn native từ snapshot qua trang 25 trở đi; các PDF bổ trợ dùng đoạn native đủ điều kiện. Runtime cũng đọc dữ kiện đã chuẩn hóa trong `normalized/admissions_facts_2026.json`. Đoạn lịch sử, sai phạm vi hoặc OCR chưa xác minh vẫn bị loại khỏi câu trả lời.
+
+Điểm chuẩn năm 2025 trong tài liệu được đánh dấu dữ liệu lịch sử, chưa có luồng truy xuất theo năm riêng. Chatbot chỉ hỗ trợ điểm chuẩn đã chuẩn hóa của kỳ 2026; không dùng điểm 2026 để trả lời câu hỏi 2025.

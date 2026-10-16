@@ -92,6 +92,27 @@ def _admission_methods(text):
 
 
 def format_answer(question, chunks, program=""):
+    if "hoc bong" in normalize(question):
+        names = [name for name in (
+            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
+        ) if name in normalize(question)]
+        sections = []
+        for index, chunk in enumerate(chunks, 1):
+            if normalize(chunk["title"]) != "12.4 hoc bong" or not chunk.get("record_id"):
+                continue
+            for section in re.split(r"(?=\([1-5]\) Học bổng)", chunk["text"]):
+                if not re.match(r"\([1-5]\) Học bổng", section):
+                    continue
+                if names and not any(name in normalize(section) for name in names):
+                    continue
+                # Quote complete source sections, including conditions and limits.
+                section = re.split(r"Chi tiết tại địa chỉ:", section)[0].strip()
+                sections.append(f"{section} [{index}]")
+        if sections:
+            return "Thông tin học bổng trong tài liệu tuyển sinh 2026:\n\n" + "\n\n".join(sections) + (
+                "\n\nĐây là thông tin chính sách, không xác nhận bạn được cấp học bổng. "
+                "Hồ sơ, thời hạn và kết quả xét cấp cần đối chiếu thông báo của từng học bổng."
+            )
     q = normalize(question)
     first = chunks[0]
 

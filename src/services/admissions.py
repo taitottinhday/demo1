@@ -68,9 +68,7 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
-        if "hoc bong" in normalized and not explicit and any(name in normalized for name in [
-            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
-        ]):
+        if "hoc bong" in normalized and not explicit:
             return {"scope": "general", "program": "", "explicit": False}
         general_fee_policy = "hoc phi" in normalized and any(
             term in normalized for term in ["tin chi", "tchp", "hoc ky he"]
@@ -233,14 +231,15 @@ class Admissions:
             ]
         ) and not postgraduate_fee_request:
             return "Phạm vi hiện tại là tuyển sinh từ THPT vào đại học chính quy HUST năm 2026. Nội dung bạn hỏi cần nguồn riêng hoặc cán bộ hỗ trợ."
-        named_scholarship = any(name in q for name in [
-            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
-        ])
-        personal_scholarship = re.search(r"\b(?:toi|em|minh)\b", q) or any(
-            term in q for term in ["chac chan", "du dieu kien", "co duoc", "se duoc", "nhan duoc"]
+        personal_scholarship = re.search(
+            r"\b(?:toi|em|minh)\b.*\b(?:du dieu kien|co duoc|se duoc|nhan duoc|duoc nhan|co the nhan|co hoc bong|duoc hoc bong)\b", q
         )
-        if "hoc bong" in q and (not named_scholarship or personal_scholarship):
-            return "Bộ nguồn hiện tại chưa đủ thông tin về điều kiện và mức học bổng để tư vấn chắc chắn. Mình không thể hứa cấp học bổng; bạn có thể nhờ cán bộ kiểm tra."
+        if "hoc bong" in q and personal_scholarship:
+            return "Mình không thể quyết định bạn có được nhận học bổng hay không. Cán bộ cần đối chiếu hồ sơ cá nhân và thông báo xét cấp của từng học bổng."
+        if "hoc bong" in q and any(term in q for term in [
+            "han nop", "thoi han", "han dang ky", "ho so", "giay to", "bao gio", "khi nao"
+        ]):
+            return "Kho nguồn có thông tin chính sách học bổng, chưa có thông báo xác minh về hồ sơ hoặc lịch xét cấp bạn hỏi. Cán bộ cần kiểm tra thông báo của từng học bổng."
         if "quy doi" in q and any(s in q for s in ["ielts", "vstep", "chung chi", "ngoai ngu"]):
             return "Bảng quy đổi chứng chỉ ở trang PDF 17 đang là ảnh và chưa được xác minh để tra cứu. Mình chưa thể tính điểm quy đổi; bạn hãy xem trang đó hoặc chuyển cán bộ kiểm tra."
         if any(s in q for s in ["hom nay", "bay gio", "hien nay", "con nop", "dang mo", "con han"]):
@@ -430,9 +429,12 @@ class Admissions:
         sources = [self.k.citation(c) for c in chunks]
         result = dict(base, kind="answered", reason="grounded", sources=sources)
         quota_question = chunks[0].get("kind") == "program" and any(term in q for term in ["chi tieu", "quota"])
-        if quota_question:
-            # Quotas are atomic facts in the official program table. Keep this deterministic so an
-            # LLM cannot turn a quota question into a nearby methods summary.
+        scholarship_policy = "hoc bong" in q and all(
+            normalize(c["title"]) == "12.4 hoc bong" and c.get("record_id") for c in chunks
+        )
+        if quota_question or scholarship_policy:
+            # Render atomic quotas and complete scholarship policy sections
+            # directly from their official source without paid synthesis.
             rendered = format_answer(question, chunks, answer_program)
             if not rendered:
                 return dict(base, response=FALLBACK)

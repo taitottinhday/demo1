@@ -52,6 +52,52 @@ async def test_public_scholarship_information_does_not_decide_personal_eligibili
     assert not personal["sources"]
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question", [
+    "điều kiện học bổng của trường",
+    "Em muốn hỏi điều kiện học bổng của trường",
+    "Học bổng khuyến khích học tập có các mức nào?",
+])
+async def test_scholarship_policy_uses_complete_pdf_section_without_api(knowledge, tmp_path, question):
+    from unittest.mock import AsyncMock
+
+    service = Admissions(knowledge, Store(tmp_path / "policy.db"),
+                         Settings(_env_file=None, answer_mode="llm"))
+    service.generate = AsyncMock(side_effect=AssertionError("Policy quotes need no paid API"))
+    result = await service.answer(question, context="IT1")
+    assert result["kind"] == "answered"
+    assert result["mode"] == "extractive"
+    assert "loại xuất sắc" in result["response"]
+    assert "1,5" in result["response"]
+    assert len(result["sources"]) == 1
+    assert result["sources"][0]["page"] == 25
+    assert result["sources"][0]["end_page"] == 26
+    assert "12.6" not in result["response"]
+    service.generate.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_historical_cutoff_is_not_replaced_with_current_year(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "historical.db"), Settings(_env_file=None))
+    result = await service.answer("điểm chuẩn của năm 2025", context="IT1")
+    assert result["kind"] == "fallback"
+    assert "29,27" not in result["response"]
+    assert not result["sources"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question", [
+    "Hạn nộp học bổng khuyến khích học tập là khi nào?",
+    "Hồ sơ học bổng Trần Đại Nghĩa gồm giấy tờ gì?",
+    "Em học khá thì có học bổng không?",
+])
+async def test_scholarship_policy_does_not_invent_awards_or_application_details(knowledge, tmp_path, question):
+    service = Admissions(knowledge, Store(tmp_path / "limits.db"), Settings(_env_file=None))
+    result = await service.answer(question)
+    assert result["kind"] == "fallback"
+    assert not result["sources"]
+
+
 def test_hybrid_failure_falls_back_without_losing_bm25_evidence(knowledge):
     from unittest.mock import Mock
 
