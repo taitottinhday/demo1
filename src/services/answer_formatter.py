@@ -2,7 +2,7 @@
 
 import re
 
-from src.services.knowledge import normalize, tokens
+from src.services.knowledge import normalize, tokens, question_intent
 
 
 def structure_answer(response, sources, next_steps, manifest):
@@ -95,13 +95,7 @@ def format_answer(question, chunks, program=""):
     if chunks and chunks[0].get("cutoff_methods"):
         c = chunks[0]
         q = normalize(question)
-        requested = [method for method in c["cutoff_methods"] if (
-            (method == "THPT" and "thpt" in q)
-            or (method == "TSA" and any(w in q for w in ["tsa", "dgtd", "danh gia tu duy"]))
-            or (method.startswith("XTTN") and any(w in q for w in ["xttn", "xet tuyen tai nang", "1.2", "1.3"])
-                and (not re.search(r"1\.[23]", q) or method[-3:] in q))
-        )]
-        methods = requested or list(c["cutoff_methods"])
+        methods = question_intent(question)["methods"] or list(c["cutoff_methods"])
         if any(word in q for word in ["co nghia", "tuong duong"]):
             methods = list(c["cutoff_methods"])
         scores = "; ".join(f"{method}: {c['cutoff_methods'][method].replace('.', ',')}/{30 if method == 'THPT' else 100}"

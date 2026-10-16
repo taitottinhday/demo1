@@ -77,6 +77,36 @@ def program_profile(program):
             "metadata_basis": "primary_program_table_name_and_notes"}
 
 
+def question_intent(question):
+    """Shared, deterministic interpretation; does not infer facts from user text."""
+    q = normalize(question)
+    topic = next((topic for topic, terms in (
+        ("cutoff", ("diem chuan", "diem trung tuyen")),
+        ("scholarship", ("hoc bong",)), ("tuition", ("hoc phi",)),
+        ("language", ("ngoai ngu", "ielts", "vstep", "tieng anh", "hust ept")),
+        ("quota", ("chi tieu",)), ("registration", ("dang ky",)),
+        ("training", ("dao tao", "chuong trinh",)),
+    ) if any(term in q for term in terms)), "general")
+    methods = []
+    if "thpt" in q:
+        methods.append("THPT")
+    if any(term in q for term in ("tsa", "dgtd", "danh gia tu duy")):
+        methods.append("TSA")
+    subtypes = re.findall(r"\b1\.[23]\b", q)
+    if subtypes:
+        methods.extend(f"XTTN {s}" for s in dict.fromkeys(subtypes))
+    elif "xttn" in q or "xet tuyen tai nang" in q:
+        methods.extend(("XTTN 1.2", "XTTN 1.3"))
+    stage = None
+    if topic == "language":
+        stage = "graduation" if any(t in q for t in ("dau ra", "tot nghiep")) else (
+            "certificate" if any(t in q for t in ("quy doi", "xac thuc", "cong diem")) else "entrance"
+        )
+    return {"topic": topic, "years": list(dict.fromkeys(re.findall(r"\b20\d{2}\b", q))),
+            "methods": methods, "language_stage": stage,
+            "needs_synthesis": any(t in q for t in ("giai thich", "vi sao", "tai sao", "khac nhau", "so sanh", "tong hop", "phan tich"))}
+
+
 class Knowledge:
     def __init__(self, data_dir: str | Path, settings=None):
         self.settings = settings

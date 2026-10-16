@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.services.answer_formatter import format_answer, structure_answer
-from src.services.knowledge import PROGRAM_CODE_RE, canonical_quote, normalize
+from src.services.knowledge import PROGRAM_CODE_RE, canonical_quote, normalize, question_intent
 
 
 def redact(text):
@@ -308,12 +308,10 @@ class Admissions:
         question = self.resolve_followup(question, conversation, context)
         result = await self._answer(question, context, history, scope, diagnostics=diagnostics)
         classification = self.classify_scope(question, context)
-        norm = normalize(question)
-        topic = "cutoff" if any(term in norm for term in ["diem chuan", "diem trung tuyen"]) else (
-            "tuition" if "hoc phi" in norm else "language" if "ngoai ngu" in norm else None
-        )
+        parsed = question_intent(question)
+        topic = parsed["topic"] if parsed["topic"] in {"cutoff", "tuition", "language"} else None
         if result["kind"] == "answered" and topic and classification["program"]:
-            years = re.findall(r"\b20\d{2}\b", norm)
+            years = parsed["years"]
             result["conversation_context"] = {"topic": topic, "program": classification["program"],
                                               "year": int(years[0]) if years else 2026}
         if "answer_sections" not in result:
@@ -366,7 +364,7 @@ class Admissions:
         guard = self.guard(question)
         if guard:
             return dict(base, response=guard, reason="guardrail")
-        cutoff_request = any(term in q for term in ["diem chuan", "diem trung tuyen"])
+        cutoff_request = question_intent(question)["topic"] == "cutoff"
         if cutoff_request:
             historical = any(year in q for year in ["2024", "2025"])
             subtype = re.search(r"\b1\.[23]\b", q)
@@ -517,9 +515,7 @@ class Admissions:
             or (bool(answer_program) and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"])
                 and not any(w in q for w in ["quy doi", "dau ra", "tot nghiep", "xac thuc"]))
         )
-        needs_synthesis = any(term in q for term in [
-            "giai thich", "vi sao", "tai sao", "khac nhau", "so sanh", "tong hop", "phan tich"
-        ])
+        needs_synthesis = question_intent(question)["needs_synthesis"]
         direct_policy = quota_question or scholarship_policy or historical_cutoff or cutoff_fact or source_policy
         safe_policy_answer = format_answer(question, chunks, answer_program) if direct_policy else None
         if direct_policy and (not needs_synthesis or self.settings.answer_mode != "llm"):
