@@ -291,10 +291,20 @@ class Admissions:
         topic = state.get("topic")
         code = program or state.get("program")
         year = state.get("year")
+        q = normalize(question).strip(" ?!.")
+        # A reply to a program clarification supplies the missing slot, rather
+        # than starting an unrelated query. Accept only a catalog code and
+        # optional conversational particles, never arbitrary instructions.
+        matches = self.k.program_matches(question)
+        if topic in labels and type(year) is int and 2000 <= year <= 2099 and len(matches) == 1:
+            supplied = matches[0]["code"]
+            compact = re.sub(r"[-\s]", "", supplied.lower())
+            reply = re.sub(r"(?:\b(?:ban|oi|nhe|a|nha|la|nganh|chuong trinh)\b|[-\s])", "", q)
+            if reply == compact:
+                return f"{labels[topic]} {supplied} năm {year}"
         if (topic not in labels or code not in {p["code"] for p in self.k.programs}
                 or type(year) is not int or not 2000 <= year <= 2099):
             return question
-        q = normalize(question).strip(" ?!.")
         match = re.fullmatch(r"(?:con\s+)?(?:nam\s+)?(20\d{2})(?:\s+thi sao)?", q)
         if match:
             return f"{labels[topic]} {code} năm {match[1]}"
@@ -313,6 +323,10 @@ class Admissions:
         if result["kind"] == "answered" and topic and classification["program"]:
             years = parsed["years"]
             result["conversation_context"] = {"topic": topic, "program": classification["program"],
+                                              "year": int(years[0]) if years else 2026}
+        elif result["kind"] == "clarification" and result.get("reason") in {"ambiguous_program", "missing_program"} and topic:
+            years = parsed["years"]
+            result["conversation_context"] = {"topic": topic, "program": "",
                                               "year": int(years[0]) if years else 2026}
         if "answer_sections" not in result:
             result["answer_sections"] = structure_answer(
@@ -392,6 +406,14 @@ class Admissions:
                 message = "Điều kiện ngoại ngữ phụ thuộc chương trình. Hãy chọn hoặc ghi rõ mã chương trình, ví dụ IT1 hoặc ITE10."
             else:
                 message = "Nội dung này phụ thuộc chương trình. Hãy chọn hoặc ghi rõ mã/tên chương trình để mình tra cứu chính xác."
+            family = re.search(r"\bnganh\s+(.+?)(?:\s+20\d{2}|[?.!]|$)", q)
+            candidates = self.k.program_matches(question)
+            if family and len(family[1]) >= 5:
+                candidates = [p for p in self.k.programs if family[1] in normalize(p["name"])]
+            if candidates and all(isinstance(p, dict) for p in candidates):
+                message += " Các chương trình phù hợp: " + "; ".join(
+                    f"{p['code']} — {p['name']}" for p in candidates
+                ) + ". Bạn muốn hỏi mã nào?"
             return dict(base, kind="clarification", reason="ambiguous_program", response=message)
         if (
             "hoc phi" in q
