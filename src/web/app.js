@@ -314,7 +314,7 @@ async function init() {
       addMessage(m.role,m);
     });
     const source=status.source||{};
-    if(source.pages)$('source-pages').textContent=`${source.pages} trang`;
+    $('source-pages').textContent=`${source.document_count||0} nguồn · ${source.indexable_pdf_count||0} PDF có thể tra cứu`;
     $('source-status').textContent=status.status==='ready'?`${source.document_count||1} nguồn · ${source.indexable_pdf_count||1} PDF có thể tra cứu · ${status.programs} chương trình · kỳ 2026 · bộ dữ liệu ${source.version||'chưa rõ'}`:'Nguồn chưa sẵn sàng. Có thể chuyển cán bộ.';
     const official=$('source-official');if(official&&source.url){official.href=source.url;official.hidden=false;}
     $('mode-label').textContent=status.mode==='llm'?'AI tổng hợp có kiểm tra trích dẫn.':'Đang dùng chế độ tra cứu tài liệu.';
@@ -368,6 +368,29 @@ $('chat-form').addEventListener('submit',async e=>{
   finally{busy=false;$('send').disabled=false;$('clear').disabled=false;$('question').focus();}
 });
 document.querySelectorAll('[data-question]').forEach(b=>b.addEventListener('click',()=>fillQuestion(quickQuestion(b))));
+async function openDocuments(event){
+  event.preventDefault();
+  const dialog=$('documents-dialog');const box=$('documents-list');
+  dialog.showModal();box.replaceChildren(node('p','hint','Đang tải danh mục tài liệu…'));
+  try{
+    const data=await api('/sources');
+    box.replaceChildren();
+    data.documents.forEach(source=>{
+      const card=node('article','document-entry');
+      card.append(node('h3','',source.title));
+      card.append(node('p','meta',`${source.type==='pdf'?'PDF':'Trang web'}${source.pages?` · ${source.pages} trang`:''} · kỳ ${source.cycle||'theo tài liệu'}`));
+      card.append(node('p','',source.scope));
+      card.append(node('p','hint',source.status_label));
+      const actions=node('div','document-actions');
+      if(source.local_url)actions.append(link('Mở PDF ↗',source.local_url));
+      if(source.official_url)actions.append(link('Nguồn chính thức ↗',source.official_url));
+      card.append(actions);box.append(card);
+    });
+    if(!data.documents.length)box.append(node('p','hint','Chưa có tài liệu trong danh mục.'));
+  }catch(error){box.replaceChildren(node('p','error-text',`Không tải được danh mục. ${error.message}`));}
+}
+$('documents-link').addEventListener('click',openDocuments);
+document.querySelectorAll('.documents-open').forEach(button=>button.addEventListener('click',openDocuments));
 $('program-search').addEventListener('input',()=>handleProgramSearch());
 $('program-search').addEventListener('change',()=>handleProgramSearch(true));
 $('program-search').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();handleProgramSearch(true);}});

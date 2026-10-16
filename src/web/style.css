@@ -1088,3 +1088,9 @@ body.staff-page,body.admin-page{
   .applicant-page .topbar nav>.header-link span,.applicant-page .topbar nav>.nav-link>span:not(.count):not(.unread),.applicant-page .topbar nav>.staff-link{font-size:9px}
   .applicant-page .topbar nav>.header-link,.applicant-page .topbar nav>.nav-link,.applicant-page .topbar nav>.staff-link{flex-basis:calc(50% - 6px);min-height:32px;padding-right:5px;padding-left:5px}
 }
+/* Public source catalog shares the existing dialog and theme controls. */
+#documents-dialog{width:min(760px,calc(100vw - 32px));max-height:85vh;overflow-y:auto;box-sizing:border-box}
+#documents-dialog .document-entry{padding:16px 0;border-bottom:1px solid currentColor}
+#documents-dialog .document-entry:last-child{border-bottom:0}
+#documents-dialog .document-entry h3{margin:0 0 8px;font-size:16px}
+#documents-dialog .document-actions{display:flex;flex-wrap:wrap;gap:12px}

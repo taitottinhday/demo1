@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261009-2"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/enhance.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/enhance.dark.css?v=20261013-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/app.js?v=20261015-1" defer></script></head>
+<head><meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261016-1"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/enhance.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/enhance.dark.css?v=20261013-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/app.js?v=20261016-1" defer></script></head>
 <body class="applicant-page">
 <header class="topbar">
   <a class="brand" href="/" aria-label="Về trang chủ Trợ lý tuyển sinh, HUST 2026">
@@ -8,7 +8,7 @@
     <span class="brand-copy"><span>Trợ lý tuyển sinh</span><small>HUST · 2026</small></span>
   </a>
   <nav aria-label="Điều hướng">
-    <a class="header-link" id="documents-link" href="/api/v1/source/pdf" target="_blank" rel="noopener">
+    <a class="header-link" id="documents-link" href="#documents-dialog" aria-haspopup="dialog" aria-controls="documents-dialog">
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
       <span>Tài liệu</span>
     </a>
@@ -73,7 +73,7 @@
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
         <span>Phương thức xét tuyển</span><b aria-hidden="true">›</b>
       </button>
-      <button type="button" data-question="Học phí HUST 2026 là bao nhiêu?" data-program-question="Học phí {code} là bao nhiêu?">
+      <button type="button" data-question="Học phí theo tín chỉ học phí năm học 2026–2027 của chương trình chuẩn là bao nhiêu?" data-program-question="Học phí {code} năm học 2026–2027 là bao nhiêu?">
         <svg aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6M4.5 11.5v6c0 1.65 3.36 3 7.5 3s7.5-1.35 7.5-3v-6"/></svg>
         <span>Học phí &amp; lệ phí</span><b aria-hidden="true">›</b>
       </button>
@@ -85,6 +85,34 @@
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
         <span>Quy trình đăng ký</span><b aria-hidden="true">›</b>
       </button>
+      <button type="button" data-question="Điều kiện học bổng của trường là gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Điều kiện học bổng</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Học bổng Trần Đại Nghĩa dành cho ai và có các mức nào?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Học bổng Trần Đại Nghĩa</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Điểm chuẩn chung HUST năm 2026 khoảng bao nhiêu?" data-program-question="Điểm chuẩn {code} năm 2026 theo THPT là bao nhiêu?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Điểm chuẩn 2026</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="HUST năm 2026 có bao nhiêu ngành và chương trình?" data-program-question="Chỉ tiêu tuyển sinh {code} năm 2026 là bao nhiêu?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Ngành &amp; chỉ tiêu</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="XTTN 1.3 cần điều kiện gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Điều kiện xét tuyển tài năng</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Theo mô hình đào tạo, chương trình cử nhân kéo dài bao lâu và cấp bằng gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Mô hình đào tạo</span><b aria-hidden="true">›</b>
+      </button>
+      <button type="button" data-question="Chuẩn tiếng Anh đầu ra chương trình chuẩn là gì?">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 3.75h7l4.25 4.3v12.2a.75.75 0 0 1-.75.75h-10.5a.75.75 0 0 1-.75-.75V4.5a.75.75 0 0 1 .75-.75Z"/><path d="M14 3.9v4.35h4.15M9 12h6M9 15.5h6"/></svg>
+        <span>Ngoại ngữ đầu ra sinh viên</span><b aria-hidden="true">›</b>
+      </button>
     </div>
 
     <div class="source-note">
@@ -92,10 +120,11 @@
         <svg viewBox="0 0 24 24"><path d="M6.5 3.75h8l4 4v12.5H6.5a1 1 0 0 1-1-1v-14.5a1 1 0 0 1 1-1Z"/><path d="M14.5 4v4h4M8.5 12h7M8.5 15h7"/></svg>
       </span>
       <div class="source-copy">
-        <b>Tài liệu tuyển sinh 2026</b>
-        <span id="source-pages" class="source-pages">51 trang</span>
+        <b>Kho tài liệu HUST</b>
+        <span id="source-pages" class="source-pages">Đang tải danh mục</span>
         <p id="source-status" class="sr-only" role="status" aria-live="polite">Đang kiểm tra tài liệu…</p>
-        <a id="source-local" href="/api/v1/source/pdf" target="_blank" rel="noopener">Mở PDF <span aria-hidden="true">↗</span></a>
+        <a href="#documents-dialog" class="documents-open">Xem tất cả tài liệu ↗</a>
+        <a id="source-local" href="/api/v1/source/pdf" target="_blank" rel="noopener">PDF tuyển sinh chính <span aria-hidden="true">↗</span></a>
         <a id="source-official" href="#" target="_blank" rel="noopener" hidden>Nguồn chính thức dự phòng ↗</a>
       </div>
     </div>
@@ -183,6 +212,12 @@
   </section>
 </main>
 <footer class="page-footer"><span>Trợ lý tuyển sinh HUST</span><span>Nguồn: tài liệu tuyển sinh HUST 2026</span></footer>
+<dialog id="documents-dialog" aria-labelledby="documents-title">
+  <div class="dialog-top"><span class="eyebrow">NGUỒN CHÍNH THỨC</span><button type="button" class="close" data-close="documents-dialog" aria-label="Đóng">×</button></div>
+  <h2 id="documents-title">Tài liệu tuyển sinh &amp; đào tạo</h2>
+  <p>Mỗi nguồn có phạm vi áp dụng riêng. Bản scan và trang chưa lưu đầy đủ vẫn có thể mở để đối chiếu; khả năng trả lời của chatbot được ghi bên dưới.</p>
+  <div id="documents-list" aria-live="polite"></div>
+</dialog>
 <dialog id="program-guidance-dialog" class="program-guidance-dialog" aria-labelledby="program-guidance-title">
   <div class="guidance-dialog-top">
     <div>

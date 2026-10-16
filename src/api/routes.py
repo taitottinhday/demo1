@@ -694,6 +694,31 @@ def update_guide_checklist(body: ChecklistInput, request: Request):
     return runtime(request)["store"].save_student_checklist(student["id"], body.guide_version, body.completed)
 
 
+@router.get("/sources")
+def source_documents(request: Request):
+    k = runtime(request)["knowledge"]
+    labels = {
+        "primary_runtime_source": "Nguồn tuyển sinh chính",
+        "supplemental_data_only": "Nguồn bổ trợ theo phạm vi tài liệu",
+        "manual_ocr_required": "Bản scan; chưa dùng để trả lời chi tiết",
+        "online_summary_only": "Chỉ một phần dữ kiện đã được lưu để tra cứu",
+        "online_listing_only": "Trang tham khảo; chưa lưu đầy đủ nội dung",
+    }
+    documents = []
+    for source in k.documents:
+        path = k.source_path(source["id"])
+        documents.append({
+            "id": source["id"], "title": source["title"], "type": source["type"],
+            "pages": source.get("pages"), "cycle": source.get("cycle"),
+            "scope": source.get("scope", ""), "audience": source.get("audience", ""),
+            "status": source.get("status"), "status_label": labels.get(source.get("status"), "Cần kiểm tra nguồn"),
+            "official_url": source["official_url"],
+            "local_url": f"/api/v1/source/pdf?source_id={quote(source['id'], safe='')}"
+            if path and path.is_file() and source["type"] == "pdf" else None,
+        })
+    return {"documents": documents, "count": len(documents)}
+
+
 @router.get("/source/pdf")
 def pdf(request: Request, source_id: str | None = None):
     k = runtime(request)["knowledge"]

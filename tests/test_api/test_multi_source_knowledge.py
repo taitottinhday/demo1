@@ -297,3 +297,23 @@ async def test_pdf_endpoint_serves_the_cited_document_and_rejects_unknown_ids(cl
 
     missing = await client.get("/api/v1/source/pdf", params={"source_id": "not-in-catalog"})
     assert missing.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_public_document_catalog_lists_every_source_without_internal_paths(client, knowledge):
+    result = await client.get("/api/v1/sources")
+    assert result.status_code == 200
+    catalog = result.json()
+    assert catalog["count"] == 8
+    assert {s["id"] for s in catalog["documents"]} == {s["id"] for s in knowledge.documents}
+    for document in catalog["documents"]:
+        assert "local_path" not in document and "resolved_path" not in document
+        assert document["status_label"] and document["scope"]
+        if document["type"] == "pdf":
+            response = await client.get(document["local_url"])
+            assert response.status_code == 200
+            assert response.content.startswith(b"%PDF-")
+        else:
+            assert document["local_url"] is None
+    scan = next(s for s in catalog["documents"] if s["id"] == "hust-tsa-regulation-scan")
+    assert "chưa dùng" in scan["status_label"]
