@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.services.answer_formatter import format_answer, structure_answer
-from src.services.knowledge import normalize
+from src.services.knowledge import PROGRAM_CODE_RE, canonical_quote, normalize
 
 
 def redact(text):
@@ -170,8 +170,12 @@ class Admissions:
             existing["end_page"] = max(pages) if pages else None
         return merged
 
-    def guard(self, question):
+    def guard(self, question, *, allow_academic_year=False):
         q = normalize(question)
+        if any(term in q for term in ["nguoi khac", "ung vien khac", "thi sinh khac"]) and any(
+            term in q for term in ["email", "dien thoai", "ho so", "du lieu", "tai khoan", "mat khau", "ticket"]
+        ):
+            return "Mình không cung cấp hồ sơ, thông tin liên hệ hay dữ liệu riêng tư của người khác. Bạn có thể liên hệ cán bộ qua kênh chính thức để được hỗ trợ đúng thẩm quyền."
         tsa_question = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy"])
         if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]):
             return "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra."
@@ -197,6 +201,9 @@ class Admissions:
                 "chac chan trung tuyen",
                 "cam ket",
                 "dam bao do",
+                "bao dam do",
+                "dam bao trung tuyen",
+                "bao dam trung tuyen",
                 "chac chan do",
                 "co do khong",
                 "co trung tuyen khong",
@@ -243,7 +250,7 @@ class Admissions:
         requested_years = set(re.findall(r"\b20\d{2}\b", q))
         unsupported_years = requested_years - {"2026"}
         supported_academic_year = (
-            "hoc phi" in q
+            ("hoc phi" in q or allow_academic_year)
             and "2026" in requested_years
             and unsupported_years.issubset({"2027"})
         )
@@ -251,8 +258,8 @@ class Admissions:
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
-    async def answer(self, question, context="", history=None, scope=None):
-        result = await self._answer(question, context, history, scope)
+    async def answer(self, question, context="", history=None, scope=None, *, diagnostics=None):
+        result = await self._answer(question, context, history, scope, diagnostics=diagnostics)
         if "answer_sections" not in result:
             result["answer_sections"] = structure_answer(
                 result.get("response", ""),
@@ -266,7 +273,7 @@ class Admissions:
             )
         return result
 
-    async def _answer(self, question, context="", history=None, scope=None):
+    async def _answer(self, question, context="", history=None, scope=None, *, diagnostics=None):
         question = redact(question)
         q = normalize(question)
         classification = self.classify_scope(question, context)
@@ -440,25 +447,40 @@ class Admissions:
                     reason="llm_not_configured",
                 )
             if not self.store.reserve_llm(self.settings.llm_daily_limit):
+                verified = self._verified_fact_fallback(question, chunks, answer_program)
+                if verified:
+                    return dict(result, response=verified, mode="extractive", reason="verified_facts_budget_fallback")
                 return dict(
                     base,
                     kind="error",
                     response="Đã đạt hạn mức AI trong ngày. Bạn có thể chuyển cán bộ để được hỗ trợ.",
                     reason="budget_limit",
                 )
+            usage = diagnostics if diagnostics is not None else {}
+            usage["tokens"] = 0
             try:
                 generated = await asyncio.wait_for(
-                    self.generate(question, chunks, history or []), timeout=self.settings.llm_timeout
+                    self.generate(question, chunks, history or [], usage=usage), timeout=self.settings.llm_timeout
                 )
                 if not generated:
-                    return dict(base, response=FALLBACK, reason="grounding_check")
-                result.update(generated, mode="llm")
+                    verified = self._verified_fact_fallback(question, chunks, answer_program)
+                    if not verified:
+                        return dict(base, response=FALLBACK, reason="grounding_check", mode="llm", tokens=usage["tokens"])
+                    result.update(response=verified, mode="extractive", reason="verified_facts_fallback", tokens=usage["tokens"])
+                else:
+                    result.update(generated, mode="llm")
             except Exception:
+                verified = self._verified_fact_fallback(question, chunks, answer_program)
+                if verified:
+                    return dict(result, response=verified, mode="extractive", reason="verified_facts_provider_fallback",
+                                tokens=usage["tokens"])
                 return dict(
                     base,
                     kind="error",
                     response="Dịch vụ AI chưa phản hồi được trong giới hạn. Chưa có câu trả lời được xác minh; bạn có thể thử lại hoặc chuyển cán bộ.",
                     reason="llm_unavailable",
+                    tokens=usage["tokens"],
+                    mode="llm",
                 )
         else:
             rendered = format_answer(question, chunks, answer_program)
@@ -480,7 +502,14 @@ class Admissions:
             self.cache[key] = (dict(result), time.time())
         return result
 
-    async def generate(self, question, chunks, history):
+    @staticmethod
+    def _verified_fact_fallback(question, chunks, program):
+        """Use curated facts/parsed fees when synthesis fails; never recycle rejected LLM text."""
+        if chunks and all(c.get("kind") in {"verified_fact", "fee"} for c in chunks):
+            return format_answer(question, chunks, program)
+        return None
+
+    async def generate(self, question, chunks, history, *, usage=None):
         schema = {
             "type": "object",
             "properties": {
@@ -511,6 +540,8 @@ class Admissions:
             "Không đưa thêm checklist/hạn/chính sách ngoài nguồn. Trả lời tiếng Việt, tối đa 5 claim."
         )
         deepseek = self.settings.llm_provider == "deepseek"
+        if usage is not None:
+            usage["check"] = "input_limit"
         if len(question) + sum(len(c["text"]) for c in chunks) > 24000:
             return None
         client = AsyncOpenAI(
@@ -536,6 +567,10 @@ class Admissions:
                     max_tokens=self.settings.llm_max_output_tokens,
                     extra_body={"thinking": {"type": "disabled"}},
                 )
+                if usage is not None and response.usage:
+                    usage["tokens"] = response.usage.total_tokens
+                if usage is not None:
+                    usage["check"] = "finish_reason"
                 if not response.choices or response.choices[0].finish_reason != "stop":
                     return None
                 content = response.choices[0].message.content or ""
@@ -547,27 +582,52 @@ class Admissions:
                     input=messages,
                     text={"format": {"type": "json_schema", "name": "grounded_admissions", "strict": True, "schema": schema}},
                 )
+                if usage is not None and response.usage:
+                    usage["tokens"] = response.usage.total_tokens
                 content = response.output_text
+            if usage is not None:
+                usage["check"] = "json_schema"
             try:
                 data = GroundedAnswer.model_validate_json(content).model_dump()
             except (ValidationError, TypeError):
                 return None
             if not data.get("supported") or not 0 < len(data.get("claims", [])) <= 5:
+                if usage is not None:
+                    usage["check"] = "unsupported"
                 return None
             claims_by_source = {}
             seen_claims = set()
             for claim in data["claims"]:
                 n = claim["source"]
+                if usage is not None:
+                    usage["check"] = "citation_id"
                 if not 1 <= n <= len(chunks) or len(claim["quote"]) < 12:
                     return None
-                if normalize(claim["quote"]) not in normalize(chunks[n - 1]["text"]):
+                if usage is not None:
+                    usage["check"] = "quote_match"
+                if canonical_quote(claim["quote"]) not in canonical_quote(chunks[n - 1]["text"]):
                     return None
                 # Reject numeric facts not present in the attached supporting quote.
-                claim_numbers = set(re.findall(r"(?<![A-Za-z])\d+(?![A-Za-z])", claim["text"]))
-                quote_numbers = set(re.findall(r"(?<![A-Za-z])\d+(?![A-Za-z])", claim["quote"]))
+                number_pattern = r"(?<!\w)\d+(?:[.,]\d+)*(?!\w)"
+                if usage is not None:
+                    usage["check"] = "numeric_match"
+                claim_numbers = set(re.findall(number_pattern, claim["text"]))
+                quote_numbers = set(re.findall(number_pattern, claim["quote"]))
                 if not claim_numbers.issubset(quote_numbers):
                     return None
-                if self.guard(claim["text"]):
+                # A numeric quote alone cannot justify switching program identifiers.
+                known_codes = {p["code"].replace("-", "") for p in self.k.programs}
+                if usage is not None:
+                    usage["check"] = "program_match"
+                claim_codes = {code.replace("-", "") for code in re.findall(PROGRAM_CODE_RE, claim["text"].upper())}
+                source_codes = {code.replace("-", "") for code in re.findall(PROGRAM_CODE_RE, chunks[n - 1]["text"].upper())}
+                if not (claim_codes & known_codes).issubset(source_codes):
+                    return None
+                if usage is not None:
+                    usage["check"] = "claim_guardrail"
+                if self.guard(claim["text"], allow_academic_year=chunks[n - 1].get("source_id") in {
+                    "hust-english-policy-k71", "hust-tuition-2026-2027",
+                }):
                     return None
                 claim_key = normalize(claim["text"])
                 if claim_key in seen_claims:
@@ -577,6 +637,8 @@ class Admissions:
             if not claims_by_source:
                 return None
             rendered = [" ".join(claims) + f" [{source}]" for source, claims in claims_by_source.items()]
+            if usage is not None:
+                usage["check"] = "accepted"
             return {"response": "\n\n".join(rendered), "tokens": response.usage.total_tokens if response.usage else 0}
         finally:
             await client.close()

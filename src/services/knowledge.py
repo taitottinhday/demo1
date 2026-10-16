@@ -29,6 +29,11 @@ def clean(text: str) -> str:
     return re.sub(r"\s+", " ", text or "").strip()
 
 
+def canonical_quote(text: str) -> str:
+    """Normalize PDF whitespace and Unicode without dropping Vietnamese accents."""
+    return clean(unicodedata.normalize("NFC", text))
+
+
 class Knowledge:
     def __init__(self, data_dir: str | Path, settings=None):
         self.settings = settings

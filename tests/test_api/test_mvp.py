@@ -736,6 +736,7 @@ async def test_deepseek_rejects_empty_truncated_or_ungrounded_answers(knowledge,
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
         result = await service.answer("Giới thiệu chương trình IT1")
     assert result["kind"] == "fallback" and result["sources"] == []
+    assert result["mode"] == "llm" and result["tokens"] == 60
 
 
 def test_budget_is_hard_limit(tmp_path):
