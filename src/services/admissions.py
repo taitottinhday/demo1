@@ -473,8 +473,8 @@ class Admissions:
             or ("dang ky" in q and any(w in q for w in ["tu duy", "tsa", "dgtd"])
                 and any("https://tsa.hust.edu.vn/dk" in c["text"]
                         and "https://thisinh.thitotnghiepthpt.edu.vn/Account/Login" in c["text"] for c in chunks))
-            or (answer_program == "EE2" and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"])
-                and not any(w in q for w in ["quy doi", "dau ra", "tot nghiep"]))
+            or (bool(answer_program) and any(w in q for w in ["ngoai ngu", "ielts", "tieng anh"])
+                and not any(w in q for w in ["quy doi", "dau ra", "tot nghiep", "xac thuc"]))
         )
         if quota_question or scholarship_policy or historical_cutoff or cutoff_fact or source_policy:
             # Render atomic quotas and complete scholarship policy sections

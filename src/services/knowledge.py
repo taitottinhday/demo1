@@ -564,7 +564,10 @@ class Knowledge:
             t in norm for t in ["phi", "xac thuc", "quy doi", "diem thuong"]
         )
         graduation_language_query = language_query and any(
-            term in norm for term in ["dau ra", "tot nghiep", "placement test", "hust ept", "k71", "ap dung", "hieu luc", "khoa nao", "troy"]
+            term in norm for term in ["dau ra", "tot nghiep", "placement test", "hust ept", "k71", "ap dung", "hieu luc", "khoa nao"]
+        )
+        graduation_language_query = graduation_language_query or (
+            language_query and "troy" in norm and any(term in norm for term in ["dau khoa", "sinh vien"])
         )
         if graduation_language_query:
             placement_test_query = any(term in norm for term in ["placement test", "hust ept"])

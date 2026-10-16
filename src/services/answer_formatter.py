@@ -161,17 +161,35 @@ def format_answer(question, chunks, program=""):
             )
     q = normalize(question)
     first = chunks[0]
-    if program == "EE2" and any(word in q for word in ["ngoai ngu", "ielts", "tieng anh"]) and not any(
-        word in q for word in ["dau ra", "tot nghiep", "quy doi"]
+    if program and any(word in q for word in ["ngoai ngu", "ielts", "tieng anh"]) and not any(
+        word in q for word in ["dau ra", "tot nghiep", "quy doi", "xac thuc"]
     ):
         rule = next((i for i, c in enumerate(chunks, 1)
                      if c.get("page") == 16 and "VSTEP" in c["text"] and "5.5" in c["text"]), None)
-        if rule:
-            return (f"Không nên áp dụng ngưỡng IELTS/VSTEP của chương trình tiên tiến cho EE2. "
-                    f"Mục 5.2 nêu yêu cầu riêng cho các chương trình tiên tiến, nhóm ngôn ngữ và liên kết TROY; "
-                    f"không nêu ngưỡng chứng chỉ riêng cho EE2 trong mục này. [{rule}]\n\n"
-                    "Chuẩn ngoại ngữ đầu ra khi tốt nghiệp là quy định riêng. Bạn muốn hỏi ngoại ngữ đầu vào, "
-                    "xác thực chứng chỉ để xét tuyển, hay chuẩn đầu ra?")
+        row = next(((i, c) for i, c in enumerate(chunks, 1)
+                    if c.get("kind") == "program" and c.get("code") == program), None)
+        if rule and row:
+            index, item = row
+            label = f"{item['title']} ({program})"
+            if program in {"TROYIT", "FL2"}:
+                return (f"{label} yêu cầu IELTS Academic từ 5.5 trở lên về ngoại ngữ đầu vào. [{rule}][{index}]\n\n"
+                        "Điều kiện này đi kèm các điều kiện xét tuyển khác; chuẩn đầu ra khi tốt nghiệp được quy định riêng.")
+            if "hoc bang tieng anh" in normalize(item["text"]) or program in {"FL1", "FL3", "FL4"}:
+                subject = "tiếng Trung" if program == "FL3" else "tiếng Hàn" if program == "FL4" else "tiếng Anh"
+                return (f"{label} cần đáp ứng ít nhất một điều kiện ngoại ngữ đầu vào sau. [{rule}][{index}]\n\n"
+                        f"• VSTEP từ B1 trở lên; hoặc IELTS Academic từ 5.0 trở lên (hoặc tương đương); "
+                        f"hoặc điểm thi tốt nghiệp THPT năm 2026 môn {subject} từ 6.5 trở lên. [{rule}]\n\n"
+                        "Không bắt buộc riêng chứng chỉ IELTS nếu đáp ứng một lựa chọn khác theo quy định. "
+                        "Các điều kiện xét tuyển khác và chuẩn ngoại ngữ đầu ra được áp dụng riêng.")
+            if re.fullmatch(r"(?!FL)[A-Z]{2}\d", program):
+                return (f"{label} là chương trình chuẩn, không thuộc nhóm có điều kiện ngoại ngữ đầu vào riêng "
+                        f"tại mục 5.2. [{rule}][{index}]\n\n"
+                        f"Mục này không nêu ngưỡng chứng chỉ riêng cho {program}; không áp ngưỡng IELTS/VSTEP "
+                        f"của chương trình tiên tiến cho chương trình chuẩn. [{rule}]\n\n"
+                        "Việc dùng chứng chỉ để quy đổi/cộng điểm xét tuyển và chuẩn ngoại ngữ đầu ra là các quy định riêng.")
+            return (f"{label} có đặc thù chương trình cần đối chiếu riêng. [{index}] "
+                    f"Mục 5.2 chỉ nêu các nhóm có ngưỡng ngoại ngữ cụ thể; chưa đủ căn cứ để gán một ngưỡng "
+                    f"IELTS/VSTEP riêng cho {program}. [{rule}] Bạn có thể nhờ cán bộ kiểm tra yêu cầu của chương trình.")
 
     if first.get("kind") == "program" and any(term in q for term in ["chi tieu", "quota"]):
         requested_code = program or first.get("code", "")

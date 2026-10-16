@@ -342,6 +342,30 @@ async def test_chat_followups_work_in_llm_mode_without_provider_for_source_polic
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("code,expected", [
+    ("CH1", "chương trình chuẩn"), ("EE2", "chương trình chuẩn"), ("IT1", "chương trình chuẩn"),
+    ("EEE8", "VSTEP từ B1"), ("EE-E8", "VSTEP từ B1"), ("ITE7", "VSTEP từ B1"),
+    ("CHE20", "VSTEP từ B1"), ("FL3", "môn tiếng Trung"), ("FL4", "môn tiếng Hàn"),
+    ("FL2", "IELTS Academic từ 5.5"), ("TROYIT", "IELTS Academic từ 5.5"),
+])
+async def test_entrance_language_follows_program_group_in_llm_mode(knowledge, tmp_path, code, expected):
+    from unittest.mock import AsyncMock
+
+    service = Admissions(knowledge, Store(tmp_path / "language.db"), Settings(_env_file=None, answer_mode="llm"))
+    service.generate = AsyncMock(side_effect=AssertionError("Source-backed entrance rules need no generation"))
+    result = await service.answer(f"Điều kiện ngoại ngữ {code} là gì?")
+    assert result["kind"] == "answered", result
+    assert expected in result["response"]
+    assert result["sources"][0]["page"] == 16
+    assert result["tokens"] == 0
+    if expected == "chương trình chuẩn":
+        assert "5.0" not in result["response"] and "5.5" not in result["response"]
+    elif expected == "VSTEP từ B1":
+        assert "5.0" in result["response"] and "6.5" in result["response"]
+    service.generate.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_tuition_uses_yearly_estimate_or_per_credit_source_as_asked(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "tuition.db"), Settings(_env_file=None, answer_mode="extractive"))
 
