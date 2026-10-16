@@ -181,17 +181,18 @@ def format_answer(question, chunks, program=""):
         if rule and row:
             index, item = row
             label = f"{item['title']} ({program})"
-            if program in {"TROYIT", "FL2"}:
+            language_rule = item.get("program_profile", {}).get("entrance_language_rule")
+            if language_rule == "ielts_5_5":
                 return (f"{label} yêu cầu IELTS Academic từ 5.5 trở lên về ngoại ngữ đầu vào. [{rule}][{index}]\n\n"
                         "Điều kiện này đi kèm các điều kiện xét tuyển khác; chuẩn đầu ra khi tốt nghiệp được quy định riêng.")
-            if "hoc bang tieng anh" in normalize(item["text"]) or program in {"FL1", "FL3", "FL4"}:
+            if language_rule == "entrance_options":
                 subject = "tiếng Trung" if program == "FL3" else "tiếng Hàn" if program == "FL4" else "tiếng Anh"
                 return (f"{label} cần đáp ứng ít nhất một điều kiện ngoại ngữ đầu vào sau. [{rule}][{index}]\n\n"
                         f"• VSTEP từ B1 trở lên; hoặc IELTS Academic từ 5.0 trở lên (hoặc tương đương); "
                         f"hoặc điểm thi tốt nghiệp THPT năm 2026 môn {subject} từ 6.5 trở lên. [{rule}]\n\n"
                         "Không bắt buộc riêng chứng chỉ IELTS nếu đáp ứng một lựa chọn khác theo quy định. "
                         "Các điều kiện xét tuyển khác và chuẩn ngoại ngữ đầu ra được áp dụng riêng.")
-            if re.fullmatch(r"(?!FL)[A-Z]{2}\d", program):
+            if language_rule == "no_specific_entrance_requirement":
                 return (f"{label} là chương trình chuẩn, không thuộc nhóm có điều kiện ngoại ngữ đầu vào riêng "
                         f"tại mục 5.2. [{rule}][{index}]\n\n"
                         f"Mục này không nêu ngưỡng chứng chỉ riêng cho {program}; không áp ngưỡng IELTS/VSTEP "

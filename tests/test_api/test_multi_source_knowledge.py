@@ -204,6 +204,18 @@ def test_every_eligible_in_scope_native_chunk_is_loaded(knowledge):
     assert knowledge.manifest["normalized_coverage"]["indexed_chunks"] == len(expected)
 
 
+def test_program_registry_covers_all_codes_without_inventing_teaching_language(knowledge):
+    registry = {p["code"]: p for p in knowledge.programs}
+    assert len(registry) == 68
+    assert all(p["aliases"] and p["metadata_basis"] for p in registry.values())
+    assert registry["CH1"]["group"] == "standard"
+    assert registry["EEE8"]["group"] == "advanced_english"
+    assert registry["EEE8"]["teaching_language"] == "en"
+    assert registry["CH1"]["teaching_language"] is None
+    assert registry["FL2"]["entrance_language_rule"] == "ielts_5_5"
+    assert registry["ETLUH"]["entrance_language_rule"] == "verify_specific"
+
+
 def test_historical_rows_require_exact_year_program_and_method(knowledge):
     rows = knowledge.search("Điểm chuẩn IT1 năm 2025 theo THPT?")
     assert rows

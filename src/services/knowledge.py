@@ -51,6 +51,32 @@ def program_label(text: str) -> str:
     return " ".join(word for word in re.findall(r"[a-z0-9]+", normalize(text)) if word != "va")
 
 
+def program_profile(program):
+    """Derive only attributes supported by the catalog name and source notes."""
+    code = program["code"]
+    name, note = normalize(program["name"]), normalize(program.get("note", ""))
+    if code in {"FL2", "TROYIT"}:
+        group, rule = "international", "ielts_5_5"
+    elif code in {"FL1", "FL3", "FL4"}:
+        group, rule = "language", "entrance_options"
+    elif "hoc bang tieng anh" in note:
+        group, rule = "advanced_english", "entrance_options"
+    elif "pfiev" in name or "pfiev" in note:
+        group, rule = "pfiev", "verify_specific"
+    elif "hop tac" in name or "lien ket" in note:
+        group, rule = "international_other", "verify_specific"
+    elif "tien tien" in name or "tang cuong" in note:
+        group, rule = "advanced_other", "verify_specific"
+    elif re.fullmatch(r"(?!FL)[A-Z]{2}\d", code):
+        group, rule = "standard", "no_specific_entrance_requirement"
+    else:
+        group, rule = "unclassified", "verify_specific"
+    return {"group": group, "entrance_language_rule": rule,
+            "teaching_language": "en" if "hoc bang tieng anh" in note else None,
+            "aliases": sorted({program["name"], code, *PROGRAM_ALIASES.get(code, ())}),
+            "metadata_basis": "primary_program_table_name_and_notes"}
+
+
 class Knowledge:
     def __init__(self, data_dir: str | Path, settings=None):
         self.settings = settings
@@ -308,11 +334,13 @@ class Knowledge:
         if current:
             self.programs.append(current)
         for item in self.programs:
+            item.update(program_profile(item))
             text = (
                 f"Mã xét tuyển {item['code']}: {item['name']}. Mã ngành {item['major_code']}. "
                 f"Chỉ tiêu năm 2026: {item['quota']}. {item['methods']}. {item['note']}"
             )
             add(item["name"], text, item["page"], item["end_page"], "program", item["code"])
+            self.chunks[-1].update(program_profile=program_profile(item))
         if len(self.programs) < 50:
             raise ValueError("Không đọc đủ bảng ngành. Kiểm tra bố cục PDF trước demo.")
         add(
