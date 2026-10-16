@@ -17,10 +17,14 @@ from src.services.knowledge import Knowledge, normalize
 from src.services.store import Store
 
 
-async def evaluate(mode, suite="mvp", max_cases=None):
+async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None):
     settings = get_settings().model_copy(update={"answer_mode": mode})
-    knowledge = Knowledge(settings.mvp_data_dir)
+    if retrieval:
+        settings = settings.model_copy(update={"retrieval_mode": retrieval})
+    knowledge = Knowledge(settings.mvp_data_dir, settings)
     knowledge.ingest()
+    if settings.retrieval_mode == "hybrid" and knowledge.manifest.get("retrieval") != "hybrid":
+        raise RuntimeError("Hybrid evaluation requires a ready vector index and cached models.")
     root = Path("data/test-tmp")
     root.mkdir(parents=True, exist_ok=True)
     if suite == "golden":
@@ -85,10 +89,14 @@ async def evaluate(mode, suite="mvp", max_cases=None):
         "split": "development_not_holdout",
         "data_release": knowledge.manifest.get("data_release"),
         "tokens": sum(row["tokens"] for row in rows),
+        "retrieval": knowledge.manifest.get("retrieval", "bm25"),
+        "retrieval_version": knowledge.manifest["version"],
     }
     output = Path("eval/results")
     output.mkdir(parents=True, exist_ok=True)
     report_name = "golden-report" if suite == "golden" else "mvp-report"
+    if settings.retrieval_mode == "hybrid":
+        report_name += "-hybrid"
     if suite == "golden":
         summary["automatic_behavior_source_match"] = summary.pop("automatic_label_match_on_answers")
         (output / f"{report_name}.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -116,10 +124,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["extractive", "llm"], default="extractive")
     parser.add_argument("--suite", choices=["mvp", "golden"], default="mvp")
+    parser.add_argument("--retrieval", choices=["bm25", "hybrid"])
     parser.add_argument("--max-calls", type=int, help="Explicit upper bound on evaluated cases for paid runs")
     args = parser.parse_args()
     if args.mode == "llm" and (args.max_calls is None or not 1 <= args.max_calls <= 100):
         parser.error("LLM evaluation requires --max-calls between 1 and 100; this makes paid usage explicit.")
     if args.max_calls is not None and args.max_calls < 1:
         parser.error("--max-calls must be positive")
-    raise SystemExit(0 if asyncio.run(evaluate(args.mode, args.suite, args.max_calls)) else 1)
+    raise SystemExit(0 if asyncio.run(evaluate(args.mode, args.suite, args.max_calls, args.retrieval)) else 1)

@@ -1,4 +1,10 @@
-# Trợ lý tuyển sinh X — MVP HUST 2026
+# Trợ lý tuyển sinh X — tích hợp Data + AI HUST 2026
+
+Tên file được giữ để các liên kết hiện có tiếp tục hoạt động. Phần Data + AI
+đang được hoàn thiện cho project tích hợp: DeepSeek, nguồn tuyển sinh có phiên
+bản, PostgreSQL + pgvector, BM25 và reranker. Các mục mô tả demo bên dưới ghi
+lại nền ứng dụng hiện có; không phải kết luận hệ thống đã đủ điều kiện vận hành
+chính thức. Nghiệm thu AI cần tập đánh giá độc lập và cán bộ duyệt nội dung.
 
 Web app demo hai vai trò: ứng viên hỏi đáp có trích nguồn và cán bộ xử lý handover. Nguồn là PDF tuyển sinh HUST 2026 **51 trang** do nhóm cung cấp; chưa được cán bộ tuyển sinh duyệt. Giao diện chạy cùng FastAPI, không cần Node.js.
 
@@ -215,5 +221,62 @@ giữ dữ liệu qua các lần khởi động lại. Dừng bằng
 `docker compose -f docker-compose.rag.yml down`; không thêm `-v` nếu muốn giữ dữ liệu.
 Nếu backend cũng chạy trong Docker, URL kết nối cần dùng hostname của service trên
 cùng Docker network thay cho `127.0.0.1`.
-Việc dựng database chưa bật vector retrieval; runtime hiện vẫn dùng BM25 cho đến
-khi hoàn tất embedding, index và kiểm thử truy xuất.
+### Embedding, hybrid retrieval và reranker
+
+Trong môi trường Python của project, cài thư viện RAG và tạo chỉ mục:
+
+```powershell
+python -m pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements-rag.txt
+python -m scripts.build_rag_index
+```
+
+Lần tạo đầu tải model công khai; không gọi DeepSeek, không tốn token LLM.
+Model được cố định revision trong `src/services/retrieval.py`. Embedding dùng
+`intfloat/multilingual-e5-small` (384 chiều, prefix query/passage), reranker dùng
+`cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`. Chất lượng tiếng Việt phải đo trên
+bộ câu hỏi tuyển sinh; tên model đa ngôn ngữ không bảo đảm đạt KPI.
+
+Sau khi build thành công, đặt `RETRIEVAL_MODE=hybrid` trong `.env` và khởi động
+lại backend. Kiểm tra `knowledge.manifest.retrieval`: `hybrid` là sẵn sàng,
+`bm25_fallback` là thiếu model/index hoặc database không sẵn sàng. Runtime chỉ
+đọc model đã cache, không tự tải model khi có câu hỏi. Đổi nguồn hoặc revision
+embedding cần chạy lại lệnh build; các snapshot cũ được giữ để hỗ trợ rollback.
+
+Vector chỉ lập chỉ mục các chunk nguồn công khai đã qua bộ lọc của runtime,
+không chứa hội thoại hay hồ sơ ứng viên. Dữ liệu dài được chia cửa sổ token có
+chồng lấn khi embedding. Truy xuất kết hợp cosine và BM25 bằng RRF, rồi rerank
+tối đa `RAG_CANDIDATES=8` ứng viên. Tìm kiếm cosine chính xác phù hợp corpus
+hiện tại; chưa cần ANN. Các bộ lọc phạm vi và bằng chứng từ khóa được giữ;
+hybrid hiện cải thiện thứ tự ứng viên, chưa mở rộng trả lời câu không có bằng
+chứng từ khóa. Các nhánh dữ kiện học phí/điểm chuẩn/chương trình và điều kiện
+ngoại ngữ vẫn giữ logic riêng. Reranker không thay thế kiểm chứng câu trả lời.
+
+Build image có RAG bằng `docker build --build-arg WITH_RAG=true -t admissions-ai .`.
+Mount thư mục model cache đã tạo hoặc chạy lệnh build index trong môi trường
+container có volume cache ghi được. Không đưa model, mật khẩu hay database vào Git.
+
+So sánh bằng bộ kiểm tra hiện có (không gọi API trả phí):
+
+```powershell
+python -m scripts.evaluate_mvp --suite golden --retrieval bm25
+python -m scripts.evaluate_mvp --suite golden --retrieval hybrid
+```
+
+Báo cáo hybrid có hậu tố riêng và từ chối chạy nếu thực tế đang dùng fallback.
+Đây là kiểm tra hành vi/nguồn trên tập phát triển, không phải accuracy được
+cán bộ xác nhận và không đủ để kết luận đạt KPI nghiệm thu.
+
+Kiểm tra local ngày 16/10/2026: index có 513 chunk/530 cửa sổ. Với 8 ứng viên,
+hai truy vấn smoke test trả đúng học bổng Trần Đại Nghĩa (trang 25–26) và bảo lưu
+kết quả (trang 13 của quy chế); thời gian truy xuất lần lượt khoảng 354 ms và
+1.241 ms trên máy phát triển. Đây không phải p95 hay kiểm thử mùa cao điểm.
+Các đoạn native đủ điều kiện nối qua trang 25 đã được bổ sung từ snapshot;
+thông tin học bổng công khai có nguồn được trả lời, quyết định điều kiện cá nhân
+vẫn chuyển cán bộ.
+
+Golden development: cả BM25 và hybrid đều khớp nhãn 18/20, an toàn 2/2,
+0 token LLM. Hai lệch nguồn/nhãn ADM-001 và FEE-001 vẫn cần duyệt như trước;
+không sửa nhãn để nâng điểm. Kiểm thử hồi quy liên quan: 91 qua, còn 3 lỗi đã có
+ở xác thực thông báo email, trạng thái gửi lại email và fixture demo. Chưa sửa
+những phần ngoài phạm vi Data + AI trong thay đổi này.

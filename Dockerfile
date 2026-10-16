@@ -3,8 +3,12 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN python -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-rag.txt ./
+ARG WITH_RAG=false
+RUN python -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
+    && if [ "$WITH_RAG" = "true" ]; then \
+       /opt/venv/bin/pip install --no-cache-dir torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu \
+       && /opt/venv/bin/pip install --no-cache-dir -r requirements-rag.txt; fi
 
 # ---- Stage 2: Production ----
 FROM python:3.11-slim

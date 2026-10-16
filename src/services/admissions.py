@@ -68,6 +68,10 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        if "hoc bong" in normalized and not explicit and any(name in normalized for name in [
+            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
+        ]):
+            return {"scope": "general", "program": "", "explicit": False}
         general_fee_policy = "hoc phi" in normalized and any(
             term in normalized for term in ["tin chi", "tchp", "hoc ky he"]
         )
@@ -222,7 +226,13 @@ class Admissions:
             ]
         ) and not postgraduate_fee_request:
             return "Phạm vi hiện tại là tuyển sinh từ THPT vào đại học chính quy HUST năm 2026. Nội dung bạn hỏi cần nguồn riêng hoặc cán bộ hỗ trợ."
-        if "hoc bong" in q:
+        named_scholarship = any(name in q for name in [
+            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
+        ])
+        personal_scholarship = re.search(r"\b(?:toi|em|minh)\b", q) or any(
+            term in q for term in ["chac chan", "du dieu kien", "co duoc", "se duoc", "nhan duoc"]
+        )
+        if "hoc bong" in q and (not named_scholarship or personal_scholarship):
             return "Bộ nguồn hiện tại chưa đủ thông tin về điều kiện và mức học bổng để tư vấn chắc chắn. Mình không thể hứa cấp học bổng; bạn có thể nhờ cán bộ kiểm tra."
         if "quy doi" in q and any(s in q for s in ["ielts", "vstep", "chung chi", "ngoai ngu"]):
             return "Bảng quy đổi chứng chỉ ở trang PDF 17 đang là ảnh và chưa được xác minh để tra cứu. Mình chưa thể tính điểm quy đổi; bạn hãy xem trang đó hoặc chuyển cán bộ kiểm tra."
@@ -368,8 +378,15 @@ class Admissions:
                 response="Mình hỗ trợ tuyển sinh đại học HUST 2026. Bạn hãy hỏi về ngành, phương thức xét tuyển, học phí hoặc quy trình đăng ký.",
                 reason="out_of_scope",
             )
+        key = (self.k.manifest["version"], normalize(question), answer_program, self.settings.answer_mode,
+               self.settings.llm_provider, self.settings.deepseek_model if self.settings.llm_provider == "deepseek"
+               else self.settings.model_name)
+        if key in self.cache:
+            value, created = self.cache[key]
+            if time.time() - created < 3600:
+                return dict(value, cached=True, tokens=0)
         # A follow-up uses only the resolved program context; free-form previous user instructions are not trusted.
-        chunks = self._merge_source_chunks(self.k.search(question, answer_program, limit=4))
+        chunks = self._merge_source_chunks(await asyncio.to_thread(self.k.search, question, answer_program, limit=4))
         if not chunks:
             return dict(base, response=FALLBACK)
         if chunks[0]["kind"] == "program" and not any(
@@ -401,13 +418,6 @@ class Admissions:
                         response="Bạn hỏi chương trình chuẩn, tiên tiến hay hợp tác quốc tế? Hãy chọn mã chương trình để tránh nhầm mức học phí.",
                         reason="ambiguous_program",
                     )
-        key = (self.k.manifest["version"], normalize(question), answer_program, self.settings.answer_mode,
-               self.settings.llm_provider, self.settings.deepseek_model if self.settings.llm_provider == "deepseek"
-               else self.settings.model_name)
-        if key in self.cache:
-            value, created = self.cache[key]
-            if time.time() - created < 3600:
-                return dict(value, cached=True, tokens=0)
         if chunks[0]["kind"] in ["program", "fee"]:
             chunks = chunks[:1]
         sources = [self.k.citation(c) for c in chunks]

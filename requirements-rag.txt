@@ -1,0 +1,7 @@
+# Install CPU PyTorch first: pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1
+sentence-transformers==5.7.0
+psycopg[binary]==3.3.6
+transformers==5.20.0
+tokenizers==0.23.3
+huggingface-hub==2.2.0

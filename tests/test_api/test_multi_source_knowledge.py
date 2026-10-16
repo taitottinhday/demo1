@@ -2,7 +2,82 @@ import pytest
 
 from src.config import Settings
 from src.services.admissions import Admissions
+from src.services.knowledge import Knowledge
 from src.services.store import Store
+
+
+def test_hybrid_keeps_scope_filters_and_preserves_citations(knowledge):
+    from unittest.mock import Mock
+
+    k = Knowledge("data")
+    k.__dict__.update(knowledge.__dict__)
+    retrieval = Mock()
+
+    def search(question, allowed, lexical, limit):
+        candidates = {c["id"]: c for c in k.chunks if c["id"] in allowed}
+        assert candidates
+        assert all(c.get("audience") != "student" for c in candidates.values())
+        assert all(c["kind"] not in {"fee", "program", "verified_fact", "overview"}
+                   for c in candidates.values())
+        return [dict(lexical[0][1], retrieval="hybrid", score=1)]
+
+    retrieval.search.side_effect = search
+    k.retrieval = retrieval
+    result = k.search("Quy chế tuyển sinh xét tuyển đại học")
+    assert result[0]["retrieval"] == "hybrid"
+    assert k.citation(result[0])["source_id"]
+    retrieval.search.assert_called_once()
+
+
+def test_named_scholarship_does_not_retrieve_unrelated_tuition_or_awards(knowledge):
+    from src.services.knowledge import normalize
+
+    results = knowledge.search("Học bổng Trần Đại Nghĩa dành cho ai?")
+    assert results
+    assert all("tran dai nghia" in normalize(c["text"]) for c in results)
+
+
+@pytest.mark.asyncio
+async def test_public_scholarship_information_does_not_decide_personal_eligibility(knowledge, tmp_path):
+    from src.services.knowledge import normalize
+
+    service = Admissions(knowledge, Store(tmp_path / "scholarship.db"), Settings(_env_file=None))
+    public = await service.answer("Học bổng Trần Đại Nghĩa dành cho ai?")
+    assert public["kind"] == "answered"
+    assert "kho khan" in normalize(public["response"])
+    assert public["sources"][0]["source_id"] == knowledge.primary_source_id
+    assert public["sources"][0]["end_page"] >= 26
+    personal = await service.answer("Em có đủ điều kiện nhận học bổng Trần Đại Nghĩa không?")
+    assert personal["kind"] == "fallback"
+    assert not personal["sources"]
+
+
+def test_hybrid_failure_falls_back_without_losing_bm25_evidence(knowledge):
+    from unittest.mock import Mock
+
+    k = Knowledge("data")
+    k.__dict__.update(knowledge.__dict__)
+    question = "Quy chế tuyển sinh xét tuyển đại học"
+    expected = k.search(question)
+    k.retrieval = Mock()
+    k.retrieval.search.side_effect = TimeoutError("private connection details")
+    assert k.search(question) == expected
+    k.retrieval.search.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_answer_cache_skips_retrieval(knowledge, tmp_path):
+    from unittest.mock import Mock
+
+    k = Knowledge("data")
+    k.__dict__.update(knowledge.__dict__)
+    service = Admissions(k, Store(tmp_path / "cache.db"), Settings(_env_file=None))
+    first = await service.answer("Giới thiệu chương trình IT1")
+    assert first["kind"] == "answered"
+    k.search = Mock(side_effect=AssertionError("Cached answers must not run retrieval"))
+    second = await service.answer("Giới thiệu chương trình IT1")
+    assert second["cached"] is True
+    assert second["response"] == first["response"]
 
 
 def test_merged_passages_keep_evidence_and_do_not_merge_different_parents():

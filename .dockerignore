@@ -38,3 +38,5 @@ scripts/
 !scripts/
 scripts/*
 !scripts/seed_admin_demo.py
+!scripts/__init__.py
+!scripts/build_rag_index.py

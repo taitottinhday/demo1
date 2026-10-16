@@ -91,7 +91,7 @@ def create_app(settings=None):
         state_dir.mkdir(parents=True, exist_ok=True)
         store = Store(state_dir / "mvp.db")
         seed_accounts(store, cfg)
-        knowledge = Knowledge(knowledge_dir)
+        knowledge = Knowledge(knowledge_dir, cfg)
         source_error = None
         try:
             await asyncio.to_thread(knowledge.ingest)

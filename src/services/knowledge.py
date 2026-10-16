@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import logging
 import math
 import re
 import unicodedata
@@ -29,7 +30,9 @@ def clean(text: str) -> str:
 
 
 class Knowledge:
-    def __init__(self, data_dir: str | Path):
+    def __init__(self, data_dir: str | Path, settings=None):
+        self.settings = settings
+        self.retrieval = None
         self.root = Path(data_dir)
         self.chunks = []
         self.programs = []
@@ -71,9 +74,9 @@ class Knowledge:
                 continue
             if chunk.get("extraction_method") != "native" or not runtime_source.get("indexable"):
                 continue
-            # Preserve the established primary program/fee parsing and API contract.
-            # Supplemental PDFs now use the reviewed-quality corpus rather than raw pages.
-            if runtime_source["id"] == self.primary_source_id:
+            # Keep primary program/fee parsing; supplement its former page-25 cap
+            # with validated native passages (including scholarships spanning 25–26).
+            if runtime_source["id"] == self.primary_source_id and chunk["page_end"] <= 25:
                 continue
             passages.append((chunk, parent, runtime_source))
         return release, passages
@@ -181,7 +184,7 @@ class Knowledge:
             "pages": len(document),
             "scope": catalog.get("corpus_scope", "Tuyển sinh và thông tin đào tạo HUST theo phạm vi từng tài liệu."),
             "status": "Kho nguồn gồm tài liệu chính thức; mỗi câu trả lời cần đối chiếu đúng nguồn và phạm vi áp dụng.",
-            "indexed_pages": "2–25; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2",
+            "indexed_pages": "2–25 và đoạn native đủ điều kiện từ snapshot; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2",
             "document_count": len(self.documents),
             "data_release": release["release"],
             "normalized_passages": len(normalized),
@@ -391,6 +394,21 @@ class Knowledge:
         self.counters = [Counter(tokens(c["title"] + " " + c["text"])) for c in self.chunks]
         self.df = Counter(t for c in self.counters for t in c)
         self.average = sum(sum(c.values()) for c in self.counters) / len(self.counters)
+        self.retrieval = None
+        self.manifest["retrieval"] = "bm25"
+        if self.settings and self.settings.retrieval_mode == "hybrid":
+            from src.services.retrieval import HybridRetrieval
+
+            try:
+                retrieval = HybridRetrieval(self.settings, self)
+                retrieval.check()
+                self.retrieval = retrieval
+                self.manifest["retrieval"] = "hybrid"
+                self.manifest["version"] = retrieval.version
+            except Exception as exc:
+                # Do not log connection strings, questions or exception text.
+                logging.warning("Hybrid retrieval unavailable: %s; using BM25", type(exc).__name__)
+                self.manifest["retrieval"] = "bm25_fallback"
         output = self.root / "processed"
         output.mkdir(parents=True, exist_ok=True)
         (output / "knowledge.json").write_text(
@@ -464,6 +482,10 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
+        scholarship_query = "hoc bong" in norm
+        scholarship_names = [name for name in (
+            "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
+        ) if name in norm]
         per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi", "hoc ky he"])
         postgraduate_fee_query = fee_query and any(term in norm for term in ["thac si", "tien si", "sau dai hoc"])
         language_query = any(t in norm for t in ["ngoai ngu", "tieng anh", "ielts", "vstep", "placement test", "hust ept", "k71"]) and not any(
@@ -591,6 +613,10 @@ class Knowledge:
         scored = []
         for chunk, counts in zip(self.chunks, self.counters, strict=True):
             # Student language policies are not general applicant requirements.
+            if scholarship_query:
+                content = normalize(chunk["text"])
+                if "hoc bong" not in content or any(name not in content for name in scholarship_names):
+                    continue
             if chunk.get("audience") == "student" and not any(
                 term in norm for term in ["sinh vien", "k71", "dau ra", "tot nghiep", "mien hoc", "ngoai ngu"]
             ):
@@ -700,6 +726,13 @@ class Knowledge:
             if matched and score >= 3:
                 scored.append((score, chunk))
         scored.sort(key=lambda x: x[0], reverse=True)
+        if self.retrieval and scored and not (fee_query or talent_query or selected or preferred_pages):
+            # Keep the established scope and lexical-evidence filters. Vector search
+            # cannot reintroduce historical, student-only or unrelated program rows.
+            try:
+                return self.retrieval.search(question, [c["id"] for _, c in scored], scored, limit)
+            except Exception as exc:
+                logging.warning("Hybrid query failed: %s; using BM25", type(exc).__name__)
         # Require lexical support beyond incidental overlap.
         return [dict(c, score=round(s, 2)) for s, c in scored[:limit]]
 

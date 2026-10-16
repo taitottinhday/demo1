@@ -33,6 +33,11 @@ class Settings(BaseSettings):
 
     # Vector Store
     chroma_persist_dir: str = "./data/chroma"
+    retrieval_mode: Literal["bm25", "hybrid"] = "bm25"
+    rag_database_url: str = ""
+    rag_model_cache: str = "data/tools/models"
+    rag_candidates: int = Field(default=8, ge=4, le=32)
+
 
     # Local MVP. LLM is opt-in so a demo never spends money implicitly.
     answer_mode: Literal["extractive", "llm"] = "extractive"
