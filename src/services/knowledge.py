@@ -482,6 +482,8 @@ class Knowledge:
         years = {int(year) for year in re.findall(r"\b20\d{2}\b", norm)}
         historical_years = years - {2026, 2027}
         if historical_years:
+            if re.search(r"\b1\.[23]\b", norm):
+                return []  # Historical source tables do not distinguish XTTN subcategories.
             if len(years) != 1 or not any(term in norm for term in ["diem chuan", "diem trung tuyen"]):
                 return []
             code = self.resolve_program(question, program)

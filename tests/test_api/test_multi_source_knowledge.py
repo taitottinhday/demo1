@@ -252,6 +252,31 @@ async def test_cutoff_answer_uses_exact_web_fact_and_does_not_overgeneralize(kno
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("question", [
+    "Điểm chuẩn IT1 năm 2026 theo TSA?",
+    "Điểm chuẩn IT1 năm 2026 XTTN diện 1.2?",
+    "Điểm chuẩn EE2 năm 2025 XTTN diện 1.3?",
+])
+async def test_cutoff_never_substitutes_another_method_or_unspecified_xttn(knowledge, tmp_path, question):
+    service = Admissions(knowledge, Store(tmp_path / "cutoff-method.db"), Settings(_env_file=None))
+    answer = await service.answer(question)
+    assert answer["kind"] == "fallback"
+    assert not answer["sources"]
+    assert "29,27" not in answer["response"]
+    assert "85.44" not in answer["response"]
+
+
+@pytest.mark.asyncio
+async def test_cutoff_summary_does_not_repeat_score_or_hide_xttn_scope(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "cutoff-render.db"), Settings(_env_file=None))
+    current = await service.answer("Điểm chuẩn IT1 2026?")
+    assert current["response"].count("29,27") == 1
+    historical = await service.answer("Điểm chuẩn EE2 2025?")
+    assert "không tách diện 1.2 và 1.3" in historical["response"]
+    assert historical["response"].count("không áp dụng thay") == 1
+
+
+@pytest.mark.asyncio
 async def test_tuition_uses_yearly_estimate_or_per_credit_source_as_asked(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "tuition.db"), Settings(_env_file=None, answer_mode="extractive"))
 

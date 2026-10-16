@@ -327,6 +327,18 @@ class Admissions:
         guard = self.guard(question)
         if guard:
             return dict(base, response=guard, reason="guardrail")
+        cutoff_request = any(term in q for term in ["diem chuan", "diem trung tuyen"])
+        if cutoff_request:
+            historical = any(year in q for year in ["2024", "2025"])
+            subtype = re.search(r"\b1\.[23]\b", q)
+            other_method = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy", "xttn", "xet tuyen tai nang"])
+            if (historical and subtype) or (not historical and (subtype or other_method)):
+                detail = (
+                    "Bảng điểm lịch sử trong PDF chỉ ghi chung XTTN, không tách diện 1.2 và 1.3; mình không thể gán điểm chung cho một diện."
+                    if historical else
+                    "Kho hiện chỉ lưu một số điểm THPT năm 2026; chưa có bảng điểm TSA hoặc XTTN diện 1.2, 1.3 được xác minh. Mình không thể dùng điểm THPT thay cho các phương thức này."
+                )
+                return dict(base, response=detail + " Cần bổ sung bảng điểm chính thức đúng phương thức hoặc nhờ cán bộ đối chiếu.")
         if q in ["xin chao", "chao", "hello", "hi"]:
             return dict(
                 base,
@@ -451,7 +463,8 @@ class Admissions:
             normalize(c["title"]) == "12.4 hoc bong" and c.get("record_id") for c in chunks
         )
         historical_cutoff = all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks)
-        if quota_question or scholarship_policy or historical_cutoff:
+        cutoff_fact = cutoff_request and all(c.get("topic") == "cutoff" for c in chunks)
+        if quota_question or scholarship_policy or historical_cutoff or cutoff_fact:
             # Render atomic quotas and complete scholarship policy sections
             # directly from their official source without paid synthesis.
             rendered = format_answer(question, chunks, answer_program)

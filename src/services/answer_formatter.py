@@ -93,7 +93,14 @@ def _admission_methods(text):
 
 def format_answer(question, chunks, program=""):
     if chunks and all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks):
-        return "\n\n".join(f"{c['text']} [{i}]" for i, c in enumerate(chunks, 1))
+        lines = []
+        for i, c in enumerate(chunks, 1):
+            text = c['text'].replace("phương thức DGTD", "phương thức ĐGTD (TSA)")
+            text = text.replace(" Đây không phải điểm chuẩn 2026.", "")
+            if c.get("method") == "XTTN":
+                text += " Bảng nguồn ghi chung XTTN, không tách diện 1.2 và 1.3."
+            lines.append(f"{text} [{i}]")
+        return "\n\n".join(lines) + "\n\nĐây là điểm lịch sử, không áp dụng thay cho điểm chuẩn năm 2026."
     if "hoc bong" in normalize(question):
         names = [name for name in (
             "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"
