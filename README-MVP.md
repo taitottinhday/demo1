@@ -178,10 +178,10 @@ Evidence Gate 2: [6 ca với output thực tế](eval/manual-tests.md). Người
 New-Item -ItemType Directory -Force data/test-tmp | Out-Null
 .venv/Scripts/python.exe -m pytest -q --basetemp=data/test-tmp/local-check
 .venv/Scripts/python.exe -m ruff check src tests scripts/ingest_sources.py scripts/evaluate_mvp.py scripts/check_browser.py
-.venv/Scripts/python.exe -X utf8 -m scripts.evaluate_mvp
+.venv/Scripts/python.exe -X utf8 -m scripts.evaluate_mvp --retrieval bm25 --output data/test-tmp/local-evaluation.json
 ```
 
-`--basetemp` phải là thư mục chỉ dành cho test vì pytest sẽ dọn nội dung của nó. Báo cáo tại [eval/results/report.md](eval/results/report.md) và `mvp-report.json`. Bộ 40 ca dự thảo là regression development; đối chiếu từ khóa/trang không thay thế accuracy được cán bộ duyệt. Cần bộ holdout 100 hỏi đáp + 30 an toàn và pilot trước khi công bố đạt KPI đề tài.
+`--basetemp` phải là thư mục chỉ dành cho test vì pytest sẽ dọn nội dung của nó. Báo cáo lần chạy nằm trong `data/test-tmp/local-evaluation.json` và `.md`, không thêm vào Git. Bộ 40 ca dự thảo là regression development; đối chiếu từ khóa/trang không thay thế accuracy được cán bộ duyệt. Cần bộ holdout 100 hỏi đáp + 30 an toàn và pilot trước khi công bố đạt KPI đề tài.
 
 Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwright`, chạy server, rồi dùng `python -m scripts.check_browser --browser "C:/Program Files/Google/Chrome/Application/chrome.exe"`. Script dùng hồ sơ trình duyệt tạm, tạo ticket DEMO UI và lưu ảnh tại `data/processed/demo/`.
 
@@ -190,6 +190,25 @@ Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwrig
 ```powershell
 docker compose up --build
 ```
+
+Image mặc định đã cài thư viện RAG CPU. Compose dùng nguồn đóng gói trong image
+và giữ state/model ở `/app/state`; không mount thư mục dữ liệu local đè lên nguồn.
+Trong container, `RAG_DATABASE_URL` phải trỏ tới database truy cập được từ Docker,
+không dùng `127.0.0.1:55432` của máy host. Với Docker Desktop và database local,
+thay hostname bằng `host.docker.internal`, giữ phần tài khoản/database của URL riêng.
+
+Để tự đồng bộ index khi deploy, cấu hình `RETRIEVAL_MODE=hybrid`,
+`RAG_MODEL_CACHE=/app/state/models`, `RAG_BUILD_ON_START=true` cùng URL pgvector.
+Container tải model còn thiếu và chỉ build snapshot nếu chưa có/đã cũ trước khi
+nhận request; lỗi khởi tạo sẽ dừng startup. Lần đầu có thể lâu, cần điều chỉnh
+startup/healthcheck timeout trên cloud. Mặc định cờ này tắt; không tự tạo PostgreSQL
+hoặc chuyển key local lên cloud. DeepSeek cần `ANSWER_MODE=llm`,
+`LLM_PROVIDER=deepseek` và secret `DEEPSEEK_API_KEY` trong môi trường backend.
+
+CI trên `main`/PR hiện kiểm thử, đánh giá BM25, build Docker có RAG rồi chạy thử
+image với 9 nguồn/68 chương trình. Bước kiểm tra image không gọi DeepSeek, không
+kết nối database production và không tự publish image; Railway/Vercel vẫn cần
+cấu hình theo dõi `main` để cập nhật web sau push.
 
 Mở cùng các URL ở trên. `data/sources.md` và PDF công khai được phép đưa vào Git để clone repo có thể chạy lại; database, dữ liệu xử lý và dữ liệu ứng viên vẫn bị ignore. Ở local, Docker Compose lưu state tại `/app/state` và mount từ `data/state`. Trên Railway, tạo Volume mount tại `/app/state` và đặt `PERSISTENT_DATA_DIR=/app/state`; giữ `MVP_DATA_DIR=data` để Volume không che các PDF nguồn. Public deployment cần HTTPS, đổi mật khẩu riêng ≥12 ký tự, `SECURE_COOKIES=true`, `APP_ENV=production` và nguồn được duyệt; production sẽ từ chối mật khẩu demo. Hai nút demo ở trang cán bộ/admin dùng database mẫu riêng tại `PERSISTENT_DATA_DIR/demo/mvp.db`, không truy cập ticket/tài khoản thật và không gửi email.
 

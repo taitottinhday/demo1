@@ -6,4 +6,6 @@ data/raw/cutoffs_2026_official.html whitespace=-space-before-tab
 # Extracted text preserves source/OCR trailing blank lines as evidence.
 data/extracted/**/*.txt whitespace=-blank-at-eof
 scripts/*.py text eol=lf
+scripts/*.sh text eol=lf
+docker-entrypoint.sh text eol=lf
 requirements-data*.txt text eol=lf

@@ -4,7 +4,7 @@ FROM python:3.11-slim AS builder
 WORKDIR /app
 
 COPY requirements.txt requirements-rag.txt ./
-ARG WITH_RAG=false
+ARG WITH_RAG=true
 RUN python -m venv /opt/venv && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
     && if [ "$WITH_RAG" = "true" ]; then \
        /opt/venv/bin/pip install --no-cache-dir torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu \
@@ -18,6 +18,7 @@ WORKDIR /app
 # Copy installed packages from builder
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH=/opt/venv/bin:$PATH
+ENV RAG_MODEL_CACHE=/app/state/models
 
 # Security: run as non-root user
 RUN useradd -m appuser

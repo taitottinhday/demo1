@@ -3,15 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        WITH_RAG: "true"
     ports:
       - "8000:8000"
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
       - ./data/state:/app/state
     environment:
       PERSISTENT_DATA_DIR: /app/state
+      RAG_MODEL_CACHE: /app/state/models
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]

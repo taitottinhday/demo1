@@ -33,7 +33,8 @@ If the currently running deployment still has the old ephemeral database, copy i
 | Lint đúng lệnh CI | Passed |
 | Toàn bộ pytest sau sửa gate | 218 passed |
 | Eval 40 ca dùng trong CI sau sửa | Exit 0: 40/40 khớp nhãn trên BM25 và hybrid; 29/30 câu nghiệp vụ trả lời, 10/10 ca an toàn qua |
-| Docker build mới trên Linux/cloud | Chưa xác minh trong đợt kiểm tra này |
+| Docker image có RAG | Build Linux thành công; import thư viện CPU, startup BM25/hybrid, 9 nguồn/68 chương trình/1.047 chunks qua; `.env` không có trong image |
+| Khởi tạo index trong container | Qua với database thử rỗng (1.068 windows), bỏ qua build khi snapshot đã có; cấu hình bootstrap sai chặn startup |
 | Dashboard, quyền truy cập, nhánh autodeploy, secret, Volume/backup thực tế | Chưa xác minh; cần chủ tài khoản kiểm tra |
 
 URL đã kiểm tra chỉ đọc: `https://demo1-production-f54e.up.railway.app/health`,
@@ -102,6 +103,7 @@ PUBLIC_BASE_URL=https://<ten-mien-frontend-thuc-te>
 CORS_ORIGINS=https://<ten-mien-frontend-thuc-te>
 WITH_RAG=true
 RETRIEVAL_MODE=bm25
+RAG_BUILD_ON_START=false
 RAG_MODEL_CACHE=/app/state/models
 RAG_DATABASE_URL=<URL-PostgreSQL-cloud-co-pgvector>
 LLM_PROVIDER=deepseek
@@ -144,8 +146,8 @@ thay thế `RAG_DATABASE_URL`; state ứng dụng hiện vẫn là SQLite trên 
 
 Nếu cả hai nền tảng đã theo dõi `main`, push/merge sẽ có thể kích hoạt deploy;
 merge local chưa push không kích hoạt. Railway có thể bật Wait for CI sau khi gate
-ở bước 1 đã qua. Chưa có workflow trong repo tự tạo database/cache hoặc build index
-cloud. Không xem autodeploy ứng dụng là tự đồng bộ mọi thành phần RAG.
+ở bước 1 đã qua. Job `package` kiểm tra Docker sau kiểm thử; không publish hay tạo
+database cloud. Nếu muốn tự cập nhật index, bật cờ startup theo bước 4 bên dưới.
 
 ### 4. Đưa code lên và khởi tạo RAG cloud — Data/AI + DevOps
 
@@ -187,7 +189,14 @@ Sau khi build hoàn tất, đổi `RETRIEVAL_MODE=hybrid`, deploy/restart và ki
 Nếu chỉ mục không sẵn sàng, xem log theo loại lỗi, quyền cache và kết nối database;
 không chép secret/log chứa dữ liệu cá nhân vào issue công khai. Thay nguồn/model revision
 cần build lại index rồi restart để tiến trình nạp bản mới. Giữ snapshot cũ cho rollback.
-Quy trình này có bước khởi tạo/cập nhật index thủ công; chưa tự động toàn phần.
+Thay cho bước build index thủ công, có thể đặt `RAG_BUILD_ON_START=true` cùng
+`RETRIEVAL_MODE=hybrid`, `RAG_MODEL_CACHE=/app/state/models` và URL pgvector cloud.
+Entrypoint chạy `python -m scripts.build_rag_index --if-needed` với user `appuser`
+trước khi chạy web: tải model vào Volume và chỉ build snapshot thiếu/cũ. Kết nối
+database hoặc build lỗi sẽ chặn startup, không báo deploy thành công giả. Điều chỉnh
+healthcheck/startup timeout phù hợp thời gian tải model lần đầu; quan sát log build
+index trước khi kết luận service lỗi. Cờ mặc định tắt, database và Volume vẫn cần
+người vận hành chuẩn bị. Deploy cập nhật nguồn sẽ tự build index khi bật cờ này.
 
 ### 5. Bật DeepSeek và thử nghiệm sau deploy — Data/AI
 

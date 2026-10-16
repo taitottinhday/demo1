@@ -35,12 +35,55 @@ jobs:
           OPENAI_API_KEY: test-key
 
       - name: Evaluate local retrieval baseline
-        run: python -m scripts.evaluate_mvp
+        run: python -m scripts.evaluate_mvp --retrieval bm25 --output data/test-tmp/ci-evaluation.json
         env:
           ANSWER_MODE: extractive
 
       - name: Upload evaluation evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mvp-evaluation
-          path: eval/results/
+          path: data/test-tmp/ci-evaluation.*
+
+  package:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build application image with RAG dependencies
+        run: docker build --tag admissions-ai:ci .
+      - name: Check Linux RAG dependencies
+        run: >-
+          docker run --rm --entrypoint python admissions-ai:ci -c
+          "import torch, psycopg; from sentence_transformers import SentenceTransformer, CrossEncoder; print('RAG dependencies ready')"
+      - name: Check packaged sources and application startup
+        run: |
+          docker run --detach --name admissions-ci -p 127.0.0.1:8000:8000 \
+            -e APP_ENV=test -e ANSWER_MODE=extractive -e RETRIEVAL_MODE=bm25 \
+            -e PERSISTENT_DATA_DIR=/app/state admissions-ai:ci
+          python - <<'PY'
+          import json
+          import time
+          import urllib.request
+
+          for attempt in range(60):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:8000/api/v1/status', timeout=5) as response:
+                      status = json.load(response)
+                  assert status['status'] == 'ready', status
+                  assert status['programs'] == 68, status
+                  assert status['source']['document_count'] == 9, status
+                  assert status['source_error'] is None, status
+                  print('Packaged application and sources are ready')
+                  break
+              except (OSError, AssertionError):
+                  if attempt == 59:
+                      raise
+                  time.sleep(2)
+          PY
+      - name: Container logs and cleanup
+        if: always()
+        run: |
+          docker logs admissions-ci || true
+          docker rm -f admissions-ci || true
