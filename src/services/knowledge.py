@@ -39,6 +39,44 @@ class Knowledge:
         self.documents_by_id = {}
         self.primary_source_id = ""
         self.version = ""
+        self.records = {}
+
+    def _normalized_snapshot(self):
+        """Verify the data/runtime boundary before using normalized passages."""
+        release = json.loads((self.root / "processed/release.json").read_text(encoding="utf-8"))
+        if release.get("schema_version") != 2:
+            raise ValueError("Knowledge cần snapshot data schema v2.")
+        names = ("source_catalog.json", "manifests/sources.json", "normalized/records.jsonl", "processed/chunks.jsonl")
+        for name in names:
+            content = (self.root / name).read_bytes().replace(b"\r\n", b"\n")
+            if hashlib.sha256(content).hexdigest() != release["files"].get(name):
+                raise ValueError(f"Snapshot checksum mismatch: {name}")
+        manifest = json.loads((self.root / "manifests/sources.json").read_text(encoding="utf-8"))
+        mapping = {s["source_id"]: s for s in manifest["sources"]}
+        self.records = {
+            item["record_id"]: item
+            for item in map(json.loads, (self.root / "normalized/records.jsonl").read_text(encoding="utf-8").splitlines())
+        }
+        passages = []
+        for line in (self.root / "processed/chunks.jsonl").read_text(encoding="utf-8").splitlines():
+            chunk = json.loads(line)
+            parent = self.records[chunk["record_id"]]
+            source = mapping[chunk["source_id"]]
+            runtime_source = self.documents_by_id[source["runtime_source_id"]]
+            if chunk["source_version"] != runtime_source["version"]:
+                raise ValueError("Normalized source version differs from runtime catalog.")
+            if not all(item.get("answer_eligible") is True for item in (chunk, parent)):
+                continue
+            if chunk.get("historical") or chunk.get("scope") != "undergraduate_regular":
+                continue
+            if chunk.get("extraction_method") != "native" or not runtime_source.get("indexable"):
+                continue
+            # Preserve the established primary program/fee parsing and API contract.
+            # Supplemental PDFs now use the reviewed-quality corpus rather than raw pages.
+            if runtime_source["id"] == self.primary_source_id:
+                continue
+            passages.append((chunk, parent, runtime_source))
+        return release, passages
 
     def _source_path(self, source):
         """Resolve a catalog path inside this data directory, never an arbitrary path."""
@@ -124,6 +162,9 @@ class Knowledge:
         if facts_path.exists():
             versions.append("facts:" + hashlib.sha256(facts_path.read_bytes()).hexdigest())
         self.version = hashlib.sha256("\n".join(sorted(versions)).encode("utf-8")).hexdigest()
+        release, normalized = self._normalized_snapshot()
+        self.version = hashlib.sha256((self.version + release["files"]["processed/chunks.jsonl"]
+                                      + release["files"]["normalized/records.jsonl"]).encode()).hexdigest()
 
         document = pymupdf.open(self.pdf)
         if len(document) < 25:
@@ -142,6 +183,8 @@ class Knowledge:
             "status": "Kho nguồn gồm tài liệu chính thức; mỗi câu trả lời cần đối chiếu đúng nguồn và phạm vi áp dụng.",
             "indexed_pages": "2–25; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2",
             "document_count": len(self.documents),
+            "data_release": release["release"],
+            "normalized_passages": len(normalized),
             "indexable_pdf_count": sum(1 for item in self.documents if item.get("type") == "pdf" and item.get("indexable")),
             "unavailable_sources": [
                 {"id": item["id"], "title": item.get("title"), "status": item.get("status")}
@@ -294,28 +337,17 @@ class Knowledge:
 
         document.close()
 
-        # Index each readable supplemental PDF as page-local text. The primary
-        # admissions PDF keeps its table-aware parsing above; scans are excluded
-        # by catalog metadata until OCR output has been reviewed.
-        for source in self.documents:
-            if source.get("id") == self.primary_source_id or source.get("type") != "pdf" or not source.get("indexable"):
-                continue
-            source_path = source.get("resolved_path")
-            if not source_path:
-                continue
-            supplemental_pdf = pymupdf.open(source_path)
-            for page_index, pdf_page in enumerate(supplemental_pdf):
-                page_text = pdf_page.get_text()
-                for part_index, part in enumerate(self._split_page(page_text), 1):
-                    add(
-                        f"{source['title']} · PDF trang {page_index + 1}",
-                        part,
-                        page_index + 1,
-                        kind="document_text",
-                        source_id=source["id"],
-                        excerpt=part,
-                    )
-            supplemental_pdf.close()
+        for chunk, parent, source in normalized:
+            add(chunk["title"], chunk["text"], chunk["page_start"], chunk["page_end"],
+                kind="document_text", source_id=source["id"],
+                excerpt=parent["evidence"]["quote"] if parent["record_type"] == "table_row" else chunk["text"])
+            self.chunks[-1].update(
+                id=chunk["chunk_id"], record_id=parent["record_id"],
+                scope=chunk["scope"], audience=chunk["audience"],
+                review_status=chunk["review_status"], answer_eligible=True,
+                context_required=chunk["context_required"],
+                related_context_record_ids=chunk.get("related_context_record_ids", []),
+            )
 
         # Curated, page-verified facts sit alongside raw source chunks. They
         # improve retrieval for exact questions and retain their original quote.
@@ -554,6 +586,11 @@ class Knowledge:
             preferred_pages = {2}
         scored = []
         for chunk, counts in zip(self.chunks, self.counters, strict=True):
+            # Student language policies are not general applicant requirements.
+            if chunk.get("audience") == "student" and not any(
+                term in norm for term in ["sinh vien", "k71", "dau ra", "tot nghiep", "mien hoc", "ngoai ngu"]
+            ):
+                continue
             length = sum(counts.values())
             if chunk["kind"] == "overview":
                 continue

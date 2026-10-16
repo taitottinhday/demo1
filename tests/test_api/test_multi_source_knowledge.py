@@ -16,6 +16,20 @@ def test_ingestion_indexes_every_readable_source_and_marks_unreadable_assets(kno
     assert all(chunk["source_id"] != "hust-scholarships-online" for chunk in knowledge.chunks)
 
 
+def test_supplemental_passages_use_normalized_quality_and_parent_references(knowledge):
+    assert knowledge.manifest["data_release"] == "k71-2026-v2"
+    passages = [c for c in knowledge.chunks if c["kind"] == "document_text"]
+    assert len(passages) == knowledge.manifest["normalized_passages"] > 0
+    for passage in passages:
+        parent = knowledge.records[passage["record_id"]]
+        assert parent["answer_eligible"] is True
+        assert parent["extraction_method"] == "native"
+        assert parent["historical"] is False
+        assert parent["scope"] == "undergraduate_regular"
+        assert set(passage["related_context_record_ids"]).issubset(knowledge.records)
+        assert knowledge.citation(passage)["source_id"] in knowledge.documents_by_id
+
+
 @pytest.mark.asyncio
 async def test_cutoff_answer_uses_exact_web_fact_and_does_not_overgeneralize(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "cutoffs.db"), Settings(_env_file=None, answer_mode="extractive"))
