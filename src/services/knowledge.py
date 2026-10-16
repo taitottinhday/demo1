@@ -464,18 +464,18 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
-        per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi"])
+        per_credit_fee_query = any(term in norm for term in ["tchp", "tin chi", "moi tin chi", "tin hoc phi", "hoc ky he"])
         postgraduate_fee_query = fee_query and any(term in norm for term in ["thac si", "tien si", "sau dai hoc"])
         language_query = any(t in norm for t in ["ngoai ngu", "tieng anh", "ielts", "vstep", "placement test", "hust ept", "k71"]) and not any(
             t in norm for t in ["phi", "xac thuc", "quy doi", "diem thuong"]
         )
         graduation_language_query = language_query and any(
-            term in norm for term in ["dau ra", "tot nghiep", "placement test", "hust ept", "k71"]
+            term in norm for term in ["dau ra", "tot nghiep", "placement test", "hust ept", "k71", "ap dung", "hieu luc", "khoa nao", "troy"]
         )
         if graduation_language_query:
             placement_test_query = any(term in norm for term in ["placement test", "hust ept"])
             troy_query = "troy" in norm
-            k71_query = "k71" in norm
+            k71_query = "k71" in norm or any(term in norm for term in ["ap dung", "hieu luc", "khoa nao"])
             ranked_facts = []
             for chunk, counts in zip(self.chunks, self.counters, strict=True):
                 if chunk["kind"] != "verified_fact" or chunk.get("topic") not in {
@@ -535,6 +535,10 @@ class Knowledge:
             rows = [c for c in self.chunks if c["kind"] == "program" and c["code"] == code]
             return [dict(c, score=100) for c in (rules + rows)[:limit]]
         cutoff_query = any(term in norm for term in ["diem chuan", "diem trung tuyen", "diem trung"])
+        cutoff_query = cutoff_query or (
+            "tsa" in norm and "diem" in norm and bool(selected)
+            and any(term in norm for term in ["co nghia", "tuong duong", "thpt"])
+        )
         talent_query = "xttn" in norm or "xet tuyen tai nang" in norm or any(term in norm for term in ["1.1", "1.2", "1.3"])
         if cutoff_query:
             cutoff_facts = [
@@ -617,6 +621,8 @@ class Knowledge:
             ):
                 continue
             if fee_query and not per_credit_fee_query and not postgraduate_fee_query and chunk["kind"] != "fee":
+                continue
+            if "hoc ky he" in norm and chunk.get("fact_id") != "summer-tuition-multiplier":
                 continue
             if (
                 not selected

@@ -68,6 +68,15 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        general_fee_policy = "hoc phi" in normalized and any(
+            term in normalized for term in ["tin chi", "tchp", "hoc ky he"]
+        )
+        general_language_policy = any(term in normalized for term in ["ngoai ngu", "tieng anh"]) and (
+            any(term in normalized for term in ["ap dung", "hieu luc", "khoa nao"])
+            or ("troy" in normalized and "chuong trinh" in normalized)
+        )
+        if (general_fee_policy or general_language_policy) and not explicit:
+            return {"scope": "general", "program": "", "explicit": False}
         normalized_postgraduate_fee = "hoc phi" in normalized and any(
             term in normalized for term in ["thac si", "tien si", "sau dai hoc"]
         )
@@ -159,6 +168,9 @@ class Admissions:
 
     def guard(self, question):
         q = normalize(question)
+        tsa_question = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy"])
+        if tsa_question and any(term in q for term in ["han dang ky", "han nop", "le phi thi", "quy che"]):
+            return "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra."
         if any(re.search(r"\b" + t + r"\b", q) for t in ["ktx", "ky tuc xa", "ki tuc xa", "noi tru"]):
             return "Bộ nguồn hiện tại chưa có hướng dẫn đăng ký ký túc xá đã được xác minh. Mình không thể dùng quy trình đăng ký xét tuyển để hướng dẫn thuê chỗ ở. Bạn có thể gửi câu hỏi này cho cán bộ để nhờ kiểm tra thông tin ký túc xá."
         if any(
@@ -300,6 +312,7 @@ class Admissions:
             "hoc phi" in q
             and not answer_program
             and not any(term in q for term in ["thac si", "tien si", "sau dai hoc"])
+            and not any(term in q for term in ["tin chi", "tchp", "hoc ky he"])
             and not any(p["code"].lower() in q.split() for p in self.k.programs)
             and len(q.split()) < 9
         ):

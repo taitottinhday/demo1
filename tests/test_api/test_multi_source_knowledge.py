@@ -19,6 +19,26 @@ def test_merged_passages_keep_evidence_and_do_not_merge_different_parents():
     assert merged[1]["text"] == "Unrelated rule."
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question,needle,kind", [
+    ("Quy chế TSA ghi hạn đăng ký thi 2026 vào ngày nào?", "chưa đủ căn cứ", "fallback"),
+    ("Lệ phí thi TSA là bao nhiêu?", "chưa đủ căn cứ", "fallback"),
+    ("Quy định ngoại ngữ mới áp dụng từ khi nào và cho khóa nào?", "2026", "answered"),
+    ("Chương trình hợp tác TROY yêu cầu tiếng Anh đầu khóa tối thiểu thế nào?", "5.5", "answered"),
+    ("700 nghìn đồng trong bảng là học phí một năm hay mỗi tín chỉ?", "TCHP", "answered"),
+    ("Học kỳ hè có học phí như học kỳ chính không?", "1,5", "answered"),
+    ("IT1 29,27 điểm có nghĩa là cần 29,27 điểm TSA không?", "THPT", "answered"),
+])
+async def test_policy_intents_do_not_invent_deadlines_or_inherit_program_context(knowledge, tmp_path, question, needle, kind):
+    service = Admissions(knowledge, Store(tmp_path / "policies.db"), Settings(_env_file=None, answer_mode="extractive"))
+    result = await service.answer(question, context="IT2")
+    assert result["kind"] == kind
+    assert needle.casefold() in result["response"].casefold()
+    if kind == "fallback":
+        assert result["sources"] == []
+        assert "tsa.hust.edu.vn/dk" not in result["response"]
+
+
 def test_ingestion_indexes_every_readable_source_and_marks_unreadable_assets(knowledge):
     assert len(knowledge.documents) == 8
     assert knowledge.manifest["document_count"] == 8
