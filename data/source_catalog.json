@@ -128,6 +128,31 @@
       "sha256": null,
       "indexable": false,
       "status": "online_listing_only"
+    },
+    {
+      "id": "hust-cutoffs-2026-table",
+      "title": "Bảng điểm chuẩn và điểm tương đương HUST năm 2026",
+      "type": "html",
+      "official_url": "https://hust.edu.vn/vi/news/tin-tuc-su-kien/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026-656013.html",
+      "local_path": "data/raw/cutoffs_2026_official.html",
+      "cycle": "2026",
+      "scope": "Bảng chính thức: điểm THPT thang 30; điểm tương đương XTTN 1.2, XTTN 1.3 và TSA thang 100 theo tổ hợp gốc. Không phải công cụ tự quy đổi điểm cá nhân.",
+      "audience": "Thí sinh tuyển sinh đại học",
+      "pages": null,
+      "text_chars": null,
+      "sha256": "b37b1369d9f5e170197f3610ce683c5706a6c478f678fb40fef0ead89136d214",
+      "indexable": false,
+      "status": "official_table_transcribed",
+      "evidence_images": [
+        {
+          "local_path": "raw/cutoffs_2026_rows_1_47.jpg",
+          "sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d"
+        },
+        {
+          "local_path": "raw/cutoffs_2026_rows_48_68.jpg",
+          "sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10"
+        }
+      ]
     }
   ],
   "corpus_scope": "Tuyển sinh đại học chính quy HUST 2026; dữ kiện bổ trợ về học phí và chính sách ngoại ngữ theo đối tượng/năm hiệu lực ghi trong từng nguồn."

@@ -41,7 +41,15 @@ File tương ứng: raw/tuition_2026_2027.pdf
 Kỳ áp dụng: Năm học 2026–2027
 Phạm vi: Có mức học phí theo tín chỉ học phí, một số mức khác cho học kỳ hè, vừa làm vừa học và sau đại học. Không suy ra tổng năm học nếu chưa biết số tín chỉ học phí đăng ký.
 
-# Nguồn trực tuyến chưa lưu bản nội dung cục bộ đầy đủ
+# Bảng điểm chuẩn trực tuyến đã lưu nguồn để đối chiếu
+Tên tài liệu: Bảng điểm chuẩn và điểm tương đương HUST năm 2026
+URL chính thức: https://hust.edu.vn/vi/news/tin-tuc-su-kien/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026-656013.html
+File tương ứng: raw/cutoffs_2026_official.html; raw/cutoffs_2026_rows_1_47.jpg; raw/cutoffs_2026_rows_48_68.jpg
+Ngày đối chiếu: 17/10/2026.
+Phạm vi: 68 dòng của bảng ảnh chính thức, gồm mã chương trình, tổ hợp gốc, điểm THPT thang 30 và điểm tương đương XTTN 1.2, XTTN 1.3, TSA thang 100. Runtime đọc bản trích theo cột trong normalized/admissions_facts_2026.json; mỗi dòng giữ số thứ tự và SHA256 ảnh. Không suy ra điểm cá nhân hoặc cam kết trúng tuyển. Chưa được cán bộ duyệt nội dung.
+Lưu ý: Dòng IT-E10 trong ảnh ghi XTTN 1.2 là 96,75, khác số 96,74 ở một số bản văn bài viết. Dữ kiện bảng dẫn trực tiếp bài chứa ảnh và chỉ trình bày đúng cột của bảng, không trộn giá trị từ các bản khác.
+
+# Nguồn trực tuyến chỉ lưu một phần nội dung
 Tên tài liệu: Điểm chuẩn Đại học Bách khoa Hà Nội năm 2026
 URL chính thức: https://ts.hust.edu.vn/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026
 File tương ứng: Không có PDF cục bộ; chỉ lưu một số dữ kiện tóm tắt đã đối chiếu với trang chính thức.

@@ -327,9 +327,9 @@
     "extracted/hust-tuition-k71/page-007.json": "7391d66a9b0f330083b0e2c75c7eb25cc2b9c863cb1ac0fb9dd0928ba59d94f3",
     "extracted/hust-tuition-k71/page-007.txt": "9d60ea3923f6e92ecbc3f9981cf72fc82a542872eaa67bb186b9778aa35130d9",
     "extracted/hust-tuition-k71/tables.jsonl": "454a2d391e4cb627be06b691c8986468cff0508b75bcc7c19405e15a663a42e1",
-    "manifests/sources.json": "a5f0eb59aadd4749d3370e4effe99650dcfe65eb3604153b4dc63d63fc4eb54e",
+    "manifests/sources.json": "09f25fa1021d02596eac4f39f0dc19d9c079d98e00db41780924feb26150759d",
     "normalized/admission_rules.jsonl": "63a2fd5094e6e717c180633f5bbefb08c237dfe1090bf507136fd133c7dd44fc",
-    "normalized/admissions_facts_2026.json": "c97183003cab5a754ab0da721b81225d32c7e69e9c2b74372d322805ad71a723",
+    "normalized/admissions_facts_2026.json": "90d229112115b4bd70edc1f688f1501c1d05c747d8010c60151180fdadfd3cff",
     "normalized/application_steps.jsonl": "ad394cf352f13ac2a1dca7abf176bc5f379aea6ae7796cac2c07e777cf242460",
     "normalized/contacts.jsonl": "a265524c6077d7a8c2862840c07e2596ba8383d58f5236036d4d4c8610b5caa5",
     "normalized/cutoffs.jsonl": "6b86087e01000b9b55f851fdfb81a970ef6bac1afcdfbb6942e55b47f34b3f67",
@@ -360,8 +360,8 @@
     "README-data.md": "51e88fc2b352c2d6bc0caa98b76f5471a967eab997a79637994f076e8fbea8b7",
     "schemas/chunk.schema.json": "648ca1327649bf462cc89d14972236477582bd48b65e240637b68afb2b1be3ea",
     "schemas/record.schema.json": "312173fc0fed6560e5562c49c16f851bb7f34ea51fd2616a5b68c2e488c8ff21",
-    "source_catalog.json": "cc2c728b920e79787bafe633256c95133a63470fa06a14255ff30b3e356ed553",
-    "sources.md": "5a89983305c8f38a65a0032e6319ae821f53095d2914844c049195c94c850f62"
+    "source_catalog.json": "0d8e5301ab7384898f9bd21cba4f32ea250f3dd3e50a90ee017025224bda4c6d",
+    "sources.md": "3bfe88c10c6e4ef5e23984f9b2c1105b6866650a742d4c76ede3ff018ab10d56"
   },
   "schema_version": 2,
   "runtime_integration": "pending_adapter",

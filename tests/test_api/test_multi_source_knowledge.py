@@ -165,8 +165,8 @@ async def test_policy_intents_do_not_invent_deadlines_or_inherit_program_context
 
 
 def test_ingestion_indexes_every_readable_source_and_marks_unreadable_assets(knowledge):
-    assert len(knowledge.documents) == 8
-    assert knowledge.manifest["document_count"] == 8
+    assert len(knowledge.documents) == 9
+    assert knowledge.manifest["document_count"] == 9
     assert knowledge.manifest["indexable_pdf_count"] == 5
     assert "hust-tuition-2026-2027" in {chunk["source_id"] for chunk in knowledge.chunks}
     assert "hust-cutoffs-2026" in {chunk["source_id"] for chunk in knowledge.chunks}
@@ -236,13 +236,13 @@ async def test_cutoff_answer_uses_exact_web_fact_and_does_not_overgeneralize(kno
     exact = await service.answer("Điểm chuẩn IT1 năm 2026 theo THPT bao nhiêu?")
     assert exact["kind"] == "answered"
     assert "29,27" in exact["response"]
-    assert "TSA tương đương" in exact["response"]
-    assert exact["sources"][0]["source_id"] == "hust-cutoffs-2026"
+    assert "THPT: 29,27/30" in exact["response"]
+    assert exact["sources"][0]["source_id"] == "hust-cutoffs-2026-table"
     assert exact["sources"][0]["page"] is None
     assert exact["sources"][0]["local_url"] is None
-    assert exact["sources"][0]["url"].startswith("https://ts.hust.edu.vn/")
+    assert exact["sources"][0]["url"].startswith("https://hust.edu.vn/")
 
-    missing = await service.answer("Điểm chuẩn IT2 năm 2026 là bao nhiêu?")
+    missing = await service.answer("Điểm chuẩn ZZ999 năm 2026 là bao nhiêu?")
     assert missing["kind"] == "fallback"
     assert not missing["sources"]
 
@@ -253,8 +253,8 @@ async def test_cutoff_answer_uses_exact_web_fact_and_does_not_overgeneralize(kno
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("question", [
-    "Điểm chuẩn IT1 năm 2026 theo TSA?",
-    "Điểm chuẩn IT1 năm 2026 XTTN diện 1.2?",
+    "Điểm chuẩn ZZ999 năm 2026 theo TSA?",
+    "Điểm chuẩn ZZ999 năm 2026 XTTN diện 1.2?",
     "Điểm chuẩn EE2 năm 2025 XTTN diện 1.3?",
 ])
 async def test_cutoff_never_substitutes_another_method_or_unspecified_xttn(knowledge, tmp_path, question):
@@ -277,7 +277,7 @@ async def test_cutoff_summary_does_not_repeat_score_or_hide_xttn_scope(knowledge
     ee2 = await service.answer("điểm chuẩn EE2 2026")
     assert ee2["kind"] == "answered"
     assert ee2["response"].count("28,98") == 1
-    assert ee2["sources"][0]["source_id"] == "hust-cutoffs-2026"
+    assert ee2["sources"][0]["source_id"] == "hust-cutoffs-2026-table"
     for year, score in [(2025, "28,48"), (2024, "28,16")]:
         past = await service.answer(f"điểm chuẩn EE2 {year}")
         assert score in past["answer_sections"]["short_answer"]
@@ -292,6 +292,30 @@ def test_every_captured_2026_program_score_has_runtime_fact(knowledge):
     for program in summary["program_scores"]:
         assert any(program["evidence"] == c["evidence"]
                    and program["program_code"] in c["text"] for c in facts)
+
+
+@pytest.mark.asyncio
+async def test_automation_alias_and_complete_method_table(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "automation.db"), Settings(_env_file=None))
+    for question in ["điểm chuẩn tự động hóa 2026", "diem chuan tu dong hoa 2026", "điểm chuẩn EE2 2026"]:
+        answer = await service.answer(question)
+        assert answer["kind"] == "answered"
+        assert all(score in answer["response"] for score in ["28,98/30", "89,50/100", "90,35/100", "76,50/100"])
+        assert len(answer["sources"]) == 1
+    for method, score in [("TSA", "76,50"), ("XTTN 1.2", "89,50"), ("XTTN 1.3", "90,35")]:
+        answer = await service.answer(f"điểm chuẩn tự động hóa 2026 theo {method}")
+        assert score in answer["response"]
+        assert "THPT: 28,98" not in answer["response"]
+    advanced = knowledge.program_matches("điểm chuẩn tự động hóa tiên tiến 2026")
+    assert [p["code"] for p in advanced] == ["EEE8"]
+    explicit = knowledge.program_matches("điểm chuẩn tự động hóa EE1 2026")
+    assert [p["code"] for p in explicit] == ["EE1"]
+    table = [c for c in knowledge.chunks if c.get("cutoff_methods")]
+    assert len(table) == len({c["program_code"] for c in table}) == 68
+    for row in table:
+        retrieved = knowledge.search(f"Điểm chuẩn {row['program_code']} năm 2026")
+        assert retrieved[0]["program_code"] == row["program_code"]
+        assert retrieved[0]["cutoff_methods"] == row["cutoff_methods"]
 
 
 @pytest.mark.asyncio
@@ -347,7 +371,7 @@ async def test_public_document_catalog_lists_every_source_without_internal_paths
     result = await client.get("/api/v1/sources")
     assert result.status_code == 200
     catalog = result.json()
-    assert catalog["count"] == 8
+    assert catalog["count"] == 9
     assert {s["id"] for s in catalog["documents"]} == {s["id"] for s in knowledge.documents}
     for document in catalog["documents"]:
         assert "local_path" not in document and "resolved_path" not in document

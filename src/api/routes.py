@@ -703,6 +703,7 @@ def source_documents(request: Request):
         "manual_ocr_required": "Bản scan; chưa dùng để trả lời chi tiết",
         "online_summary_only": "Chỉ một phần dữ kiện đã được lưu để tra cứu",
         "online_listing_only": "Trang tham khảo; chưa lưu đầy đủ nội dung",
+        "official_table_transcribed": "Bảng điểm chính thức có đủ THPT, XTTN 1.2, XTTN 1.3 và TSA",
     }
     documents = []
     for source in k.documents:

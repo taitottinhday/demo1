@@ -1,6 +1,8 @@
 # Release artifacts must retain stable text line endings across local and CI.
 data/** text=auto eol=lf
 data/raw/*.pdf -text
+# Preserve the official HTML capture byte-for-byte, including source indentation.
+data/raw/cutoffs_2026_official.html whitespace=-space-before-tab
 # Extracted text preserves source/OCR trailing blank lines as evidence.
 data/extracted/**/*.txt whitespace=-blank-at-eof
 scripts/*.py text eol=lf

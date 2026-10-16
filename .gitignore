@@ -39,6 +39,9 @@ data/*
 !data/raw/
 data/raw/*
 !data/raw/*.pdf
+!data/raw/cutoffs_2026_official.html
+!data/raw/cutoffs_2026_rows_1_47.jpg
+!data/raw/cutoffs_2026_rows_48_68.jpg
 !data/manifests/
 data/manifests/*
 !data/manifests/*.json

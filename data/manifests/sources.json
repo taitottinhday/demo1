@@ -138,6 +138,13 @@
       "title": "Trang thông tin học bổng sinh viên",
       "status": "online_listing_only",
       "full_snapshot_available": false
+    },
+    {
+      "runtime_source_id": "hust-cutoffs-2026-table",
+      "url": "https://hust.edu.vn/vi/news/tin-tuc-su-kien/diem-chuan-dai-hoc-bach-khoa-ha-noi-nam-2026-656013.html",
+      "title": "Bảng điểm chuẩn và điểm tương đương HUST năm 2026",
+      "status": "official_table_transcribed",
+      "full_snapshot_available": true
     }
   ]
 }

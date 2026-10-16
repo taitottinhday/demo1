@@ -77,6 +77,8 @@ class Admissions:
         selected = context if context in {p["code"] for p in self.k.programs} else ""
         if "hoc bong" in normalized and not explicit:
             return {"scope": "general", "program": "", "explicit": False}
+        if "tu dong hoa" in normalized and not explicit:
+            return {"scope": "ambiguous", "program": "", "explicit": False}
         general_fee_policy = "hoc phi" in normalized and any(
             term in normalized for term in ["tin chi", "tchp", "hoc ky he"]
         )
@@ -332,7 +334,9 @@ class Admissions:
             historical = any(year in q for year in ["2024", "2025"])
             subtype = re.search(r"\b1\.[23]\b", q)
             other_method = any(term in q for term in ["tsa", "dgtd", "danh gia tu duy", "xttn", "xet tuyen tai nang"])
-            if (historical and subtype) or (not historical and (subtype or other_method)):
+            table_available = any(c.get("cutoff_methods") and c["program_code"].replace("-", "") == answer_program.replace("-", "")
+                                  for c in self.k.chunks) if answer_program else False
+            if (historical and subtype) or (not historical and (subtype or other_method) and not table_available):
                 detail = (
                     "Bảng điểm lịch sử trong PDF chỉ ghi chung XTTN, không tách diện 1.2 và 1.3; mình không thể gán điểm chung cho một diện."
                     if historical else

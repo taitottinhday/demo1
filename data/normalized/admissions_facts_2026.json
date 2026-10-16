@@ -236,6 +236,1910 @@
         "MI-E22",
         "MIE22"
       ]
+    },
+    {
+      "id": "cutoff-table-2026-it-e10",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 1, mã IT-E10, tổ hợp gốc A00: THPT (thang 30): 29,54; XTTN 1.2 (thang 100): 96,75; XTTN 1.3 (thang 100): 96,09; TSA (thang 100): 82,12.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 1, mã IT-E10, tổ hợp gốc A00: THPT (thang 30): 29,54; XTTN 1.2 (thang 100): 96,75; XTTN 1.3 (thang 100): 96,09; TSA (thang 100): 82,12.",
+      "program_code": "IT-E10",
+      "program_name": "Khoa học dữ liệu và Trí tuệ nhân tạo (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "29.54",
+        "XTTN 1.2": "96.75",
+        "XTTN 1.3": "96.09",
+        "TSA": "82.12"
+      },
+      "source_row": 1,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT-E10",
+        "ITE10"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 2, mã IT1, tổ hợp gốc A00: THPT (thang 30): 29,27; XTTN 1.2 (thang 100): 93,28; XTTN 1.3 (thang 100): 93,33; TSA (thang 100): 79,26.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 2, mã IT1, tổ hợp gốc A00: THPT (thang 30): 29,27; XTTN 1.2 (thang 100): 93,28; XTTN 1.3 (thang 100): 93,33; TSA (thang 100): 79,26.",
+      "program_code": "IT1",
+      "program_name": "CNTT: Khoa học Máy tính",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "29.27",
+        "XTTN 1.2": "93.28",
+        "XTTN 1.3": "93.33",
+        "TSA": "79.26"
+      },
+      "source_row": 2,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT1",
+        "IT1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it-e15",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 3, mã IT-E15, tổ hợp gốc A00: THPT (thang 30): 29,01; XTTN 1.2 (thang 100): 89,89; XTTN 1.3 (thang 100): 90,66; TSA (thang 100): 76,79.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 3, mã IT-E15, tổ hợp gốc A00: THPT (thang 30): 29,01; XTTN 1.2 (thang 100): 89,89; XTTN 1.3 (thang 100): 90,66; TSA (thang 100): 76,79.",
+      "program_code": "IT-E15",
+      "program_name": "An toàn không gian số - Cyber Security (CT Tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "29.01",
+        "XTTN 1.2": "89.89",
+        "XTTN 1.3": "90.66",
+        "TSA": "76.79"
+      },
+      "source_row": 3,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT-E15",
+        "ITE15"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 4, mã IT2, tổ hợp gốc A00: THPT (thang 30): 28,91; XTTN 1.2 (thang 100): 88,59; XTTN 1.3 (thang 100): 89,63; TSA (thang 100): 75,84.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 4, mã IT2, tổ hợp gốc A00: THPT (thang 30): 28,91; XTTN 1.2 (thang 100): 88,59; XTTN 1.3 (thang 100): 89,63; TSA (thang 100): 75,84.",
+      "program_code": "IT2",
+      "program_name": "CNTT: Kỹ thuật Máy tính",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.91",
+        "XTTN 1.2": "88.59",
+        "XTTN 1.3": "89.63",
+        "TSA": "75.84"
+      },
+      "source_row": 4,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT2",
+        "IT2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it-e7",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 5, mã IT-E7, tổ hợp gốc A00: THPT (thang 30): 28,75; XTTN 1.2 (thang 100): 86,50; XTTN 1.3 (thang 100): 87,98; TSA (thang 100): 74,31.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 5, mã IT-E7, tổ hợp gốc A00: THPT (thang 30): 28,75; XTTN 1.2 (thang 100): 86,50; XTTN 1.3 (thang 100): 87,98; TSA (thang 100): 74,31.",
+      "program_code": "IT-E7",
+      "program_name": "Công nghệ thông tin (Global ICT)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.75",
+        "XTTN 1.2": "86.50",
+        "XTTN 1.3": "87.98",
+        "TSA": "74.31"
+      },
+      "source_row": 5,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT-E7",
+        "ITE7"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it-ep",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 6, mã IT-EP, tổ hợp gốc A00: THPT (thang 30): 27,75; XTTN 1.2 (thang 100): 77,31; XTTN 1.3 (thang 100): 73,71; TSA (thang 100): 67,87.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 6, mã IT-EP, tổ hợp gốc A00: THPT (thang 30): 27,75; XTTN 1.2 (thang 100): 77,31; XTTN 1.3 (thang 100): 73,71; TSA (thang 100): 67,87.",
+      "program_code": "IT-EP",
+      "program_name": "Công nghệ thông tin (Việt - Pháp)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.75",
+        "XTTN 1.2": "77.31",
+        "XTTN 1.3": "73.71",
+        "TSA": "67.87"
+      },
+      "source_row": 6,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT-EP",
+        "ITEP"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-it-e6",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 7, mã IT-E6, tổ hợp gốc A00: THPT (thang 30): 27,74; XTTN 1.2 (thang 100): 77,16; XTTN 1.3 (thang 100): 73,59; TSA (thang 100): 67,83.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 7, mã IT-E6, tổ hợp gốc A00: THPT (thang 30): 27,74; XTTN 1.2 (thang 100): 77,16; XTTN 1.3 (thang 100): 73,59; TSA (thang 100): 67,83.",
+      "program_code": "IT-E6",
+      "program_name": "Công nghệ thông tin (Việt - Nhật)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.74",
+        "XTTN 1.2": "77.16",
+        "XTTN 1.3": "73.59",
+        "TSA": "67.83"
+      },
+      "source_row": 7,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "IT-E6",
+        "ITE6"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ee2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 8, mã EE2, tổ hợp gốc A00: THPT (thang 30): 28,98; XTTN 1.2 (thang 100): 89,50; XTTN 1.3 (thang 100): 90,35; TSA (thang 100): 76,50.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 8, mã EE2, tổ hợp gốc A00: THPT (thang 30): 28,98; XTTN 1.2 (thang 100): 89,50; XTTN 1.3 (thang 100): 90,35; TSA (thang 100): 76,50.",
+      "program_code": "EE2",
+      "program_name": "Kỹ thuật Điều khiển - Tự động hoá",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.98",
+        "XTTN 1.2": "89.50",
+        "XTTN 1.3": "90.35",
+        "TSA": "76.50"
+      },
+      "source_row": 8,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EE2",
+        "EE2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ee-e8",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 9, mã EE-E8, tổ hợp gốc A00: THPT (thang 30): 28,75; XTTN 1.2 (thang 100): 86,50; XTTN 1.3 (thang 100): 87,98; TSA (thang 100): 74,31.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 9, mã EE-E8, tổ hợp gốc A00: THPT (thang 30): 28,75; XTTN 1.2 (thang 100): 86,50; XTTN 1.3 (thang 100): 87,98; TSA (thang 100): 74,31.",
+      "program_code": "EE-E8",
+      "program_name": "Kỹ thuật Điều khiển - Tự động hoá (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.75",
+        "XTTN 1.2": "86.50",
+        "XTTN 1.3": "87.98",
+        "TSA": "74.31"
+      },
+      "source_row": 9,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EE-E8",
+        "EEE8"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 10, mã ET1, tổ hợp gốc A00: THPT (thang 30): 28,57; XTTN 1.2 (thang 100): 84,92; XTTN 1.3 (thang 100): 85,39; TSA (thang 100): 73,13.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 10, mã ET1, tổ hợp gốc A00: THPT (thang 30): 28,57; XTTN 1.2 (thang 100): 84,92; XTTN 1.3 (thang 100): 85,39; TSA (thang 100): 73,13.",
+      "program_code": "ET1",
+      "program_name": "Kỹ thuật Điện tử - Viễn thông",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.57",
+        "XTTN 1.2": "84.92",
+        "XTTN 1.3": "85.39",
+        "TSA": "73.13"
+      },
+      "source_row": 10,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET1",
+        "ET1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et-e9",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 11, mã ET-E9, tổ hợp gốc A00: THPT (thang 30): 28,40; XTTN 1.2 (thang 100): 83,43; XTTN 1.3 (thang 100): 82,94; TSA (thang 100): 72,00.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 11, mã ET-E9, tổ hợp gốc A00: THPT (thang 30): 28,40; XTTN 1.2 (thang 100): 83,43; XTTN 1.3 (thang 100): 82,94; TSA (thang 100): 72,00.",
+      "program_code": "ET-E9",
+      "program_name": "Hệ thống nhúng thông minh và IoT (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.40",
+        "XTTN 1.2": "83.43",
+        "XTTN 1.3": "82.94",
+        "TSA": "72.00"
+      },
+      "source_row": 11,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET-E9",
+        "ETE9"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ee1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 12, mã EE1, tổ hợp gốc A00: THPT (thang 30): 28,24; XTTN 1.2 (thang 100): 82,02; XTTN 1.3 (thang 100): 80,63; TSA (thang 100): 70,95.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 12, mã EE1, tổ hợp gốc A00: THPT (thang 30): 28,24; XTTN 1.2 (thang 100): 82,02; XTTN 1.3 (thang 100): 80,63; TSA (thang 100): 70,95.",
+      "program_code": "EE1",
+      "program_name": "Kỹ thuật Điện",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.24",
+        "XTTN 1.2": "82.02",
+        "XTTN 1.3": "80.63",
+        "TSA": "70.95"
+      },
+      "source_row": 12,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EE1",
+        "EE1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et-e4",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 13, mã ET-E4, tổ hợp gốc A00: THPT (thang 30): 28,13; XTTN 1.2 (thang 100): 81,06; XTTN 1.3 (thang 100): 79,04; TSA (thang 100): 70,22.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 13, mã ET-E4, tổ hợp gốc A00: THPT (thang 30): 28,13; XTTN 1.2 (thang 100): 81,06; XTTN 1.3 (thang 100): 79,04; TSA (thang 100): 70,22.",
+      "program_code": "ET-E4",
+      "program_name": "Kỹ thuật Điện tử - Viễn thông (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.13",
+        "XTTN 1.2": "81.06",
+        "XTTN 1.3": "79.04",
+        "TSA": "70.22"
+      },
+      "source_row": 13,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET-E4",
+        "ETE4"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ee-ep",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 14, mã EE-EP, tổ hợp gốc A00: THPT (thang 30): 28,13; XTTN 1.2 (thang 100): 81,06; XTTN 1.3 (thang 100): 79,04; TSA (thang 100): 70,22.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 14, mã EE-EP, tổ hợp gốc A00: THPT (thang 30): 28,13; XTTN 1.2 (thang 100): 81,06; XTTN 1.3 (thang 100): 79,04; TSA (thang 100): 70,22.",
+      "program_code": "EE-EP",
+      "program_name": "Tin học công nghiệp và Tự động hóa (Chương trình Việt - Pháp PFIEV)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.13",
+        "XTTN 1.2": "81.06",
+        "XTTN 1.3": "79.04",
+        "TSA": "70.22"
+      },
+      "source_row": 14,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EE-EP",
+        "EEEP"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et-e16",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 15, mã ET-E16, tổ hợp gốc A00: THPT (thang 30): 27,48; XTTN 1.2 (thang 100): 73,35; XTTN 1.3 (thang 100): 70,39; TSA (thang 100): 66,71.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 15, mã ET-E16, tổ hợp gốc A00: THPT (thang 30): 27,48; XTTN 1.2 (thang 100): 73,35; XTTN 1.3 (thang 100): 70,39; TSA (thang 100): 66,71.",
+      "program_code": "ET-E16",
+      "program_name": "Truyền thông số và Kỹ thuật đa phương tiện (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.48",
+        "XTTN 1.2": "73.35",
+        "XTTN 1.3": "70.39",
+        "TSA": "66.71"
+      },
+      "source_row": 15,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET-E16",
+        "ETE16"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et-luh",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 16, mã ET-LUH, tổ hợp gốc A00: THPT (thang 30): 27,45; XTTN 1.2 (thang 100): 72,91; XTTN 1.3 (thang 100): 70,02; TSA (thang 100): 66,58.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 16, mã ET-LUH, tổ hợp gốc A00: THPT (thang 30): 27,45; XTTN 1.2 (thang 100): 72,91; XTTN 1.3 (thang 100): 70,02; TSA (thang 100): 66,58.",
+      "program_code": "ET-LUH",
+      "program_name": "Điện tử - Viễn thông - hợp tác với ĐH Leibniz Hannover (Đức)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.45",
+        "XTTN 1.2": "72.91",
+        "XTTN 1.3": "70.02",
+        "TSA": "66.58"
+      },
+      "source_row": 16,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET-LUH",
+        "ETLUH"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ee-e18",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 17, mã EE-E18, tổ hợp gốc A00: THPT (thang 30): 27,29; XTTN 1.2 (thang 100): 70,56; XTTN 1.3 (thang 100): 68,05; TSA (thang 100): 65,89.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 17, mã EE-E18, tổ hợp gốc A00: THPT (thang 30): 27,29; XTTN 1.2 (thang 100): 70,56; XTTN 1.3 (thang 100): 68,05; TSA (thang 100): 65,89.",
+      "program_code": "EE-E18",
+      "program_name": "Hệ thống điện và năng lượng tái tạo (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.29",
+        "XTTN 1.2": "70.56",
+        "XTTN 1.3": "68.05",
+        "TSA": "65.89"
+      },
+      "source_row": 17,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EE-E18",
+        "EEE18"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 18, mã ET2, tổ hợp gốc A00: THPT (thang 30): 27,15; XTTN 1.2 (thang 100): 68,50; XTTN 1.3 (thang 100): 66,33; TSA (thang 100): 65,29.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 18, mã ET2, tổ hợp gốc A00: THPT (thang 30): 27,15; XTTN 1.2 (thang 100): 68,50; XTTN 1.3 (thang 100): 66,33; TSA (thang 100): 65,29.",
+      "program_code": "ET2",
+      "program_name": "Kỹ thuật Y sinh",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.15",
+        "XTTN 1.2": "68.50",
+        "XTTN 1.3": "66.33",
+        "TSA": "65.29"
+      },
+      "source_row": 18,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET2",
+        "ET2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-et-e5",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 19, mã ET-E5, tổ hợp gốc A00: THPT (thang 30): 26,74; XTTN 1.2 (thang 100): 62,49; XTTN 1.3 (thang 100): 61,28; TSA (thang 100): 63,53.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 19, mã ET-E5, tổ hợp gốc A00: THPT (thang 30): 26,74; XTTN 1.2 (thang 100): 62,49; XTTN 1.3 (thang 100): 61,28; TSA (thang 100): 63,53.",
+      "program_code": "ET-E5",
+      "program_name": "Kỹ thuật Y sinh (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.74",
+        "XTTN 1.2": "62.49",
+        "XTTN 1.3": "61.28",
+        "TSA": "63.53"
+      },
+      "source_row": 19,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ET-E5",
+        "ETE5"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 20, mã ME1, tổ hợp gốc A00: THPT (thang 30): 28,47; XTTN 1.2 (thang 100): 84,05; XTTN 1.3 (thang 100): 83,95; TSA (thang 100): 72,47.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 20, mã ME1, tổ hợp gốc A00: THPT (thang 30): 28,47; XTTN 1.2 (thang 100): 84,05; XTTN 1.3 (thang 100): 83,95; TSA (thang 100): 72,47.",
+      "program_code": "ME1",
+      "program_name": "Kỹ thuật Cơ điện tử",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.47",
+        "XTTN 1.2": "84.05",
+        "XTTN 1.3": "83.95",
+        "TSA": "72.47"
+      },
+      "source_row": 20,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME1",
+        "ME1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me-e1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 21, mã ME-E1, tổ hợp gốc A00: THPT (thang 30): 27,83; XTTN 1.2 (thang 100): 78,42; XTTN 1.3 (thang 100): 74,72; TSA (thang 100): 68,24.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 21, mã ME-E1, tổ hợp gốc A00: THPT (thang 30): 27,83; XTTN 1.2 (thang 100): 78,42; XTTN 1.3 (thang 100): 74,72; TSA (thang 100): 68,24.",
+      "program_code": "ME-E1",
+      "program_name": "Kỹ thuật Cơ điện tử (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.83",
+        "XTTN 1.2": "78.42",
+        "XTTN 1.3": "74.72",
+        "TSA": "68.24"
+      },
+      "source_row": 21,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME-E1",
+        "MEE1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 22, mã ME2, tổ hợp gốc A00: THPT (thang 30): 27,57; XTTN 1.2 (thang 100): 74,67; XTTN 1.3 (thang 100): 71,50; TSA (thang 100): 67,10.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 22, mã ME2, tổ hợp gốc A00: THPT (thang 30): 27,57; XTTN 1.2 (thang 100): 74,67; XTTN 1.3 (thang 100): 71,50; TSA (thang 100): 67,10.",
+      "program_code": "ME2",
+      "program_name": "Kỹ thuật Cơ khí",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.57",
+        "XTTN 1.2": "74.67",
+        "XTTN 1.3": "71.50",
+        "TSA": "67.10"
+      },
+      "source_row": 22,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME2",
+        "ME2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-te3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 23, mã TE3, tổ hợp gốc A00: THPT (thang 30): 27,36; XTTN 1.2 (thang 100): 71,59; XTTN 1.3 (thang 100): 68,91; TSA (thang 100): 66,20.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 23, mã TE3, tổ hợp gốc A00: THPT (thang 30): 27,36; XTTN 1.2 (thang 100): 71,59; XTTN 1.3 (thang 100): 68,91; TSA (thang 100): 66,20.",
+      "program_code": "TE3",
+      "program_name": "Kỹ thuật Hàng không",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.36",
+        "XTTN 1.2": "71.59",
+        "XTTN 1.3": "68.91",
+        "TSA": "66.20"
+      },
+      "source_row": 23,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TE3",
+        "TE3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-te1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 24, mã TE1, tổ hợp gốc A00: THPT (thang 30): 27,34; XTTN 1.2 (thang 100): 71,29; XTTN 1.3 (thang 100): 68,67; TSA (thang 100): 66,11.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 24, mã TE1, tổ hợp gốc A00: THPT (thang 30): 27,34; XTTN 1.2 (thang 100): 71,29; XTTN 1.3 (thang 100): 68,67; TSA (thang 100): 66,11.",
+      "program_code": "TE1",
+      "program_name": "Kỹ thuật Ô tô",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.34",
+        "XTTN 1.2": "71.29",
+        "XTTN 1.3": "68.67",
+        "TSA": "66.11"
+      },
+      "source_row": 24,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TE1",
+        "TE1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me-luh",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 25, mã ME-LUH, tổ hợp gốc A00: THPT (thang 30): 27,33; XTTN 1.2 (thang 100): 71,15; XTTN 1.3 (thang 100): 68,54; TSA (thang 100): 66,07.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 25, mã ME-LUH, tổ hợp gốc A00: THPT (thang 30): 27,33; XTTN 1.2 (thang 100): 71,15; XTTN 1.3 (thang 100): 68,54; TSA (thang 100): 66,07.",
+      "program_code": "ME-LUH",
+      "program_name": "Cơ điện tử - hợp tác với ĐH Leibniz Hannover (Đức)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.33",
+        "XTTN 1.2": "71.15",
+        "XTTN 1.3": "68.54",
+        "TSA": "66.07"
+      },
+      "source_row": 25,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME-LUH",
+        "MELUH"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-te2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 26, mã TE2, tổ hợp gốc A00: THPT (thang 30): 27,08; XTTN 1.2 (thang 100): 67,48; XTTN 1.3 (thang 100): 65,47; TSA (thang 100): 64,99.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 26, mã TE2, tổ hợp gốc A00: THPT (thang 30): 27,08; XTTN 1.2 (thang 100): 67,48; XTTN 1.3 (thang 100): 65,47; TSA (thang 100): 64,99.",
+      "program_code": "TE2",
+      "program_name": "Kỹ thuật Cơ khí động lực",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.08",
+        "XTTN 1.2": "67.48",
+        "XTTN 1.3": "65.47",
+        "TSA": "64.99"
+      },
+      "source_row": 26,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TE2",
+        "TE2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me-nut",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 27, mã ME-NUT, tổ hợp gốc A00: THPT (thang 30): 26,97; XTTN 1.2 (thang 100): 65,86; XTTN 1.3 (thang 100): 64,11; TSA (thang 100): 64,52.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 27, mã ME-NUT, tổ hợp gốc A00: THPT (thang 30): 26,97; XTTN 1.2 (thang 100): 65,86; XTTN 1.3 (thang 100): 64,11; TSA (thang 100): 64,52.",
+      "program_code": "ME-NUT",
+      "program_name": "Cơ điện tử - hợp tác với ĐH Công nghệ Nagaoka (Nhật Bản)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.97",
+        "XTTN 1.2": "65.86",
+        "XTTN 1.3": "64.11",
+        "TSA": "64.52"
+      },
+      "source_row": 27,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME-NUT",
+        "MENUT"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-he1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 28, mã HE1, tổ hợp gốc A00: THPT (thang 30): 26,85; XTTN 1.2 (thang 100): 64,10; XTTN 1.3 (thang 100): 62,64; TSA (thang 100): 64,00.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 28, mã HE1, tổ hợp gốc A00: THPT (thang 30): 26,85; XTTN 1.2 (thang 100): 64,10; XTTN 1.3 (thang 100): 62,64; TSA (thang 100): 64,00.",
+      "program_code": "HE1",
+      "program_name": "Kỹ thuật Nhiệt",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.85",
+        "XTTN 1.2": "64.10",
+        "XTTN 1.3": "62.64",
+        "TSA": "64.00"
+      },
+      "source_row": 28,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "HE1",
+        "HE1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-teep",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 29, mã TEEP, tổ hợp gốc A00: THPT (thang 30): 26,74; XTTN 1.2 (thang 100): 62,49; XTTN 1.3 (thang 100): 61,28; TSA (thang 100): 63,53.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 29, mã TEEP, tổ hợp gốc A00: THPT (thang 30): 26,74; XTTN 1.2 (thang 100): 62,49; XTTN 1.3 (thang 100): 61,28; TSA (thang 100): 63,53.",
+      "program_code": "TEEP",
+      "program_name": "Cơ khí hàng không (Chương trình Việt - Pháp PFIEV)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.74",
+        "XTTN 1.2": "62.49",
+        "XTTN 1.3": "61.28",
+        "TSA": "63.53"
+      },
+      "source_row": 29,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TEEP",
+        "TEEP"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-me-gu",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 30, mã ME-GU, tổ hợp gốc A00: THPT (thang 30): 26,52; XTTN 1.2 (thang 100): 59,26; XTTN 1.3 (thang 100): 58,57; TSA (thang 100): 62,58.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 30, mã ME-GU, tổ hợp gốc A00: THPT (thang 30): 26,52; XTTN 1.2 (thang 100): 59,26; XTTN 1.3 (thang 100): 58,57; TSA (thang 100): 62,58.",
+      "program_code": "ME-GU",
+      "program_name": "Cơ khí - Chế tạo máy - hợp tác với ĐH Griffith (Úc)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.52",
+        "XTTN 1.2": "59.26",
+        "XTTN 1.3": "58.57",
+        "TSA": "62.58"
+      },
+      "source_row": 30,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ME-GU",
+        "MEGU"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-tee2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 31, mã TEE2, tổ hợp gốc A00: THPT (thang 30): 26,38; XTTN 1.2 (thang 100): 57,21; XTTN 1.3 (thang 100): 56,85; TSA (thang 100): 61,98.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 31, mã TEE2, tổ hợp gốc A00: THPT (thang 30): 26,38; XTTN 1.2 (thang 100): 57,21; XTTN 1.3 (thang 100): 56,85; TSA (thang 100): 61,98.",
+      "program_code": "TEE2",
+      "program_name": "Kỹ thuật Ô tô (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.38",
+        "XTTN 1.2": "57.21",
+        "XTTN 1.3": "56.85",
+        "TSA": "61.98"
+      },
+      "source_row": 31,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TEE2",
+        "TEE2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ch1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 32, mã CH1, tổ hợp gốc A00: THPT (thang 30): 25,50; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 58,81.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 32, mã CH1, tổ hợp gốc A00: THPT (thang 30): 25,50; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 58,81.",
+      "program_code": "CH1",
+      "program_name": "Kỹ thuật Hoá học",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "25.50",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "58.81"
+      },
+      "source_row": 32,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "CH1",
+        "CH1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ch2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 33, mã CH2, tổ hợp gốc A00: THPT (thang 30): 24,94; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 56,88.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 33, mã CH2, tổ hợp gốc A00: THPT (thang 30): 24,94; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 56,88.",
+      "program_code": "CH2",
+      "program_name": "Hoá học",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "24.94",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "56.88"
+      },
+      "source_row": 33,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "CH2",
+        "CH2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-bf1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 34, mã BF1, tổ hợp gốc A00: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,56.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 34, mã BF1, tổ hợp gốc A00: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,56.",
+      "program_code": "BF1",
+      "program_name": "Kỹ thuật Sinh học",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "24.56",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "55.56"
+      },
+      "source_row": 34,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "BF1",
+        "BF1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-bf2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 35, mã BF2, tổ hợp gốc A00: THPT (thang 30): 24,40; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,01.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 35, mã BF2, tổ hợp gốc A00: THPT (thang 30): 24,40; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,01.",
+      "program_code": "BF2",
+      "program_name": "Kỹ thuật Thực phẩm",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "24.40",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "55.01"
+      },
+      "source_row": 35,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "BF2",
+        "BF2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ev1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 36, mã EV1, tổ hợp gốc A00: THPT (thang 30): 23,72; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,42.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 36, mã EV1, tổ hợp gốc A00: THPT (thang 30): 23,72; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,42.",
+      "program_code": "EV1",
+      "program_name": "Kỹ thuật Môi trường",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "23.72",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "53.42"
+      },
+      "source_row": 36,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EV1",
+        "EV1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ev2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 37, mã EV2, tổ hợp gốc A00: THPT (thang 30): 22,63; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 50,94.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 37, mã EV2, tổ hợp gốc A00: THPT (thang 30): 22,63; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 50,94.",
+      "program_code": "EV2",
+      "program_name": "Quản lý Tài nguyên và Môi trường",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "22.63",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "50.94"
+      },
+      "source_row": 37,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EV2",
+        "EV2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ch-e20",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 38, mã CH-E20, tổ hợp gốc A00: THPT (thang 30): 22,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 50,78.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 38, mã CH-E20, tổ hợp gốc A00: THPT (thang 30): 22,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 50,78.",
+      "program_code": "CH-E20",
+      "program_name": "Hóa học mỹ phẩm",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "22.56",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "50.78"
+      },
+      "source_row": 38,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "CH-E20",
+        "CHE20"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ch-e11",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 39, mã CH-E11, tổ hợp gốc A00: THPT (thang 30): 20,69; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 46,51.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 39, mã CH-E11, tổ hợp gốc A00: THPT (thang 30): 20,69; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 46,51.",
+      "program_code": "CH-E11",
+      "program_name": "Kỹ thuật Hóa dược (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "20.69",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "46.51"
+      },
+      "source_row": 39,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "CH-E11",
+        "CHE11"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-bf-e12",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 40, mã BF-E12, tổ hợp gốc A00: THPT (thang 30): 20,30; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,62.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 40, mã BF-E12, tổ hợp gốc A00: THPT (thang 30): 20,30; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,62.",
+      "program_code": "BF-E12",
+      "program_name": "Kỹ thuật Thực phẩm (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "20.30",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "45.62"
+      },
+      "source_row": 40,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "BF-E12",
+        "BFE12"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-bf-e19",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 41, mã BF-E19, tổ hợp gốc A00: THPT (thang 30): 20,06; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,07.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 41, mã BF-E19, tổ hợp gốc A00: THPT (thang 30): 20,06; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,07.",
+      "program_code": "BF-E19",
+      "program_name": "Kỹ thuật sinh học (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "20.06",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "45.07"
+      },
+      "source_row": 41,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "BF-E19",
+        "BFE19"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ms2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 42, mã MS2, tổ hợp gốc A00: THPT (thang 30): 28,64; XTTN 1.2 (thang 100): 85,54; XTTN 1.3 (thang 100): 86,40; TSA (thang 100): 73,59.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 42, mã MS2, tổ hợp gốc A00: THPT (thang 30): 28,64; XTTN 1.2 (thang 100): 85,54; XTTN 1.3 (thang 100): 86,40; TSA (thang 100): 73,59.",
+      "program_code": "MS2",
+      "program_name": "Kỹ thuật Vi điện tử và Công nghệ nano",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "28.64",
+        "XTTN 1.2": "85.54",
+        "XTTN 1.3": "86.40",
+        "TSA": "73.59"
+      },
+      "source_row": 42,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MS2",
+        "MS2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ms1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 43, mã MS1, tổ hợp gốc A00: THPT (thang 30): 26,63; XTTN 1.2 (thang 100): 60,87; XTTN 1.3 (thang 100): 59,93; TSA (thang 100): 63,06.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 43, mã MS1, tổ hợp gốc A00: THPT (thang 30): 26,63; XTTN 1.2 (thang 100): 60,87; XTTN 1.3 (thang 100): 59,93; TSA (thang 100): 63,06.",
+      "program_code": "MS1",
+      "program_name": "Kỹ thuật Vật liệu",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.63",
+        "XTTN 1.2": "60.87",
+        "XTTN 1.3": "59.93",
+        "TSA": "63.06"
+      },
+      "source_row": 43,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MS1",
+        "MS1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ms3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 44, mã MS3, tổ hợp gốc A00: THPT (thang 30): 26,31; XTTN 1.2 (thang 100): 56,18; XTTN 1.3 (thang 100): 55,99; TSA (thang 100): 61,68.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 44, mã MS3, tổ hợp gốc A00: THPT (thang 30): 26,31; XTTN 1.2 (thang 100): 56,18; XTTN 1.3 (thang 100): 55,99; TSA (thang 100): 61,68.",
+      "program_code": "MS3",
+      "program_name": "Công nghệ vật liệu Polyme và Compozit",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.31",
+        "XTTN 1.2": "56.18",
+        "XTTN 1.3": "55.99",
+        "TSA": "61.68"
+      },
+      "source_row": 44,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MS3",
+        "MS3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ms-e3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 45, mã MS-E3, tổ hợp gốc A00: THPT (thang 30): 25,69; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,47.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 45, mã MS-E3, tổ hợp gốc A00: THPT (thang 30): 25,69; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,47.",
+      "program_code": "MS-E3",
+      "program_name": "Khoa học và kỹ thuật vật liệu (CT tiên tiến)",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "25.69",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "59.47"
+      },
+      "source_row": 45,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MS-E3",
+        "MSE3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ms5",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 46, mã MS5, tổ hợp gốc A00: THPT (thang 30): 25,45; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 58,64.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 46, mã MS5, tổ hợp gốc A00: THPT (thang 30): 25,45; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 58,64.",
+      "program_code": "MS5",
+      "program_name": "Kỹ thuật in",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "25.45",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "58.64"
+      },
+      "source_row": 46,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MS5",
+        "MS5"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-tx1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 47, mã TX1, tổ hợp gốc A00: THPT (thang 30): 23,36; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 52,60.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 47, mã TX1, tổ hợp gốc A00: THPT (thang 30): 23,36; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 52,60.",
+      "program_code": "TX1",
+      "program_name": "Công nghệ Dệt - May",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "23.36",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "52.60"
+      },
+      "source_row": 47,
+      "evidence_image": "raw/cutoffs_2026_rows_1_47.jpg",
+      "evidence_image_sha256": "dc8b4c5b83aa74e0f0ccd96c9cd9354387f1d1791a0c7806d995763ebb206e2d",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TX1",
+        "TX1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 48, mã EM2, tổ hợp gốc D01: THPT (thang 30): 25,07; XTTN 1.2 (thang 100): 56,66; XTTN 1.3 (thang 100): 56,39; TSA (thang 100): 61,63.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 48, mã EM2, tổ hợp gốc D01: THPT (thang 30): 25,07; XTTN 1.2 (thang 100): 56,66; XTTN 1.3 (thang 100): 56,39; TSA (thang 100): 61,63.",
+      "program_code": "EM2",
+      "program_name": "Quản lý công nghiệp",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "25.07",
+        "XTTN 1.2": "56.66",
+        "XTTN 1.3": "56.39",
+        "TSA": "61.63"
+      },
+      "source_row": 48,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM2",
+        "EM2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 49, mã EM1, tổ hợp gốc D01: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,64.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 49, mã EM1, tổ hợp gốc D01: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,64.",
+      "program_code": "EM1",
+      "program_name": "Quản lý năng lượng",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "24.56",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "59.64"
+      },
+      "source_row": 49,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM1",
+        "EM1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em-e14",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 50, mã EM-E14, tổ hợp gốc D01: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,64.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 50, mã EM-E14, tổ hợp gốc D01: THPT (thang 30): 24,56; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,64.",
+      "program_code": "EM-E14",
+      "program_name": "Logistics và Quản lý chuỗi cung ứng (CT tiên tiến)",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "24.56",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "59.64"
+      },
+      "source_row": 50,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM-E14",
+        "EME14"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em5",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 51, mã EM5, tổ hợp gốc D01: THPT (thang 30): 24,48; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,34.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 51, mã EM5, tổ hợp gốc D01: THPT (thang 30): 24,48; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,34.",
+      "program_code": "EM5",
+      "program_name": "Tài chính - Ngân hàng",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "24.48",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "59.34"
+      },
+      "source_row": 51,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM5",
+        "EM5"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 52, mã EM3, tổ hợp gốc D01: THPT (thang 30): 24,12; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 57,99.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 52, mã EM3, tổ hợp gốc D01: THPT (thang 30): 24,12; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 57,99.",
+      "program_code": "EM3",
+      "program_name": "Quản trị kinh doanh",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "24.12",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "57.99"
+      },
+      "source_row": 52,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM3",
+        "EM3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em-e13",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 53, mã EM-E13, tổ hợp gốc D01: THPT (thang 30): 23,38; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,21.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 53, mã EM-E13, tổ hợp gốc D01: THPT (thang 30): 23,38; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 55,21.",
+      "program_code": "EM-E13",
+      "program_name": "Phân tích kinh doanh (CT tiên tiến)",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "23.38",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "55.21"
+      },
+      "source_row": 53,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM-E13",
+        "EME13"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-em-e17",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 54, mã EM-E17, tổ hợp gốc D01: THPT (thang 30): 20,06; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,50.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 54, mã EM-E17, tổ hợp gốc D01: THPT (thang 30): 20,06; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 45,50.",
+      "program_code": "EM-E17",
+      "program_name": "Kế toán",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "20.06",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "45.50"
+      },
+      "source_row": 54,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "EM-E17",
+        "EME17"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-mi1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 55, mã MI1, tổ hợp gốc A00: THPT (thang 30): 27,97; XTTN 1.2 (thang 100): 79,65; XTTN 1.3 (thang 100): 76,74; TSA (thang 100): 69,17.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 55, mã MI1, tổ hợp gốc A00: THPT (thang 30): 27,97; XTTN 1.2 (thang 100): 79,65; XTTN 1.3 (thang 100): 76,74; TSA (thang 100): 69,17.",
+      "program_code": "MI1",
+      "program_name": "Toán - Tin",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.97",
+        "XTTN 1.2": "79.65",
+        "XTTN 1.3": "76.74",
+        "TSA": "69.17"
+      },
+      "source_row": 55,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MI1",
+        "MI1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-mi-e22",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 56, mã MI-E22, tổ hợp gốc A00: THPT (thang 30): 27,97; XTTN 1.2 (thang 100): 79,65; XTTN 1.3 (thang 100): 76,74; TSA (thang 100): 69,17.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 56, mã MI-E22, tổ hợp gốc A00: THPT (thang 30): 27,97; XTTN 1.2 (thang 100): 79,65; XTTN 1.3 (thang 100): 76,74; TSA (thang 100): 69,17.",
+      "program_code": "MI-E22",
+      "program_name": "Khoa học tính toán cho các hệ thống thông minh",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.97",
+        "XTTN 1.2": "79.65",
+        "XTTN 1.3": "76.74",
+        "TSA": "69.17"
+      },
+      "source_row": 56,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MI-E22",
+        "MIE22"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-mi2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 57, mã MI2, tổ hợp gốc A00: THPT (thang 30): 27,83; XTTN 1.2 (thang 100): 78,42; XTTN 1.3 (thang 100): 74,72; TSA (thang 100): 68,24.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 57, mã MI2, tổ hợp gốc A00: THPT (thang 30): 27,83; XTTN 1.2 (thang 100): 78,42; XTTN 1.3 (thang 100): 74,72; TSA (thang 100): 68,24.",
+      "program_code": "MI2",
+      "program_name": "Hệ thống thông tin quản lý",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.83",
+        "XTTN 1.2": "78.42",
+        "XTTN 1.3": "74.72",
+        "TSA": "68.24"
+      },
+      "source_row": 57,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "MI2",
+        "MI2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-troy-it",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 58, mã TROY-IT, tổ hợp gốc D01: THPT (thang 30): 24,44; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,19.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 58, mã TROY-IT, tổ hợp gốc D01: THPT (thang 30): 24,44; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 59,19.",
+      "program_code": "TROY-IT",
+      "program_name": "Khoa học máy tính - hợp tác với ĐH Troy (Hoa Kỳ)",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "24.44",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "59.19"
+      },
+      "source_row": 58,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "TROY-IT",
+        "TROYIT"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ph1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 59, mã PH1, tổ hợp gốc A00: THPT (thang 30): 27,03; XTTN 1.2 (thang 100): 66,74; XTTN 1.3 (thang 100): 64,85; TSA (thang 100): 64,78.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 59, mã PH1, tổ hợp gốc A00: THPT (thang 30): 27,03; XTTN 1.2 (thang 100): 66,74; XTTN 1.3 (thang 100): 64,85; TSA (thang 100): 64,78.",
+      "program_code": "PH1",
+      "program_name": "Vật lý kỹ thuật",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "27.03",
+        "XTTN 1.2": "66.74",
+        "XTTN 1.3": "64.85",
+        "TSA": "64.78"
+      },
+      "source_row": 59,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "PH1",
+        "PH1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ph2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 60, mã PH2, tổ hợp gốc A00: THPT (thang 30): 26,54; XTTN 1.2 (thang 100): 59,55; XTTN 1.3 (thang 100): 58,82; TSA (thang 100): 62,67.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 60, mã PH2, tổ hợp gốc A00: THPT (thang 30): 26,54; XTTN 1.2 (thang 100): 59,55; XTTN 1.3 (thang 100): 58,82; TSA (thang 100): 62,67.",
+      "program_code": "PH2",
+      "program_name": "Kỹ thuật hạt nhân",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.54",
+        "XTTN 1.2": "59.55",
+        "XTTN 1.3": "58.82",
+        "TSA": "62.67"
+      },
+      "source_row": 60,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "PH2",
+        "PH2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ph3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 61, mã PH3, tổ hợp gốc A00: THPT (thang 30): 26,26; XTTN 1.2 (thang 100): 55,45; XTTN 1.3 (thang 100): 55,37; TSA (thang 100): 61,46.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 61, mã PH3, tổ hợp gốc A00: THPT (thang 30): 26,26; XTTN 1.2 (thang 100): 55,45; XTTN 1.3 (thang 100): 55,37; TSA (thang 100): 61,46.",
+      "program_code": "PH3",
+      "program_name": "Vật lý Y khoa",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "26.26",
+        "XTTN 1.2": "55.45",
+        "XTTN 1.3": "55.37",
+        "TSA": "61.46"
+      },
+      "source_row": 61,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "PH3",
+        "PH3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ed2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 62, mã ED2, tổ hợp gốc A00: THPT (thang 30): 23,75; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 56,60.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 62, mã ED2, tổ hợp gốc A00: THPT (thang 30): 23,75; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 56,60.",
+      "program_code": "ED2",
+      "program_name": "Công nghệ giáo dục",
+      "base_combination": "A00",
+      "cutoff_methods": {
+        "THPT": "23.75",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "56.60"
+      },
+      "source_row": 62,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ED2",
+        "ED2"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ed5",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 63, mã ED5, tổ hợp gốc D01: THPT (thang 30): 23,25; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 54,73.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 63, mã ED5, tổ hợp gốc D01: THPT (thang 30): 23,25; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 54,73.",
+      "program_code": "ED5",
+      "program_name": "Tâm lý học công nghiệp và tổ chức",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "23.25",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "54.73"
+      },
+      "source_row": 63,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ED5",
+        "ED5"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-ed3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 64, mã ED3, tổ hợp gốc D01: THPT (thang 30): 23,20; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 54,56.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 64, mã ED3, tổ hợp gốc D01: THPT (thang 30): 23,20; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 54,56.",
+      "program_code": "ED3",
+      "program_name": "Quản lý giáo dục",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "23.20",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "54.56"
+      },
+      "source_row": 64,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "ED3",
+        "ED3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-fl3",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 65, mã FL3, tổ hợp gốc D01: THPT (thang 30): 25,50; XTTN 1.2 (thang 100): 63,13; XTTN 1.3 (thang 100): 61,82; TSA (thang 100): 63,55.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 65, mã FL3, tổ hợp gốc D01: THPT (thang 30): 25,50; XTTN 1.2 (thang 100): 63,13; XTTN 1.3 (thang 100): 61,82; TSA (thang 100): 63,55.",
+      "program_code": "FL3",
+      "program_name": "Tiếng Trung Khoa học và Công nghệ",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "25.50",
+        "XTTN 1.2": "63.13",
+        "XTTN 1.3": "61.82",
+        "TSA": "63.55"
+      },
+      "source_row": 65,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "FL3",
+        "FL3"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-fl1",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 66, mã FL1, tổ hợp gốc D01: THPT (thang 30): 23,00; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,98.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 66, mã FL1, tổ hợp gốc D01: THPT (thang 30): 23,00; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,98.",
+      "program_code": "FL1",
+      "program_name": "Tiếng Anh KHKT và Công nghệ",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "23.00",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "53.98"
+      },
+      "source_row": 66,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "FL1",
+        "FL1"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-fl4",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 67, mã FL4, tổ hợp gốc D01: THPT (thang 30): 22,98; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,92.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 67, mã FL4, tổ hợp gốc D01: THPT (thang 30): 22,98; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 53,92.",
+      "program_code": "FL4",
+      "program_name": "Tiếng Hàn Khoa học và Công nghệ",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "22.98",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "53.92"
+      },
+      "source_row": 67,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "FL4",
+        "FL4"
+      ]
+    },
+    {
+      "id": "cutoff-table-2026-fl2",
+      "topic": "cutoff",
+      "claim_vi": "Dòng 68, mã FL2, tổ hợp gốc D01: THPT (thang 30): 20,75; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 47,49.",
+      "scope_vi": "Điểm tương đương trong bảng công bố chính thức năm 2026 theo tổ hợp gốc; không tự quy đổi điểm cá nhân.",
+      "source_id": "hust-cutoffs-2026-table",
+      "page": null,
+      "evidence": "Dòng 68, mã FL2, tổ hợp gốc D01: THPT (thang 30): 20,75; XTTN 1.2 (thang 100): 55,00; XTTN 1.3 (thang 100): 55,00; TSA (thang 100): 47,49.",
+      "program_code": "FL2",
+      "program_name": "Tiếng Anh chuyên nghiệp quốc tế",
+      "base_combination": "D01",
+      "cutoff_methods": {
+        "THPT": "20.75",
+        "XTTN 1.2": "55.00",
+        "XTTN 1.3": "55.00",
+        "TSA": "47.49"
+      },
+      "source_row": 68,
+      "evidence_image": "raw/cutoffs_2026_rows_48_68.jpg",
+      "evidence_image_sha256": "5738cf37bb25dc35f9b9aaf0a552ae6196feb47770ab247b82658304d6cebe10",
+      "extraction_method": "visual_table_transcription",
+      "staff_reviewed": false,
+      "retrieved_on": "2026-10-17",
+      "aliases": [
+        "FL2",
+        "FL2"
+      ]
     }
   ]
 }

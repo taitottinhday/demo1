@@ -162,6 +162,10 @@ class Knowledge:
             actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
             if item.get("sha256") and actual_hash != item["sha256"].lower():
                 raise ValueError(f"Checksum nguồn không khớp catalog: {item.get('id')}")
+            for asset in item.get("evidence_images", []):
+                image_path = self._source_path({"local_path": asset["local_path"]})
+                if not image_path or hashlib.sha256(image_path.read_bytes()).hexdigest() != asset["sha256"]:
+                    raise ValueError("Checksum ảnh bảng điểm không khớp nguồn.")
             item["resolved_path"] = path
             item["version"] = actual_hash
             if item.get("indexable") and item.get("type") == "pdf":
@@ -415,6 +419,11 @@ class Knowledge:
                     fact_id=fact.get("id", ""),
                 )
 
+                if fact.get("cutoff_methods"):
+                    self.chunks[-1].update(cutoff_methods=fact["cutoff_methods"],
+                                           program_code=fact["program_code"], program_name=fact.get("program_name", fact["program_code"]),
+                                           base_combination=fact["base_combination"])
+
         self.counters = [Counter(tokens(c["title"] + " " + c["text"])) for c in self.chunks]
         self.df = Counter(t for c in self.counters for t in c)
         self.average = sum(sum(c.values()) for c in self.counters) / len(self.counters)
@@ -457,7 +466,15 @@ class Knowledge:
         """Return explicit program matches in the question, without using session context."""
         q = normalize(question)
         codes = set(re.findall(PROGRAM_CODE_RE, question.upper()))
-        matches = [p for p in self.programs if p["code"] in codes]
+        matches = [p for p in self.programs if p["code"].replace("-", "") in {c.replace("-", "") for c in codes}]
+        if matches:
+            return matches
+        if re.search(r"\btu dong hoa\b", q):
+            alias_code = "EEE8" if "tien tien" in q else "EEEP" if any(
+                word in q for word in ["viet phap", "pfiev"]
+            ) else "EE2" if not any(word in q for word in ["tai nang", "tat ca", "cac chuong trinh"]) else None
+            if alias_code:
+                return [p for p in self.programs if p["code"] == alias_code]
         matched_codes = {p["code"] for p in matches}
         for program in self.programs:
             names = {
@@ -500,7 +517,7 @@ class Knowledge:
             return [dict(c, score=100) for c in self.chunks
                     if c.get("record_type") == "cutoff" and c.get("historical")
                     and c.get("admission_year") in years and code in c.get("program_codes", [])
-                    and (not methods or c.get("method") in methods)][:limit]
+                    and (not methods or c.get("method", "").replace("DGTD", "ĐGTD") in methods)][:limit]
         result_date = any(t in norm for t in ["ket qua", "trung tuyen", "diem chuan"]) and any(
             t in norm for t in ["khi nao", "bao gio", "ngay nao", "thoi gian", "thong bao", "cong bo"]
         )
@@ -618,6 +635,12 @@ class Knowledge:
         )
         talent_query = "xttn" in norm or "xet tuyen tai nang" in norm or any(term in norm for term in ["1.1", "1.2", "1.3"])
         if cutoff_query:
+            table_facts = [c for c in self.chunks if c.get("cutoff_methods")]
+            requested_codes = {code.replace("-", "") for code in query_codes | selected}
+            chosen_table = [c for c in table_facts
+                            if c["program_code"].replace("-", "") in requested_codes]
+            if chosen_table:
+                return [dict(c, score=100) for c in chosen_table[:limit]]
             cutoff_facts = [
                 chunk for chunk in self.chunks
                 if chunk["kind"] == "verified_fact" and chunk.get("topic") == "cutoff"
@@ -802,7 +825,7 @@ class Knowledge:
         if chunk.get("source_type", "pdf") == "pdf" and page:
             source_url = f"{source_url}#page={page}"
         local_url = None
-        if chunk.get("source_local", True):
+        if chunk.get("source_local", True) and chunk.get("source_type", "pdf") == "pdf":
             local_url = f"/api/v1/source/pdf?source_id={source_id}"
             if page:
                 local_url += f"#page={page}"
@@ -812,6 +835,7 @@ class Knowledge:
             "online_summary_only": "Dữ kiện tóm tắt đối chiếu trang chính thức; chưa bao gồm toàn bộ bảng điểm.",
             "manual_ocr_required": "PDF scan chưa được kiểm tra OCR; không dùng làm căn cứ trả lời.",
             "online_listing_only": "Trang danh mục trực tuyến; chưa có nội dung chi tiết của từng học bổng trong kho.",
+            "official_table_transcribed": "Bảng ảnh chính thức đã được trích theo từng dòng và cột; có bản nguồn cục bộ để đối chiếu.",
         }
         source = self.documents_by_id.get(source_id, {})
         doc_status = status_labels.get(chunk.get("source_status", ""), chunk.get("source_status", ""))

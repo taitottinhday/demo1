@@ -92,6 +92,23 @@ def _admission_methods(text):
 
 
 def format_answer(question, chunks, program=""):
+    if chunks and chunks[0].get("cutoff_methods"):
+        c = chunks[0]
+        q = normalize(question)
+        requested = [method for method in c["cutoff_methods"] if (
+            (method == "THPT" and "thpt" in q)
+            or (method == "TSA" and any(w in q for w in ["tsa", "dgtd", "danh gia tu duy"]))
+            or (method.startswith("XTTN") and any(w in q for w in ["xttn", "xet tuyen tai nang", "1.2", "1.3"])
+                and (not re.search(r"1\.[23]", q) or method[-3:] in q))
+        )]
+        methods = requested or list(c["cutoff_methods"])
+        if any(word in q for word in ["co nghia", "tuong duong"]):
+            methods = list(c["cutoff_methods"])
+        scores = "; ".join(f"{method}: {c['cutoff_methods'][method].replace('.', ',')}/{30 if method == 'THPT' else 100}"
+                           for method in methods)
+        return (f"Điểm chuẩn {c.get('program_name', c['program_code'])} ({c['program_code']}) năm 2026: {scores}. [1]\n\n"
+                f"Tổ hợp gốc {c['base_combination']}. XTTN 1.2, XTTN 1.3 và TSA là điểm chuẩn tương đương "
+                "được công bố trong bảng chính thức, không phải phép tự quy đổi điểm cá nhân. [1]")
     if chunks and all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks):
         code = chunks[0].get("program_codes", [program])[0]
         year = chunks[0]["admission_year"]

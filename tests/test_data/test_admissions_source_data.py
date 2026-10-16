@@ -40,6 +40,10 @@ def test_source_catalog_has_unique_official_sources_and_valid_local_files():
         path = ROOT / doc["local_path"]
         assert path.is_file(), doc["id"]
         assert hashlib.sha256(path.read_bytes()).hexdigest() == doc["sha256"]
+        if doc["type"] == "html":
+            assert doc["pages"] is None
+            assert doc["evidence_images"]
+            continue
         pdf = pymupdf.open(path)
         assert len(pdf) == doc["pages"], doc["id"]
         text_chars = sum(len(page.get_text()) for page in pdf)
@@ -82,7 +86,17 @@ def test_normalized_facts_are_grounded_in_the_cited_document_page():
             assert _normalized(evidence) in _normalized(page_text), fact["id"]
         else:
             assert fact["page"] is None, fact["id"]
-            assert evidence in online_evidence, fact["id"]
+            if fact.get("cutoff_methods"):
+                import hashlib
+                image = DATA / fact["evidence_image"]
+                assert hashlib.sha256(image.read_bytes()).hexdigest() == fact["evidence_image_sha256"]
+                assert 1 <= fact["source_row"] <= 68
+                assert set(fact["cutoff_methods"]) == {"THPT", "XTTN 1.2", "XTTN 1.3", "TSA"}
+                assert fact["staff_reviewed"] is False
+                for method, score in fact["cutoff_methods"].items():
+                    assert 0 <= float(score) <= (30 if method == "THPT" else 100)
+            else:
+                assert evidence in online_evidence, fact["id"]
 
 
 def test_golden_cases_reference_known_facts_or_explicit_abstention_reasons():
