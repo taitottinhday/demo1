@@ -379,6 +379,7 @@ async def test_no_notification_before_reply_commit_or_to_unverified_student(clie
     ticket_id, _, store = await _verified_student_ticket(client)
     mailer = FakeTicketMailer()
     app.state.runtime["mailer"] = mailer
+    assert (await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})).status_code == 200
     assert (await client.post(f"/api/v1/staff/tickets/{ticket_id}/resolve", json={"reply": "Chưa nhận."})).status_code == 409
     assert mailer.sent == []
     await _claim_ticket(client, ticket_id)
@@ -400,7 +401,8 @@ async def test_provider_failure_keeps_reply_and_retry_only_retries_email(client)
     assert detail["reply"] == "Đã lưu dù email lỗi." and detail["email_status"] == "failed"
     mailer.error = None
     retried = await client.post(f"/api/v1/staff/tickets/{ticket_id}/notification")
-    assert retried.status_code == 200 and retried.json()["email_status"] == "sent"
+    assert retried.status_code == 200 and retried.json()["email_status"] == "sending"
+    assert (await client.get(f"/api/v1/tickets/{ticket_id}")).json()["email_status"] == "sent"
     assert len(mailer.sent) == 1
     again = await client.post(f"/api/v1/staff/tickets/{ticket_id}/notification")
     assert again.json()["email_status"] == "sent"
@@ -418,21 +420,17 @@ async def test_test_mode_does_not_send_real_email_when_provider_is_missing(clien
 
 
 @pytest.mark.asyncio
-async def test_demo_entry_points_work_in_test_and_are_disabled_in_production(client):
-    assert (await client.get("/api/v1/demo/status")).json() == {"enabled": True}
-    assert (await client.post("/api/v1/demo/staff")).status_code == 200
-    assert (await client.get("/api/v1/staff/session")).json()["authenticated"] is True
-    await client.post("/api/v1/staff/logout")
-    assert (await client.post("/api/v1/demo/admin")).status_code == 200
-    assert (await client.get("/api/v1/admin/session")).json()["authenticated"] is True
-
+async def test_manually_injected_runtime_without_demo_disables_demo_entrypoints(client):
+    # Full lifespan demo isolation is covered in test_public_demo.py. The shared
+    # API fixture deliberately contains only the main runtime, not demo_runtime.
     runtime = app.state.runtime
     previous = runtime["settings"]
-    runtime["settings"] = previous.model_copy(update={"app_env": "production"})
     try:
-        assert (await client.get("/api/v1/demo/status")).json() == {"enabled": False}
-        assert (await client.post("/api/v1/demo/staff")).status_code == 404
-        assert (await client.post("/api/v1/demo/admin")).status_code == 404
+        for environment in ("test", "production"):
+            runtime["settings"] = previous.model_copy(update={"app_env": environment})
+            assert (await client.get("/api/v1/demo/status")).json() == {"enabled": False}
+            assert (await client.post("/api/v1/demo/staff")).status_code == 404
+            assert (await client.post("/api/v1/demo/admin")).status_code == 404
     finally:
         runtime["settings"] = previous
 

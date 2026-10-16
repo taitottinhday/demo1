@@ -238,6 +238,16 @@ def test_ai_operational_metrics_are_bounded_and_exclude_conversation_text(tmp_pa
 async def test_ai_metrics_require_staff_authentication(client):
     result = await client.get("/api/v1/staff/ai/metrics")
     assert result.status_code == 401
+    login = await client.post("/api/v1/staff/login", json={"username": "canbo", "password": "Demo@2026!"})
+    assert login.status_code == 200
+    result = await client.get("/api/v1/staff/ai/metrics")
+    assert result.status_code == 200
+    metrics = result.json()
+    assert metrics["source_ready"] is True
+    assert metrics["sample_limit"] == 1000
+    assert metrics["calls_remaining_today"] >= 0
+    assert "retrieval_since_process_start" in metrics
+    assert "messages" not in metrics and "api_key" not in metrics
 
 
 @pytest.mark.asyncio

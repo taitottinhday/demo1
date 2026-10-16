@@ -392,3 +392,47 @@ mã chương trình và năm; không gửi lịch sử hội thoại tự do cho
 chọn chương trình khác hoặc xóa chat sẽ giới hạn việc kế thừa ngữ cảnh tương ứng.
 FAQ công khai được cache theo nguồn, câu hỏi, chương trình và cấu hình model;
 câu có đại từ cá nhân hoặc dữ liệu đã được che không đưa vào cache dùng chung.
+
+### Bàn giao trước khi merge — 17/10/2026
+
+Đã thống nhất danh mục runtime của 68 chương trình (mã, tên gọi, nhóm đào tạo,
+ngôn ngữ có căn cứ), dùng chung bộ phân tích ý định/năm/phương thức và phân biệt
+ngoại ngữ đầu vào với đầu ra. Kiểm thử bao phủ mọi chương trình, FAQ và hội thoại
+đổi năm/phương thức/chủ đề. Giao diện hiển thị tiêu đề chi tiết theo ý định.
+
+Kiểm tra toàn bộ: **207 tests passed**; Ruff qua trên các file Python thay đổi.
+Ruff toàn repo còn 3 lỗi có sẵn trong `scripts/build_dark_theme.py` (UP031, E741),
+ngoài phạm vi xử lý chatbot. Báo cáo hybrid/extractive hiện tại ở
+[eval/results/admissions-review-premerge.json](eval/results/admissions-review-premerge.json):
+99/100 câu nghiệp vụ được trả lời, 30/30 ca an toàn qua; đối chiếu tự động hành vi,
+nguồn và trang khớp 77/99 câu đã trả lời. Chưa có accuracy được người xác nhận;
+không sử dụng tỷ lệ khớp nguồn để tuyên bố đạt accuracy 85%. Lần chạy này không
+gọi DeepSeek. Độ trễ trong báo cáo thuộc phép đo local extractive, không đại diện
+cho độ trễ LLM hoặc tải cao điểm.
+
+Người rà mở từng nguồn trong báo cáo rồi điền `human_expected_kind` trên mỗi dòng
+(`answered`, `fallback`, `clarification`, `error`), `human_correct` đúng/sai cho câu
+đã trả lời, cùng `reviewer` và `review_notes`. Kiểm tra cả câu từ chối sai; không
+sửa nhãn chỉ để khớp output. Tính lại chỉ số mà không gọi API:
+
+```powershell
+python -m scripts.judge_answers eval/results/admissions-review-premerge.json --human-only
+```
+
+Báo cáo kết quả có hậu tố `.reviewed.json`; các chỉ số chỉ có giá trị đầy đủ khi
+đủ phạm vi rà tương ứng. Tập hiện tại vẫn là tập phát triển, cần bộ nhãn độc lập
+được người đối chiếu để nghiệm thu KPI.
+
+Cán bộ đã đăng nhập có thể kiểm tra `GET /api/v1/staff/ai/metrics`: mẫu tối đa
+1.000 lượt gần nhất, token đã biết, cache, lý do kết quả, p50/p95 và lượt đặt chỗ
+ngân sách trong ngày UTC; kèm trạng thái nguồn/chỉ mục và bộ đếm truy xuất từ lúc
+tiến trình khởi động. Lượt đặt chỗ không đồng nghĩa số API thành công, token thiếu
+usage không được tự ước tính thành chi phí. Endpoint không trả nội dung hội thoại
+hoặc khóa API. Ngày kiểm tra nguồn là ngày ghi trong danh mục, không phải xác minh
+web trực tiếp mỗi lần gọi.
+
+Khi cập nhật nguồn: đối chiếu bản chính thức và năm áp dụng, cập nhật dữ liệu cùng
+provenance/hash, chạy validator và bộ kiểm thử hiện có, xây lại chỉ mục bằng quy
+trình pgvector ở trên, rồi kiểm tra trạng thái chỉ mục và chạy lại eval. Chỉ mục
+hiện tại đã được xây lại thành công với 1.047 chunks/1.068 windows. Khởi động lại
+backend và nhấn Ctrl+F5 trên trình duyệt để nhận code và giao diện mới.
