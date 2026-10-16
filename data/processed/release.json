@@ -361,7 +361,7 @@
     "schemas/chunk.schema.json": "648ca1327649bf462cc89d14972236477582bd48b65e240637b68afb2b1be3ea",
     "schemas/record.schema.json": "312173fc0fed6560e5562c49c16f851bb7f34ea51fd2616a5b68c2e488c8ff21",
     "source_catalog.json": "cc2c728b920e79787bafe633256c95133a63470fa06a14255ff30b3e356ed553",
-    "sources.md": "4b0d2b75e0bc6e1fc904bdf7aa60416e560ba83231c70961878719d0d242fac1"
+    "sources.md": "5a89983305c8f38a65a0032e6319ae821f53095d2914844c049195c94c850f62"
   },
   "schema_version": 2,
   "runtime_integration": "pending_adapter",

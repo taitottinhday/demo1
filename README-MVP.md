@@ -267,13 +267,18 @@ Báo cáo hybrid có hậu tố riêng và từ chối chạy nếu thực tế 
 Đây là kiểm tra hành vi/nguồn trên tập phát triển, không phải accuracy được
 cán bộ xác nhận và không đủ để kết luận đạt KPI nghiệm thu.
 
-Kiểm tra local ngày 16/10/2026: index có 513 chunk/530 cửa sổ. Với 8 ứng viên,
+Kiểm tra local ban đầu ngày 16/10/2026: index có 513 chunk/530 cửa sổ. Với 8 ứng viên,
 hai truy vấn smoke test trả đúng học bổng Trần Đại Nghĩa (trang 25–26) và bảo lưu
 kết quả (trang 13 của quy chế); thời gian truy xuất lần lượt khoảng 354 ms và
 1.241 ms trên máy phát triển. Đây không phải p95 hay kiểm thử mùa cao điểm.
-Các đoạn native đủ điều kiện nối qua trang 25 đã được bổ sung từ snapshot;
-thông tin học bổng công khai có nguồn được trả lời, quyết định điều kiện cá nhân
-vẫn chuyển cán bộ.
+Sau rà soát độ phủ, index hiện có 974 chunk/995 cửa sổ: nạp đủ 796 đoạn native
+đạt điều kiện thuộc đại học chính quy, tương ứng 789 bản ghi, không giới hạn
+trang của tài liệu chính. Trong 1.065 đoạn snapshot, 193 đoạn cần duyệt nội dung
+và 76 đoạn ngoài phạm vi đại học chính quy không được nạp. JSONL theo chủ đề là
+view của records, không nạp trùng. Xem `source.normalized_coverage` tại
+`/api/v1/status` để kiểm tra. Điểm chuẩn lịch sử chỉ được truy xuất theo đúng
+năm và chương trình; citation giữ năm của bản ghi. Học bổng công khai được trả
+lời từ chính sách, quyết định điều kiện cá nhân vẫn chuyển cán bộ.
 
 Golden development: cả BM25 và hybrid đều khớp nhãn 18/20, an toàn 2/2,
 0 token LLM. Hai lệch nguồn/nhãn ADM-001 và FEE-001 vẫn cần duyệt như trước;
@@ -363,8 +368,8 @@ python -m scripts.judge_answers data/test-tmp/review-baseline.json --human-only
 `accuracy_human` chỉ được tính khi tất cả câu nghiệp vụ đã trả lời có nhận xét
 đúng/sai và mã người rà. Bộ phát triển luôn để `kpi_verified=false`.
 
-Baseline extractive/BM25 trên bản nhãn dự thảo: 84/100 câu nghiệp vụ được trả
-lời, 30/30 ca an toàn qua; đối chiếu hành vi/nguồn/trang khớp 66/84 câu đã trả
-lời (78,57%). Đây không phải accuracy ngữ nghĩa và chưa xác nhận đạt KPI 85%.
+Sau mở rộng độ phủ, baseline extractive/BM25 trên bản nhãn dự thảo: 90/100 câu
+nghiệp vụ được trả lời, 30/30 ca an toàn qua; đối chiếu hành vi/nguồn/trang khớp
+71/90 câu đã trả lời (78,89%). Đây không phải accuracy ngữ nghĩa và chưa xác nhận đạt KPI 85%.
 Các ca còn lại được giữ để rà nhãn và kiểm tra truy xuất/phạm vi, không tự đổi
 đáp án tham chiếu theo output hiện tại.

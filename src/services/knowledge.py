@@ -66,6 +66,7 @@ class Knowledge:
             for item in map(json.loads, (self.root / "normalized/records.jsonl").read_text(encoding="utf-8").splitlines())
         }
         passages = []
+        excluded = Counter()
         for line in (self.root / "processed/chunks.jsonl").read_text(encoding="utf-8").splitlines():
             chunk = json.loads(line)
             parent = self.records[chunk["record_id"]]
@@ -74,16 +75,21 @@ class Knowledge:
             if chunk["source_version"] != runtime_source["version"]:
                 raise ValueError("Normalized source version differs from runtime catalog.")
             if not all(item.get("answer_eligible") is True for item in (chunk, parent)):
+                excluded["requires_content_review"] += 1
                 continue
-            if chunk.get("historical") or chunk.get("scope") != "undergraduate_regular":
+            if chunk.get("scope") != "undergraduate_regular":
+                excluded["outside_undergraduate_scope"] += 1
                 continue
             if chunk.get("extraction_method") != "native" or not runtime_source.get("indexable"):
-                continue
-            # Keep primary program/fee parsing; supplement its former page-25 cap
-            # with validated native passages (including scholarships spanning 25–26).
-            if runtime_source["id"] == self.primary_source_id and chunk["page_end"] <= 25:
+                excluded["unverified_extraction_or_source"] += 1
                 continue
             passages.append((chunk, parent, runtime_source))
+        self.normalized_coverage = {
+            "total_chunks": len(passages) + sum(excluded.values()),
+            "indexed_chunks": len(passages), "excluded_chunks": dict(excluded),
+            "indexed_records": len({c["record_id"] for c, _, _ in passages}),
+            "historical_chunks": sum(bool(c.get("historical")) for c, _, _ in passages),
+        }
         return release, passages
 
     def _source_path(self, source):
@@ -172,7 +178,8 @@ class Knowledge:
         self.version = hashlib.sha256("\n".join(sorted(versions)).encode("utf-8")).hexdigest()
         release, normalized = self._normalized_snapshot()
         self.version = hashlib.sha256((self.version + release["files"]["processed/chunks.jsonl"]
-                                      + release["files"]["normalized/records.jsonl"]).encode()).hexdigest()
+                                      + release["files"]["normalized/records.jsonl"]
+                                      + "all-eligible-scoped-passages-v3").encode()).hexdigest()
 
         document = pymupdf.open(self.pdf)
         if len(document) < 25:
@@ -189,10 +196,11 @@ class Knowledge:
             "pages": len(document),
             "scope": catalog.get("corpus_scope", "Tuyển sinh và thông tin đào tạo HUST theo phạm vi từng tài liệu."),
             "status": "Kho nguồn gồm tài liệu chính thức; mỗi câu trả lời cần đối chiếu đúng nguồn và phạm vi áp dụng.",
-            "indexed_pages": "2–25 và đoạn native đủ điều kiện từ snapshot; không dùng bảng điểm 2024/2025 hoặc liên thông/VB2",
+            "indexed_pages": "Toàn bộ đoạn native đủ điều kiện thuộc đại học chính quy; dữ liệu lịch sử chỉ dùng khi hỏi đúng năm",
             "document_count": len(self.documents),
             "data_release": release["release"],
             "normalized_passages": len(normalized),
+            "normalized_coverage": self.normalized_coverage,
             "indexable_pdf_count": sum(1 for item in self.documents if item.get("type") == "pdf" and item.get("indexable")),
             "unavailable_sources": [
                 {"id": item["id"], "title": item.get("title"), "status": item.get("status")}
@@ -355,6 +363,13 @@ class Knowledge:
                 review_status=chunk["review_status"], answer_eligible=True,
                 context_required=chunk["context_required"],
                 related_context_record_ids=chunk.get("related_context_record_ids", []),
+                historical=parent.get("historical", False),
+                admission_year=parent.get("admission_year"),
+                academic_year=parent.get("academic_year"),
+                topics=parent.get("topics", []),
+                program_codes=parent.get("program_codes", []),
+                record_type=parent["record_type"],
+                method=parent.get("method"),
             )
 
         # Curated, page-verified facts sit alongside raw source chunks. They
@@ -464,6 +479,22 @@ class Knowledge:
         query = tokens(question)
         query = list(dict.fromkeys(query))
         norm = normalize(question)
+        years = {int(year) for year in re.findall(r"\b20\d{2}\b", norm)}
+        historical_years = years - {2026, 2027}
+        if historical_years:
+            if len(years) != 1 or not any(term in norm for term in ["diem chuan", "diem trung tuyen"]):
+                return []
+            code = self.resolve_program(question, program)
+            if not code:
+                return []
+            methods = {method for word, method in (
+                ("thpt", "THPT"), ("tsa", "ĐGTD"), ("dgtd", "ĐGTD"), ("xttn", "XTTN"),
+                ("danh gia tu duy", "ĐGTD"), ("xet tuyen tai nang", "XTTN"),
+            ) if word in norm}
+            return [dict(c, score=100) for c in self.chunks
+                    if c.get("record_type") == "cutoff" and c.get("historical")
+                    and c.get("admission_year") in years and code in c.get("program_codes", [])
+                    and (not methods or c.get("method") in methods)][:limit]
         result_date = any(t in norm for t in ["ket qua", "trung tuyen", "diem chuan"]) and any(
             t in norm for t in ["khi nao", "bao gio", "ngay nao", "thoi gian", "thong bao", "cong bo"]
         )
@@ -630,6 +661,9 @@ class Knowledge:
             preferred_pages = {2}
         scored = []
         for chunk, counts in zip(self.chunks, self.counters, strict=True):
+            # Historical rows are opt-in; they must never answer current-cycle questions.
+            if chunk.get("historical"):
+                continue
             # Student language policies are not general applicant requirements.
             if scholarship_query:
                 content = normalize(chunk["text"])
@@ -785,7 +819,7 @@ class Knowledge:
             "local_url": local_url,
             "excerpt": chunk.get("evidence") or chunk["text"],
             "version": chunk.get("source_version", self.version)[:12],
-            "year": 2026,
+            "year": chunk.get("admission_year") or 2026,
             "document_title": chunk.get("source_title", self.manifest.get("title", "Tài liệu tuyển sinh")),
             "document_status": doc_status,
             "source_id": source_id,

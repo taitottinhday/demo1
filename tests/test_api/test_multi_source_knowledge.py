@@ -80,9 +80,13 @@ async def test_scholarship_policy_uses_complete_pdf_section_without_api(knowledg
 async def test_historical_cutoff_is_not_replaced_with_current_year(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "historical.db"), Settings(_env_file=None))
     result = await service.answer("điểm chuẩn của năm 2025", context="IT1")
-    assert result["kind"] == "fallback"
-    assert "29,27" not in result["response"]
-    assert not result["sources"]
+    assert result["kind"] == "answered"
+    assert "lịch sử 2025" in result["response"]
+    assert all(s["year"] == 2025 for s in result["sources"])
+    assert all(s["source_id"] == knowledge.primary_source_id for s in result["sources"])
+    missing = await service.answer("Điểm chuẩn IT1 năm 2023?")
+    assert missing["kind"] == "fallback"
+    assert not missing["sources"]
 
 
 @pytest.mark.asyncio
@@ -179,10 +183,50 @@ def test_supplemental_passages_use_normalized_quality_and_parent_references(know
         parent = knowledge.records[passage["record_id"]]
         assert parent["answer_eligible"] is True
         assert parent["extraction_method"] == "native"
-        assert parent["historical"] is False
         assert parent["scope"] == "undergraduate_regular"
         assert set(passage["related_context_record_ids"]).issubset(knowledge.records)
         assert knowledge.citation(passage)["source_id"] in knowledge.documents_by_id
+
+
+def test_every_eligible_in_scope_native_chunk_is_loaded(knowledge):
+    import json
+    from pathlib import Path
+
+    expected = set()
+    for line in Path("data/processed/chunks.jsonl").read_text(encoding="utf-8").splitlines():
+        c = json.loads(line)
+        parent = knowledge.records[c["record_id"]]
+        if (c["answer_eligible"] and parent["answer_eligible"]
+                and c["scope"] == "undergraduate_regular" and c["extraction_method"] == "native"):
+            expected.add(c["chunk_id"])
+    actual = {c["id"] for c in knowledge.chunks if c.get("record_id")}
+    assert actual == expected
+    assert knowledge.manifest["normalized_coverage"]["indexed_chunks"] == len(expected)
+
+
+def test_historical_rows_require_exact_year_program_and_method(knowledge):
+    rows = knowledge.search("Điểm chuẩn IT1 năm 2025 theo THPT?")
+    assert rows
+    assert all(c["admission_year"] == 2025 and c["method"] == "THPT"
+               and "IT1" in c["program_codes"] for c in rows)
+    assert not knowledge.search("Điểm chuẩn năm 2025?")
+    assert not knowledge.search("Điểm chuẩn IT1 năm 2023?")
+    assert all(not c.get("historical") for c in knowledge.search("Thông tin tuyển sinh IT1"))
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question", [
+    "Theo mô hình đào tạo, chương trình cử nhân kéo dài bao lâu và cấp bằng gì?",
+    "Mô hình tích hợp Cử nhân–Thạc sĩ được mô tả thế nào về thời gian và bằng cấp?",
+])
+async def test_general_training_models_are_not_mistaken_for_program_or_postgraduate_requests(
+    knowledge, tmp_path, question
+):
+    service = Admissions(knowledge, Store(tmp_path / "models.db"), Settings(_env_file=None))
+    result = await service.answer(question)
+    assert result["kind"] == "answered"
+    assert result["sources"]
+    assert all(s["source_id"] == knowledge.primary_source_id for s in result["sources"])
 
 
 @pytest.mark.asyncio

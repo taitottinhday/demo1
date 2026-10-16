@@ -19,6 +19,13 @@ def redact(text):
 FALLBACK = "Mình chưa tìm thấy đủ căn cứ trong các nguồn HUST đã nạp để trả lời chính xác câu hỏi này. Bạn có thể chuyển nội dung cho cán bộ tuyển sinh để được kiểm tra."
 
 GENERAL_SCOPE_MARKERS = (
+    "mo hinh dao tao",
+    "chuong trinh cu nhan",
+    "chuong trinh tich hop",
+    "dao tao tai nang",
+    "lien ket dao tao quoc te",
+    "elitech gom",
+    "to hop xet tuyen",
     "toan truong",
     "toan bo",
     "cac phuong thuc tuyen sinh",
@@ -117,6 +124,8 @@ class Admissions:
                 "vstep",
                 "ma nganh",
                 "hoc bong",
+                "diem chuan",
+                "diem trung tuyen",
             )
         )
 
@@ -179,6 +188,9 @@ class Admissions:
             return "Quy chế TSA trong kho hiện là bản scan chưa được duyệt OCR. Mình chưa đủ căn cứ để xác nhận hạn đăng ký, lệ phí hoặc điều khoản bạn hỏi; cần đối chiếu thông báo chính thức hoặc chuyển cán bộ kiểm tra."
         if any(re.search(r"\b" + t + r"\b", q) for t in ["ktx", "ky tuc xa", "ki tuc xa", "noi tru"]):
             return "Bộ nguồn hiện tại chưa có hướng dẫn đăng ký ký túc xá đã được xác minh. Mình không thể dùng quy trình đăng ký xét tuyển để hướng dẫn thuê chỗ ở. Bạn có thể gửi câu hỏi này cho cán bộ để nhờ kiểm tra thông tin ký túc xá."
+        training_model_request = "mo hinh" in q and "cu nhan" in q and not any(
+            term in q for term in ["truong khac", "bach khoa tphcm", "lien thong", "van bang 2", "van bang hai"]
+        )
         if any(
             s in q
             for s in [
@@ -229,7 +241,7 @@ class Admissions:
                 "truong khac",
                 "bach khoa tphcm",
             ]
-        ) and not postgraduate_fee_request:
+        ) and not postgraduate_fee_request and not training_model_request:
             return "Phạm vi hiện tại là tuyển sinh từ THPT vào đại học chính quy HUST năm 2026. Nội dung bạn hỏi cần nguồn riêng hoặc cán bộ hỗ trợ."
         personal_scholarship = re.search(
             r"\b(?:toi|em|minh)\b.*\b(?:du dieu kien|co duoc|se duoc|nhan duoc|duoc nhan|co the nhan|co hoc bong|duoc hoc bong)\b", q
@@ -248,12 +260,18 @@ class Admissions:
             return "Bộ nguồn hiện tại chưa đủ danh sách giấy tờ chi tiết cho hồ sơ bạn hỏi. Mình có thể hướng dẫn kênh đăng ký ĐGTD hoặc chuyển cán bộ kiểm tra danh sách hồ sơ đúng phương thức."
         requested_years = set(re.findall(r"\b20\d{2}\b", q))
         unsupported_years = requested_years - {"2026"}
+        historical_cutoff = (
+            len(requested_years) == 1
+            and any(term in q for term in ["diem chuan", "diem trung tuyen"])
+            and any(c.get("historical") and str(c.get("admission_year")) in requested_years
+                    and c.get("record_type") == "cutoff" for c in self.k.chunks)
+        )
         supported_academic_year = (
             ("hoc phi" in q or allow_academic_year)
             and "2026" in requested_years
             and unsupported_years.issubset({"2027"})
         )
-        if unsupported_years and not supported_academic_year:
+        if unsupported_years and not supported_academic_year and not historical_cutoff:
             return "Bộ nguồn này áp dụng kỳ tuyển sinh 2026. Bạn đang cần thông tin năm khác; mình cần nguồn đúng kỳ hoặc cán bộ kiểm tra."
         return None
 
@@ -432,7 +450,8 @@ class Admissions:
         scholarship_policy = "hoc bong" in q and all(
             normalize(c["title"]) == "12.4 hoc bong" and c.get("record_id") for c in chunks
         )
-        if quota_question or scholarship_policy:
+        historical_cutoff = all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks)
+        if quota_question or scholarship_policy or historical_cutoff:
             # Render atomic quotas and complete scholarship policy sections
             # directly from their official source without paid synthesis.
             rendered = format_answer(question, chunks, answer_program)

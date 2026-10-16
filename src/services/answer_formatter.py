@@ -92,6 +92,8 @@ def _admission_methods(text):
 
 
 def format_answer(question, chunks, program=""):
+    if chunks and all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks):
+        return "\n\n".join(f"{c['text']} [{i}]" for i, c in enumerate(chunks, 1))
     if "hoc bong" in normalize(question):
         names = [name for name in (
             "tran dai nghia", "khuyen khich hoc tap", "gan ket que huong", "trao doi sinh vien"

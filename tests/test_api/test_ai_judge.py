@@ -14,9 +14,20 @@ from src.services.store import Store
 
 
 @pytest.fixture
-def report():
+def report(knowledge):
     saved = json.loads(Path("eval/results/golden-report.json").read_text(encoding="utf-8"))
     saved["rows"] = copy.deepcopy(saved["rows"][:3])
+    # Bind the legacy fixture's unchanged evidence to the current ingestion IDs.
+    # Production judging intentionally rejects stale IDs instead of remapping.
+    for row in saved["rows"]:
+        for source in row["sources"]:
+            match = next((c for c in knowledge.chunks
+                         if c["source_id"] == source["source_id"]
+                         and source["excerpt"] == c.get("evidence")), None)
+            if match:
+                source["id"] = match["id"]
+    saved["source_version"] = knowledge.version
+    saved["retrieval_version"] = knowledge.version
     return saved
 
 
