@@ -171,6 +171,71 @@
         "BF-E19",
         "EM-E17"
       ]
+    },
+    {
+      "id": "cutoff-ee2-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của Kỹ thuật Điều khiển - Tự động hoá (EE2) là 28,98 điểm.",
+      "scope_vi": "Chỉ áp dụng điểm THPT năm 2026, không suy ra điểm TSA hoặc XTTN diện 1.2/1.3.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình Kỹ thuật Điều khiển - Tự động hoá (EE2) có điểm chuẩn là 28,98 điểm.",
+      "aliases": [
+        "EE2",
+        "EE2"
+      ]
+    },
+    {
+      "id": "cutoff-ms2-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của Kỹ thuật Vi điện tử và Công nghệ nano (MS2) là 28,64 điểm.",
+      "scope_vi": "Chỉ áp dụng điểm THPT năm 2026, không suy ra điểm TSA hoặc XTTN diện 1.2/1.3.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình Kỹ thuật Vi điện tử và Công nghệ nano (MS2) có điểm chuẩn là 28,64.",
+      "aliases": [
+        "MS2",
+        "MS2"
+      ]
+    },
+    {
+      "id": "cutoff-et1-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của Kỹ thuật Điện tử - Viễn thông (ET1) là 28,57 điểm.",
+      "scope_vi": "Chỉ áp dụng điểm THPT năm 2026, không suy ra điểm TSA hoặc XTTN diện 1.2/1.3.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình Kỹ thuật Điện tử - Viễn thông (ET1) có điểm chuẩn là 28,57 điểm.",
+      "aliases": [
+        "ET1",
+        "ET1"
+      ]
+    },
+    {
+      "id": "cutoff-me1-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của Kỹ thuật Cơ điện tử (ME1) là 28,47 điểm.",
+      "scope_vi": "Chỉ áp dụng điểm THPT năm 2026, không suy ra điểm TSA hoặc XTTN diện 1.2/1.3.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Chương trình Kỹ thuật Cơ điện tử (ME1) có điểm chuẩn là 28,47 điểm.",
+      "aliases": [
+        "ME1",
+        "ME1"
+      ]
+    },
+    {
+      "id": "cutoff-mi-e22-2026-thpt",
+      "topic": "cutoff",
+      "claim_vi": "Điểm chuẩn theo điểm thi tốt nghiệp THPT năm 2026 của Khoa học tính toán cho các hệ thống thông minh (MI-E22) là 27,97 điểm.",
+      "scope_vi": "Chỉ áp dụng điểm THPT năm 2026, không suy ra điểm TSA hoặc XTTN diện 1.2/1.3.",
+      "source_id": "hust-cutoffs-2026",
+      "page": null,
+      "evidence": "Khoa học tính toán cho các hệ thống thông minh (MI-E22) cũng đã đạt mức điểm chuẩn rất cao là 27,97 điểm.",
+      "aliases": [
+        "MI-E22",
+        "MIE22"
+      ]
     }
   ]
 }

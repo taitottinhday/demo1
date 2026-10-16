@@ -377,6 +377,10 @@ class Knowledge:
         facts_path = self.root / "normalized" / "admissions_facts_2026.json"
         if facts_path.exists():
             facts = json.loads(facts_path.read_text(encoding="utf-8")).get("facts", [])
+            capture_version = hashlib.sha256(facts_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+            for source in self.documents:
+                if source.get("type") == "html":
+                    source["version"] = capture_version
             for fact in facts:
                 source = self.documents_by_id.get(fact.get("source_id"))
                 if not source:

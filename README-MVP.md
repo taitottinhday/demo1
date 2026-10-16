@@ -271,7 +271,7 @@ Kiểm tra local ban đầu ngày 16/10/2026: index có 513 chunk/530 cửa sổ
 hai truy vấn smoke test trả đúng học bổng Trần Đại Nghĩa (trang 25–26) và bảo lưu
 kết quả (trang 13 của quy chế); thời gian truy xuất lần lượt khoảng 354 ms và
 1.241 ms trên máy phát triển. Đây không phải p95 hay kiểm thử mùa cao điểm.
-Sau rà soát độ phủ, index hiện có 974 chunk/995 cửa sổ: nạp đủ 796 đoạn native
+Sau rà soát độ phủ và nối đủ điểm THPT đã lưu trong JSON tóm tắt, index hiện có 979 chunk/1.000 cửa sổ: nạp đủ 796 đoạn native
 đạt điều kiện thuộc đại học chính quy, tương ứng 789 bản ghi, không giới hạn
 trang của tài liệu chính. Trong 1.065 đoạn snapshot, 193 đoạn cần duyệt nội dung
 và 76 đoạn ngoài phạm vi đại học chính quy không được nạp. JSONL theo chủ đề là

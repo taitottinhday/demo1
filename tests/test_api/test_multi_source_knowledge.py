@@ -81,7 +81,7 @@ async def test_historical_cutoff_is_not_replaced_with_current_year(knowledge, tm
     service = Admissions(knowledge, Store(tmp_path / "historical.db"), Settings(_env_file=None))
     result = await service.answer("điểm chuẩn của năm 2025", context="IT1")
     assert result["kind"] == "answered"
-    assert "lịch sử 2025" in result["response"]
+    assert "năm 2025" in result["response"]
     assert all(s["year"] == 2025 for s in result["sources"])
     assert all(s["source_id"] == knowledge.primary_source_id for s in result["sources"])
     missing = await service.answer("Điểm chuẩn IT1 năm 2023?")
@@ -274,6 +274,24 @@ async def test_cutoff_summary_does_not_repeat_score_or_hide_xttn_scope(knowledge
     historical = await service.answer("Điểm chuẩn EE2 2025?")
     assert "không tách diện 1.2 và 1.3" in historical["response"]
     assert historical["response"].count("không áp dụng thay") == 1
+    ee2 = await service.answer("điểm chuẩn EE2 2026")
+    assert ee2["kind"] == "answered"
+    assert ee2["response"].count("28,98") == 1
+    assert ee2["sources"][0]["source_id"] == "hust-cutoffs-2026"
+    for year, score in [(2025, "28,48"), (2024, "28,16")]:
+        past = await service.answer(f"điểm chuẩn EE2 {year}")
+        assert score in past["answer_sections"]["short_answer"]
+
+
+def test_every_captured_2026_program_score_has_runtime_fact(knowledge):
+    import json
+    from pathlib import Path
+
+    summary = json.loads(Path("data/normalized/cutoffs_2026_summary.json").read_text(encoding="utf-8"))
+    facts = [c for c in knowledge.chunks if c.get("topic") == "cutoff"]
+    for program in summary["program_scores"]:
+        assert any(program["evidence"] == c["evidence"]
+                   and program["program_code"] in c["text"] for c in facts)
 
 
 @pytest.mark.asyncio

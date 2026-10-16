@@ -329,7 +329,7 @@
     "extracted/hust-tuition-k71/tables.jsonl": "454a2d391e4cb627be06b691c8986468cff0508b75bcc7c19405e15a663a42e1",
     "manifests/sources.json": "a5f0eb59aadd4749d3370e4effe99650dcfe65eb3604153b4dc63d63fc4eb54e",
     "normalized/admission_rules.jsonl": "63a2fd5094e6e717c180633f5bbefb08c237dfe1090bf507136fd133c7dd44fc",
-    "normalized/admissions_facts_2026.json": "b6e32192e905d4427a057eec4f248ba84d1493e9ba8fb63d89f56e0db162cfe8",
+    "normalized/admissions_facts_2026.json": "c97183003cab5a754ab0da721b81225d32c7e69e9c2b74372d322805ad71a723",
     "normalized/application_steps.jsonl": "ad394cf352f13ac2a1dca7abf176bc5f379aea6ae7796cac2c07e777cf242460",
     "normalized/contacts.jsonl": "a265524c6077d7a8c2862840c07e2596ba8383d58f5236036d4d4c8610b5caa5",
     "normalized/cutoffs.jsonl": "6b86087e01000b9b55f851fdfb81a970ef6bac1afcdfbb6942e55b47f34b3f67",
