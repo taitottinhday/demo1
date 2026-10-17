@@ -217,13 +217,14 @@ body.auth-page .desk .action-error:empty{display:none}
 
 /* ---------- Admin specifics ---------- */
 body.auth-page .admin-desk .admin-tabs{
-  display:flex;flex-direction:row;align-items:center;gap:2px;margin:0;padding:4px;border:0;border-radius:14px;background:#f2f0ec;overflow:visible;white-space:nowrap
+  display:flex;flex:0 1 auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;max-width:100%;box-sizing:border-box;margin:0;padding:4px;border:0;border-radius:14px;background:#f2f0ec;overflow:visible;white-space:normal
 }
 body.auth-page .admin-desk .admin-tabs button{
-  display:inline-flex;align-items:center;justify-content:center;min-height:34px;border:0!important;padding:0 16px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:600;
+  display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:34px;border:0!important;padding:0 16px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:600;white-space:nowrap;
   transition:background .2s,color .2s,box-shadow .2s
 }
 body.auth-page .admin-desk .admin-tabs button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:var(--shadow-sm)}
+body.auth-page .admin-desk .admin-tabs button:focus-visible{position:relative;z-index:1;outline:3px solid #c47a86;outline-offset:2px}
 body.auth-page .admin-desk .admin-tab:not([hidden]){display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;overflow-y:auto;animation:dk-rise .35s both}
 body.auth-page .admin-desk #tab-tickets:not([hidden]){overflow:hidden}
 body.auth-page .admin-desk .admin-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
