@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field, field_validator
 from src.models.schemas import ProgramGuidanceInput, ProgramGuidanceResponse
 from src.services.accounts import authenticate
 from src.services.admin import AdminStore
+from src.services.admission_score import build_score_reference, calculate_alternative_score, calculate_thpt_score
 from src.services.admissions import redact
 from src.services.email import EmailDeliveryError
 from src.services.product_features import compare_programs
@@ -74,6 +75,26 @@ class FeedbackInput(BaseModel):
 
 class ComparisonInput(BaseModel):
     codes: list[str] = Field(min_length=2, max_length=3)
+
+
+class THPTScoreInput(BaseModel):
+    combination: str = Field(min_length=3, max_length=3)
+    scores: dict[str, float] = Field(min_length=3, max_length=3)
+    area: Literal["KV1", "KV2NT", "KV2", "KV3"]
+    policy_group: Literal["none", "UT1", "UT2"]
+    math_coefficient: Literal[1, 2] = 1
+    ielts: float | None = Field(default=None, ge=5, le=9)
+
+
+class AlternativeScoreInput(BaseModel):
+    method: Literal["TSA", "XTTN 1.2", "XTTN 1.3"]
+    primary_score: float = Field(ge=0, le=1600)
+    certificate_type: Literal["SAT", "ACT", "A-Level", "AP", "IB"] | None = None
+    ielts: float | None = Field(default=None, ge=5, le=9)
+    achievement_score: float = Field(default=0, ge=0, le=50)
+    other_bonus: float = Field(default=0, ge=0, le=10)
+    area: Literal["KV1", "KV2NT", "KV2", "KV3"] = "KV3"
+    policy_group: Literal["none", "UT1", "UT2"] = "none"
 
 
 class ChecklistInput(BaseModel):
@@ -323,6 +344,35 @@ def comparison(body: ComparisonInput, request: Request):
     if len(set(codes)) != len(codes) or not set(codes).issubset({p["code"] for p in knowledge.programs}):
         raise HTTPException(422, "Chọn 2–3 mã chương trình khác nhau có trong nguồn.")
     return {"programs": compare_programs(knowledge, codes), "year": 2026}
+
+
+@router.get("/programs/score-reference")
+def program_score_reference(request: Request):
+    try:
+        return build_score_reference(runtime(request)["knowledge"])
+    except ValueError as exc:
+        raise HTTPException(503, "Hiện chưa tải được mốc điểm tham khảo.") from exc
+
+
+@router.post("/programs/score-thpt")
+def calculate_program_thpt_score(body: THPTScoreInput):
+    try:
+        return calculate_thpt_score(
+            body.combination, body.scores, body.area, body.policy_group, body.math_coefficient, body.ielts
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.post("/programs/score-alternative")
+def calculate_program_alternative_score(body: AlternativeScoreInput):
+    try:
+        return calculate_alternative_score(
+            body.method, body.primary_score, body.certificate_type, body.ielts,
+            body.achievement_score, body.other_bonus, body.area, body.policy_group,
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
 @router.get("/programs/recommend/options")

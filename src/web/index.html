@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261016-1"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/enhance.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261012-1"><link rel="stylesheet" href="/assets/enhance.dark.css?v=20261013-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/app.js?v=20261017-1" defer></script></head>
+<head><meta charset="utf-8"><script src="/assets/theme.js?v=20261012-3"></script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trợ lý tuyển sinh · HUST 2026</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/assets/style.css?v=20261017-5"><link rel="stylesheet" href="/assets/fonts/be-vietnam-pro.css"><link rel="stylesheet" href="/assets/enhance.css?v=20261015-1"><link rel="stylesheet" href="/assets/style.dark.css?v=20261017-5"><link rel="stylesheet" href="/assets/enhance.dark.css?v=20261013-1"><link rel="stylesheet" href="/assets/theme.css?v=20261013-3"><script src="/assets/app.js?v=20261017-5" defer></script></head>
 <body class="applicant-page">
 <header class="topbar">
   <a class="brand" href="/" aria-label="Về trang chủ Trợ lý tuyển sinh, HUST 2026">
@@ -137,6 +137,10 @@
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg>
         <span>So sánh chương trình</span><b aria-hidden="true">›</b>
       </button>
+      <button class="secondary" id="score-open" type="button" aria-haspopup="dialog" aria-controls="score-dialog">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.5 19.5h15M6.5 16l3.2-4 2.6 2 5.2-7"/><circle cx="6.5" cy="16" r="1"/><circle cx="9.7" cy="12" r="1"/><circle cx="12.3" cy="14" r="1"/><circle cx="17.5" cy="7" r="1"/></svg>
+        <span>Đối chiếu điểm &amp; nguyện vọng</span><b aria-hidden="true">›</b>
+      </button>
       <button class="guide-link" id="guide-open" type="button">Checklist đăng ký ĐGTD <span aria-hidden="true">↗</span></button>
     </div>
   </aside>
@@ -194,6 +198,7 @@
         <div class="welcome-tools">
           <button type="button" class="welcome-tool" data-welcome-open="recommend-open"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3.5 14.2 9l5.8 2.2-5.8 2.1-2.2 5.8-2.1-5.8L4 11.2 9.9 9 12 3.5Z"/></svg>Chưa biết chọn ngành? <b>Gợi ý ngành</b></button>
           <button type="button" class="welcome-tool" data-welcome-open="compare-open"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 7h6M13 7h6M5 17h6M13 17h6"/><path d="m8 4-3 3 3 3m8 4 3 3-3 3M12 5v14"/></svg><b>So sánh chương trình</b></button>
+          <button type="button" class="welcome-tool" data-welcome-open="score-open"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.5 19.5h15M6.5 16l3.2-4 2.6 2 5.2-7"/><circle cx="6.5" cy="16" r="1"/><circle cx="9.7" cy="12" r="1"/><circle cx="12.3" cy="14" r="1"/><circle cx="17.5" cy="7" r="1"/></svg><b>Đối chiếu điểm chuẩn &amp; xếp nguyện vọng</b></button>
         </div>
       </div>
     </div>
@@ -217,6 +222,71 @@
   <h2 id="documents-title">Tài liệu tuyển sinh &amp; đào tạo</h2>
   <p>Mỗi nguồn có phạm vi áp dụng riêng. Bản scan và trang chưa lưu đầy đủ vẫn có thể mở để đối chiếu; khả năng trả lời của chatbot được ghi bên dưới.</p>
   <div id="documents-list" aria-live="polite"></div>
+</dialog>
+<dialog id="score-dialog" class="score-dialog" aria-labelledby="score-title">
+  <div class="dialog-top"><div><span class="eyebrow">CÔNG CỤ THAM KHẢO</span><h2 id="score-title">Thử điểm và xếp nguyện vọng</h2></div><button type="button" class="close" data-close="score-dialog" aria-label="Đóng">×</button></div>
+  <p class="score-lead">Nhập điểm xét tuyển của bạn, chọn phương thức và thêm các chương trình đang quan tâm. Kết quả cho biết điểm của bạn chênh bao nhiêu so với mốc đã công bố.</p>
+  <div class="score-caution" role="note"><b>Bạn cần biết:</b> Điểm chuẩn thay đổi theo từng năm. Đây là thông tin tham khảo, không phải dự đoán kết quả trúng tuyển.</div>
+  <p id="score-load-status" class="hint" role="status" aria-live="polite">Đang tải mốc điểm chuẩn…</p>
+  <p id="score-error" class="error-text" role="alert"></p>
+  <div id="score-content" class="score-content" hidden>
+    <form id="score-form" novalidate>
+      <div class="score-input-grid">
+        <div><label for="score-method">Phương thức xét tuyển</label><select id="score-method" required><option value="">Chọn phương thức</option></select></div>
+        <div><label id="score-basis-label" for="score-basis">Tổ hợp / nhóm dữ liệu</label><select id="score-basis" required><option value="">Chọn phương thức trước</option></select></div>
+      </div>
+      <p id="score-scale" class="score-scale">Chọn phương thức và nhóm gốc tương ứng với dữ liệu điểm bạn đang đối chiếu.</p>
+      <div id="score-entry-mode-wrap" class="score-entry-mode" hidden><label for="score-entry-mode">Cách nhập điểm THPT</label><select id="score-entry-mode"><option value="subjects" selected>Tính từ điểm từng môn (khuyến nghị)</option><option value="final">Tôi đã có điểm xét tuyển cuối cùng</option></select></div>
+      <div id="score-final-score-wrap" class="score-input-grid" hidden><div><label for="score-value">Điểm xét tuyển THPT đã tính</label><input id="score-value" type="text" inputmode="decimal" autocomplete="off" maxlength="6" placeholder="Nhập điểm sau hệ số và ưu tiên, ví dụ 27,50" aria-describedby="score-scale"></div></div>
+      <section id="score-alternative-panel" class="score-raw-score-panel" hidden aria-labelledby="score-alternative-title">
+        <h3 id="score-alternative-title">Nhập thành phần điểm</h3>
+        <p id="score-alternative-help" class="score-basis-help">Công cụ áp dụng công thức HUST 2026 và hiển thị cách tính trong kết quả.</p>
+        <div class="score-input-grid">
+          <div><label id="score-alt-primary-label" for="score-alt-primary">Điểm TSA</label><input id="score-alt-primary" type="text" inputmode="decimal" autocomplete="off" placeholder="0–100"></div>
+          <div id="score-alt-certificate-wrap"><label for="score-alt-certificate">Loại chứng chỉ</label><select id="score-alt-certificate"><option value="SAT">SAT / 1600</option><option value="ACT">ACT / 36</option><option value="A-Level">A-Level / 30</option><option value="AP">AP / 15</option><option value="IB">IB / 45</option></select></div>
+          <div id="score-alt-ielts-wrap"><label for="score-alt-ielts">IELTS Academic (nếu có)</label><input id="score-alt-ielts" type="text" inputmode="decimal" autocomplete="off" placeholder="5.0–9.0"></div>
+          <div id="score-alt-achievement-wrap"><label for="score-alt-achievement">Điểm thành tích / 50</label><input id="score-alt-achievement" type="text" inputmode="decimal" autocomplete="off" placeholder="0–50"></div>
+          <div id="score-alt-other-bonus-wrap"><label for="score-alt-other-bonus">Điểm thưởng khác / 10</label><input id="score-alt-other-bonus" type="text" inputmode="decimal" autocomplete="off" placeholder="0–10"></div>
+        </div>
+        <div class="score-input-grid score-priority-inputs">
+          <div><label for="score-alt-area">Khu vực ưu tiên</label><select id="score-alt-area"><option value="KV3">KV3 · 0 điểm</option><option value="KV1">KV1 · 0,75 điểm</option><option value="KV2NT">KV2-NT · 0,50 điểm</option><option value="KV2">KV2 · 0,25 điểm</option></select></div>
+          <div><label for="score-alt-policy-group">Đối tượng ưu tiên</label><select id="score-alt-policy-group"><option value="none">Không thuộc UT1/UT2 · 0 điểm</option><option value="UT1">UT1 · 2,00 điểm</option><option value="UT2">UT2 · 1,00 điểm</option></select></div>
+        </div>
+      </section>
+      <section id="score-raw-score-panel" class="score-raw-score-panel" hidden aria-labelledby="score-raw-title">
+        <h3 id="score-raw-title">Điểm các môn trong tổ hợp</h3>
+          <p class="score-basis-help">Nhập điểm thi từng môn từ 0 đến 10. Công cụ tự đọc hệ số Toán theo từng chương trình từ bảng tuyển sinh HUST và hiển thị ngay bên cạnh nguyện vọng. K01 luôn theo công thức riêng. Điểm ưu tiên tính từ tổng 3 môn chưa nhân hệ số; chứng chỉ ngoại ngữ chưa tự quy đổi.</p>
+        <div id="score-subject-inputs" class="score-input-grid"></div>
+        <div id="score-ielts-replacement-wrap" class="score-input-grid" hidden><div><label for="score-ielts-replacement">IELTS Academic thay cho môn Tiếng Anh (nếu có)</label><input id="score-ielts-replacement" type="text" inputmode="decimal" autocomplete="off" placeholder="5.0–9.0"><p class="score-basis-help">HUST 2026 quy đổi 5.0 → 8,0; 5.5 → 8,5; 6.0 → 9,0; 6.5 → 9,5; từ 7.0 → 10,0.</p></div></div>
+        <div class="score-input-grid score-priority-inputs">
+          <div><label for="score-area">Khu vực ưu tiên</label><select id="score-area"><option value="">Chọn khu vực</option><option value="KV1">KV1 · 0,75 điểm</option><option value="KV2NT">KV2-NT · 0,50 điểm</option><option value="KV2">KV2 · 0,25 điểm</option><option value="KV3">KV3 · 0 điểm</option></select></div>
+          <div><label for="score-policy-group">Đối tượng ưu tiên</label><select id="score-policy-group"><option value="">Chọn nhóm đối tượng</option><option value="none">Không thuộc UT1/UT2 · 0 điểm</option><option value="UT1">UT1 · 2,00 điểm</option><option value="UT2">UT2 · 1,00 điểm</option></select></div>
+        </div>
+        <p id="score-priority-help" class="score-basis-help">Chọn theo hồ sơ hợp lệ và nơi học THPT lâu nhất; nếu thời gian bằng nhau, dùng trường học sau cùng. Mức ưu tiên được giảm theo quy định khi tổng điểm 3 môn chưa nhân hệ số từ 22,50 trở lên.</p>
+      </section>
+      <p class="score-basis-help">Với THPT, nhập điểm từng môn để công cụ áp dụng hệ số và có thể quy đổi IELTS sang điểm tiếng Anh. Với TSA và XTTN, nhập đúng điểm thi/chứng chỉ cùng IELTS nếu có để công cụ tính theo công thức HUST 2026. <a id="score-equivalency-link" href="https://tsbkhn.shinyapps.io/QuyDoi-2026BK/" target="_blank" rel="noopener noreferrer">Mở công cụ quy đổi điểm HUST ↗</a></p>
+      <div class="score-program-picker">
+        <label for="score-search">Chọn chương trình bạn quan tâm</label>
+        <input id="score-search" type="search" autocomplete="off" placeholder="Nhập mã hoặc tên chương trình">
+        <div id="score-program-options" class="score-program-options" role="group" aria-label="Danh sách chương trình"></div>
+      </div>
+      <section class="score-preferences-section" aria-labelledby="score-preferences-title">
+        <div class="score-section-heading"><h3 id="score-preferences-title">Nguyện vọng dự kiến</h3><span id="score-preference-count">0/15</span></div>
+        <p class="score-order-guidance">Dùng nút lên/xuống để xếp theo thứ tự bạn muốn học. Khi đăng ký chính thức, hãy giữ đúng mức ưu tiên của mình.</p>
+        <ol id="score-preferences" class="score-preferences"></ol>
+        <p id="score-preferences-empty" class="hint">Chưa có nguyện vọng. Chọn chương trình ở danh sách phía trên.</p>
+      </section>
+      <div class="score-form-actions"><button id="score-reset" class="secondary" type="button">Làm lại</button><button id="score-submit" class="primary" type="submit">Đối chiếu nguyện vọng</button></div>
+    </form>
+    <section id="score-results" class="score-results" aria-live="polite" hidden>
+      <div class="score-section-heading"><h3>Điểm của bạn so với điểm chuẩn</h3><span id="score-result-value"></span></div>
+      <p class="score-band-note">Dấu “+” là cao hơn mốc; dấu “−” là thấp hơn mốc. Mỗi mốc được ghi rõ năm và phương thức.</p>
+      <ol id="score-result-list" class="score-result-list"></ol>
+      <p id="score-result-notice" class="score-result-notice"></p>
+      <div class="score-citation"><span id="score-source-title"></span><a id="score-source-link" target="_blank" rel="noopener noreferrer">Điểm chuẩn HUST 2026 ↗</a><a id="score-history-link" target="_blank" rel="noopener noreferrer">Điểm chuẩn HUST 2025 ↗</a><a id="score-methodology-link" target="_blank" rel="noopener noreferrer">Cách quy đổi điểm 2026 ↗</a><a id="score-combination-methodology-link" target="_blank" rel="noopener noreferrer">Độ lệch tổ hợp HUST ↗</a><a id="score-calculation-rules-link" target="_blank" rel="noopener noreferrer">Công thức tính điểm THPT ↗</a><a id="score-priority-rules-link" target="_blank" rel="noopener noreferrer">Quy chế điểm ưu tiên ↗</a><a id="score-preference-link" target="_blank" rel="noopener noreferrer">Hướng dẫn xếp nguyện vọng ↗</a></div>
+      <button id="score-edit" class="secondary" type="button">Điều chỉnh điểm/nguyện vọng</button>
+    </section>
+  </div>
 </dialog>
 <dialog id="program-guidance-dialog" class="program-guidance-dialog" aria-labelledby="program-guidance-title">
   <div class="guidance-dialog-top">

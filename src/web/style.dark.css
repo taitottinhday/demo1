@@ -552,3 +552,25 @@ html[data-theme="dark"] .applicant-page .guidance-results:focus{outline:none}
 @media(max-width:600px){
 html[data-theme="dark"] .applicant-page .program-guidance-dialog{border-right:0;border-bottom:0;border-left:0}
 }
+html[data-theme="dark"] .applicant-page .score-dialog .score-caution{border-color:#5a4825;background:#272219;color:#e2c778}
+html[data-theme="dark"] .applicant-page .score-entry-mode,html[data-theme="dark"] .applicant-page .score-raw-score-panel{border-color:#2d3e54;background:#1f2229}
+html[data-theme="dark"] .applicant-page .score-entry-mode label,html[data-theme="dark"] .applicant-page .score-raw-score-panel h3{color:#cdd0d8}
+html[data-theme="dark"] .applicant-page .score-entry-mode select,html[data-theme="dark"] .applicant-page .score-raw-score-panel select,html[data-theme="dark"] .applicant-page .score-raw-score-panel input,html[data-theme="dark"] .applicant-page .score-preference-score{border-color:#344052;background:#202630;color:#cdd0d8}
+html[data-theme="dark"] .applicant-page .score-input-grid label,html[data-theme="dark"] .applicant-page .score-program-picker>label,html[data-theme="dark"] .applicant-page .score-section-heading h3,html[data-theme="dark"] .applicant-page .score-preference-name,html[data-theme="dark"] .applicant-page .score-result-name{color:#cdd0d8}
+html[data-theme="dark"] .applicant-page .score-program-option,html[data-theme="dark"] .applicant-page .score-preference-row,html[data-theme="dark"] .applicant-page .score-preference-actions button,html[data-theme="dark"] .applicant-page .score-result-card{border-color:#2d3e54;background:#1f2229;color:#b7bcc7}
+html[data-theme="dark"] .applicant-page .score-program-option:hover,html[data-theme="dark"] .applicant-page .score-program-option[aria-pressed="true"],html[data-theme="dark"] .applicant-page .score-preference-actions button:hover:not(:disabled){border-color:#63353d;background:#2b1d21;color:#f06b80}
+html[data-theme="dark"] .applicant-page .score-program-option-copy b,html[data-theme="dark"] .applicant-page .score-program-mark{color:#f06b80}
+html[data-theme="dark"] .applicant-page .score-preference-rank{background:#351e24;color:#f06b80}
+html[data-theme="dark"] .applicant-page .score-result-state--above{background:#1b3024;color:#9ed4a9}
+html[data-theme="dark"] .applicant-page .score-result-state--at{background:#1b293a;color:#9fc6ed}
+html[data-theme="dark"] .applicant-page .score-result-state--near{background:#342b18;color:#e2c778}
+html[data-theme="dark"] .applicant-page .score-result-state--below,html[data-theme="dark"] .applicant-page .score-result-state--missing{background:#292c32;color:#afb4be}
+html[data-theme="dark"] .applicant-page .score-comparison-item{border-color:#344052;background:#202630}
+html[data-theme="dark"] .applicant-page .score-comparison-item--below{border-color:#65343c;background:#2c1f23}
+html[data-theme="dark"] .applicant-page .score-comparison-label,html[data-theme="dark"] .applicant-page .score-comparison-context{color:#aeb7c5}
+html[data-theme="dark"] .applicant-page .score-comparison-delta{color:#9fc6ed}
+html[data-theme="dark"] .applicant-page .score-comparison-item--below .score-comparison-delta{color:#f08b98}
+html[data-theme="dark"] .applicant-page .score-comparison-item--equal .score-comparison-delta{color:#e2c778}
+html[data-theme="dark"] .applicant-page .score-result-notice{border-left-color:#b5122a;background:#1c1f25;color:#9da3b2}
+html[data-theme="dark"] .applicant-page .score-citation a{color:#70a5ea}
+@media(max-width:600px){html[data-theme="dark"] .applicant-page .score-dialog{border-right:0;border-bottom:0;border-left:0}}

@@ -85,7 +85,7 @@ LLM_TIMEOUT=15
 
 Adapter DeepSeek dùng Chat Completions + JSON Output, validate cấu trúc tại server rồi kiểm tra quote/số liệu trước hiển thị. Output rỗng, bị cắt, sai schema hoặc thiếu căn cứ chuyển fallback; lỗi provider/timeout trả thông báo lỗi có đường chuyển cán bộ. Không retry ngầm; giới hạn 24.000 ký tự câu hỏi + nguồn trước khi gọi. Các giới hạn này chưa thay thế trần chi phí tiền tệ hoặc benchmark tải. Câu chỉ tiêu vẫn dùng trích xuất xác định và không gọi model. Tham khảo [DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/).
 
-Kiểm thử tự động provider dùng mock; smoke-test live được ghi riêng bên dưới. Embedding/pgvector/reranker chưa được tích hợp. Corpus chuẩn hóa hiện thay phần trích trang PDF bổ trợ, có kiểm tra checksum và lọc quality/scope; bảng chương trình/học phí nguồn chính giữ parser hiện tại. API/citation và giao diện không thay đổi.
+Kiểm thử tự động provider dùng mock; smoke-test live được ghi riêng bên dưới. Embedding, pgvector và reranker đã được tích hợp dưới dạng chế độ RAG hybrid tùy chọn; mặc định ứng dụng vẫn dùng BM25. Corpus chuẩn hóa được kiểm tra checksum và lọc theo quality/scope trước khi lập chỉ mục; bảng chương trình/học phí nguồn chính tiếp tục dùng parser hiện tại. API/citation và giao diện giữ luồng hiện có.
 
 Cập nhật 16/10/2026: đã smoke-test live model `deepseek-flash`: request kết nối 42 token; một câu giới thiệu IT1 qua retrieval/grounding dùng 646 token, khoảng 2 giây cho bước trả lời, citation PDF trang 10. Đây chỉ là kiểm tra kết nối và một câu trả lời, không phải benchmark KPI. Một lần thử trong sandbox bị chặn mạng và không có response từ provider.
 

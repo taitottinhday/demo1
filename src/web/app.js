@@ -850,6 +850,291 @@ $('guidance-next').onclick=()=>renderGuidanceStep(Math.min(3,guidanceStep+1));
 $('guidance-back').onclick=()=>renderGuidanceStep(Math.max(1,guidanceStep-1));
 $('guidance-adjust').onclick=()=>{$('guidance-results').hidden=true;$('program-guidance-form').hidden=false;renderGuidanceStep(1);};
 $('guidance-restart').onclick=()=>clearGuidanceProfile();
+let scoreReference=null,scoreReferencePromise=null,scorePreferences=[],scoreCalculation=null;
+function invalidateScoreResults(){scoreCalculation=null;$('score-results').hidden=true;$('score-result-list').replaceChildren();$('score-error').textContent='';}
+function renderScoreMethod(){
+  const select=$('score-method');const selected=select.value;select.replaceChildren();
+  const empty=node('option','','Chọn phương thức');empty.value='';select.append(empty);
+  (scoreReference?.methods||[]).forEach(method=>{const option=node('option','',method.label);option.value=method.id;option.dataset.maximum=String(method.maximum);select.append(option);});
+  if((scoreReference?.methods||[]).some(method=>method.id===selected))select.value=selected;
+  renderScoreBasisOptions();
+  updateScoreScale();
+}
+function renderScoreBasisOptions(){
+  const select=$('score-basis'),previous=select.value,method=$('score-method').value;
+  select.replaceChildren();const empty=node('option','','Chọn tổ hợp hoặc nhóm gốc');empty.value='';select.append(empty);
+  const thpt=method==='THPT';
+  const options=thpt?(scoreReference?.combinations||[]):(scoreReference?.reference_combinations||[]).map(id=>({id,label:`${id} · nhóm gốc ${id}`}));
+  options.forEach(item=>{const option=node('option','',item.label);option.value=item.id;option.dataset.group=item.group||item.id;select.append(option);});
+  if(options.some(item=>item.id===previous))select.value=previous;
+  $('score-basis-label').textContent=thpt?'Tổ hợp thi THPT':'Nhóm gốc của bảng quy đổi';
+}
+function updateScoreScale(){
+  const method=scoreReference?.methods.find(item=>item.id===$('score-method').value);
+  const basis=$('score-basis').value;
+  if(!method){$('score-scale').textContent='Chọn phương thức và nhóm gốc tương ứng với dữ liệu điểm bạn đang đối chiếu.';syncScoreEntryMode();return;}
+  $('score-value').max=String(method.maximum);$('score-value').setAttribute('aria-label',`Điểm xét tuyển dự kiến, tối đa ${method.maximum} điểm`);
+  const selected=$('score-basis').selectedOptions[0];
+  $('score-scale').textContent=`${method.label}, thang tối đa ${method.maximum}.${method.id==='THPT'?' Có thể nhập từng môn để công cụ áp dụng công thức THPT HUST 2026, hoặc nhập điểm xét tuyển cuối cùng.':'Nhập điểm xét tuyển cuối cùng đã được tính theo quy định; công cụ không tự quy đổi điểm cá nhân.'}${basis?` Bạn chọn ${selected?.textContent||basis}; các chương trình không nhận tổ hợp này sẽ được báo rõ.`:''}`;
+  syncScoreEntryMode();
+}
+const scoreSubjectLabels={math:'Toán',physics:'Vật lí',chemistry:'Hóa học',biology:'Sinh học',english:'Tiếng Anh',literature:'Ngữ văn',chinese:'Tiếng Trung',korean:'Tiếng Hàn',informatics:'Tin học'};
+const scoreCombinationSubjects={A00:['math','physics','chemistry'],A01:['math','physics','english'],B00:['math','chemistry','biology'],D01:['math','literature','english'],D04:['math','literature','chinese'],D07:['math','chemistry','english'],DD2:['math','literature','korean']};
+function renderRawScoreFields(){
+  const container=$('score-subject-inputs');container.replaceChildren();const combination=$('score-basis').value;
+  $('score-ielts-replacement-wrap').hidden=!['A01','D01','D07'].includes(combination);
+  $('score-ielts-replacement').value='';
+  const addField=(key,label)=>{const wrap=node('div');const title=node('label','',label);title.htmlFor=`score-subject-${key}`;const input=node('input');input.id=`score-subject-${key}`;input.dataset.scoreSubject=key;input.type='text';input.inputMode='decimal';input.autocomplete='off';input.maxLength=5;input.placeholder='0–10';input.setAttribute('aria-label',`Điểm ${label}`);wrap.append(title,input);container.append(wrap);};
+  (combination==='K01'?['math','literature']:scoreCombinationSubjects[combination]||[]).forEach(key=>addField(key,scoreSubjectLabels[key]));
+  if(combination==='K01'){
+    const wrap=node('div');const title=node('label','', 'Môn thứ ba trong K01');title.htmlFor='score-k01-subject';const select=node('select');select.id='score-k01-subject';[['physics','Vật lí'],['chemistry','Hóa học'],['biology','Sinh học'],['informatics','Tin học']].forEach(([value,label])=>{const option=node('option','',label);option.value=value;select.append(option);});
+    const scoreTitle=node('label','', 'Điểm Vật lí');scoreTitle.htmlFor='score-subject-k01_subject';const input=node('input');input.id='score-subject-k01_subject';input.dataset.scoreSubject='k01_subject';input.type='text';input.inputMode='decimal';input.autocomplete='off';input.maxLength=5;input.placeholder='0–10';input.setAttribute('aria-label','Điểm Vật lí trong K01');
+    select.addEventListener('change',()=>{scoreTitle.textContent=`Điểm ${scoreSubjectLabels[select.value]}`;input.setAttribute('aria-label',`Điểm ${scoreSubjectLabels[select.value]} trong K01`);});wrap.append(title,select,scoreTitle,input);container.append(wrap);
+  }
+}
+function syncScoreEntryMode(){
+  const method=$('score-method').value;const isThpt=method==='THPT';const auto=isThpt&&$('score-entry-mode').value==='subjects';const hasMethod=Boolean(method);
+  $('score-entry-mode-wrap').hidden=!isThpt;$('score-final-score-wrap').hidden=!hasMethod||isThpt||auto;$('score-raw-score-panel').hidden=!auto;$('score-value').required=false;
+  $('score-alternative-panel').hidden=!hasMethod||isThpt;
+  if(hasMethod&&!isThpt)renderAlternativeFields(method);
+  if(auto&&!$('score-subject-inputs').childElementCount)renderRawScoreFields();
+}
+function renderAlternativeFields(method){
+  const certificate=method==='XTTN 1.2',profile=method==='XTTN 1.3';
+  $('score-alt-certificate-wrap').hidden=!certificate;$('score-alt-ielts-wrap').hidden=false;
+  $('score-alt-achievement-wrap').hidden=!profile;$('score-alt-other-bonus-wrap').hidden=!profile;
+  $('score-alt-primary-label').textContent=certificate?'Điểm chứng chỉ chính':profile?'Điểm TSA':'Điểm TSA';
+  $('score-alt-primary').placeholder=certificate?'Nhập điểm theo loại chứng chỉ': '0–100';
+  $('score-alternative-help').textContent=certificate?'IELTS được quy đổi thành điểm thưởng theo đúng thang của SAT/ACT/A-Level/AP/IB trước khi áp dụng công thức HUST.':profile?'Điểm HSNL = TSA × 40/60 + điểm thành tích (tối đa 50) + điểm thưởng (tối đa 10). IELTS được tính trong điểm thưởng.':'Điểm TSA được cộng điểm thưởng IELTS trên thang 100 rồi cộng ưu tiên theo quy định HUST.';
+}
+function parseApplicantScore(value){const raw=value.trim().replace(',','.');if(!/^\d{1,2}(?:\.\d{1,2})?$/.test(raw))return null;const score=Number(raw);return Number.isFinite(score)&&score>=0&&score<=10?score:null;}
+function parseFlexibleScore(input,label){const raw=String(input||'').trim().replace(',','.');if(!raw||!/^\d+(?:\.\d{1,2})?$/.test(raw))throw new Error(`Nhập ${label} hợp lệ.`);const value=Number(raw);if(!Number.isFinite(value))throw new Error(`Nhập ${label} hợp lệ.`);return value;}
+function getAlternativeScorePayload(method){
+  const payload={method,primary_score:parseFlexibleScore($('score-alt-primary').value,method==='XTTN 1.2'?'điểm chứng chỉ':'điểm TSA'),certificate_type:method==='XTTN 1.2'?$('score-alt-certificate').value:null,ielts:$('score-alt-ielts').value?parseFlexibleScore($('score-alt-ielts').value,'IELTS'):null,achievement_score:method==='XTTN 1.3'?parseFlexibleScore($('score-alt-achievement').value||'0','điểm thành tích'):0,other_bonus:method==='XTTN 1.3'?parseFlexibleScore($('score-alt-other-bonus').value||'0','điểm thưởng khác'):0,area:$('score-alt-area').value,policy_group:$('score-alt-policy-group').value};
+  if(method==='TSA'&&payload.primary_score>100)throw new Error('Điểm TSA tối đa là 100.');
+  const max={SAT:1600,ACT:36,'A-Level':30,AP:15,IB:45};if(method==='XTTN 1.2'&&payload.primary_score>max[payload.certificate_type])throw new Error(`Điểm ${payload.certificate_type} vượt thang điểm cho phép.`);
+  if(payload.ielts!==null&&(payload.ielts<5||payload.ielts>9))throw new Error('IELTS phải từ 5.0 đến 9.0.');
+  return payload;
+}
+function getRawScorePayload(){
+  const combination=$('score-basis').value,scores={};for(const input of document.querySelectorAll('[data-score-subject]')){const score=parseApplicantScore(input.value);if(score===null){input.focus();throw new Error(`Nhập điểm ${input.getAttribute('aria-label')} từ 0 đến 10, tối đa 2 chữ số thập phân.`);}scores[input.dataset.scoreSubject]=score;}
+  const area=$('score-area').value,policy_group=$('score-policy-group').value;
+  if(!area){$('score-area').focus();throw new Error('Hãy chọn khu vực ưu tiên theo hồ sơ tuyển sinh.');}
+  if(!policy_group){$('score-policy-group').focus();throw new Error('Hãy xác nhận nhóm đối tượng ưu tiên, hoặc chọn “Không thuộc UT1/UT2”.');}
+  const ielts=$('score-ielts-replacement').value?parseFlexibleScore($('score-ielts-replacement').value,'IELTS'):null;
+  if(ielts!==null&&(ielts<5||ielts>9))throw new Error('IELTS phải từ 5.0 đến 9.0.');
+    return {combination,scores,area,policy_group,ielts};
+}
+async function ensureScoreReference(){
+  if(scoreReference){$('score-load-status').hidden=true;$('score-content').hidden=false;renderScoreMethod();renderScorePrograms();return;}
+  $('score-load-status').hidden=false;$('score-load-status').textContent='Đang tải mốc điểm chuẩn…';$('score-error').textContent='';
+  if(!scoreReferencePromise)scoreReferencePromise=api('/programs/score-reference');
+  try{
+    const data=await scoreReferencePromise;
+    if(!Array.isArray(data.items)||!data.items.length||!Array.isArray(data.methods)||!Array.isArray(data.reference_combinations)||!Array.isArray(data.combinations))throw new Error('Dữ liệu mốc điểm chưa đầy đủ.');
+    scoreReference=data;$('score-content').hidden=false;$('score-load-status').hidden=true;renderScoreMethod();renderScorePrograms();
+  }catch(error){$('score-load-status').hidden=true;$('score-error').textContent=error.message||'Chưa tải được mốc điểm. Vui lòng thử lại.';}
+  finally{scoreReferencePromise=null;}
+}
+function renderScorePrograms(){
+  const list=$('score-program-options');list.replaceChildren();if(!scoreReference)return;
+  const query=fold($('score-search').value);const filtered=scoreReference.items.filter(item=>!query||fold(`${item.code} ${item.name}`).includes(query));
+  filtered.forEach(item=>{
+    const selected=scorePreferences.some(entry=>entry.code===item.code);const button=node('button','score-program-option');button.type='button';button.setAttribute('aria-pressed',String(selected));
+    button.setAttribute('aria-label',`${selected?'Bỏ khỏi':'Thêm vào'} nguyện vọng: ${item.code}, ${item.name}`);
+    const copy=node('span','score-program-option-copy');copy.append(node('b','',item.code),node('span','',item.name));
+    button.append(copy,node('span','score-program-mark',selected?'Đã thêm':'Thêm'));
+    button.onclick=()=>{
+      if(selected)scorePreferences=scorePreferences.filter(entry=>entry.code!==item.code);
+      else if(scorePreferences.length>=15){$('score-error').textContent='Bạn có thể xếp tối đa 15 nguyện vọng.';return;}
+        else scorePreferences.push({code:item.code,name:item.name,scoreValue:'',math_coefficient:''});
+      invalidateScoreResults();renderScorePrograms();renderScorePreferences();
+    };
+    list.append(button);
+  });
+  if(!filtered.length)list.append(node('p','hint','Không tìm thấy chương trình phù hợp.'));
+}
+function renderScorePreferences(){
+  const list=$('score-preferences');list.replaceChildren();$('score-preference-count').textContent=`${scorePreferences.length}/15`;
+  $('score-preferences-empty').hidden=scorePreferences.length>0;
+  const thpt=$('score-method').value==='THPT';
+  const rawMode=thpt&&$('score-entry-mode').value==='subjects';
+  const combination=$('score-basis').value;
+  const needsMathCoefficient=rawMode&&combination!=='K01';
+  scorePreferences.forEach((entry,index)=>{
+    const reference=scoreReference.items.find(item=>item.code===entry.code);
+    const eligibleForCombination=Boolean(reference?.combinations.includes(combination));
+    const row=node('li','score-preference-row');row.append(node('span','score-preference-rank',String(index+1)));
+    const details=node('div','score-preference-details');details.append(node('span','score-preference-name',`${entry.code} · ${entry.name}`));
+    if(thpt&&eligibleForCombination&&rawMode&&needsMathCoefficient){
+      const coefficient=reference?.thpt_math_coefficients?.[combination];
+      if(coefficient){
+        entry.math_coefficient=String(coefficient);
+        const hint=node('span','score-preference-coefficient');
+        hint.setAttribute('role','status');
+        hint.textContent=`Toán ×${coefficient} · tự áp dụng theo bảng HUST`;
+        hint.title=reference?.thpt_coefficient_source||'Hệ số được lấy từ dữ liệu tuyển sinh HUST.';
+        details.append(hint);
+      }else{
+        const hint=node('span','score-preference-coefficient score-preference-coefficient--missing');
+        hint.textContent='Chưa xác định hệ số · nhập điểm cuối cùng';
+        details.append(hint);
+      }
+    }else if(thpt&&eligibleForCombination&&!rawMode){
+      const scoreInput=node('input','score-preference-score');scoreInput.type='text';scoreInput.inputMode='decimal';scoreInput.autocomplete='off';scoreInput.maxLength=6;scoreInput.placeholder='Điểm xét tuyển đã tính / 30';scoreInput.value=entry.scoreValue||'';scoreInput.setAttribute('aria-label',`Điểm xét tuyển THPT đã tính của ${entry.code}, tối đa 30`);
+      scoreInput.addEventListener('input',()=>{entry.scoreValue=scoreInput.value;invalidateScoreResults();});details.append(scoreInput);
+    }
+    row.append(details);
+    const actions=node('span','score-preference-actions');
+    [['↑','Lên','up'],['↓','Xuống','down'],['×','Bỏ','remove']].forEach(([symbol,label,action])=>{
+      const button=node('button','',symbol);button.type='button';button.setAttribute('aria-label',`${label} nguyện vọng ${index+1}: ${entry.code}`);
+      if(action==='up')button.disabled=index===0;
+      if(action==='down')button.disabled=index===scorePreferences.length-1;
+      button.onclick=()=>{
+        if(action==='remove')scorePreferences.splice(index,1);
+        else{const destination=action==='up'?index-1:index+1;[scorePreferences[index],scorePreferences[destination]]=[scorePreferences[destination],scorePreferences[index]];}
+        invalidateScoreResults();renderScorePreferences();renderScorePrograms();
+      };
+      actions.append(button);
+    });
+    row.append(actions);list.append(row);
+  });
+}
+function formatScore(value){return Number(value).toLocaleString('vi-VN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function getScoreReferenceCutoff(reference,method,combination){
+  const cutoff=reference?.cutoffs?.[method];if(!Number.isFinite(cutoff))return null;
+  if(method!=='THPT')return reference.base_combination===combination?{value:cutoff,adjustment:0}:null;
+  if(!reference.combinations?.includes(combination))return null;
+  const selectedGroup=scoreReference.combinations.find(item=>item.id===combination)?.group;
+  const baseGroup=scoreReference.combinations.find(item=>item.id===reference.base_combination)?.group;
+  if(!selectedGroup||!baseGroup)return null;
+  if(selectedGroup===baseGroup)return {value:cutoff,adjustment:0};
+  if(!reference.has_published_group_offset)return null;
+  const adjustment=selectedGroup==='A00'?0.5:-0.5;
+  return {value:cutoff+adjustment,adjustment};
+}
+function renderScoreResults(scoresByProgram,method){
+  const results=$('score-result-list');results.replaceChildren();const methodInfo=scoreReference.methods.find(item=>item.id===method);
+  const combination=$('score-basis').value;
+  scorePreferences.forEach((entry,index)=>{
+    const reference=scoreReference.items.find(item=>item.code===entry.code);const cutoffInfo=getScoreReferenceCutoff(reference,method,combination);const cutoff=cutoffInfo?.value;
+    const score=scoresByProgram[entry.code];
+    const card=node('li','score-result-card');card.append(node('span','score-result-rank',`NV${index+1}`));
+    const copy=node('div','score-result-copy');copy.append(node('b','score-result-name',`${entry.code} · ${entry.name}`));
+    if(!Number.isFinite(cutoff)){
+      const explanation=method==='THPT'&&!reference?.combinations?.includes(combination)?`Chương trình không công bố nhận tổ hợp ${combination} trong phương thức THPT.`:`Chưa có mốc ${methodInfo.label} phù hợp với nhóm gốc ${combination}.`;
+      copy.append(node('span','score-result-details',explanation));card.append(copy,node('span','score-result-state score-result-state--missing','Chưa đủ căn cứ'));
+    }else{
+      const difference=score-cutoff;
+      const state=difference>0?['score-result-state--above','Cao hơn mốc']:difference===0?['score-result-state--at','Bằng mốc']:['score-result-state--below','Thấp hơn mốc'];
+      const adjustment=cutoffInfo.adjustment?` · Mốc đã điều chỉnh ${cutoffInfo.adjustment>0?'+':''}${formatScore(cutoffInfo.adjustment)} theo độ lệch tổ hợp HUST`:'';
+      const comparisons=node('div','score-comparison-grid');
+      const addComparison=(label,benchmark,year,extra='')=>{
+        const delta=score-benchmark;const tile=node('div',`score-comparison-item ${delta<0?'score-comparison-item--below':delta>0?'score-comparison-item--above':'score-comparison-item--equal'}`);
+        tile.append(node('span','score-comparison-label',label),node('strong','score-comparison-delta',`${delta>0?'+':delta<0?'−':''}${formatScore(Math.abs(delta))} điểm`),node('span','score-comparison-context',`Bạn: ${formatScore(score)} · Chuẩn ${year}: ${formatScore(benchmark)}${extra}`));
+        comparisons.append(tile);
+      };
+      addComparison(`Điểm chuẩn ${scoreReference.cycle} · ${combination}`,cutoff,scoreReference.cycle,adjustment);
+      if(method==='THPT'&&Number.isFinite(reference?.historical_2025?.value)){
+        addComparison('Điểm chuẩn THPT 2025',reference.historical_2025.value,2025,' · mốc công bố theo chương trình');
+      }
+      if(scoreCalculation?.[entry.code]){
+        const calc=scoreCalculation[entry.code];
+        copy.append(node('span','score-result-details',calc.method?`Điểm cơ sở: ${formatScore(calc.base_score)}/100 · Điểm thưởng IELTS: ${formatScore(calc.ielts_bonus)} · Ưu tiên: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`:`Điểm tổ hợp sau hệ số: ${formatScore(calc.subject_score)} · Tổng gốc 3 môn để tính ưu tiên: ${formatScore(calc.priority_base_score)} · Ưu tiên ban đầu: ${formatScore(calc.priority_before_scaling)} · Ưu tiên sau điều chỉnh: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`));
+      }
+      copy.append(comparisons);card.append(copy,node('span',`score-result-state ${state[0]}`,state[1]));
+    }
+    results.append(card);
+  });
+  const perProgram=method==='THPT';
+  $('score-result-value').textContent=perProgram?'Điểm tính riêng theo từng chương trình':`${methodInfo.label}: ${formatScore(scoresByProgram[scorePreferences[0]?.code]??0)}/${methodInfo.maximum}`;
+  const calculationNote=scoreCalculation&&Object.keys(scoreCalculation).length?'Mỗi nguyện vọng được tính theo hệ số của đúng chương trình; các môn ưu tiên được tính từ tổng chưa nhân hệ số.':'Với THPT, điểm xét tuyển được nhập riêng cho từng chương trình. Với TSA/XTTN, điểm đã nhập được so sánh theo nhóm gốc đã chọn.';
+  $('score-result-notice').textContent=`${calculationNote} ${scoreReference.notice} Điểm chỉ được dùng cho lần đối chiếu này và không lưu theo tài khoản.`;
+  const source=scoreReference.source||{};$('score-source-title').textContent=`${source.title||'Nguồn chính thức'} · đối chiếu ${combination} · dữ liệu kiểm tra ${scoreReference.source_checked_on||'theo snapshot hiện có'} · ${scoreReference.items.length} chương trình.`;
+  const url=typeof source.url==='string'&&source.url.startsWith('https://')?source.url:'#';$('score-source-link').href=url;
+  const history=scoreReference.historical_source||{};$('score-history-link').href=typeof history.url==='string'&&history.url.startsWith('https://')?history.url:'#';
+  const methodology=scoreReference.methodology_source||{};const methodologyUrl=typeof methodology.url==='string'&&methodology.url.startsWith('https://')?methodology.url:'#';$('score-methodology-link').href=methodologyUrl;
+  const preference=scoreReference.preference_source||{};const preferenceUrl=typeof preference.url==='string'&&preference.url.startsWith('https://')?preference.url:'#';$('score-preference-link').href=preferenceUrl;
+  const combinationSource=scoreReference.combination_methodology_source||{};
+  const combinationLink=$('score-combination-methodology-link');
+  if(combinationLink)combinationLink.href=typeof combinationSource.url==='string'&&combinationSource.url.startsWith('https://')?combinationSource.url:'#';
+  const rulesSource=scoreReference.calculation_rules_source||{};const rulesLink=$('score-calculation-rules-link');
+  if(rulesLink)rulesLink.href=typeof rulesSource.url==='string'&&rulesSource.url.startsWith('https://')?rulesSource.url:'#';
+  const prioritySource=scoreReference.priority_rules_source||{};const priorityLink=$('score-priority-rules-link');
+  if(priorityLink)priorityLink.href=typeof prioritySource.url==='string'&&prioritySource.url.startsWith('https://')?prioritySource.url:'#';
+  $('score-results').hidden=false;
+}
+function clearScoreTool(){
+  scorePreferences=[];$('score-value').value='';$('score-search').value='';$('score-method').value='';$('score-basis').value='';$('score-entry-mode').value='subjects';$('score-area').value='';$('score-policy-group').value='';$('score-error').textContent='';$('score-subject-inputs').replaceChildren();invalidateScoreResults();renderScorePreferences();
+  if(scoreReference){$('score-content').hidden=false;renderScoreMethod();renderScorePrograms();}
+}
+$('score-open').onclick=()=>{$('score-dialog').showModal();ensureScoreReference();};
+  $('score-method').addEventListener('change',()=>{renderScoreBasisOptions();updateScoreScale();invalidateScoreResults();renderScorePreferences();});
+  $('score-basis').addEventListener('change',()=>{scorePreferences.forEach(entry=>{entry.math_coefficient='';});renderRawScoreFields();updateScoreScale();invalidateScoreResults();renderScorePreferences();});
+  $('score-entry-mode').addEventListener('change',()=>{syncScoreEntryMode();invalidateScoreResults();renderScorePreferences();});
+$('score-search').addEventListener('input',renderScorePrograms);
+$('score-reset').onclick=clearScoreTool;
+$('score-edit').onclick=()=>{$('score-results').hidden=true;const target=$('score-method').value==='THPT'?($('score-entry-mode').value==='subjects'?document.querySelector('[data-score-subject]'):$('score-preferences').querySelector('.score-preference-score')):$('score-value');(target||$('score-search')).focus();};
+$('score-form').addEventListener('submit',async event=>{
+  event.preventDefault();$('score-error').textContent='';
+  const method=$('score-method').value;const methodInfo=scoreReference?.methods.find(item=>item.id===method);
+  const basis=$('score-basis').value;
+  const isThpt=method==='THPT';const calculateFromSubjects=isThpt&&$('score-entry-mode').value==='subjects';
+  const scoresByProgram={};scoreCalculation=null;
+  if(!methodInfo){$('score-error').textContent='Hãy chọn phương thức xét tuyển.';$('score-method').focus();return;}
+  const validBasis=method==='THPT'?scoreReference?.combinations.some(item=>item.id===basis):scoreReference?.reference_combinations.includes(basis);
+  if(!validBasis){$('score-error').textContent=method==='THPT'?'Hãy chọn một tổ hợp được HUST công bố.':'Hãy chọn nhóm gốc A00 hoặc D01 để so sánh đúng với bảng HUST.';$('score-basis').focus();return;}
+  if(!scorePreferences.length){$('score-error').textContent='Hãy thêm ít nhất một chương trình vào danh sách nguyện vọng.';$('score-search').focus();return;}
+  if(calculateFromSubjects){
+    let payload;try{payload=getRawScorePayload();}catch(error){$('score-error').textContent=error.message;return;}
+    const submit=$('score-submit');submit.disabled=true;submit.textContent='Đang tính điểm…';
+    try{
+      const eligible=scorePreferences.filter(entry=>scoreReference.items.find(item=>item.code===entry.code)?.combinations.includes(basis));
+      const needsMathCoefficient=['A00','A01','B00','D01','D07'].includes(basis);
+      for(const entry of eligible){
+        const reference=scoreReference.items.find(item=>item.code===entry.code);
+        const coefficient=reference?.thpt_math_coefficients?.[basis];
+        if(needsMathCoefficient&&!coefficient){
+          $('score-error').textContent=`Chưa có dữ liệu hệ số tự động cho ${entry.code}; hãy nhập điểm xét tuyển cuối cùng cho nguyện vọng này.`;
+          return;
+        }
+        entry.math_coefficient=String(coefficient||1);
+      }
+      const calculations=await Promise.all(eligible.map(async entry=>{
+        const calculation=await api('/programs/score-thpt',{method:'POST',body:JSON.stringify({...payload,math_coefficient:Number(entry.math_coefficient||1)})});
+        return [entry.code,calculation];
+      }));
+      scoreCalculation=Object.fromEntries(calculations);
+      calculations.forEach(([code,calculation])=>{scoresByProgram[code]=calculation.final_score;});
+    }
+    catch(error){$('score-error').textContent=error.message||'Chưa tính được điểm. Vui lòng kiểm tra lại thông tin.';return;}
+    finally{submit.disabled=false;submit.textContent='Đối chiếu nguyện vọng';}
+  }else if(isThpt){
+    for(const entry of scorePreferences){
+      if(!scoreReference.items.find(item=>item.code===entry.code)?.combinations.includes(basis))continue;
+      const raw=String(entry.scoreValue||'').trim().replace(',','.');const score=Number(raw);
+      if(!raw||!Number.isFinite(score)||score<0||score>30||!/^\d{1,2}(?:\.\d{1,2})?$/.test(raw)){
+        $('score-error').textContent=`Nhập điểm THPT cuối cùng hợp lệ từ 0 đến 30 cho ${entry.code}.`;
+        $('score-preferences').querySelector(`[aria-label="Điểm xét tuyển THPT đã tính của ${entry.code}, tối đa 30"]`)?.focus();return;
+      }
+      scoresByProgram[entry.code]=score;
+    }
+  }else{
+    let calculation;
+    try{calculation=await api('/programs/score-alternative',{method:'POST',body:JSON.stringify(getAlternativeScorePayload(method))});}
+    catch(error){$('score-error').textContent=error.message||'Chưa tính được điểm. Vui lòng kiểm tra lại thông tin.';return;}
+    scorePreferences.forEach(entry=>{scoresByProgram[entry.code]=calculation.final_score;});
+    scoreCalculation=Object.fromEntries(scorePreferences.map(entry=>[entry.code,calculation]));
+    renderScoreResults(scoresByProgram,method);
+    return;
+    const raw=$('score-value').value.trim().replace(',','.');const score=Number(raw);
+    if(!raw||!Number.isFinite(score)||score<0||score>methodInfo.maximum||!/^\d{1,3}(?:\.\d{1,2})?$/.test(raw)){
+      $('score-error').textContent=`Nhập điểm hợp lệ từ 0 đến ${methodInfo.maximum}, tối đa 2 chữ số thập phân.`;$('score-value').focus();return;
+    }
+    scorePreferences.forEach(entry=>{scoresByProgram[entry.code]=score;});
+  }
+  renderScoreResults(scoresByProgram,method);
+});
 $('compare-open').onclick=()=>{
   const box=$('compare-selects');box.replaceChildren();$('compare-error').textContent='';clearComparisonResult();
   for(let i=0;i<3;i++){const label=node('label','',`Chương trình ${i+1}${i===2?' (tùy chọn)':''}`);const select=node('select');select.id='compare-'+i;select.setAttribute('aria-label',`Chương trình ${i+1}${i===2?' tùy chọn':''}`);label.htmlFor=select.id;const empty=node('option','','Chọn chương trình');empty.value='';select.append(empty);programs.forEach(program=>{const option=node('option','',program.code+' · '+program.name);option.value=program.code;select.append(option);});if(i===0)select.value=$('program').value;select.addEventListener('change',()=>{clearComparisonFieldError(select);$('compare-error').textContent='';markComparisonStale();});box.append(label,select);}
