@@ -39,7 +39,7 @@ Thứ tự đọc dành cho người triển khai và agent:
 - `admissions_facts_2026.json` và `cutoffs_2026_summary.json` từ main giữ một số dữ kiện web tóm tắt năm 2026, chưa có bản lưu web đầy đủ. Chúng nằm riêng với `records.jsonl` (điểm chuẩn lịch sử 2024/2025). Không gộp năm hoặc suy rộng thành bảng điểm đầy đủ. Học bổng chi tiết vẫn thiếu nguồn.
 - Chưa có embedding, vector index, model reranker hay kết quả đánh giá chatbot trên snapshot này. Corpus là đầu vào để các bên triển khai các thành phần đó.
 - `eval/retrieval-dev.jsonl` có 25 ca development chỉ cho `normalized_pdf_records_only`, gắn `dataset_release`; các candidate ID chỉ là đoạn cùng vùng trang, chưa phải nhãn relevance đã duyệt. Ca thiếu điểm chuẩn 2026 là kỳ vọng cho corpus PDF này, không áp dụng cho facts web riêng của runtime. Không dùng kết quả trên bộ này để tuyên bố đạt KPI đề tài.
-- Việc backend hiện có đọc PDF/`knowledge.json` không đồng nghĩa đã dùng bộ chuẩn này: bên backend cần viết adapter/importer chủ động cho records/chunks. Người phụ trách Data không thay đổi code backend trong lần bàn giao này.
+- Runtime hiện đã tích hợp records/chunks chuẩn hóa qua `Knowledge` adapter: kiểm tra snapshot/checksum, nối chunk với record cha và catalog nguồn, đồng thời chỉ đưa vào tìm kiếm khi cả chunk và record cha có `answer_eligible=true`. Đây là điều kiện kỹ thuật, không phải xác nhận nội dung đã được cán bộ duyệt.
 
 ## Hướng dẫn tích hợp cho backend và agent
 
@@ -143,7 +143,7 @@ ID có SHA nguồn và hash nội dung; thay một PDF chỉ thay ID của ngu�
 2. Index `retrieval_text` cho embedding; BM25 dùng text có dấu và có thể thêm bản không dấu. Giữ text gốc để hiển thị.
 3. Truy xuất BM25 + vector, gộp RRF rồi rerank cặp `(question, retrieval_text)`.
 4. Với câu nhiều lượt bổ sung ngữ cảnh do người dùng xác nhận vào query; không nhập hồ sơ cá nhân vào corpus công khai.
-5. Đọc record cha, lọc answer_eligible, kiểm tra năm/đơn vị/đối tượng và nguồn mâu thuẫn trước trả lời.
+5. Runtime thực hiện bước đọc record cha và lọc `answer_eligible`; vẫn cần tiếp tục đối chiếu năm/đơn vị/đối tượng và nguồn mâu thuẫn trong từng câu trả lời. Nguồn OCR chưa duyệt không được nâng thành dữ liệu tin cậy.
 6. Dẫn nguồn bằng source_id, SHA, URL và trang PDF. Thiếu căn cứ thì hỏi rõ hoặc handover.
 
 Chưa tạo embedding hay gắn với một database/model cụ thể. Bên AI có thể bắt đầu benchmark bằng corpus này; bên backend nhập dữ liệu bằng schema mà không cần sửa luồng trích xuất.
@@ -170,11 +170,11 @@ Kiểm tra snapshot đã có (chỉ đọc, không cần OCR/model, không tạo
 
 Lưu bộ release cùng nhau khi bàn giao. Git theo dõi nguồn công khai, extracted, schema, normalized, quality và corpus; ZIP trong `data/releases/`, tools, database và dữ liệu ứng viên vẫn bị ignore. CI validate snapshot đã commit bằng chế độ chỉ đọc; không cần cài OCR. Không đưa dữ liệu phiên ứng viên hoặc database vào gói bàn giao.
 
-## Thay đổi v2 và ranh giới trước tích hợp AI
+## Thay đổi v2 và ranh giới sử dụng
 
 - Catalog là metadata chung. Sáu PDF dùng tên chuẩn như runtime; năm bản sao trùng được bỏ. `source_id` corpus giữ nguyên, manifest bổ sung `runtime_source_id` để adapter nối đúng nguồn. Evidence chuyển sang đường dẫn PDF chuẩn.
 - Schema v2 bắt buộc metadata nguồn/trang/phạm vi/đối tượng/chất lượng trên cả record và chunk. OCR và bảng chưa duyệt không được đánh dấu đủ điều kiện trả lời. Không nâng trạng thái duyệt tự động.
 - `checksum_format=sha256_binary_pdf_utf8_lf_text`: PDF băm nguyên byte; file văn bản chuẩn hóa CRLF thành LF trước SHA256 để Windows/Linux kiểm tra cùng một snapshot. `.gitattributes` cố định LF cho dữ liệu và script phát hành.
 - Ngày 07/09/2026 của quy định ngoại ngữ được giữ dưới dạng ghi chú chưa xác minh; `publication_date=null`. Hiệu lực học kỳ 1 năm học 2026–2027 giữ theo Điều 7, không còn cảnh báo sai về sources.md cũ.
 - Gói bàn giao gồm cả catalog, facts tóm tắt, bộ golden 20 ca và bộ development 25 ca. Hai bộ chưa phải holdout, chưa đo chất lượng chatbot trên snapshot v2.
-- Runtime vẫn đọc PDF và facts theo logic hiện có. Chưa nối records/chunks, chưa tạo embedding hoặc thay retrieval/LLM. Bước AI kế tiếp cần adapter, lọc chất lượng/phạm vi và benchmark riêng.
+- Snapshot dữ liệu không chứa embedding/vector index. Runtime hiện nối records/chunks qua `Knowledge` adapter; retrieval BM25 là mặc định, hybrid cần cấu hình hạ tầng/model riêng. Chất lượng nội dung vẫn cần review thủ công và đánh giá trên tập holdout độc lập.

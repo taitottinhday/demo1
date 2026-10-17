@@ -1,4 +1,4 @@
-# Bàn giao data trước tích hợp AI — 15/10/2026
+# Bàn giao data v2 — trạng thái cập nhật 17/10/2026
 
 Nhánh làm việc: `feature/data-ai-integration`. Snapshot: `k71-2026-v2`.
 
@@ -31,10 +31,10 @@ Toàn ứng dụng: 106 passed, 4 failed. Không sửa runtime hoặc các test 
 
 Đây là các bất đồng hợp đồng/fixture quan sát được, chưa kết luận mọi lỗi chỉ thuộc test. CI có bước validate data mới nhưng job toàn ứng dụng vẫn cần xử lý bốn mục này trước khi có thể báo xanh toàn bộ.
 
-## Ranh giới tích hợp kế tiếp
+## Trạng thái tích hợp runtime
 
-Runtime vẫn dùng PDF + `admissions_facts_2026.json`; chưa dùng records/chunks. Không tạo embedding, vector index, reranker, gọi LLM hay gửi email thật trong đợt chuẩn hóa này.
+Runtime hiện nối snapshot records/chunks qua `Knowledge` adapter; adapter xác minh checksum, nối nguồn và record cha, rồi chặn chunk/record không có `answer_eligible=true`. BM25 là mặc định. Hybrid retrieval là tùy chọn, phụ thuộc vector database và model cache. LLM chỉ được gọi khi cấu hình bật; câu trả lời phải qua kiểm tra trích dẫn/grounding, nếu không sẽ fallback hoặc từ chối. Phần bàn giao data ban đầu mô tả trạng thái tại thời điểm tạo, không phải trạng thái runtime hiện tại.
 
 OCR TSA và bảng ảnh trang 17 cần đối chiếu; ô gộp chưa rõ giữ null. Facts web năm 2026 được giữ riêng, chưa có bản lưu web đầy đủ. Bộ 25 ca development chỉ áp dụng cho corpus PDF chuẩn hóa; bộ golden 20 ca của runtime có facts web riêng. Không cộng hai bộ thành số đo accuracy.
 
-Xem [README data](../data/README-data.md) để build lại và dùng hợp đồng dữ liệu v2. Bước tiếp theo là adapter records/chunks, bộ lọc phạm vi/năm/chất lượng và benchmark retrieval trước khi thay luồng AI.
+Xem [README data](../data/README-data.md) để build lại và dùng hợp đồng dữ liệu v2. Việc tích hợp runtime không thay thế rà soát nội dung bởi cán bộ; OCR, nguồn web tóm tắt và dữ liệu học bổng còn thiếu cần tiếp tục được xử lý theo ranh giới bên dưới.

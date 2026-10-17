@@ -21,6 +21,16 @@ from src.services.knowledge import Knowledge, normalize
 from src.services.store import Store
 
 
+def source_expectation_matches(expected_sources, alternatives, actual_sources):
+    """Require canonical sources, allowing documented equivalent sources per source ID."""
+    actual = set(actual_sources)
+    alternatives = alternatives or {}
+    return all(
+        source_id in actual or bool(set(alternatives.get(source_id, [])) & actual)
+        for source_id in expected_sources
+    )
+
+
 async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=None, output_path=None):
     if mode == "llm" and (max_cases is None or not 1 <= max_cases <= 100):
         raise ValueError("Paid evaluation requires max_cases between 1 and 100")
@@ -66,8 +76,9 @@ async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=N
             print(f"{case['id']}: {answer['kind']}", file=sys.stderr, flush=True)
             source_pages = {s["page"] for s in answer["sources"]}
             if suite in {"golden", "review"}:
-                matched = answer["kind"] == case["expected_kind"] and set(case["expected_fact_sources"]).issubset(
-                    {source["source_id"] for source in answer["sources"]})
+                matched = answer["kind"] == case["expected_kind"] and source_expectation_matches(
+                    case["expected_fact_sources"], case.get("acceptable_source_alternatives"),
+                    (source["source_id"] for source in answer["sources"]))
                 if suite == "review" and matched:
                     matched = all(any(source["source_id"] == e["source_id"] and (
                         e["page"] is None or (source["page"] is not None
@@ -93,6 +104,7 @@ async def evaluate(mode, suite="mvp", max_cases=None, retrieval=None, case_ids=N
                     "answer_reason": answer.get("reason"),
                     "latency_ms": latency_ms,
                     "generation_check": diagnostics.get("check"),
+                    "generation_guard_reason": diagnostics.get("guard_reason"),
                     "human_correct": None,
                     "human_expected_kind": None,
                     "reviewer": None,

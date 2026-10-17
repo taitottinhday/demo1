@@ -38,7 +38,7 @@
   ],
   "files": {
     "eval/retrieval-dev.jsonl": "a84b1d395dbda7062260d9f654423f63c683be420780ff07e904f5d5df5299db",
-    "evaluation/admissions_2026_golden.jsonl": "920b562c8bb9c5f69b6ab16fa0488e05b9f270cc010ebe59fd5eede6d8564d68",
+    "evaluation/admissions_2026_golden.jsonl": "5d485c49c4d33aefdb181d5d9a0e1883fbd95cc651d2888628582206006a69c4",
     "extracted/hust-admissions-k71/page-001.json": "e11a4def63542eb618ed492bc3c997db7eef5acdc60c61b0c3c0077c4360c05d",
     "extracted/hust-admissions-k71/page-001.txt": "c9354795e4d9256aa87e0e9b71fc817c9e8b3f49d8fc7fca38bf1e6e4bf314aa",
     "extracted/hust-admissions-k71/page-002.json": "6f011783771c6fc16faafd3625c68f47e57dda48da554e95d4b86e0f2321c7f4",
@@ -357,14 +357,14 @@
     "raw/thong-tin-tuyen-sinh-dai-hoc-2026f.pdf": "9aea5b7b9afb53c185514bba4613dc7f30b3656e4ee5db44e26c42985f89ef7f",
     "raw/tsa_regulation_2026.pdf": "a9e3724b1f933594b838bf99d641ff14dbfb77cf7b19ee882d79f2f79288cb45",
     "raw/tuition_2026_2027.pdf": "3a0d3a2a7fa60720a83764b77d9fb414d94690450c095cfa5c190755ed425009",
-    "README-data.md": "51e88fc2b352c2d6bc0caa98b76f5471a967eab997a79637994f076e8fbea8b7",
+    "README-data.md": "3924c6250c546baae7994d5dcd0c88b9925f2a2fd925328449eeb5e06551f156",
     "schemas/chunk.schema.json": "648ca1327649bf462cc89d14972236477582bd48b65e240637b68afb2b1be3ea",
     "schemas/record.schema.json": "312173fc0fed6560e5562c49c16f851bb7f34ea51fd2616a5b68c2e488c8ff21",
     "source_catalog.json": "0d8e5301ab7384898f9bd21cba4f32ea250f3dd3e50a90ee017025224bda4c6d",
     "sources.md": "3bfe88c10c6e4ef5e23984f9b2c1105b6866650a742d4c76ede3ff018ab10d56"
   },
   "schema_version": 2,
-  "runtime_integration": "pending_adapter",
+  "runtime_integration": "normalized_records_chunks_via_knowledge_adapter",
   "pipeline_files": {
     "scripts/normalize_admissions_data.py": "45cc731b61932b7beb3af168311a2b746b3c4f45bb1c4f6c0939f7e196157ac3",
     "scripts/validate_admissions_data.py": "8b8c8c01a55848e4bf12d6745f5cfe86be16b1bfb25f42d90eff8bb98b71219a",
