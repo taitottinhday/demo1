@@ -1040,7 +1040,7 @@ function renderScoreResults(scoresByProgram,method){
       }
       if(scoreCalculation?.[entry.code]){
         const calc=scoreCalculation[entry.code];
-        copy.append(node('span','score-result-details',calc.method?`Điểm cơ sở: ${formatScore(calc.base_score)}/100 · Điểm thưởng IELTS: ${formatScore(calc.ielts_bonus)} · Ưu tiên: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`:`Điểm tổ hợp sau hệ số: ${formatScore(calc.subject_score)} · Tổng gốc 3 môn để tính ưu tiên: ${formatScore(calc.priority_base_score)} · Ưu tiên ban đầu: ${formatScore(calc.priority_before_scaling)} · Ưu tiên sau điều chỉnh: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`));
+        copy.append(node('span','score-result-details',calc.method?`Điểm cơ sở: ${formatScore(calc.base_score)}/100 · IELTS cộng: ${formatScore(calc.ielts_bonus_in_certificate_scale)}${calc.certificate_type?` theo thang ${calc.certificate_type}`:' điểm'} · Ưu tiên: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`:`Điểm tổ hợp sau hệ số: ${formatScore(calc.subject_score)} · Tổng gốc 3 môn để tính ưu tiên: ${formatScore(calc.priority_base_score)} · Ưu tiên ban đầu: ${formatScore(calc.priority_before_scaling)} · Ưu tiên sau điều chỉnh: ${formatScore(calc.priority_score)} · Công thức: ${calc.formula}.`));
       }
       copy.append(comparisons);card.append(copy,node('span',`score-result-state ${state[0]}`,state[1]));
     }

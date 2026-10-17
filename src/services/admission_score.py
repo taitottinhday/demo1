@@ -92,6 +92,7 @@ def calculate_alternative_score(method, primary_score, certificate_type=None, ie
     """Calculate HUST 2026 TSA/XTTN scores from user-entered components."""
     method = str(method).strip()
     bonus100 = ielts_bonus(ielts)
+    ielts_bonus_in_certificate_scale = bonus100
     if method == "TSA":
         tsa = _number(primary_score, "Điểm TSA phải từ 0 đến 100.", 0, 100)
         raw = min(Decimal(100), tsa + bonus100)
@@ -103,11 +104,13 @@ def calculate_alternative_score(method, primary_score, certificate_type=None, ie
         cert = _number(primary_score, "Điểm chứng chỉ không hợp lệ.", 0, XTTN_CERTIFICATE_MAX[certificate_type])
         if certificate_type == "SAT":
             total = cert + bonus100 * Decimal(16)
+            ielts_bonus_in_certificate_scale = bonus100 * Decimal(16)
             base = (Decimal(7) * total - Decimal(6150)) / Decimal(60) if total <= 1650 else (total - Decimal(1380)) / Decimal(3)
             formula = "XTTN(SAT) theo bảng HUST 2026 với điểm thưởng IELTS quy đổi theo thang SAT"
         else:
             scale = {"ACT": Decimal("37.8"), "A-Level": Decimal("31.5"), "AP": Decimal("15.75"), "IB": Decimal("47.25")} [certificate_type]
             bonus = bonus100 * Decimal(str(XTTN_CERTIFICATE_MAX[certificate_type])) / Decimal(100)
+            ielts_bonus_in_certificate_scale = bonus
             base = (cert + bonus) * Decimal(100) / scale
             formula = f"XTTN({certificate_type}) = (chứng chỉ + ĐTNN) × 100 / {scale}"
         base = max(Decimal(0), min(Decimal(100), base))
@@ -130,6 +133,8 @@ def calculate_alternative_score(method, primary_score, certificate_type=None, ie
         "formula": formula,
         "base_score": _round_score(base),
         "ielts_bonus": _round_score(bonus100),
+        "ielts_bonus_in_certificate_scale": _round_score(ielts_bonus_in_certificate_scale),
+        "certificate_type": certificate_type,
         "priority_score": _round_score(priority),
         "final_score": _round_score(final),
         "maximum": 100,

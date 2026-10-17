@@ -17,6 +17,7 @@ def test_xttn_12_sat_uses_official_piecewise_formula():
     result = calculate_alternative_score("XTTN 1.2", 1600, "SAT", ielts=7.0)
 
     assert result["base_score"] == 100.0
+    assert result["ielts_bonus_in_certificate_scale"] == 80.0
     assert result["final_score"] == 100.0
 
 
