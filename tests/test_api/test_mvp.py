@@ -647,6 +647,7 @@ def test_production_rejects_demo_credentials():
 
 @pytest.mark.asyncio
 async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
+    # Overviews now use source fields directly; explanation requests exercise the provider.
     cfg = Settings(_env_file=None, answer_mode="llm", openai_api_key="test-key")
     service = Admissions(knowledge, Store(tmp_path / "test.db"), cfg)
     fake = AsyncMock()
@@ -660,7 +661,7 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
         usage=SimpleNamespace(total_tokens=50),
     )
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("Giới thiệu chương trình IT1")
+        result = await service.answer("Giải thích chương trình IT1")
         assert result["kind"] == "fallback" and not result["sources"]
     fake.responses.create.side_effect = None
     fake.responses.create.return_value = SimpleNamespace(
@@ -677,7 +678,7 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
     )
     service.cache.clear()
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("Giới thiệu chương trình IT1")
+        result = await service.answer("Giải thích chương trình IT1")
         assert result["kind"] == "answered"
         assert result["response"].count("IT1 có chỉ tiêu năm 2026 là 300.") == 1
         assert result["response"].count("[1]") == 1
@@ -685,7 +686,7 @@ async def test_llm_quote_validation_and_failure(knowledge, tmp_path):
     service.cache.clear()
     fake.responses.create.side_effect = TimeoutError()
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("Giới thiệu chương trình IT1")
+        result = await service.answer("Giải thích chương trình IT1")
         assert result["kind"] == "error" and "9999" not in result["response"]
 
 
@@ -704,7 +705,7 @@ async def test_deepseek_grounded_generation_and_quota_bypass(knowledge, tmp_path
         quota = await service.answer("IT1 có chỉ tiêu bao nhiêu?")
         assert quota["kind"] == "answered" and quota["mode"] == "extractive"
         factory.assert_not_called()
-        result = await service.answer("Giới thiệu chương trình IT1")
+        result = await service.answer("Giải thích chương trình IT1")
         assert result["kind"] == "answered" and result["tokens"] == 60
         assert result["sources"][0]["page"] == 10
         assert factory.call_args.kwargs["base_url"] == "https://api.deepseek.com"
@@ -732,7 +733,7 @@ async def test_deepseek_rejects_empty_truncated_or_ungrounded_answers(knowledge,
         usage=SimpleNamespace(total_tokens=60),
     )
     with patch("src.services.admissions.AsyncOpenAI", return_value=fake):
-        result = await service.answer("Giới thiệu chương trình IT1")
+        result = await service.answer("Giải thích chương trình IT1")
     assert result["kind"] == "fallback" and result["sources"] == []
     assert result["mode"] == "llm" and result["tokens"] == 60
 

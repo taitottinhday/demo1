@@ -93,13 +93,19 @@ def program_profile(program):
 def question_intent(question):
     """Shared, deterministic interpretation; does not infer facts from user text."""
     q = normalize(question)
-    topic = next((topic for topic, terms in (
-        ("cutoff", ("diem chuan", "diem trung tuyen")),
-        ("scholarship", ("hoc bong",)), ("tuition", ("hoc phi",)),
+    topics = [topic for topic, terms in (
+        ("cutoff", ("diem chuan", "diem trung tuyen", "diem do")),
+        ("scholarship", ("hoc bong",)), ("tuition", ("hoc phi", "tien hoc")),
         ("language", ("ngoai ngu", "ielts", "vstep", "tieng anh", "hust ept")),
         ("quota", ("chi tieu",)), ("registration", ("dang ky",)),
+        ("methods", ("phuong thuc", "cach xet tuyen")),
         ("training", ("dao tao", "chuong trinh",)),
-    ) if any(term in q for term in terms)), "general")
+    ) if any(term in q for term in terms)]
+    topic = topics[0] if topics else "general"
+    task = "comparison" if any(t in q for t in ("so sanh", "khac nhau", "khac gi", "khac biet", " vs ", "phan van", "chon giua")) else (
+        "overview" if any(t in q for t in ("tat tan tat", "tong quan", "gioi thieu", "thong tin ve", "tim hieu ve", "tat ca thong tin"))
+        or (not topics and re.search(r"\b[A-Z]{2,8}-?\d{1,3}\s+(?:la (?:nganh )?gi|hoc gi|nganh gi)\b", q, re.I)) else "lookup"
+    )
     methods = []
     if "thpt" in q:
         methods.append("THPT")
@@ -111,12 +117,14 @@ def question_intent(question):
     elif "xttn" in q or "xet tuyen tai nang" in q:
         methods.extend(("XTTN 1.2", "XTTN 1.3"))
     stage = None
-    if topic == "language":
+    if "language" in topics:
         stage = "graduation" if any(t in q for t in ("dau ra", "tot nghiep")) else (
             "certificate" if any(t in q for t in ("quy doi", "xac thuc", "cong diem")) else "entrance"
         )
-    return {"topic": topic, "years": list(dict.fromkeys(re.findall(r"\b20\d{2}\b", q))),
+    return {"topic": topic, "topics": topics, "task": task,
+            "years": list(dict.fromkeys(re.findall(r"\b20\d{2}\b", q))),
             "methods": methods, "language_stage": stage,
+            "tuition_basis": "per_credit" if any(t in q for t in ("tin chi", "tchp")) else "annual",
             "needs_synthesis": any(t in q for t in ("giai thich", "vi sao", "tai sao", "khac nhau", "so sanh", "tong hop", "phan tich"))}
 
 
@@ -562,6 +570,11 @@ class Knowledge:
 
     def program_matches(self, question):
         """Return explicit program matches in the question, without using session context."""
+        parts = re.split(r"\b(?:và|va|với|voi|hay|vs)\b", question, flags=re.I)
+        if len(parts) > 1:
+            combined = {p["code"]: p for part in parts for p in self.program_matches(part)}
+            if len(combined) > 1:
+                return list(combined.values())
         q = normalize(question)
         codes = set(re.findall(PROGRAM_CODE_RE, question.upper()))
         matches = [p for p in self.programs if p["code"].replace("-", "") in {c.replace("-", "") for c in codes}]
@@ -706,6 +719,18 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
+        if fee_query and selected and any(term in norm for term in ["tin chi", "tchp"]) and "ky he" not in norm:
+            def table_name(value):
+                value = re.sub(r"\([^)]*\)", "", value.replace("CNTT:", ""))
+                return re.sub(r"\bkt\b", "ky thuat", program_label(value))
+            rows = [c for c in self.chunks if c.get("source_id") == "hust-tuition-2026-2027"
+                    and c.get("page") == 3 and c.get("record_type") == "table_row"
+                    and re.search(r"Mức học phí: \d+\.", c["text"])]
+            names = [table_name(p["name"]) for p in self.programs if p["code"] in selected
+                     and p.get("group") == "standard"]
+            return [dict(c, score=100) for c in rows
+                    if any(name and re.search(r"\b" + re.escape(name) + r"\b", table_name(c["text"]))
+                           for name in names)][:1]
         if (fee_query and not selected and "chuong trinh chuan" in norm
                 and any(term in norm for term in ["tin chi", "tchp"])):
             rows = [c for c in self.chunks if c.get("source_id") == "hust-tuition-2026-2027"

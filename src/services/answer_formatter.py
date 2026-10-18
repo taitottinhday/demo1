@@ -183,6 +183,12 @@ def format_answer(question, chunks, program=""):
             )
     q = normalize(question)
     first = chunks[0]
+    if program and "hoc phi" in q and any(word in q for word in ["tin chi", "tchp"]):
+        match = re.search(r"Mức học phí: (\d+)\.", first["text"])
+        if first.get("record_type") == "table_row" and match:
+            return (f"{program}: {match[1]} nghìn đồng/TCHP năm học 2026–2027. [1]\n\n"
+                    "Áp dụng cho học phần trong khung chương trình ở hai học kỳ chính. "
+                    "Đây là đơn giá tín chỉ học phí, không phải tổng học phí năm.")
     if (not program and "hoc phi" in q and "chuong trinh chuan" in q
             and any(word in q for word in ["tin chi", "tchp"])):
         rows = []
