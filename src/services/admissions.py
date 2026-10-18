@@ -75,6 +75,8 @@ class Admissions:
         """Resolve explicit program mentions before falling back to session context."""
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
+        if question_intent(question)["scope_request"] == "all_programs" and not explicit:
+            return {"scope": "general", "program": "", "explicit": False, "reset_program": True}
         if len(explicit) > 1:
             return {"scope": "general", "program": "", "explicit": True,
                     "programs": [p["code"] for p in explicit]}
@@ -309,6 +311,10 @@ class Admissions:
         code = program or state.get("program")
         year = state.get("year")
         q = normalize(question).strip(" ?!.")
+        if question_intent(question)["scope_request"] == "all_programs":
+            if not question_intent(question)["topics"] and topic in labels:
+                return f"{labels[topic]} {question}"
+            return question
         slots = re.fullmatch(r"(?:con |the |vay |ve )?(hoc phi|tien hoc|diem chuan|chi tieu|ngoai ngu|phuong thuc)(?: thi sao| la bao nhieu| nhu the nao)?", q)
         codes = state.get("programs", []) if state.get("topic") == "comparison" else [code]
         if (slots and 1 <= len(codes) <= 3 and all(c in {p['code'] for p in self.k.programs} for c in codes)
@@ -376,6 +382,66 @@ class Admissions:
                 self.k.manifest, question,
             )
         return result
+
+    def _all_programs(self, question, base):
+        parsed = question_intent(question)
+        if parsed["scope_request"] != "all_programs" or self.k.program_matches(question):
+            return None
+        topic = parsed["topic"]
+        if topic == "tuition":
+            if parsed["tuition_basis"] == "per_credit":
+                if "chuong trinh chuan" in normalize(question):
+                    return None
+                return dict(base, kind="clarification", reason="tuition_group",
+                            response="Đơn giá TCHP phụ thuộc nhóm chương trình và loại học phần. "
+                                     "Bạn muốn xem chương trình chuẩn, tiên tiến hay hợp tác quốc tế? Không thể dùng một đơn giá cho toàn bộ ngành.")
+            groups = {}
+            for chunk in self.k.chunks:
+                if chunk.get("kind") != "fee":
+                    continue
+                category, _, rest = chunk["text"].partition(": ")
+                name, _, price = rest.rpartition(": ")
+                price = price.split(". Đây là", 1)[0]
+                if not name or not price:
+                    continue
+                category = category.split("2026–2027, ", 1)[-1]
+                if "chuong trinh chuan" in normalize(question) and normalize(category) != "chuong trinh chuan":
+                    continue
+                if any(term in normalize(question) for term in ["tien tien", "elitech"]) and normalize(category) != "elitech":
+                    continue
+                groups.setdefault((category, price), []).append((name, chunk))
+            if not groups:
+                return None
+            lines, sources = [], []
+            for (category, price), rows in groups.items():
+                sources.append(self.k.citation(dict(rows[0][1],
+                    text=" ".join(row["text"] for _, row in rows),
+                    evidence=" ".join(row.get("evidence") or row["text"] for _, row in rows),
+                    end_page=max(row.get("end_page") or row["page"] for _, row in rows))))
+                names = "; ".join(dict.fromkeys(name for name, _ in rows))
+                lines.append(f"• {category}: {price} — {names}. [{len(sources)}]")
+            response = ("Học phí dự kiến K71 năm học 2026–2027 được chia theo nhóm chương trình, không phải một mức chung cho mọi ngành.\n\n"
+                        + "\n\n".join(lines)
+                        + "\n\nGiữ nguyên đơn vị năm học/học kỳ của từng dòng nguồn; không tự quy đổi giữa hai đơn vị. "
+                          "Đây là mức dự kiến, không phải hóa đơn cá nhân hoặc đơn giá TCHP.")
+        elif topic in {"quota", "cutoff"}:
+            chunks = ([c for c in self.k.chunks if c.get("kind") == "program"] if topic == "quota" else
+                      [c for c in self.k.chunks if c.get("cutoff_methods")])
+            if any(year != "2026" for year in parsed["years"]) or not chunks:
+                return dict(base, response="Bảng toàn bộ chương trình hiện chỉ đủ căn cứ cho năm 2026; hãy nêu mã ngành để tra năm lịch sử.")
+            sources = [self.k.citation(c) for c in chunks]
+            lines = []
+            for i, c in enumerate(chunks, 1):
+                if topic == "quota":
+                    lines.append(f"• {c['code']} — {c['title']}: {c.get('quota', next(p['quota'] for p in self.k.programs if p['code'] == c['code']))}. [{i}]")
+                else:
+                    text = format_answer(question, [c], c["program_code"])
+                    lines.append(re.sub(r"\[1\]", f"[{i}]", text))
+            response = ("Chỉ tiêu" if topic == "quota" else "Điểm chuẩn") + " các chương trình năm 2026:\n\n" + "\n\n".join(lines)
+        else:
+            return None
+        return dict(base, kind="answered", reason="grounded_all_programs", response=response, sources=sources,
+                    next_steps=["Đối chiếu dòng chương trình và đơn vị trong nguồn", "Nêu mã chương trình nếu muốn xem chi tiết"])
 
     async def _program_request(self, question, context, base):
         """Compose bounded, source-backed program dossiers using the same field readers."""
@@ -509,6 +575,9 @@ class Admissions:
         guard = self.guard(question)
         if guard:
             return dict(base, response=guard, reason="guardrail")
+        all_programs = self._all_programs(question, base)
+        if all_programs is not None:
+            return all_programs
         dossier = await self._program_request(question, context, base)
         if dossier is not None:
             return dossier
@@ -666,6 +735,8 @@ class Admissions:
         source_policy = (
             all(c.get("kind") == "fee" for c in chunks)
             or all(c.get("kind") == "overview" for c in chunks)
+            or (question_intent(question)["scope_request"] == "all_programs"
+                and question_intent(question)["topic"] in {"language", "methods"})
             or ("hoc phi" in q and any(w in q for w in ["tin chi", "tchp"])
                 and all(c.get("record_type") == "table_row" for c in chunks))
             or (not answer_program and "phuong thuc" in q)

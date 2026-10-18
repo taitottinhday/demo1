@@ -122,6 +122,9 @@ def question_intent(question):
             "certificate" if any(t in q for t in ("quy doi", "xac thuc", "cong diem")) else "entrance"
         )
     return {"topic": topic, "topics": topics, "task": task,
+            "scope_request": "all_programs" if re.search(
+                r"\b(?:(?:tat ca|toan bo|moi|cac|nhung) (?:cac )?(?:nganh|chuong trinh)|toan truong|(?:tat ca|toan bo)(?!\s+(?:thong tin|chi tiet)))\b", q
+            ) else None,
             "years": list(dict.fromkeys(re.findall(r"\b20\d{2}\b", q))),
             "methods": methods, "language_stage": stage,
             "tuition_basis": "per_credit" if any(t in q for t in ("tin chi", "tchp")) else "annual",

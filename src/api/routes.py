@@ -771,7 +771,7 @@ async def chat(body: ChatInput, request: Request, row=Depends(candidate)):
         answer_program = classification["program"] if scope == "program" else ""
         # Keep an explicitly selected program as the next-turn context even when the
         # current question is general; the answer itself must still use general scope.
-        stored_program = "" if len(classification.get("programs", [])) > 1 else answer_program or selected_program
+        stored_program = "" if classification.get("reset_program") or len(classification.get("programs", [])) > 1 else answer_program or selected_program
         rt["store"].context(row["id"], stored_program)
         started = time.perf_counter()
         if rt.get("source_error"):

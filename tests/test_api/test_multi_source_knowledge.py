@@ -573,6 +573,34 @@ async def test_all_catalog_programs_have_source_backed_overviews(knowledge, tmp_
 
 
 @pytest.mark.asyncio
+async def test_explicit_all_program_scope_replaces_selected_program(client):
+    first = (await client.post("/api/v1/chat", json={"message": "học phí CH1"})).json()
+    assert first["kind"] == "answered" and first["program"] == "CH1"
+    all_fees = (await client.post("/api/v1/chat", json={"message": "học phí tất cả các ngành"})).json()
+    assert all_fees["kind"] == "answered" and all_fees["scope"] == "general"
+    assert all_fees["program"] is None and all_fees["scope_program"] is None
+    assert all_fees["reason"] == "grounded_all_programs"
+    assert "Elitech" in all_fees["response"] and "học kỳ" in all_fees["response"]
+    assert len(all_fees["sources"]) > 1
+    ambiguous = (await client.post("/api/v1/chat", json={"message": "điều kiện ngoại ngữ là gì?"})).json()
+    assert ambiguous["kind"] == "clarification" and ambiguous["program"] is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question", [
+    "học phí các ngành", "học phí tất cả", "chỉ tiêu tất cả các ngành", "điểm chuẩn toàn trường",
+    "phương thức của mọi chương trình", "điều kiện ngoại ngữ các chương trình",
+])
+async def test_all_program_scope_is_topic_independent(knowledge, tmp_path, question):
+    service = Admissions(knowledge, Store(tmp_path / "all-scope.db"), Settings(_env_file=None))
+    scope = service.classify_scope(question, "CH1")
+    assert scope["scope"] == "general" and scope["program"] == "" and scope["reset_program"]
+    result = await service.answer(question, context="CH1")
+    assert result["scope"] == "general"
+    assert result.get("conversation_context", {}).get("program") != "CH1"
+
+
+@pytest.mark.asyncio
 async def test_comparison_planner_is_not_limited_to_it_programs(knowledge, tmp_path):
     service = Admissions(knowledge, Store(tmp_path / "all-comparisons.db"), Settings(_env_file=None))
     programs = knowledge.programs
