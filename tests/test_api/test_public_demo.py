@@ -38,7 +38,7 @@ def response_cookies(response):
     return {key: morsel.value for key, morsel in parsed.items()}
 
 
-def test_public_staff_and_admin_demo_use_isolated_sample_store(tmp_path):
+def test_public_staff_and_admin_demo_share_the_main_store(tmp_path):
     base_store = Store(tmp_path / "production" / "mvp.db")
     _, real_session = base_store.session(None, 24)
     real_ticket = base_store.create_ticket(
@@ -50,13 +50,12 @@ def test_public_staff_and_admin_demo_use_isolated_sample_store(tmp_path):
         staff_username="demo-officer",
         admin_username="demo-admin",
     )
-    demo_store = Store(tmp_path / "sandbox" / "demo.db")
-    seed_accounts(demo_store, demo_cfg)
-    seed_demo_tickets(demo_store, demo_cfg)
+    seed_accounts(base_store, demo_cfg)
+    seed_demo_tickets(base_store, demo_cfg)
     app.state.runtime = {
         "settings": demo_cfg,
         "store": base_store,
-        "demo_runtime": {"settings": demo_cfg, "store": demo_store, "mailer": None},
+        "demo_runtime": {"settings": demo_cfg, "store": base_store, "mailer": None},
     }
 
     assert routes.demo_status(request_with_cookie()) == {"enabled": True}
@@ -71,8 +70,8 @@ def test_public_staff_and_admin_demo_use_isolated_sample_store(tmp_path):
         "username": "demo-officer",
     }
     staff_tickets = routes.queue(staff_request, user="demo-officer")
-    assert len(staff_tickets) == 3
-    assert all("Câu hỏi mẫu:" in ticket["summary"] for ticket in staff_tickets)
+    assert len(staff_tickets) == 4
+    assert sum("Câu hỏi mẫu:" in ticket["summary"] for ticket in staff_tickets) == 3
 
     admin_response = Response()
     assert routes.demo_admin_login(request_with_cookie(), admin_response)["demo"] is True
@@ -84,8 +83,7 @@ def test_public_staff_and_admin_demo_use_isolated_sample_store(tmp_path):
         "authenticated": True,
         "username": "demo-admin",
     }
-    assert admin_api.runtime(admin_request)["store"] is demo_store
-    assert AdminStore(base_store).tickets()["total"] == 1
+    assert admin_api.runtime(admin_request)["store"] is base_store
+    assert AdminStore(base_store).tickets()["total"] == 4
     assert base_store.ticket(real_ticket["id"])["summary"] == "REAL-ONLY confidential record"
-    assert AdminStore(demo_store).tickets()["total"] == 3
     assert admin_api.runtime(admin_request)["mailer"] is None

@@ -98,21 +98,25 @@ def create_app(settings=None):
         except Exception as exc:
             source_error = str(exc)
             logging.warning("Nguồn chưa sẵn sàng: %s", type(exc).__name__)
+        # Demo sessions intentionally use the same persistent store as normal
+        # accounts. This lets a mentor submit a ticket in the public flow and
+        # immediately open it from the no-login staff/admin demo. The demo
+        # identities are seeded into that store, while the demo runtime keeps
+        # email delivery disabled so testing never sends a real notification.
         demo_cfg = cfg.model_copy(update={
             "staff_username": "demo-officer",
             "staff_password": "demo-only-unused",
             "admin_username": "demo-admin",
             "admin_password": "demo-only-unused",
         })
-        demo_store = Store(state_dir / "demo" / "mvp.db")
-        seed_accounts(demo_store, demo_cfg)
-        if not demo_store.tickets():
-            seed_demo_tickets(demo_store, demo_cfg)
+        seed_accounts(store, demo_cfg)
+        if not any(str(ticket.get("request_key", "")).startswith("demo-seed-") for ticket in store.tickets()):
+            seed_demo_tickets(store, demo_cfg)
         demo_runtime = {
             "settings": demo_cfg,
-            "store": demo_store,
+            "store": store,
             "knowledge": knowledge,
-            "admissions": Admissions(knowledge, demo_store, demo_cfg),
+            "admissions": Admissions(knowledge, store, demo_cfg),
             "mailer": None,
             "source_error": source_error,
         }
@@ -126,7 +130,6 @@ def create_app(settings=None):
             "demo_runtime": demo_runtime,
         }
         store.purge(cfg.session_hours)
-        demo_store.purge(cfg.session_hours)
 
         async def cleanup():
             while True:

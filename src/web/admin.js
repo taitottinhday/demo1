@@ -312,7 +312,7 @@ $('login-form').addEventListener('submit',async e=>{e.preventDefault();$('login-
 $('logout').onclick=async()=>{try{await api('/admin/logout',{method:'POST'});location.reload();}catch(e){fail(e);}};
 const demoLoginButton=node('button','secondary demo-login-button','Vào demo admin, không cần đăng nhập');
 demoLoginButton.type='button';demoLoginButton.hidden=true;$('login-panel').append(demoLoginButton);
-const demoLoginNote=node('p','login-help','Demo dùng ticket mẫu riêng, không gửi email và không tác động dữ liệu thật.');
+const demoLoginNote=node('p','login-help','Demo dùng chung dữ liệu ticket với môi trường đang chạy để kiểm thử luồng; không gửi email thật.');
 demoLoginNote.hidden=true;$('login-panel').append(demoLoginNote);
 fetch('/api/v1/demo/status').then(r=>r.json()).then(data=>{demoLoginButton.hidden=!data.enabled;demoLoginNote.hidden=!data.enabled;}).catch(()=>{});
 demoLoginButton.onclick=async()=>{demoLoginButton.disabled=true;try{const response=await fetch('/api/v1/demo/admin',{method:'POST',credentials:'include'});if(!response.ok)throw new Error('Không thể mở phiên demo. Vui lòng thử lại.');location.reload();}catch(error){$('login-error').textContent=error.message;demoLoginButton.disabled=false;}};
