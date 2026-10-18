@@ -187,6 +187,16 @@ Kiểm thử browser tùy chọn (không cần để chạy app): cài `playwrig
 
 ## Docker và máy khác
 
+Chat hỗ trợ tổng quan chương trình (ví dụ “tất tần tật về IT1”), so sánh tối đa
+3 chương trình, hỏi nhiều mục và hỏi tiếp “còn học phí?” sau một lượt so sánh.
+Luồng dùng chung lấy từng trường có nguồn: chỉ tiêu, phương thức, học phí, ngoại
+ngữ và điểm chuẩn; mục thiếu căn cứ được ghi rõ thay vì từ chối cả câu. Có thể dùng
+tên gọi/mã kết hợp, ví dụ “so sánh tiền học IT1 với trí tuệ nhân tạo”. Mã gõ sai cần
+xác nhận, không tự sửa. Tổng quan không thay thế đề cương môn học hay tư vấn chọn
+ngành cá nhân. Những luồng tra dữ kiện này không cần gọi LLM; câu giải thích vẫn
+đi qua provider và kiểm chứng hiện có. Kiểm thử phát triển bao phủ tổng quan cả
+68 mã và so sánh chỉ tiêu từng cặp xuyên danh mục; chưa thay thế nghiệm thu accuracy.
+
 ```powershell
 docker compose up --build
 ```

@@ -1,4 +1,5 @@
 import asyncio
+import difflib
 import json
 import re
 import time
@@ -74,7 +75,16 @@ class Admissions:
         """Resolve explicit program mentions before falling back to session context."""
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
+        if question_intent(question)["scope_request"] == "all_programs" and not explicit:
+            return {"scope": "general", "program": "", "explicit": False, "reset_program": True}
+        if len(explicit) > 1:
+            return {"scope": "general", "program": "", "explicit": True,
+                    "programs": [p["code"] for p in explicit]}
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        if "phuong thuc" in normalized and not explicit and any(
+            term in normalized for term in ["hust", "cac phuong thuc", "toan truong"]
+        ):
+            return {"scope": "general", "program": "", "explicit": False}
         if admission_charge_label(question) or ("k01" in normalized and "he so" in normalized):
             return {"scope": "general", "program": "", "explicit": False}
         if "hoc bong" in normalized and not explicit:
@@ -99,8 +109,6 @@ class Admissions:
         )
         if normalized_postgraduate_fee:
             return {"scope": "general", "program": "", "explicit": False}
-        if len(explicit) > 1:
-            return {"scope": "ambiguous", "program": "", "explicit": True}
         if explicit:
             return {"scope": "program", "program": explicit[0]["code"], "explicit": True}
         if any(marker in normalized for marker in GENERAL_SCOPE_MARKERS):
@@ -295,11 +303,25 @@ class Admissions:
     def resolve_followup(self, question, conversation=None, program=""):
         """Expand only short, whitelisted continuations from non-personal turn metadata."""
         state = conversation or {}
-        labels = {"cutoff": "điểm chuẩn", "tuition": "học phí", "language": "điều kiện ngoại ngữ"}
+        labels = {"cutoff": "điểm chuẩn", "tuition": "học phí", "language": "điều kiện ngoại ngữ",
+                  "quota": "chỉ tiêu", "methods": "phương thức xét tuyển", "overview": "tổng quan"}
+        if state.get("tuition_basis") == "per_credit":
+            labels["tuition"] = "học phí theo tín chỉ"
         topic = state.get("topic")
         code = program or state.get("program")
         year = state.get("year")
         q = normalize(question).strip(" ?!.")
+        if question_intent(question)["scope_request"] == "all_programs":
+            if not question_intent(question)["topics"] and topic in labels:
+                return f"{labels[topic]} {question}"
+            return question
+        slots = re.fullmatch(r"(?:con |the |vay |ve )?(hoc phi|tien hoc|diem chuan|chi tieu|ngoai ngu|phuong thuc)(?: thi sao| la bao nhieu| nhu the nao)?", q)
+        codes = state.get("programs", []) if state.get("topic") == "comparison" else [code]
+        if (slots and 1 <= len(codes) <= 3 and all(c in {p['code'] for p in self.k.programs} for c in codes)
+                and type(year) is int and 2000 <= year <= 2099):
+            prefix = "So sánh " if len(codes) > 1 else ""
+            slot = "học phí theo tín chỉ" if slots[1] in {"hoc phi", "tien hoc"} and state.get("tuition_basis") == "per_credit" else slots[1]
+            return f"{prefix}{slot} {' và '.join(codes)} năm {year}"
         # A reply to a program clarification supplies the missing slot, rather
         # than starting an unrelated query. Accept only a catalog code and
         # optional conversational particles, never arbitrary instructions.
@@ -324,11 +346,21 @@ class Admissions:
 
     async def answer(self, question, context="", history=None, scope=None, *, diagnostics=None, conversation=None):
         question = self.resolve_followup(question, conversation, context)
+        parsed = question_intent(question)
+        for topic, label in {"tuition": "Học phí", "cutoff": "Điểm chuẩn", "methods": "Phương thức"}.items():
+            if topic in parsed["topics"] and normalize(label) not in normalize(question):
+                question = label + ": " + question
         result = await self._answer(question, context, history, scope, diagnostics=diagnostics)
+        if "phuong thuc" in normalize(question):
+            for index, source in enumerate(result.get("sources", [])):
+                if source.get("page") == 2 and source.get("source_id") == self.k.primary_source_id:
+                    match = re.search(r"Các phương thức tuyển sinh:.*?(?=\s+2\.1\.|$)", source.get("excerpt", ""), re.S)
+                    if match:
+                        result["sources"][index] = dict(source, excerpt=match[0].strip())
         classification = self.classify_scope(question, context)
         parsed = question_intent(question)
-        topic = parsed["topic"] if parsed["topic"] in {"cutoff", "tuition", "language"} else None
-        if result["kind"] == "answered" and topic and classification["program"]:
+        topic = parsed["topic"] if parsed["topic"] in {"cutoff", "tuition", "language", "methods", "quota"} else None
+        if result["kind"] == "answered" and topic and classification["program"] and "conversation_context" not in result:
             years = parsed["years"]
             result["conversation_context"] = {"topic": topic, "program": classification["program"],
                                               "year": int(years[0]) if years else 2026}
@@ -336,6 +368,8 @@ class Admissions:
             years = parsed["years"]
             result["conversation_context"] = {"topic": topic, "program": "",
                                               "year": int(years[0]) if years else 2026}
+        if result.get("conversation_context") and parsed["tuition_basis"] == "per_credit":
+            result["conversation_context"]["tuition_basis"] = "per_credit"
         if "answer_sections" not in result:
             result["answer_sections"] = structure_answer(
                 result.get("response", ""),
@@ -347,6 +381,161 @@ class Admissions:
                 ],
                 self.k.manifest, question,
             )
+        return result
+
+    def _all_programs(self, question, base):
+        parsed = question_intent(question)
+        if parsed["scope_request"] != "all_programs" or self.k.program_matches(question):
+            return None
+        topic = parsed["topic"]
+        if topic == "tuition":
+            if parsed["tuition_basis"] == "per_credit":
+                if "chuong trinh chuan" in normalize(question):
+                    return None
+                return dict(base, kind="clarification", reason="tuition_group",
+                            response="Đơn giá TCHP phụ thuộc nhóm chương trình và loại học phần. "
+                                     "Bạn muốn xem chương trình chuẩn, tiên tiến hay hợp tác quốc tế? Không thể dùng một đơn giá cho toàn bộ ngành.")
+            groups = {}
+            for chunk in self.k.chunks:
+                if chunk.get("kind") != "fee":
+                    continue
+                category, _, rest = chunk["text"].partition(": ")
+                name, _, price = rest.rpartition(": ")
+                price = price.split(". Đây là", 1)[0]
+                if not name or not price:
+                    continue
+                category = category.split("2026–2027, ", 1)[-1]
+                if "chuong trinh chuan" in normalize(question) and normalize(category) != "chuong trinh chuan":
+                    continue
+                if any(term in normalize(question) for term in ["tien tien", "elitech"]) and normalize(category) != "elitech":
+                    continue
+                groups.setdefault((category, price), []).append((name, chunk))
+            if not groups:
+                return None
+            lines, sources = [], []
+            for (category, price), rows in groups.items():
+                sources.append(self.k.citation(dict(rows[0][1],
+                    text=" ".join(row["text"] for _, row in rows),
+                    evidence=" ".join(row.get("evidence") or row["text"] for _, row in rows),
+                    end_page=max(row.get("end_page") or row["page"] for _, row in rows))))
+                names = "; ".join(dict.fromkeys(name for name, _ in rows))
+                lines.append(f"• {category}: {price} — {names}. [{len(sources)}]")
+            response = ("Học phí dự kiến K71 năm học 2026–2027 được chia theo nhóm chương trình, không phải một mức chung cho mọi ngành.\n\n"
+                        + "\n\n".join(lines)
+                        + "\n\nGiữ nguyên đơn vị năm học/học kỳ của từng dòng nguồn; không tự quy đổi giữa hai đơn vị. "
+                          "Đây là mức dự kiến, không phải hóa đơn cá nhân hoặc đơn giá TCHP.")
+        elif topic in {"quota", "cutoff"}:
+            chunks = ([c for c in self.k.chunks if c.get("kind") == "program"] if topic == "quota" else
+                      [c for c in self.k.chunks if c.get("cutoff_methods")])
+            if any(year != "2026" for year in parsed["years"]) or not chunks:
+                return dict(base, response="Bảng toàn bộ chương trình hiện chỉ đủ căn cứ cho năm 2026; hãy nêu mã ngành để tra năm lịch sử.")
+            sources = [self.k.citation(c) for c in chunks]
+            lines = []
+            for i, c in enumerate(chunks, 1):
+                if topic == "quota":
+                    lines.append(f"• {c['code']} — {c['title']}: {c.get('quota', next(p['quota'] for p in self.k.programs if p['code'] == c['code']))}. [{i}]")
+                else:
+                    text = format_answer(question, [c], c["program_code"])
+                    lines.append(re.sub(r"\[1\]", f"[{i}]", text))
+            response = ("Chỉ tiêu" if topic == "quota" else "Điểm chuẩn") + " các chương trình năm 2026:\n\n" + "\n\n".join(lines)
+        else:
+            return None
+        return dict(base, kind="answered", reason="grounded_all_programs", response=response, sources=sources,
+                    next_steps=["Đối chiếu dòng chương trình và đơn vị trong nguồn", "Nêu mã chương trình nếu muốn xem chi tiết"])
+
+    async def _program_request(self, question, context, base):
+        """Compose bounded, source-backed program dossiers using the same field readers."""
+        parsed = question_intent(question)
+        programs = self.k.program_matches(question)
+        catalog = {p["code"].replace("-", ""): p for p in self.k.programs}
+        prefixes = {re.match(r"[A-Z]+", code)[0] for code in catalog}
+        mentioned = re.findall(r"\b[A-Z]{2,8}(?:-[A-Z]{1,3})?-?\d{1,3}\b", question.upper())
+        invalid = [code for code in mentioned if code.replace("-", "") not in catalog
+                   and re.match(r"[A-Z]+", code.replace("-", ""))[0] in prefixes]
+        if invalid:
+            suggestions = difflib.get_close_matches(invalid[0].replace("-", ""), list(catalog), n=3, cutoff=0.65)
+            message = f"Mã {invalid[0]} chưa có trong danh mục đã nạp."
+            if suggestions:
+                message += " Bạn muốn nói " + ", ".join(suggestions) + "? Hãy xác nhận mã đúng."
+            return dict(base, kind="clarification", reason="unknown_program", response=message)
+        fields = [topic for topic in parsed["topics"] if topic in {"quota", "methods", "tuition", "language", "cutoff"}]
+        compound = parsed["task"] in {"comparison", "overview"} or len(programs) > 1 or len(fields) > 1
+        if not compound:
+            return None
+        if not programs and context in catalog:
+            programs = [catalog[context]]
+        minimum = 2 if parsed["task"] == "comparison" else 1
+        if len(programs) < minimum or len(programs) > 3:
+            return dict(base, kind="clarification", reason="comparison_programs",
+                        response="Hãy nêu hai hoặc ba mã/tên chương trình để so sánh." if minimum == 2 else
+                        "Bạn muốn xem tổng quan chương trình nào? Hãy nêu mã hoặc tên chương trình.")
+        cache_key = ("program_dossier", self.k.manifest["version"], normalize(question), context)
+        if cache_key in self.cache:
+            value, created = self.cache[cache_key]
+            if time.time() - created < 3600:
+                return dict(value, cached=True, tokens=0)
+        fields = fields or ["quota", "methods", "tuition", "language", "cutoff"]
+        labels = {"quota": "Chỉ tiêu", "methods": "Phương thức xét tuyển", "tuition": "Học phí",
+                  "language": "Điều kiện ngoại ngữ đầu vào", "cutoff": "Điểm chuẩn"}
+        year = int(parsed["years"][0]) if parsed["years"] else 2026
+        sources, source_keys, parts = [], {}, []
+        available_fields = 0
+
+        def cite(text, citations):
+            mapping = {}
+            for i, source in enumerate(citations, 1):
+                key = (source["source_id"], source.get("page"), source.get("end_page"),
+                       source.get("version"), source.get("excerpt"))
+                if key not in source_keys:
+                    sources.append(source)
+                    source_keys[key] = len(sources)
+                mapping[i] = source_keys[key]
+            return re.sub(r"\[(\d+)\]", lambda m: f"[{mapping[int(m[1])]}]" if int(m[1]) in mapping else "", text)
+
+        # Deterministic field readers prevent a missing optional field or provider
+        # outage from discarding the whole comparison. No applicant history is used.
+        reader = Admissions(self.k, self.store, self.settings.model_copy(update={"answer_mode": "extractive"}))
+        for program in programs:
+            code = program["code"]
+            chunk = next(c for c in self.k.chunks if c.get("kind") == "program" and c.get("code") == code)
+            lines = [cite(f"{code} — {program['name']}. [1]", [self.k.citation(chunk)])]
+            if program.get("note"):
+                lines.append(cite(f"Ghi chú trong bảng: {program['note']}. [1]", [self.k.citation(chunk)]))
+            for field in fields:
+                query = f"{labels[field]} {code} năm {year}"
+                if field == "tuition" and parsed["tuition_basis"] == "per_credit":
+                    query = f"Học phí theo tín chỉ {code} năm {year}"
+                if field == "language" and parsed["language_stage"] == "graduation":
+                    query = f"Chuẩn ngoại ngữ đầu ra {code} năm {year}"
+                if field == "cutoff" and parsed["methods"]:
+                    query += " theo " + " và ".join(parsed["methods"])
+                answer = await reader.answer(query, code)
+                if answer["kind"] == "answered" and answer.get("sources"):
+                    available_fields += 1
+                    text = cite(answer["response"], answer["sources"])
+                    lines.append(f"• {labels[field]}: {text}")
+                else:
+                    lines.append(f"• {labels[field]}: chưa đủ căn cứ cho mục này; cần đối chiếu nguồn hoặc cán bộ.")
+            parts.append("\n".join(lines))
+        if not available_fields:
+            return dict(base, kind="clarification", reason="missing_requested_fields",
+                        response="Mình đã xác định chương trình bạn hỏi nhưng chưa đủ nguồn cho các mục được yêu cầu. "
+                                 "Bạn có thể hỏi mục khác hoặc chuyển cán bộ đối chiếu; mình không dùng dữ kiện khác phạm vi để thay thế.")
+        comparison = len(programs) > 1
+        heading = ("So sánh " if comparison else "Tổng quan ") + " và ".join(p["code"] for p in programs)
+        response = f"{heading} theo thông tin tuyển sinh năm {year}.\n\n" + "\n\n".join(parts)
+        response += ("\n\nChỉ trình bày các mục có nguồn; không suy ra chương trình nào tốt hơn hoặc bảo đảm trúng tuyển. "
+                     "Kho tuyển sinh chưa thay thế đề cương môn học/chuẩn đầu ra nghề nghiệp chi tiết.")
+        state = {"topic": "comparison", "programs": [p["code"] for p in programs], "year": year} if comparison else {
+            "topic": "overview", "program": programs[0]["code"], "year": year}
+        result = dict(base, kind="answered", reason="grounded_program_dossier", response=response, sources=sources,
+                    conversation_context=state,
+                    next_steps=["Hỏi tiếp học phí, ngoại ngữ hoặc điểm chuẩn của các chương trình trên",
+                                "Mở tài liệu nguồn để đối chiếu điều kiện và phạm vi áp dụng"])
+        if "[đã ẩn" not in question and not re.search(r"\b(?:toi|em|minh)\b", normalize(question)):
+            if len(self.cache) >= 200:
+                self.cache.pop(next(iter(self.cache)))
+            self.cache[cache_key] = (result, time.time())
         return result
 
     async def _answer(self, question, context="", history=None, scope=None, *, diagnostics=None):
@@ -386,6 +575,12 @@ class Admissions:
         guard = self.guard(question)
         if guard:
             return dict(base, response=guard, reason="guardrail")
+        all_programs = self._all_programs(question, base)
+        if all_programs is not None:
+            return all_programs
+        dossier = await self._program_request(question, context, base)
+        if dossier is not None:
+            return dossier
         cutoff_request = question_intent(question)["topic"] == "cutoff"
         if cutoff_request:
             historical = any(year in q for year in ["2024", "2025"])
@@ -539,6 +734,14 @@ class Admissions:
         cutoff_fact = cutoff_request and all(c.get("topic") == "cutoff" for c in chunks)
         source_policy = (
             all(c.get("kind") == "fee" for c in chunks)
+            or all(c.get("kind") == "overview" for c in chunks)
+            or (question_intent(question)["scope_request"] == "all_programs"
+                and question_intent(question)["topic"] in {"language", "methods"})
+            or ("hoc phi" in q and any(w in q for w in ["tin chi", "tchp"])
+                and all(c.get("record_type") == "table_row" for c in chunks))
+            or (not answer_program and "phuong thuc" in q)
+            or (not answer_program and "chuong trinh chuan" in q
+                and "hoc phi" in q and any(w in q for w in ["tin chi", "tchp"]))
             or bool(admission_charge_label(question))
             or ("k01" in q and "he so" in q)
             or (not answer_program and "chuong trinh tien tien" in q
@@ -616,6 +819,7 @@ class Admissions:
             result["response"] = re.sub(r"\[(\d+)\]", lambda m: f"[{mapping[int(m[1])]}]", result["response"])
         followup = (
             "Nêu rõ năm và phương thức nếu muốn tra điểm khác" if cutoff_request else
+            "Đối chiếu nhóm ngành và loại học phần trong bảng nguồn" if "hoc phi" in q and any(w in q for w in ["tin chi", "tchp"]) else
             "Hỏi mức theo tín chỉ nếu muốn phân biệt với học phí năm dự kiến" if "hoc phi" in q else
             "Nêu rõ đầu vào, đầu ra hoặc xác thực chứng chỉ khi hỏi tiếp" if "ngoai ngu" in q else
             "Chọn tên học bổng để xem điều kiện cụ thể" if "hoc bong" in q else

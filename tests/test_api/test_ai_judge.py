@@ -274,6 +274,6 @@ async def test_concurrent_requests_cannot_exceed_paid_call_limit(knowledge, tmp_
         return {"response": "IT1: Khoa học máy tính. [1]", "tokens": 10}
 
     service.generate = AsyncMock(side_effect=generate)
-    results = await asyncio.gather(*[service.answer("Giới thiệu chương trình IT1") for _ in range(8)])
+    results = await asyncio.gather(*[service.answer("Giải thích chương trình IT1") for _ in range(8)])
     assert service.generate.await_count == 2
     assert sum(r["reason"] == "budget_limit" for r in results) == 6
