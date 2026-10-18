@@ -543,6 +543,25 @@ async def test_general_faqs_answer_completely_without_llm_or_inherited_program(k
 
 
 @pytest.mark.asyncio
+async def test_answer_layout_keeps_lists_and_registration_steps_together(knowledge, tmp_path):
+    service = Admissions(knowledge, Store(tmp_path / "answer-layout.db"), Settings(_env_file=None))
+    methods = await service.answer("HUST 2026 có các phương thức tuyển sinh nào?")
+    sections = methods["answer_sections"]
+    assert all(word in sections["short_answer"] for word in ["XTTN", "ĐGTD", "THPT"])
+    assert len([line for line in sections["conditions"] if line.startswith("•")]) == 4
+    steps = await service.answer("Đăng ký xét tuyển đánh giá tư duy như thế nào?")
+    sections = steps["answer_sections"]
+    assert "1." not in sections["short_answer"]
+    assert any(line.startswith("1.") for line in sections["conditions"])
+    assert any(line.startswith("2.") for line in sections["conditions"])
+    score = await service.answer("Điểm chuẩn CH2 năm 2026 theo THPT là bao nhiêu?")
+    assert "24,94" in score["response"] and "XTTN" not in score["response"]
+    scholarship = await service.answer("Học bổng Trần Đại Nghĩa dành cho ai và có các mức nào?")
+    assert all(term in scholarship["response"] for term in ["hộ nghèo", "50%", "100%", "học kỳ"])
+    assert len(scholarship["answer_sections"]["short_answer"]) < 220
+
+
+@pytest.mark.asyncio
 async def test_program_reply_completes_pending_tuition_question(client):
     first = (await client.post("/api/v1/chat", json={"message": "học phí của ngành vật liệu"})).json()
     assert first["kind"] == "clarification"

@@ -27,9 +27,6 @@ def structure_answer(response, sources, next_steps, manifest, question=""):
     first = paragraphs[0] if paragraphs else [""]
     short_answer = first[0]
     conditions = first[1:] + [line for paragraph in paragraphs[1:] for line in paragraph]
-    if short_answer.endswith(":") and len(short_answer) < 90 and conditions:
-        # Do not leave the main answer as an empty heading above all facts.
-        short_answer += " " + conditions.pop(0).removeprefix("• ")
     source_refs = []
     source_seen = set()
     for index, source in enumerate(sources or [], 1):
@@ -53,7 +50,8 @@ def structure_answer(response, sources, next_steps, manifest, question=""):
             "cutoff": "Phạm vi áp dụng", "scholarship": "Điều kiện và mức hỗ trợ",
             "language": "Điều kiện và lưu ý", "tuition": "Đơn vị và phạm vi học phí",
             "registration": "Các bước thực hiện",
-        }.get(question_intent(question)["topic"], "Thông tin bổ sung"),
+        }.get(question_intent(question)["topic"],
+              "Các phương thức xét tuyển" if "phuong thuc" in normalize(question) else "Thông tin bổ sung"),
         "short_answer": short_answer,
         "conditions": conditions,
         "source_note": " · ".join(
@@ -115,9 +113,14 @@ def format_answer(question, chunks, program=""):
             methods = list(c["cutoff_methods"])
         scores = "; ".join(f"{method}: {c['cutoff_methods'][method].replace('.', ',')}/{30 if method == 'THPT' else 100}"
                            for method in methods)
+        note = f"Tổ hợp gốc {c['base_combination']}."
+        if any(method != "THPT" for method in methods):
+            note += (" Điểm XTTN/TSA nêu trên là điểm chuẩn tương đương công bố trong bảng chính thức, "
+                     "không phải phép tự quy đổi điểm cá nhân.")
+        else:
+            note += " Mức này áp dụng cho phương thức điểm thi tốt nghiệp THPT."
         return (f"Điểm chuẩn {c.get('program_name', c['program_code'])} ({c['program_code']}) năm 2026: {scores}. [1]\n\n"
-                f"Tổ hợp gốc {c['base_combination']}. XTTN 1.2, XTTN 1.3 và TSA là điểm chuẩn tương đương "
-                "được công bố trong bảng chính thức, không phải phép tự quy đổi điểm cá nhân. [1]")
+                f"{note} [1]")
     if chunks and all(c.get("historical") and c.get("record_type") == "cutoff" for c in chunks):
         code = chunks[0].get("program_codes", [program])[0]
         year = chunks[0]["admission_year"]
@@ -154,6 +157,16 @@ def format_answer(question, chunks, program=""):
                     f"Tài liệu còn nêu học bổng tài trợ, gắn kết quê hương và trao đổi sinh viên quốc tế. [{index}]\n\n"
                     "Bạn muốn tìm hiểu loại nào? Điều kiện chính sách không đồng nghĩa chắc chắn được cấp; "
                     "hồ sơ và thời hạn cần theo thông báo từng đợt."
+                )
+            if names == ["tran dai nghia"] and all(term in normalize(chunk["text"]) for term in [
+                "ho ngheo", "ho can ngheo", "50%", "100%", "theo hoc ky"
+            ]):
+                return (
+                    f"Học bổng Trần Đại Nghĩa hỗ trợ sinh viên có hoàn cảnh kinh tế gia đình đặc biệt khó khăn, "
+                    f"có ý chí và nghị lực vươn lên. [{index}]\n\n"
+                    f"• Đối tượng: hộ nghèo, hộ cận nghèo hoặc hoàn cảnh kinh tế đặc biệt khó khăn khác. [{index}]\n"
+                    f"• Mức hỗ trợ: 50% hoặc 100% học phí, xét theo học kỳ. [{index}]\n\n"
+                    "Đáp ứng mô tả đối tượng không đồng nghĩa chắc chắn được cấp; hồ sơ và thời hạn cần theo thông báo từng đợt."
                 )
             for section in re.split(r"(?=\([1-5]\) Học bổng)", chunk["text"]):
                 if not re.match(r"\([1-5]\) Học bổng", section):
@@ -287,7 +300,8 @@ def format_answer(question, chunks, program=""):
         for i, chunk in enumerate(chunks, 1):
             methods = _admission_methods(chunk["text"])
             if len(methods) >= 3:
-                return "Các phương thức tuyển sinh chung toàn trường trong tài liệu HUST 2026:\n\n" + "\n".join(
+                return (f"HUST năm 2026 có xét tuyển tài năng (XTTN), xét điểm Đánh giá tư duy (ĐGTD/TSA), "
+                        f"xét điểm thi tốt nghiệp THPT và diện xét tuyển khác. [{i}]\n\n") + "\n".join(
                     f"• {item} [{i}]" for item in methods
                 )
     if first["kind"] in {"fee", "overview"}:
@@ -315,7 +329,7 @@ def format_answer(question, chunks, program=""):
                     if condition:
                         return f"{condition[0].rstrip(';')}. [{i}]"
                 return (
-                    "Có hai bước đăng ký khác nhau:\n\n"
+                    f"Bạn cần đăng ký dự thi ĐGTD và đăng ký nguyện vọng xét tuyển trên hai hệ thống riêng. [{i}]\n\n"
                     f"1. Đăng ký dự thi Đánh giá tư duy tại https://tsa.hust.edu.vn/dk. [{i}]\n"
                     "2. Đăng ký nguyện vọng xét tuyển bằng tài khoản thí sinh trên hệ thống của Bộ: "
                     f"https://thisinh.thitotnghiepthpt.edu.vn/Account/Login, theo kế hoạch chung. [{i}]\n\n"
