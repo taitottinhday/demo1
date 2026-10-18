@@ -518,6 +518,31 @@ def test_tsa_charge_guard_requires_independent_readable_evidence(knowledge, tmp_
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("question,expected,source_id", [
+    ("HUST 2026 có các phương thức tuyển sinh nào?", ["XTTN", "ĐGTD", "THPT", "diện cử tuyển"],
+     "hust-admission-guide-2026"),
+    ("Học phí theo tín chỉ học phí năm học 2026–2027 của chương trình chuẩn là bao nhiêu?",
+     ["700 nghìn đồng/TCHP", "680 nghìn đồng/TCHP", "620 nghìn đồng/TCHP", "không phải học phí cả năm"],
+     "hust-tuition-2026-2027"),
+    ("HUST năm 2026 có bao nhiêu ngành và chương trình?", ["43", "68"], "hust-admission-guide-2026"),
+    ("Điều kiện ngoại ngữ IELTS cho chương trình tiên tiến là gì?",
+     ["IELTS Academic từ 5.0", "VSTEP từ B1", "tiếng Anh từ 6.5"], "hust-admission-guide-2026"),
+])
+async def test_general_faqs_answer_completely_without_llm_or_inherited_program(knowledge, tmp_path, question, expected, source_id):
+    service = Admissions(knowledge, Store(tmp_path / "general-faq.db"),
+                         Settings(_env_file=None, answer_mode="llm", llm_provider="deepseek"))
+    answer = await service.answer(question, context="CH1")
+    assert answer["kind"] == "answered", answer
+    assert answer["mode"] == "extractive" and answer["tokens"] == 0
+    assert all(term in answer["response"] for term in expected), answer
+    assert {s["source_id"] for s in answer["sources"]} == {source_id}
+    if "tín chỉ" in question:
+        assert "Hỏi mức theo tín chỉ" not in " ".join(answer["next_steps"])
+    if "tiên tiến" in question:
+        assert "TROY" not in answer["response"]
+
+
+@pytest.mark.asyncio
 async def test_program_reply_completes_pending_tuition_question(client):
     first = (await client.post("/api/v1/chat", json={"message": "học phí của ngành vật liệu"})).json()
     assert first["kind"] == "clarification"

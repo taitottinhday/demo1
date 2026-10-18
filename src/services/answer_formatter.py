@@ -27,6 +27,9 @@ def structure_answer(response, sources, next_steps, manifest, question=""):
     first = paragraphs[0] if paragraphs else [""]
     short_answer = first[0]
     conditions = first[1:] + [line for paragraph in paragraphs[1:] for line in paragraph]
+    if short_answer.endswith(":") and len(short_answer) < 90 and conditions:
+        # Do not leave the main answer as an empty heading above all facts.
+        short_answer += " " + conditions.pop(0).removeprefix("• ")
     source_refs = []
     source_seen = set()
     for index, source in enumerate(sources or [], 1):
@@ -167,6 +170,20 @@ def format_answer(question, chunks, program=""):
             )
     q = normalize(question)
     first = chunks[0]
+    if (not program and "hoc phi" in q and "chuong trinh chuan" in q
+            and any(word in q for word in ["tin chi", "tchp"])):
+        rows = []
+        for i, chunk in enumerate(chunks, 1):
+            match = re.search(r"Chương trình: (.+?); Mức học phí: (\d+)\.", chunk["text"])
+            if match:
+                rows.append((i, match[1].rstrip("."), match[2]))
+        if len(rows) != 3:
+            return None
+        return ("Chương trình chuẩn năm học 2026–2027 có 3 mức đơn giá, tùy nhóm ngành; không có một mức chung cho tất cả:\n\n"
+                + "\n".join(f"• {amount} nghìn đồng/TCHP — ví dụ: {', '.join(name.split(', ')[:3])}. [{i}]"
+                            for i, name, amount in rows)
+                + "\n\nĐây là đơn giá cho học phần trong khung chương trình ở hai học kỳ chính, không phải học phí cả năm. "
+                "Tổng tiền phụ thuộc số TCHP đăng ký; đối chiếu đầy đủ nhóm ngành trong bảng nguồn.")
     if "chon" in q and any(term in q for term in ["thoi diem", "khi nao"]) and "tich hop" in q:
         for i, c in enumerate(chunks, 1):
             match = re.search(r"Sinh viên có thể xem xét.*?cuối năm thứ 3.*?\.", c["text"])
@@ -350,6 +367,15 @@ def format_answer(question, chunks, program=""):
                         "Nếu bạn dùng chứng chỉ ngoại ngữ để quy đổi điểm hoặc cộng điểm thưởng, "
                         f"chứng chỉ cần đăng ký xác thực trên https://ts-hn.hust.edu.vn/ theo quy định. [{i}]\n\n"
                         "Điều này không áp dụng thay cho chuẩn ngoại ngữ đầu ra."
+                    )
+                if "tien tien" in q:
+                    return (
+                        f"Chương trình tiên tiến giảng dạy bằng tiếng Anh yêu cầu đáp ứng một trong ba điều kiện ngoại ngữ đầu vào. [{i}]\n\n"
+                        f"• IELTS Academic từ 5.0 hoặc tương đương. [{i}]\n"
+                        f"• Chứng chỉ VSTEP từ B1. [{i}]\n"
+                        f"• Điểm thi tốt nghiệp THPT 2026 môn tiếng Anh từ 6.5. [{i}]\n\n"
+                        "Không bắt buộc đồng thời cả ba; đây là điều kiện đầu vào, đi kèm các điều kiện xét tuyển khác. "
+                        "Chỉ áp dụng cho nhóm tiên tiến giảng dạy bằng tiếng Anh, không áp chung cho mọi chương trình."
                     )
                 response = (
                     "Về ngoại ngữ đầu vào, tài liệu HUST 2026 quy định:\n\n"

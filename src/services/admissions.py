@@ -75,6 +75,10 @@ class Admissions:
         normalized = normalize(question)
         explicit = self.k.program_matches(question)
         selected = context if context in {p["code"] for p in self.k.programs} else ""
+        if "phuong thuc" in normalized and not explicit and any(
+            term in normalized for term in ["hust", "cac phuong thuc", "toan truong"]
+        ):
+            return {"scope": "general", "program": "", "explicit": False}
         if admission_charge_label(question) or ("k01" in normalized and "he so" in normalized):
             return {"scope": "general", "program": "", "explicit": False}
         if "hoc bong" in normalized and not explicit:
@@ -539,6 +543,10 @@ class Admissions:
         cutoff_fact = cutoff_request and all(c.get("topic") == "cutoff" for c in chunks)
         source_policy = (
             all(c.get("kind") == "fee" for c in chunks)
+            or all(c.get("kind") == "overview" for c in chunks)
+            or (not answer_program and "phuong thuc" in q)
+            or (not answer_program and "chuong trinh chuan" in q
+                and "hoc phi" in q and any(w in q for w in ["tin chi", "tchp"]))
             or bool(admission_charge_label(question))
             or ("k01" in q and "he so" in q)
             or (not answer_program and "chuong trinh tien tien" in q
@@ -616,6 +624,7 @@ class Admissions:
             result["response"] = re.sub(r"\[(\d+)\]", lambda m: f"[{mapping[int(m[1])]}]", result["response"])
         followup = (
             "Nêu rõ năm và phương thức nếu muốn tra điểm khác" if cutoff_request else
+            "Đối chiếu nhóm ngành và loại học phần trong bảng nguồn" if "hoc phi" in q and any(w in q for w in ["tin chi", "tchp"]) else
             "Hỏi mức theo tín chỉ nếu muốn phân biệt với học phí năm dự kiến" if "hoc phi" in q else
             "Nêu rõ đầu vào, đầu ra hoặc xác thực chứng chỉ khi hỏi tiếp" if "ngoai ngu" in q else
             "Chọn tên học bổng để xem điều kiện cụ thể" if "hoc bong" in q else

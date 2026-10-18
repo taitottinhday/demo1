@@ -706,6 +706,12 @@ class Knowledge:
                 if c["kind"] == "overview" and c.get("source_id") == self.primary_source_id
             ]
         fee_query = "hoc phi" in norm
+        if (fee_query and not selected and "chuong trinh chuan" in norm
+                and any(term in norm for term in ["tin chi", "tchp"])):
+            rows = [c for c in self.chunks if c.get("source_id") == "hust-tuition-2026-2027"
+                    and c.get("page") == 3 and c.get("record_type") == "table_row"
+                    and re.search(r"Mức học phí: \d+\.", c["text"])]
+            return [dict(c, score=100) for c in rows[:limit]]
         charge_chunks = self.admission_charge_chunks(question)
         if charge_chunks:
             return [dict(c, score=100) for c in charge_chunks[:limit]]
